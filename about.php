@@ -28,6 +28,7 @@ require_once(dirname(__FILE__).'/../../config/config.inc.php');
 require_once(dirname(__FILE__).'/../../init.php');
 
 include_once(dirname(__FILE__).'/paypal.php');
+include_once(dirname(__FILE__).'/backward_compatibility/Display.php');
 
 new PayPal();
 Context::getContext()->smarty->assign('iso_code',
