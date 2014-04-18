@@ -19,7 +19,7 @@
 *
 *  @author PrestaShop SA <contact@prestashop.com>
 *  @copyright  2007-2014 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @license	http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
@@ -41,7 +41,7 @@
 
 	<div class="clear"></div><hr />
 
-	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall'}" id="paypal_configuration">
+	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}" id="paypal_configuration">
 		{* PayPal configuration blocks *}
 		<div class="box">
 			<div style="line-height: 18px;">{$PayPal_content.expectations}</div>
@@ -86,46 +86,46 @@
 			<br /><br /><br />
 
 			{if (in_array($PayPal_WPS, $PayPal_allowed_methods) || in_array($PayPal_HSS, $PayPal_allowed_methods))}
-                <h4 class="inline">{$PayPal_content.sole_solution_section_title}</h4> <img src="{$PayPal_logo.BackOfficeCards}" height="22px"/>
-                <div class="clear"></div>
-                <div class="form-block">
-                    {if (in_array($PayPal_WPS, $PayPal_allowed_methods))}
-                        {* WEBSITE PAYMENT STANDARD *}
-                        <label for="paypal_payment_wps">
-                            <input type="radio" name="paypal_payment_method" id="paypal_payment_wps" value='{$PayPal_WPS}' {if $PayPal_payment_method == $PayPal_WPS}checked="checked"{/if} />
-                            {$PayPal_content.choose} {$PayPal_content.website_payment_standard}
-                            <br />
-                            <span class="description">{$PayPal_content.website_payment_standard_tagline}</span>
-                        </label>
-                    {/if}
+				<h4 class="inline">{$PayPal_content.sole_solution_section_title}</h4> <img src="{$PayPal_logo.BackOfficeCards}" height="22px"/>
+				<div class="clear"></div>
+				<div class="form-block">
+					{if (in_array($PayPal_WPS, $PayPal_allowed_methods))}
+						{* WEBSITE PAYMENT STANDARD *}
+						<label for="paypal_payment_wps">
+							<input type="radio" name="paypal_payment_method" id="paypal_payment_wps" value='{$PayPal_WPS}' {if $PayPal_payment_method == $PayPal_WPS}checked="checked"{/if} />
+							{$PayPal_content.choose} {$PayPal_content.website_payment_standard}
+							<br />
+							<span class="description">{$PayPal_content.website_payment_standard_tagline}</span>
+						</label>
+					{/if}
 
-                    {if (in_array($PayPal_HSS, $PayPal_allowed_methods))}
-                        {* WEBSITE PAYMENT PRO *}
-                        <br />
-                        <label for="paypal_payment_wpp">
-                            <input type="radio" name="paypal_payment_method" id="paypal_payment_wpp" value='{$PayPal_HSS}' {if $PayPal_payment_method == $PayPal_HSS}checked="checked"{/if} />
-                            {$PayPal_content.choose} {$PayPal_content.website_payment_pro}<br />
-                            <span class="description">{$PayPal_content.website_payment_pro_tagline}</span>
-                            <p class="toolbox">{$PayPal_content.website_payment_pro_disclaimer}</p>
-                        </label>
-                    {/if}
-                </div>
-            {/if}
+					{if (in_array($PayPal_HSS, $PayPal_allowed_methods))}
+						{* WEBSITE PAYMENT PRO *}
+						<br />
+						<label for="paypal_payment_wpp">
+							<input type="radio" name="paypal_payment_method" id="paypal_payment_wpp" value='{$PayPal_HSS}' {if $PayPal_payment_method == $PayPal_HSS}checked="checked"{/if} />
+							{$PayPal_content.choose} {$PayPal_content.website_payment_pro}<br />
+							<span class="description">{$PayPal_content.website_payment_pro_tagline}</span>
+							<p class="toolbox">{$PayPal_content.website_payment_pro_disclaimer}</p>
+						</label>
+					{/if}
+				</div>
+			{/if}
 
-            {if (in_array($PayPal_ECS, $PayPal_allowed_methods))}
-            <h4 class="inline">{$PayPal_content.additional_solution_tagline}</h4> <img src="{$PayPal_logo.LocalPayPalMarkSmall}" />
-            <div class="form-block">
-                {* EXPRESS CHECKOUT SOLUTION *}
-                <label for="paypal_payment_ecs">
-                    <input type="radio" name="paypal_payment_method" id="paypal_payment_ecs" value='{$PayPal_ECS}' {if $PayPal_payment_method == $PayPal_ECS}checked="checked"{/if} />
-                    {$PayPal_content.choose} {$PayPal_content.express_checkout}<br />
-                    <span class="description">{$PayPal_content.express_checkout_tagline}</span>
-                </label>
-            </div>
-            {/if}
+			{if (in_array($PayPal_ECS, $PayPal_allowed_methods))}
+			<h4 class="inline">{$PayPal_content.additional_solution_tagline}</h4> <img src="{$PayPal_logo.LocalPayPalMarkSmall}" />
+			<div class="form-block">
+				{* EXPRESS CHECKOUT SOLUTION *}
+				<label for="paypal_payment_ecs">
+					<input type="radio" name="paypal_payment_method" id="paypal_payment_ecs" value='{$PayPal_ECS}' {if $PayPal_payment_method == $PayPal_ECS}checked="checked"{/if} />
+					{$PayPal_content.choose} {$PayPal_content.express_checkout}<br />
+					<span class="description">{$PayPal_content.express_checkout_tagline}</span>
+				</label>
+			</div>
+			{/if}
 
-            <hr />
-        </div>
+			<hr />
+		</div>
 
 		{* SUBSCRIBE OR OPEN YOUR PAYPAL BUSINESS ACCOUNT *}
 		<div class="box" id="account">
@@ -187,11 +187,11 @@
 
 					<dl>
 						<dt><label for="api_username">{$PayPal_content.credentials_username} : </label></dt>
-						<dd><input type='text' name="api_username" id="api_username" value="{$PayPal_api_username}" autocomplete="off" /></dd>
+						<dd><input type='text' name="api_username" id="api_username" value="{$PayPal_api_username|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
 						<dt><label for="api_password">{$PayPal_content.credentials_password} : </label></dt>
-						<dd><input type='password' name="api_password" id="api_password" value="{$PayPal_api_password}" autocomplete="off" /></dd>
+						<dd><input type='password' name="api_password" id="api_password" value="{$PayPal_api_password|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
 						<dt><label for="api_signature">{$PayPal_content.credentials_signature} : </label></dt>
-						<dd><input type='text' name="api_signature" id="api_signature" value="{$PayPal_api_signature}" autocomplete="off" /></dd>
+						<dd><input type='text' name="api_signature" id="api_signature" value="{$PayPal_api_signature|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
 					</dl>
 					<div class="clear"></div>
 					<span class="description">{$PayPal_content.credentials_fields_disclaimer}</span>
@@ -205,7 +205,7 @@
 
 					<dl>
 						<dt><label for="api_business_account">{$PayPal_content.credentials_business_email} : </label></dt>
-						<dd><input type='text' name="api_business_account" id="api_business_account" value="{$PayPal_api_business_account}" autocomplete="off" /></dd>
+						<dd><input type='text' name="api_business_account" id="api_business_account" value="{$PayPal_api_business_account|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
 					</dl>
 				</div>
 
@@ -216,6 +216,25 @@
 				<p><span class="bold">2.</span> {$PayPal_content.setup_reminder_2}</p>
 
 				<h4>{$PayPal_content.configuration_options_title}</h4>
+				<div id="integral_evolution_solution" class="paypal-hide">
+					<p class="description">
+						{$PayPal_content.integral_evolution_solution}
+					</p>
+					<input type="radio" name="integral_evolution_solution" id="integral_evolution_solution_iframe" value="1" {if $PayPal_integral_evolution_solution == 1}checked="checked"{/if} /> <label for="integral_evolution_solution_iframe">{$PayPal_content.integral_evolution_solution_iframe}</label><br />
+					<input type="radio" name="integral_evolution_solution" id="integral_evolution_solution_no_iframe" value="0" {if $PayPal_integral_evolution_solution == 0}checked="checked"{/if} /> <label for="integral_evolution_solution_no_iframe">{$PayPal_content.integral_evolution_solution_no_iframe}</label><br/>
+					<div id="integral_evolution_template">
+						<p class="description">
+						{$PayPal_content.template_to_choose}
+						</p>
+						<img src="../modules/paypal/img/template.png" alt=""><br/>
+						<input type="radio" name="integral_evolution_template" id="integral_evolution_template_A" value="A" {if $PayPal_integral_evolution_template == "A"}checked="checked"{/if}  style="margin-left:60px"/> <label for="integral_evolution_template">A</label> &nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="integral_evolution_template" id="integral_evolution_template_B" value="B" {if $PayPal_integral_evolution_template == "B"}checked="checked"{/if} style="margin-left:80px"/> <label for="integral_evolution_template">B</label>&nbsp;&nbsp;&nbsp;&nbsp;
+						&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="integral_evolution_template" id="integral_evolution_template_C" value="C" {if $PayPal_integral_evolution_template == "C"}checked="checked"{/if} style="margin-left:70px" /> <label for="integral_evolution_template">C</label>&nbsp;&nbsp;&nbsp;&nbsp;
+					</div>
+					
+					
+				</div>
+
 				<div id="express_checkout_shortcut" class="paypal-hide">
 					<p>{$PayPal_content.express_checkout_shortcut_title}</p>
 					<p class="description">{$PayPal_content.express_checkout_shortcut_tagline}</p>

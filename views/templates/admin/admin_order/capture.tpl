@@ -23,16 +23,12 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<div id="container_express_checkout" style="float:right; margin: 10px 40px 0 0">
-	{if isset($use_mobile) && $use_mobile}
-		<div style="margin-left:30px">
-			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl}modules/paypal/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" alt="" />
-		</div>
-	{else}
-		<img id="payment_paypal_express_checkout" src="https://www.paypal.com/{$PayPal_lang_code}/i/btn/btn_xpressCheckout.gif" alt="" />
-	{/if}
-	{if isset($include_form) && $include_form}
-		{include file="$template_dir./express_checkout_shortcut_form.tpl"}
-	{/if}
-</div>
-<div class="clearfix"></div>
+<br />
+<fieldset {if isset($ps_version) && ($ps_version < '1.5')}style="width: 400px"{/if}>
+	<legend><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" />{l s='PayPal Capture' mod='paypal'}</legend>
+	<p><b>{l s='Information:' mod='paypal'}</b> {l s='Funds ready to be captured before shipping' mod='paypal'}</p>
+	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
+		<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
+		<p class="center"><input type="submit" class="button" name="submitPayPalCapture" value="{l s='Get the money' mod='paypal'}" onclick="return confirm('{l s='Are you sure you want to capture?' mod='paypal'}');" /></p>
+	</form>
+</fieldset>
