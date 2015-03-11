@@ -365,9 +365,18 @@ class PaypalExpressCheckout extends Paypal
 		}
 		else
 		{
-			$fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = sprintf('%.2f', $shipping_cost_wt);
-			$fields['PAYMENTREQUEST_0_ITEMAMT'] = Tools::ps_round($total, $this->decimals);
-			$fields['PAYMENTREQUEST_0_AMT'] = sprintf('%.2f', ($total + $fields['PAYMENTREQUEST_0_SHIPPINGAMT']));
+			if($currency->iso_code == "HUF")
+			{ 
+				$fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = round($shipping_cost_wt); 
+				$fields['PAYMENTREQUEST_0_ITEMAMT'] = Tools::ps_round($total, $this->decimals); 
+				$fields['PAYMENTREQUEST_0_AMT'] = sprintf('%.2f', ($total + $fields['PAYMENTREQUEST_0_SHIPPINGAMT'])); 
+			}
+			else
+			{ 
+				$fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = sprintf('%.2f', $shipping_cost_wt);
+				$fields['PAYMENTREQUEST_0_ITEMAMT'] = Tools::ps_round($total, $this->decimals);
+				$fields['PAYMENTREQUEST_0_AMT'] = sprintf('%.2f', ($total + $fields['PAYMENTREQUEST_0_SHIPPINGAMT']));
+			}
 		}
 	}
 
