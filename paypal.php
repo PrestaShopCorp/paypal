@@ -27,12 +27,12 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-include_once(_PS_MODULE_DIR_.'/paypal/api/paypal_lib.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_logos.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_orders.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_tools.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_login/paypal_login.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_login/PayPalLoginUser.php');
+include_once(_PS_MODULE_DIR_.'paypal/api/paypal_lib.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_logos.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_orders.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_tools.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_login/paypal_login.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_login/PayPalLoginUser.php');
 
 define('WPS', 1); //Paypal Integral
 define('HSS', 2); //Paypal Integral Evolution
@@ -131,7 +131,7 @@ class PayPal extends PaymentModule
 		!$this->registerHook('displayMobileShoppingCartTop') || !$this->registerHook('displayMobileAddToCartTop')))
 			return false;
 
-		include_once(_PS_MODULE_DIR_.'/'.$this->name.'/paypal_install.php');
+		include_once(_PS_MODULE_DIR_.$this->name.'/paypal_install.php');
 		$paypal_install = new PayPalInstall();
 		$paypal_install->createTables();
 		$paypal_install->updateConfiguration($this->version);
@@ -148,7 +148,7 @@ class PayPal extends PaymentModule
 
 	public function uninstall()
 	{
-		include_once(_PS_MODULE_DIR_.'/'.$this->name.'/paypal_install.php');
+		include_once(_PS_MODULE_DIR_.$this->name.'/paypal_install.php');
 		$paypal_install = new PayPalInstall();
 		$paypal_install->deleteConfiguration();
 		return parent::uninstall();
@@ -173,7 +173,7 @@ class PayPal extends PaymentModule
 
 	private function compatibilityCheck()
 	{
-		if (file_exists(_PS_MODULE_DIR_.'/paypalapi/paypalapi.php') && $this->active)
+		if (file_exists(_PS_MODULE_DIR_.'paypalapi/paypalapi.php') && $this->active)
 			$this->warning = $this->l('All features of Paypal API module are included in the new Paypal module. In order to do not have any conflict, please do not use and remove PayPalAPI module.').'<br />';
 
 		/* For 1.4.3 and less compatibility */
