@@ -60,12 +60,15 @@ $(document).ready( function() {
 	}
 
 	$('select[name^="group_"]').change(function () {
-		displayExpressCheckoutShortcut();
+		setTimeout(function(){displayExpressCheckoutShortcut()}, 500);
 	});
 
 	$('.color_pick').click(function () {
-		displayExpressCheckoutShortcut();
+		setTimeout(function(){displayExpressCheckoutShortcut()}, 500);
 	});
+
+	if($('body#product').length > 0)
+		setTimeout(function(){displayExpressCheckoutShortcut()}, 500);
 	
 	{/literal}
 	{if isset($paypal_authorization)}
