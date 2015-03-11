@@ -40,5 +40,9 @@ if ($quantity && $quantity > 0)
 	
 	if ($product_quantity > 0)
 		die('1');
+
+	if($product_quantity <= 0 && $product->isAvailableWhenOutOfStock((int)$product->out_of_stock))
+		die('1');
+
 }
 die('0');
