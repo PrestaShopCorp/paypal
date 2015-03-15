@@ -2135,7 +2135,7 @@
 	<country iso_code="NL">
 		<yes>Ja</yes>
 		<no>Nee</no>
-		<payment_choice>Pay with your card or your PayPal account</payment_choice>
+		<payment_choice>Betaal met uw creditcard of PayPal-account</payment_choice>
 		<leader>Het</leader>
 		<online_payment>Nieuwe Betalen</online_payment>
 		<tagline>Makkelijk, Veilig en Overal.</tagline>
@@ -2150,7 +2150,7 @@
 
 		<your_country>Land</your_country>
 		<change_country>Wijzig</change_country>
-		<country_change_title>Select your country</country_change_title>
+		<country_change_title>Selecteer uw land</country_change_title>
 
 		<customer_support><![CDATA[<span style="font-weight: bold">Hulp nodig?</span>]]> Neem contact op met een van onze adviseurs: 0900 265 8950</customer_support>
 		<customer_support_image>call</customer_support_image>
@@ -2198,10 +2198,10 @@
 
 		<configuration_options_title>PayPal configuratieopties</configuration_options_title>
 
-		<integral_evolution_solution>Choose the solution you want to use</integral_evolution_solution>
+		<integral_evolution_solution>Kies de betaaloplossing die u wilt gebruiken</integral_evolution_solution>
 		<integral_evolution_solution_iframe>Iframe</integral_evolution_solution_iframe>
 		<integral_evolution_solution_no_iframe>Full page redirect</integral_evolution_solution_no_iframe>
-		<template_to_choose>Choose your template</template_to_choose>
+		<template_to_choose>Kies uw sjabloon</template_to_choose>
 
 		<express_checkout_shortcut_title>Gebruik PayPal Express Checkout Shortcut</express_checkout_shortcut_title>
 		<express_checkout_shortcut_tagline>Geef je klanten de mogelijkheid om in twee stappen te betalen</express_checkout_shortcut_tagline>
