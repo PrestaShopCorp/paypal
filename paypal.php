@@ -828,13 +828,18 @@ class PayPal extends PaymentModule
 			elseif (_PS_MOBILE_PHONE_)
 				return SMARTPHONE_TRACKING_CODE;
 		}
-
 		//Get Seamless checkout
-		$login_user = PaypalLoginUser::getByIdCustomer((int)$this->context->customer->id);
-		if ($login_user && $login_user->expires_in <= time())
+		
+		$login_user = false;
+		if(Configuration::get('PAYPAL_LOGIN'))
 		{
-			$obj = new PayPalLogin();
-			$login_user = $obj->getRefreshToken();
+			$login_user = PaypalLoginUser::getByIdCustomer((int)$this->context->customer->id);
+
+			if ($login_user && $login_user->expires_in <= time())
+			{
+				$obj = new PayPalLogin();
+				$login_user = $obj->getRefreshToken();
+			}
 		}
 
 		if ($method == WPS)
