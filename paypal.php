@@ -716,7 +716,7 @@ class PayPal extends PaymentModule
 
 	public function hookCancelProduct($params)
 	{
-		if (Tools::isSubmit('generateDiscount') || !$this->isPayPalAPIAvailable())
+		if (Tools::isSubmit('generateDiscount') || !$this->isPayPalAPIAvailable() || Tools::isSubmit('generateCreditSlip'))
 			return false;
 		elseif ($params['order']->module != $this->name || !($order = $params['order']) || !Validate::isLoadedObject($order))
 			return false;
