@@ -50,6 +50,11 @@ $ppec = new PaypalExpressCheckout($request_type);
 $token = Tools::getValue('token');
 $payer_id = Tools::getValue('PayerID');
 
+if(Tools::getValue('banktxnpendingurl') && Tools::getValue('banktxnpendingurl') == 'true')
+	$banktxnpendingurl = true;
+else
+	$banktxnpendingurl = false;
+
 function setContextData($ppec)
 {
 	// Create new Cart to avoid any refresh or other bad manipulations
@@ -255,12 +260,16 @@ function validateOrder($customer, $cart, $ppec)
 			else
 				$payment_status = 'Error';
 
-			if ((strcasecmp($payment_status, 'Completed') === 0) || (strcasecmp($payment_status, 'Completed_Funds_Held') === 0))
+			if (strcmp($payment_status, 'Completed') === 0)
 			{
 				$payment_type = (int)Configuration::get('PS_OS_PAYMENT');
 				$message = $ppec->l('Payment accepted.').'<br />';
 			}
-			elseif (strcasecmp($payment_status, 'Pending') === 0)
+			elseif ($banktxnpendingurl){
+				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
+				$message = $ppec->l('eCheck').'<br />';
+			}
+			elseif (strcmp($payment_status, 'Pending') === 0)
 			{
 				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
 				$message = $ppec->l('Pending payment confirmation.').'<br />';
@@ -302,7 +311,11 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		// When all information are checked before, we can validate the payment to paypal
 		// and create the prestashop order
 		$ppec->doExpressCheckout();
+		
 
+		if($ppec->result['RedirectRequired'] == 'true')
+			$ppec->redirectToAPI();
+			
 		validateOrder($customer, $cart, $ppec);
 
 		unset($ppec->context->cookie->{PaypalExpressCheckout::$cookie_name});
