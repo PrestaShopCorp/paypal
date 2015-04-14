@@ -1528,7 +1528,7 @@ class PayPal extends PaymentModule
 				}
 
 				// calculate the longest length of decimals
-				$dLen = max(Tools::strlen($dec1), Tools::strlen($dec2));
+				$d_len = max(Tools::strlen($dec1), Tools::strlen($dec2));
 
 				// append the padded decimals onto the end of the whole numbers
 				$num1 .= str_pad($dec1, $d_len, '0');
