@@ -41,6 +41,9 @@ if ($quantity && $quantity > 0)
 	$id_product_attribute = (int)Tools::getValue('id_product_attribute');
 	$product_quantity = Product::getQuantity($id_product, $id_product_attribute);
 	$product = new Product($id_product);
+
+	if(!$product->available_for_order)
+		die('0');
 	
 	if ($product_quantity > 0)
 		die('1');
