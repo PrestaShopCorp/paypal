@@ -27,12 +27,12 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-include_once(_PS_MODULE_DIR_.'/paypal/api/paypal_lib.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_logos.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_orders.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_tools.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_login/paypal_login.php');
-include_once(_PS_MODULE_DIR_.'/paypal/paypal_login/PayPalLoginUser.php');
+include_once(_PS_MODULE_DIR_.'paypal/api/paypal_lib.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_logos.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_orders.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_tools.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_login/paypal_login.php');
+include_once(_PS_MODULE_DIR_.'paypal/paypal_login/PayPalLoginUser.php');
 
 define('WPS', 1); //Paypal Integral
 define('HSS', 2); //Paypal Integral Evolution
@@ -131,7 +131,7 @@ class PayPal extends PaymentModule
 		!$this->registerHook('displayMobileShoppingCartTop') || !$this->registerHook('displayMobileAddToCartTop')))
 			return false;
 
-		include_once(_PS_MODULE_DIR_.'/'.$this->name.'/paypal_install.php');
+		include_once(_PS_MODULE_DIR_.$this->name.'/paypal_install.php');
 		$paypal_install = new PayPalInstall();
 		$paypal_install->createTables();
 		$paypal_install->updateConfiguration($this->version);
@@ -148,7 +148,7 @@ class PayPal extends PaymentModule
 
 	public function uninstall()
 	{
-		include_once(_PS_MODULE_DIR_.'/'.$this->name.'/paypal_install.php');
+		include_once(_PS_MODULE_DIR_.$this->name.'/paypal_install.php');
 		$paypal_install = new PayPalInstall();
 		$paypal_install->deleteConfiguration();
 		return parent::uninstall();
@@ -173,7 +173,7 @@ class PayPal extends PaymentModule
 
 	private function compatibilityCheck()
 	{
-		if (file_exists(_PS_MODULE_DIR_.'/paypalapi/paypalapi.php') && $this->active)
+		if (file_exists(_PS_MODULE_DIR_.'paypalapi/paypalapi.php') && $this->active)
 			$this->warning = $this->l('All features of Paypal API module are included in the new Paypal module. In order to do not have any conflict, please do not use and remove PayPalAPI module.').'<br />';
 
 		/* For 1.4.3 and less compatibility */
@@ -434,7 +434,7 @@ class PayPal extends PaymentModule
 			case 'id':
 				return 'id-id';
 			case 'il':
-				return 'it-il';
+				return 'it-it';
 			case 'jp':
 				return 'ja-jp';
 			case 'no':
@@ -716,7 +716,7 @@ class PayPal extends PaymentModule
 
 	public function hookCancelProduct($params)
 	{
-		if (Tools::isSubmit('generateDiscount') || !$this->isPayPalAPIAvailable())
+		if (Tools::isSubmit('generateDiscount') || !$this->isPayPalAPIAvailable() || Tools::isSubmit('generateCreditSlip'))
 			return false;
 		elseif ($params['order']->module != $this->name || !($order = $params['order']) || !Validate::isLoadedObject($order))
 			return false;
@@ -828,13 +828,18 @@ class PayPal extends PaymentModule
 			elseif (_PS_MOBILE_PHONE_)
 				return SMARTPHONE_TRACKING_CODE;
 		}
-
 		//Get Seamless checkout
-		$login_user = PaypalLoginUser::getByIdCustomer((int)$this->context->customer->id);
-		if ($login_user && $login_user->expires_in <= time())
+		
+		$login_user = false;
+		if(Configuration::get('PAYPAL_LOGIN'))
 		{
-			$obj = new PayPalLogin();
-			$login_user = $obj->getRefreshToken();
+			$login_user = PaypalLoginUser::getByIdCustomer((int)$this->context->customer->id);
+
+			if ($login_user && $login_user->expires_in <= time())
+			{
+				$obj = new PayPalLogin();
+				$login_user = $obj->getRefreshToken();
+			}
 		}
 
 		if ($method == WPS)
@@ -1523,7 +1528,7 @@ class PayPal extends PaymentModule
 				}
 
 				// calculate the longest length of decimals
-				$dLen = max(Tools::strlen($dec1), Tools::strlen($dec2));
+				$d_len = max(Tools::strlen($dec1), Tools::strlen($dec2));
 
 				// append the padded decimals onto the end of the whole numbers
 				$num1 .= str_pad($dec1, $d_len, '0');
