@@ -560,11 +560,15 @@ class PayPal extends PaymentModule
 	public function hookShoppingCartExtra()
 	{
 		// No active
+		// 
+		
 		if (!$this->active || (((int)Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->context->getMobileDevice()) ||
 			!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || !in_array(ECS, $this->getPaymentMethods()) || isset($this->context->cookie->express_checkout))
 			return null;
 
-		$values = array('en' => 'en_US', 'fr' => 'fr_FR');
+
+
+		$values = array('en' => 'en_US', 'fr' => 'fr_FR', 'de' => 'de_DE');
 		$this->context->smarty->assign(array(
 			'PayPal_payment_type' => 'cart',
 			'PayPal_current_page' => $this->getCurrentUrl(),
@@ -770,7 +774,8 @@ class PayPal extends PaymentModule
 
 		$iso_lang = array(
 			'en' => 'en_US',
-			'fr' => 'fr_FR'
+			'fr' => 'fr_FR', 
+			'de' => 'de_DE',
 		);
 
 		$this->context->smarty->assign(array(
@@ -934,7 +939,7 @@ class PayPal extends PaymentModule
 		// HSS -> Web Payment Pro / Integral Evolution
 		// ECS -> Express Checkout Solution
 
-		$payment_method = array('AU' => array(WPS, HSS, ECS), 'BE' => array(WPS, ECS), 'CN' => array(WPS, ECS), 'CZ' => array(), 'DE' => array(WPS),
+		$payment_method = array('AU' => array(WPS, HSS, ECS), 'BE' => array(WPS, ECS), 'CN' => array(WPS, ECS), 'CZ' => array(), 'DE' => array(WPS, ECS),
 		'ES' => array(WPS, HSS, ECS), 'FR' => array(WPS, HSS, ECS), 'GB' => array(WPS, HSS, ECS), 'HK' => array(WPS, HSS, ECS),
 		'IL' => array(WPS, ECS), 'IN' => array(WPS, ECS), 'IT' => array(WPS, HSS, ECS), 'JP' => array(WPS, HSS, ECS), 'MY' => array(WPS, ECS),
 		'NL' => array(WPS, ECS), 'NZ' => array(WPS, ECS), 'PL' => array(WPS, ECS), 'PT' => array(WPS, ECS), 'RA' => array(WPS, ECS), 'RE' => array(WPS, ECS),
