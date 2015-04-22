@@ -262,8 +262,10 @@ $(document).ready( function() {
 			$.fancybox({'hideOnOverlayClick' : true, 'content' : $('<div id="paypal-save-failure">').append($('#paypal-save-failure').clone().html())});
 
 		$('#paypal-get-identification').live('click', function() {
+
 			identificationButtonClicked = true;
-			var url = 'https://www.paypal.com/us/cgi-bin/webscr?cmd=_get-api-signature&generic-flow=true';
+			sandbox_prefix = $('#paypal_payment_test_mode').is(':checked') ? 'sandbox.' : '';
+			var url = 'https://www.'+sandbox_prefix+'paypal.com/us/cgi-bin/webscr?cmd=_get-api-signature&generic-flow=true';
 			var title = 'PayPal identification informations';
 			window.open (url, title, config='height=500, width=360, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
 			return false;
