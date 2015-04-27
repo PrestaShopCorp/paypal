@@ -160,7 +160,7 @@ class PayPal extends PaymentModule
 	public function runUpgrades($install = false)
 	{
 		if (version_compare(_PS_VERSION_, '1.5', '<'))
-			foreach (array('2.8', '3.0', '3.7') as $version)
+			foreach (array('2.8', '3.0', '3.7', '3.8.3') as $version)
 			{
 				$file = dirname(__FILE__).'/upgrade/install-'.$version.'.php';
 				if (Configuration::get('PAYPAL_VERSION') < $version && file_exists($file))
