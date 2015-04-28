@@ -32,6 +32,7 @@
 class PayPalSubmitModuleFrontController extends ModuleFrontController
 {
 	public $display_column_left = false;
+	public $ssl = true;
 
 	public function initContent()
 	{
