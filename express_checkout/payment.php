@@ -244,7 +244,7 @@ function validateOrder($customer, $cart, $ppec)
 	{
 		if ((bool)Configuration::get('PAYPAL_CAPTURE'))
 		{
-			$payment_type = (int)Configuration::get('PS_OS_WS_PAYMENT');
+			$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
 			$payment_status = 'Pending_capture';
 			$message = $ppec->l('Pending payment capture.').'<br />';
 		}

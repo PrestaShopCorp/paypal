@@ -78,6 +78,5 @@ function upgrade_module_3_0($object, $install = false)
 				PRIMARY KEY (`id_paypal_customer`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 AUTO_INCREMENT=1');
 	}
-
 	return true;
 }
