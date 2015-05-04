@@ -78,16 +78,5 @@ function upgrade_module_3_0($object, $install = false)
 				PRIMARY KEY (`id_paypal_customer`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 AUTO_INCREMENT=1');
 	}
-
-	//Add datas to paypal order
-	Db::getInstance()->Execute('
-		ALTER TABLE `' . _DB_PREFIX_ . 'paypal_order`
-		ADD `id_invoice` varchar(255) DEFAULT NULL,
-		ADD `currency` varchar(10) NOT NULL,
-		ADD `total_paid` varchar(50) NOT NULL,				
-		ADD `shipping` varchar(50) NOT NULL,
-		ADD `payment_date` varchar(50) NOT NULL,	
-	');
-
 	return true;
 }
