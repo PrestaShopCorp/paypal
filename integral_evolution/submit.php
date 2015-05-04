@@ -37,7 +37,7 @@ class PayPalIntegralEvolutionSubmit extends OrderConfirmationControllerCore
 	public function __construct()
 	{
 		/** Backward compatibility */
-		include_once(_PS_MODULE_DIR_.'/paypal/backward_compatibility/backward.php');
+		include_once(_PS_MODULE_DIR_.'paypal/backward_compatibility/backward.php');
 		$this->context = Context::getContext();
 		parent::__construct();
 	}
@@ -62,7 +62,7 @@ class PayPalIntegralEvolutionSubmit extends OrderConfirmationControllerCore
 			));
 		}
 
-		echo $this->context->smarty->fetch(_PS_MODULE_DIR_.'/paypal/views/templates/front/order-confirmation.tpl');
+		echo $this->context->smarty->fetch(_PS_MODULE_DIR_.'paypal/views/templates/front/order-confirmation.tpl');
 	}
 }
 
