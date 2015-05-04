@@ -42,7 +42,7 @@ function upgrade_module_3_8_3($object, $install = false)
 		if (Db::getInstance()->ExecuteS('SHOW COLUMNS FROM `'._DB_PREFIX_.'paypal_order` LIKE \'shipping\'') == false)
 			Db::getInstance()->Execute('ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `shipping` varchar(50) DEFAULT NULL');
 		if (Db::getInstance()->ExecuteS('SHOW COLUMNS FROM `'._DB_PREFIX_.'paypal_order` LIKE \'payment_date\'') == false)
-			Db::getInstance()->Execute('ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `shipping` payment_date(50) DEFAULT NULL');
+			Db::getInstance()->Execute('ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `payment_date` varchar(50) DEFAULT NULL');
 
 
 		Configuration::updateValue('PAYPAL_VERSION', '3.8.3');
