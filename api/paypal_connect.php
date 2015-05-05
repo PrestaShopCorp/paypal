@@ -46,7 +46,7 @@ class PayPalConnect
 
 		$tmp = $this->_connectByFSOCK($host, $script, $body);
 
-		if (!$simple_mode || !preg_match('/[A-Z]+=/', $tmp, $result))
+		if (!$simple_mode || !preg_match('/[TOKEN]+=/', $tmp, $result))
 			return $tmp;
 
 		return Tools::substr($tmp, strpos($tmp, $result[0]));
