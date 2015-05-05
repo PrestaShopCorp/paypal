@@ -83,7 +83,7 @@ class PayPal extends PaymentModule
 	{
 		$this->name = 'paypal';
 		$this->tab = 'payments_gateways';
-		$this->version = '3.8.3';
+		$this->version = '3.8.4';
 		$this->author = 'PrestaShop';
 		$this->is_eu_compatible = 1;
 
