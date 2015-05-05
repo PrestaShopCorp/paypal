@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>paypal</name>
+	<displayName><![CDATA[PayPal]]></displayName>
+	<version><![CDATA[3.8.4]]></version>
+	<description><![CDATA[Acceptez le paiements par cartes de cr&eacute;dits  (CB, Visa, MasterCard, Amex, Aurore, Cofinoga, 4 stars)  avec PayPal.]]></description>
+	<author><![CDATA[PrestaShop]]></author>
+	<tab><![CDATA[payments_gateways]]></tab>
+	<confirmUninstall><![CDATA[Êtes-vous certain de vouloir supprimer vos informations ?]]></confirmUninstall>
+	<is_configurable>1</is_configurable>
+	<need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

@@ -146,7 +146,11 @@ if ($request_type && $ppec->type)
 
 	/* Set details for a payment */
 	$ppec->setExpressCheckout(($login_user ? $login_user->access_token : false));
-
+	if(Tools::getValue('ajax'))
+	{
+		echo $ppec->token;
+		die;
+	}
 	if ($ppec->hasSucceedRequest() && !empty($ppec->token))
 		$ppec->redirectToAPI();
 	/* Display Error and die with this method */
