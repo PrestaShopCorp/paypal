@@ -84,7 +84,7 @@ class PayPal extends PaymentModule
 	{
 		$this->name = 'paypal';
 		$this->tab = 'payments_gateways';
-		$this->version = '3.8.2';
+		$this->version = '3.8.3';
 		$this->author = 'PrestaShop';
 
 		$this->currencies = true;
@@ -624,22 +624,33 @@ class PayPal extends PaymentModule
 			if($capture_amount = Tools::getValue('totalCaptureMoney')){
 				if($capture_amount = PaypalCapture::parsePrice($capture_amount))
 				{
-					if(Validate::isFloat($capture_amount)){
+					if(Validate::isFloat($capture_amount))
+					{
 						$capture_amount = Tools::ps_round($capture_amount, '6');
 						$ord = new Order((int)$params['id_order']);
 						$cpt = new PaypalCapture();
 						
-						if(($capture_amount > Tools::ps_round(0, '6')) &&  (Tools::ps_round($cpt->getRestToPaid($ord), '6') >= $capture_amount)){
+						if(($capture_amount > Tools::ps_round(0, '6')) &&  (Tools::ps_round($cpt->getRestToPaid($ord), '6') >= $capture_amount))
+						{
+							$complete = false;
+							
 							if($capture_amount > Tools::ps_round((float)$ord->total_paid, '6'))
+							{
 								$capture_amount = Tools::ps_round((float)$ord->total_paid, '6');
-							$this->_doCapture($params['id_order'], $capture_amount);
+								$complete = true;
+							}
+							if($capture_amount == Tools::ps_round($cpt->getRestToPaid($ord), '6'))
+								$complete = true;
+							$this->_doCapture($params['id_order'], $capture_amount, $complete);
 						}
-						else{
+						else
+						{
 							//nombre négatif ou plus grand de ce qu'il reste
 							die;
 						}
 					}
-					else{
+					else
+					{
 						//not Float
 						die;
 					}
@@ -649,7 +660,8 @@ class PayPal extends PaymentModule
 					// No price syntax
 				}
 			}
-			else{
+			else
+			{
 				//Nombre egal à 0 aussi
 				die;
 			}
@@ -1200,9 +1212,8 @@ class PayPal extends PaymentModule
 		Tools::redirect($_SERVER['HTTP_REFERER']);
 	}
 
-	private function _doCapture($id_order, $capture_amount=false)
+	private function _doCapture($id_order, $capture_amount=false, $is_complete = false)
 	{
-
 		$paypal_order = PayPalOrder::getOrderById((int)$id_order);
 		if (!$this->isPayPalAPIAvailable() || !$paypal_order)
 			return false;
@@ -1215,10 +1226,14 @@ class PayPal extends PaymentModule
 		if(!$capture_amount)
 			$capture_amount = (float)$order->total_paid;
 
+		$complete = 'Complete';
+		if(!$is_complete)
+			$complete = 'NotComplete';
+
 		$paypal_lib	= new PaypalLib();
 		$response = $paypal_lib->makeCall($this->getAPIURL(), $this->getAPIScript(), 'DoCapture',
 			'&'.http_build_query(array('AMT' => $capture_amount, 'AUTHORIZATIONID' => $paypal_order['id_transaction'],
-			'CURRENCYCODE' => $currency->iso_code, 'COMPLETETYPE' => 'NotComplete'), '', '&'));
+			'CURRENCYCODE' => $currency->iso_code, 'COMPLETETYPE' => $complete), '', '&'));
 		$message = $this->l('Capture operation result:').'<br>';
 
 		foreach ($response as $key => $value)
