@@ -28,7 +28,11 @@
 <div class="row">
 	<div class="col-xs-12 col-md-6">
         <p class="payment_module paypal">
-			<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+        	{if $PayPal_in_context_checkout == 1}
+				<a href="javascript:void(0)" onclick="" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+			{else}
+				<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" title="{l s='Pay with PayPal' mod='paypal'}">
+			{/if}
 				{if isset($use_mobile) && $use_mobile}
 					<img src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code|escape:'htmlall':'UTF-8'}_orange_295x43.png" />
 				{else}
@@ -53,7 +57,11 @@
 </style>
 {else}
 <p class="payment_module">
-	<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+	{if $PayPal_in_context_checkout == 1}
+		<a href="javascript:void(0)" onclick="" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+	{else}
+		<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" title="{l s='Pay with PayPal' mod='paypal'}">
+	{/if}
 		{if isset($use_mobile) && $use_mobile}
 			<img src="{$base_dir_ssl}modules/paypal/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" />
 		{else}
@@ -71,45 +79,44 @@
 {/if}
 
 <script async src="//www.paypalobjects.com/api/checkout.js"></script>
-{if $PayPal_is_in_context_checkout_enabled == 1 && $PayPal_in_context_checkout == 1}
-	<script>
-	    window.paypalCheckoutReady = function() {
-	        paypal.checkout.setup("6XF3MPZBZV6HU", {
-	            environment: 'sandbox',
-	            click: function(event) {
-	                event.preventDefault();
 
-	                paypal.checkout.initXO();
-	                $.support.cors = true;
-	                $.ajax({
-	                    url: "{$base_dir_ssl}modules/paypal/express_checkout/payment.php",
-	                    type: "GET",
-	                    data: '&ajax=1&onlytoken=1&express_checkout='+$('input[name="express_checkout"]').val()+'&current_shop_url='+$('input[name="current_shop_url"]').val()+'&bn='+$('input[name="bn"]').val()+'',   
-	                    async: true,
-	                    crossDomain: true,
+<script>
+    window.paypalCheckoutReady = function() {
+        paypal.checkout.setup("{$PayPal_in_context_checkout_merchant_id}", {
+            environment: 'sandbox',
+            click: function(event) {
+                event.preventDefault();
 
-	                    //Load the minibrowser with the redirection url in the success handler
-	                    success: function (token) {
-	                        var url = paypal.checkout.urlPrefix +token;
-	                        //Loading Mini browser with redirect url, true for async AJAX calls
-	                        paypal.checkout.startFlow(url);
-	                    },
-	                    error: function (responseData, textStatus, errorThrown) {
-	                        alert("Error in ajax post"+responseData.statusText);
-	                        //Gracefully Close the minibrowser in case of AJAX errors
-	                        paypal.checkout.closeFlow();
-	                    }
-	                });
-	            },
-	            button: ['paypal_process_payment', 't2']
-	        });
-	    }
+                paypal.checkout.initXO();
+                $.support.cors = true;
+                $.ajax({
+                    url: "{$base_dir_ssl}modules/paypal/express_checkout/payment.php",
+                    type: "GET",
+                    data: '&ajax=1&onlytoken=1&express_checkout='+$('input[name="express_checkout"]').val()+'&current_shop_url='+$('input[name="current_shop_url"]').val()+'&bn='+$('input[name="bn"]').val()+'',   
+                    async: true,
+                    crossDomain: true,
 
-	</script>
-{else}
-	<form id="paypal_payment_form" action="{$base_dir_ssl}modules/paypal/express_checkout/payment.php" data-ajax="false" title="{l s='Pay with PayPal' mod='paypal'}" method="post">
-		<input type="hidden" name="express_checkout" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
-		<input type="hidden" name="current_shop_url" value="{$PayPal_current_page|escape:'htmlall':'UTF-8'}" />
-		<input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
-	</form>
-{/if}
+                    //Load the minibrowser with the redirection url in the success handler
+                    success: function (token) {
+                        var url = paypal.checkout.urlPrefix +token;
+                        //Loading Mini browser with redirect url, true for async AJAX calls
+                        paypal.checkout.startFlow(url);
+                    },
+                    error: function (responseData, textStatus, errorThrown) {
+                        alert("Error in ajax post"+responseData.statusText);
+                        //Gracefully Close the minibrowser in case of AJAX errors
+                        paypal.checkout.closeFlow();
+                    }
+                });
+            },
+            button: ['paypal_process_payment', 't2']
+        });
+    }
+
+</script>
+
+<form id="paypal_payment_form" action="{$base_dir_ssl}modules/paypal/express_checkout/payment.php" data-ajax="false" title="{l s='Pay with PayPal' mod='paypal'}" method="post">
+	<input type="hidden" name="express_checkout" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
+	<input type="hidden" name="current_shop_url" value="{$PayPal_current_page|escape:'htmlall':'UTF-8'}" />
+	<input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
+</form>

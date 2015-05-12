@@ -943,6 +943,7 @@
 
 		<in_context_checkout_title>Utilisez PayPal In Context Checkout</in_context_checkout_title>
 		<in_context_checkout_tagline>Faites payer votre client sans quitter votre site</in_context_checkout_tagline>
+		<in_context_checkout_merchant_id>ID du marchant</in_context_checkout_merchant_id>
 
 		<sandbox_title>Utilisez la Sandbox</sandbox_title>
 		<sandbox_recommended>(recommandé)</sandbox_recommended>

@@ -146,10 +146,10 @@ if ($request_type && $ppec->type)
 
 	/* Set details for a payment */
 	$ppec->setExpressCheckout(($login_user ? $login_user->access_token : false));
-	if(Tools::getValue('ajax'))
+
+	if(Tools::getValue('ajax') && Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
 	{
-		echo $ppec->token;
-		die;
+		$ppec->displayPaypalInContextCheckout();
 	}
 	if ($ppec->hasSucceedRequest() && !empty($ppec->token))
 		$ppec->redirectToAPI();
@@ -361,7 +361,6 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 $display = (_PS_VERSION_ < '1.5') ? new BWDisplay() : new FrontController();
 $payment_confirmation = Tools::getValue('get_confirmation');
 
-/* Display payment confirmation */
 if ($ppec->ready && $payment_confirmation && (_PS_VERSION_ < '1.5'))
 {
 	$shop_domain = PayPal::getShopDomainSsl(true, true);

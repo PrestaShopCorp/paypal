@@ -265,6 +265,10 @@
 					<p class="description">{$PayPal_content.in_context_checkout_tagline|escape:'htmlall':'UTF-8'}</p>
 					<input type="radio" name="in_context_checkout" id="paypal_payment_ecs_no_in_context_checkout" value="1" {if $PayPal_in_context_checkout == 1}checked="checked"{/if} /> <label for="paypal_payment_ecs_no_in_context_checkout">{$PayPal_content.yes|escape:'htmlall':'UTF-8'}</label><br />
 					<input type="radio" name="in_context_checkout" id="paypal_payment_ecs_in_context_checkout" value="0" {if $PayPal_in_context_checkout == 0}checked="checked"{/if} /> <label for="paypal_payment_ecs_in_context_checkout">{$PayPal_content.no|escape:'htmlall':'UTF-8'}</label>
+					<p class="merchant_id">
+						<label>{$PayPal_content.in_context_checkout_merchant_id|escape:'htmlall':'UTF-8'}</label>
+						<input type="text" name="in_context_checkout_merchant_id" id="in_context_checkout_merchant_id" value="{if isset($PayPal_in_context_checkout_merchant_id) && $PayPal_in_context_checkout_merchant_id != ""}{$PayPal_in_context_checkout_merchant_id}{/if}" />
+					</p>
 				</div>
 
 				<div>
