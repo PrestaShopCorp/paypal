@@ -259,7 +259,15 @@
 					<input type="radio" name="express_checkout_shortcut" id="paypal_payment_ecs_no_shortcut" value="1" {if $PayPal_express_checkout_shortcut == 1}checked="checked"{/if} /> <label for="paypal_payment_ecs_no_shortcut">{$PayPal_content.yes|escape:'htmlall':'UTF-8'} {$PayPal_content.sandbox_recommended|escape:'htmlall':'UTF-8'}</label><br />
 					<input type="radio" name="express_checkout_shortcut" id="paypal_payment_ecs_shortcut" value="0" {if $PayPal_express_checkout_shortcut == 0}checked="checked"{/if} /> <label for="paypal_payment_ecs_shortcut">{$PayPal_content.no|escape:'htmlall':'UTF-8'}</label>
 				</div>
-								<div>
+
+				<div id="in_context_checkout" class="paypal-hide">
+					<p>{$PayPal_content.in_context_checkout_title|escape:'htmlall':'UTF-8'}</p>
+					<p class="description">{$PayPal_content.in_context_checkout_tagline|escape:'htmlall':'UTF-8'}</p>
+					<input type="radio" name="in_context_checkout" id="paypal_payment_ecs_no_in_context_checkout" value="1" {if $PayPal_in_context_checkout == 1}checked="checked"{/if} /> <label for="paypal_payment_ecs_no_in_context_checkout">{$PayPal_content.yes|escape:'htmlall':'UTF-8'}</label><br />
+					<input type="radio" name="in_context_checkout" id="paypal_payment_ecs_in_context_checkout" value="0" {if $PayPal_in_context_checkout == 0}checked="checked"{/if} /> <label for="paypal_payment_ecs_in_context_checkout">{$PayPal_content.no|escape:'htmlall':'UTF-8'}</label>
+				</div>
+
+				<div>
 					<p>{l s='Use the PayPal Login functionnality' mod='paypal'}{if $default_lang_iso == 'fr'}{l s='(*see the ' mod='paypal'} <a href="http://altfarm.mediaplex.com/ad/ck/3484-197941-8030-96"> {l s='integration guide' mod='paypal'} </a> {l s='and follow the steps' mod='paypal'}){else}{l s='(*see the ' mod='paypal'} <a href="http://altfarm.mediaplex.com/ad/ck/3484-197941-8030-170"> {l s='integration guide' mod='paypal'} </a> {l s='and follow the steps' mod='paypal'}){/if}</p>
 					<p class="description">
 						{l s='This function allows to your clients to connect with their PayPal credentials to shorten the check out' mod='paypal'}

@@ -941,6 +941,9 @@
 		<express_checkout_shortcut_title>Utilisez PayPal Express</express_checkout_shortcut_title>
 		<express_checkout_shortcut_tagline>Offrez à vos clients la possibilité de payer en 2 clics</express_checkout_shortcut_tagline>
 
+		<in_context_checkout_title>Utilisez PayPal In Context Checkout</in_context_checkout_title>
+		<in_context_checkout_tagline>Faites payer votre client sans quitter votre site</in_context_checkout_tagline>
+
 		<sandbox_title>Utilisez la Sandbox</sandbox_title>
 		<sandbox_recommended>(recommandé)</sandbox_recommended>
 		<sandbox_tagline>Mettez en place un environnement de test dans votre compte PayPal (seulement si vous êtes un développeur).</sandbox_tagline>
