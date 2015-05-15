@@ -124,7 +124,7 @@ class PayPal extends PaymentModule
 		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('displayPaymentEU') || !$this->registerHook('paymentReturn') ||
 		!$this->registerHook('shoppingCartExtra') || !$this->registerHook('backBeforePayment') || !$this->registerHook('rightColumn') ||
 		!$this->registerHook('cancelProduct') || !$this->registerHook('productFooter') || !$this->registerHook('header') ||
-		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader') || !$this->registerHook('actionPSCleanerGetModulesTables')h)
+		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader') || !$this->registerHook('actionPSCleanerGetModulesTables'))
 			return false;
 
 		if ((_PS_VERSION_ >= '1.5') && (!$this->registerHook('displayMobileHeader') ||
