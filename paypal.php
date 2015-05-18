@@ -382,10 +382,14 @@ class PayPal extends PaymentModule
 		$smarty = $this->context->smarty;
 		$smarty->assign(array(
 			'ssl_enabled' => Configuration::get('PS_SSL_ENABLED'),
+			'PAYPAL_SANDBOX' => Configuration::get('PAYPAL_SANDBOX'),
+			'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
+			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_MERCHANT_ID')
 		));
 		
-
 		$process = '<script type="text/javascript">'.$this->fetchTemplate('js/paypal.js').'</script>';
+		if(Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
+			$process .= '<script async src="//www.paypalobjects.com/api/checkout.js"></script>';
 
 
 		if ((
@@ -397,7 +401,6 @@ class PayPal extends PaymentModule
 			$this->context->smarty->assign(array(
 				'paypal_locale' => $this->getLocale(),
 				'PAYPAL_LOGIN_CLIENT_ID' => Configuration::get('PAYPAL_LOGIN_CLIENT_ID'),
-				'PAYPAL_SANDBOX' => Configuration::get('PAYPAL_SANDBOX'),
 				'PAYPAL_LOGIN_TPL' => Configuration::get('PAYPAL_LOGIN_TPL'),
 				'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
 			));
