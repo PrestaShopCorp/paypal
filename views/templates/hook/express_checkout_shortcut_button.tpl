@@ -29,7 +29,11 @@
 			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl}modules/paypal/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" alt="" />
 		</div>
 	{else}
+		{if $paypal_express_checkout_shortcut_logo != false}
+		<img id="payment_paypal_express_checkout" src="{$paypal_express_checkout_shortcut_logo}" alt="" />
+		{else}
 		<img id="payment_paypal_express_checkout" src="https://www.paypal.com/{$PayPal_lang_code}/i/btn/btn_xpressCheckout.gif" alt="" />
+		{/if}
 	{/if}
 	{if isset($include_form) && $include_form}
 		{include file="$template_dir./express_checkout_shortcut_form.tpl"}

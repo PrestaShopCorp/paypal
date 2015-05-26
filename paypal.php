@@ -569,8 +569,11 @@ class PayPal extends PaymentModule
 
 
 		$values = array('en' => 'en_US', 'fr' => 'fr_FR', 'de' => 'de_DE');
+		$paypal_logos = $this->paypal_logos->getLogos();
+
 		$this->context->smarty->assign(array(
 			'PayPal_payment_type' => 'cart',
+			'paypal_express_checkout_shortcut_logo' => isset($paypal_logos['ExpressCheckoutShortcutButton']) ? $paypal_logos['ExpressCheckoutShortcutButton'] : false,
 			'PayPal_current_page' => $this->getCurrentUrl(),
 			'PayPal_lang_code' => (isset($values[$this->context->language->iso_code]) ? $values[$this->context->language->iso_code] : 'en_US'),
 			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')),
@@ -783,7 +786,7 @@ class PayPal extends PaymentModule
 		if (!in_array(ECS, $this->getPaymentMethods()) || (((int)Configuration::get('PAYPAL_BUSINESS') == 1) &&
 		(int)Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->useMobile())
 			return null;
-
+		$paypal_logos = $this->paypal_logos->getLogos();
 		$iso_lang = array(
 			'en' => 'en_US',
 			'fr' => 'fr_FR', 
@@ -795,8 +798,9 @@ class PayPal extends PaymentModule
 			'PayPal_payment_type' => $type,
 			'PayPal_current_page' => $this->getCurrentUrl(),
 			'PayPal_lang_code' => (isset($iso_lang[$this->context->language->iso_code])) ? $iso_lang[$this->context->language->iso_code] : 'en_US',
-			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')))
-		);
+			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')),
+			'paypal_express_checkout_shortcut_logo' => isset($paypal_logos['ExpressCheckoutShortcutButton']) ? $paypal_logos['ExpressCheckoutShortcutButton'] : false,
+		));
 
 		return $this->fetchTemplate('express_checkout_shortcut_button.tpl');
 	}
@@ -806,12 +810,13 @@ class PayPal extends PaymentModule
 		if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && !$this->useMobile()) || !in_array(ECS, $this->getPaymentMethods()) ||
 		(((int)Configuration::get('PAYPAL_BUSINESS') == 1) && ((int)Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->useMobile()))
 			return;
-
+		
 		$this->context->smarty->assign(array(
 			'PayPal_payment_type' => $type,
 			'PayPal_current_page' => $this->getCurrentUrl(),
-			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')))
-		);
+			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')),
+			
+		));
 
 		return $this->fetchTemplate('express_checkout_shortcut_form.tpl');
 	}

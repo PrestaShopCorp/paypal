@@ -66,6 +66,8 @@
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
 		<LocalPayPalHorizontalSolutionPP>/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
 
+		<ExpressCheckoutShortcutButton>https://www.paypalobjects.com/webstatic/de_DE/i/de-btn-expresscheckout.gif</ExpressCheckoutShortcutButton>
+
 		<PayPalMarkSmall>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg</PayPalMarkSmall>
 		<PayPalMarkMedium>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg</PayPalMarkMedium>
 		<PayPalMarkLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalMarkLarge>
