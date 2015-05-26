@@ -598,7 +598,9 @@
 
 		<your_country>Ihr Land</your_country>
 		<change_country>Ändern</change_country>
-		<country_change_title>Select your country</country_change_title>
+		<country_change_title>Land auswählen</country_change_title>
+		
+		<translated_in_lang>Übersetzt in Ihre Sprache</translated_in_lang>
 
 		<customer_support><![CDATA[<span style="font-weight: bold">Haben Sie Fragen?</span>]]> Rufen Sie uns an: 01805 23 32 05</customer_support>
 		<customer_support_image>call</customer_support_image>
@@ -618,20 +620,20 @@
 			Sie profitieren von weniger Kaufabbrüchen und profitieren so von mehr Umsatz.
 		</website_payment_standard_tagline>
 
-		<website_payment_pro></website_payment_pro>
-		<website_payment_pro_tagline></website_payment_pro_tagline>
-		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		<website_payment_pro>Website Payments Pro</website_payment_pro>
+		<website_payment_pro_tagline>Eine professionelle Plattform für eingehende Kreditkarten- und PayPal-Zahlungen, inklusive Verkäuferschutz.<![CDATA[<br />]]>Angepasste Zahlungsseiten. 25,00 EUR monatlich.</website_payment_pro_tagline>
+		<website_payment_pro_disclaimer>Klicken Sie erst dann auf "Speichern", nachdem PayPal dieses Produkt für Sie freigeschaltet hat. Das dauert in der Regel 3-5 Tage.</website_payment_pro_disclaimer>
 
-		<express_checkout></express_checkout>
-		<express_checkout_tagline></express_checkout_tagline>
-		<express_checkout_tagline_source></express_checkout_tagline_source>
+		<express_checkout>Express Checkout</express_checkout>
+		<express_checkout_tagline>Steigern Sie Ihre Online-Umsätze um 30%*</express_checkout_tagline>
+		<express_checkout_tagline_source>* Quelle: Forrester-Studie vom März 2011</express_checkout_tagline_source>
 
 		<account_section_title>Eröffnen Sie ein PayPal-Geschäftskonto</account_section_title>
 
 		<credentials_section_title>So aktivieren Sie PayPal in Ihrem Online-Shop oder auf Ihrer Webseite</credentials_section_title>
-		<credentials_tagline></credentials_tagline>
+		<credentials_tagline>Einfach Ihre PayPal-Daten eingeben, Konto einrichten und sofort Zahlungen akzeptieren</credentials_tagline>
 		<credentials_description>Übermitteln Sie die Daten Ihrer API-Schnittstelle an PrestaShop</credentials_description>
-		<credentials_integral_description>Indicate the email you used when you signed up for a PayPal Business account</credentials_integral_description>
+		<credentials_integral_description>Geben Sie dieselbe E-Mail-Adresse an wie bei der Eröffnung Ihres PayPal-Geschäftskontos.</credentials_integral_description>
 		<credentials_button>API Informationen abrufen</credentials_button>
 		<credentials_button_disclaimer>Nachdem Sie auf "API Informationen abrufen" geklickt haben, geben Sie bitte Ihren PayPal Login-Namen und das Passwort in das Pop-Up ein, kopieren Sie dann die Infos, um Sie in die unten stehenden Felder einzusetzen.</credentials_button_disclaimer>
 		<credentials_username>API-Name</credentials_username>
@@ -648,7 +650,7 @@
 
 		<integral_evolution_solution>Bitte wählen Sie, welche Lösung Sie nutzen möchten</integral_evolution_solution>
 		<integral_evolution_solution_iframe>iFrame</integral_evolution_solution_iframe>
-		<integral_evolution_solution_no_iframe>Full Page redirect</integral_evolution_solution_no_iframe>
+		<integral_evolution_solution_no_iframe>Vollständige Weiterleitung</integral_evolution_solution_no_iframe>
 		<template_to_choose>Bitte wählen Sie Ihr Template</template_to_choose>
 
 
@@ -696,14 +698,14 @@
 			<signUpRedirectLink>https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=14</signUpRedirectLink>
 		</u1>
 		<u2>
-			<signUpCallButton></signUpCallButton>
-			<content></content>
-			<signUpRedirectLink></signUpRedirectLink>
+			<signUpCallButton>Abonnieren</signUpCallButton>
+			<content>Klicken Sie erst dann auf "Speichern", nachdem PayPal dieses Produkt für Sie freigeschaltet hat.<![CDATA[<br />]]></content>
+			<signUpRedirectLink>Andernfalls werden Sie keine Zahlungen verarbeiten können. Das dauert in der Regel 3-5 Tage.</signUpRedirectLink>
 		</u2>
 		<u3>
-			<signUpCallButton></signUpCallButton>
-			<content></content>
-			<signUpRedirectLink></signUpRedirectLink>
+			<signUpCallButton>Anmelden</signUpCallButton>
+			<content>Nachdem Sie Ihr Konto erstellt haben, schließen Sie auf dieser Seite Schritt 3 ab.</content>
+			<signUpRedirectLink>https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=3</signUpRedirectLink>
 		</u3>
 		<u4>
 			<signUpCallButton></signUpCallButton>
@@ -711,8 +713,8 @@
 			<signUpRedirectLink></signUpRedirectLink>
 		</u4>
 		<u5>
-			<signUpCallButton></signUpCallButton>
-			<content></content>
+			<signUpCallButton>Abonnieren</signUpCallButton>
+			<content>Klicken Sie erst dann auf "Speichern", nachdem PayPal dieses Produkt für Sie freigeschaltet hat.<![CDATA[<br />]]>Andernfalls werden Sie keine Zahlungen verarbeiten können. Das dauert in der Regel 3-5 Tage.<![CDATA[<br />]]><![CDATA[<br />]]>Falls PayPal für Sie Website Payments Pro bereits freigeschaltet hat, gehen Sie direkt zu</content>
 			<signUpRedirectLink></signUpRedirectLink>
 		</u5>
 		<u6>
