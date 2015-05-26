@@ -59,11 +59,11 @@
 	</country>
 
 	<country iso_code="DE">
-		<PayPalLogoSmall>https://www.paypal-deutschland.de/external/logocenter-update/logo-paypal-100x27.gif</PayPalLogoSmall>
-		<PayPalLogoMedium>https://www.paypal-deutschland.de/external/logocenter-update/logo-paypal-150x41.gif</PayPalLogoMedium>
-		<PayPalLogoLarge>https://www.paypal-deutschland.de/external/logocenter-update/logo-paypal-200x55.gif</PayPalLogoLarge>
+		<PayPalLogoSmall>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-100px.png</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-150px.png</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalLogoLarge>
 
-		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalHorizontalSolutionPP>
 		<LocalPayPalHorizontalSolutionPP>/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
 
 		<ExpressCheckoutShortcutButton>https://www.paypalobjects.com/webstatic/de_DE/i/de-btn-expresscheckout.gif</ExpressCheckoutShortcutButton>
@@ -75,6 +75,7 @@
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
 		<LocalPayPalVerticalSolutionPP>/img/default_logos/DE_vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
 	</country>
+
 
 	<country iso_code="ES">
 		<PayPalLogoSmall>https://www.paypal.com/es_ES/ES/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
