@@ -703,13 +703,13 @@ class PayPal extends PaymentModule
 						else
 						{
 							//nombre négatif ou plus grand de ce qu'il reste
-							die;
+							
 						}
 					}
 					else
 					{
 						//not Float
-						die;
+						
 					}
 				}
 				else
@@ -720,7 +720,6 @@ class PayPal extends PaymentModule
 			else
 			{
 				//Nombre egal à 0 aussi
-				die;
 			}
 		}
 		elseif (Tools::isSubmit('submitPayPalRefund'))
