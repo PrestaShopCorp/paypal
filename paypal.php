@@ -465,53 +465,6 @@ class PayPal extends PaymentModule
 		return $this->hookHeader();
 	}
 
-		public function hookDisplayPaymentEU($params) {
-		if (!$this->active)
-			return;
-
-		if ($this->hookPayment($params) == null)
-			return null;
-
-		$use_mobile = $this->useMobile();
-
-		if ($use_mobile)
-			$method = ECS;
-		else
-			$method = (int)Configuration::get('PAYPAL_PAYMENT_METHOD');
-
-		if (isset($this->context->cookie->express_checkout))
-			$this->redirectToConfirmation();
-
-		$logos = $this->paypal_logos->getLogos();
-
-		if (isset($logos['LocalPayPalHorizontalSolutionPP']) && $method == WPS)
-		{
-			$logo = $logos['LocalPayPalHorizontalSolutionPP'];
-		}
-		else
-		{
-			$logo = $logos['LocalPayPalLogoMedium'];
-		}
-		
-		if ($method == HSS)
-		{
-			return array(
-				'cta_text' => $this->l('Paypal'),
-				'logo' => $logo,
-				'form' => $this->fetchTemplate('integral_evolution_payment_eu.tpl')
-			);
-		}
-		elseif ($method == WPS || $method == ECS)
-		{
-			return array(
-				'cta_text' => $this->l('Paypal'),
-				'logo' => $logo,
-				'form' => $this->fetchTemplate('express_checkout_payment_eu.tpl')
-			);
-		}
-	}
-
-
 	public function hookDisplayMobileShoppingCartTop()
 	{
 		return $this->renderExpressCheckoutButton('cart').$this->renderExpressCheckoutForm('cart');
@@ -611,16 +564,57 @@ class PayPal extends PaymentModule
 		return null;
 	}
 
+	public function hookDisplayPaymentEU($params) {
+		if (!$this->active)
+			return;
+
+		if ($this->hookPayment($params) == null)
+			return null;
+
+		$use_mobile = $this->useMobile();
+
+		if ($use_mobile)
+			$method = ECS;
+		else
+			$method = (int)Configuration::get('PAYPAL_PAYMENT_METHOD');
+
+		if (isset($this->context->cookie->express_checkout))
+			$this->redirectToConfirmation();
+
+		$logos = $this->paypal_logos->getLogos();
+
+		if (isset($logos['LocalPayPalHorizontalSolutionPP']) && $method == WPS)
+		{
+			$logo = $logos['LocalPayPalHorizontalSolutionPP'];
+		}
+		else
+		{
+			$logo = $logos['LocalPayPalLogoMedium'];
+		}
+		
+		if ($method == HSS)
+		{
+			return array(
+				'cta_text' => $this->l('Paypal'),
+				'logo' => $logo,
+				'form' => $this->fetchTemplate('integral_evolution_payment_eu.tpl')
+			);
+		}
+		elseif ($method == WPS || $method == ECS)
+		{
+			return array(
+				'cta_text' => $this->l('Paypal'),
+				'logo' => $logo,
+				'form' => $this->fetchTemplate('express_checkout_payment_eu.tpl')
+			);
+		}
+	}
+
 	public function hookShoppingCartExtra()
 	{
-		// No active
-		// 
-		
 		if (!$this->active || (((int)Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->context->getMobileDevice()) ||
 			!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || !in_array(ECS, $this->getPaymentMethods()) || isset($this->context->cookie->express_checkout))
 			return null;
-
-
 
 		$values = array('en' => 'en_US', 'fr' => 'fr_FR', 'de' => 'de_DE');
 		$paypal_logos = $this->paypal_logos->getLogos();
@@ -700,26 +694,8 @@ class PayPal extends PaymentModule
 								$complete = true;
 							$this->_doCapture($params['id_order'], $capture_amount, $complete);
 						}
-						else
-						{
-							//nombre négatif ou plus grand de ce qu'il reste
-							
-						}
-					}
-					else
-					{
-						//not Float
-						
 					}
 				}
-				else
-				{
-					// No price syntax
-				}
-			}
-			else
-			{
-				//Nombre egal à 0 aussi
 			}
 		}
 		elseif (Tools::isSubmit('submitPayPalRefund'))
