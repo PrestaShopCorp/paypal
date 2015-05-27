@@ -27,6 +27,20 @@
 	<div class="col-lg-12">
 		<div class="panel">
 			<div class="panel-heading"><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" /> {l s='PayPal Refund' mod='paypal'}</div>
+			<table class="table" width="100%" cellspacing="0" cellpadding="0">
+			  <tr>
+			    <th>{l s='Capture date'}</th>
+			    <th>{l s='Capture Amount'}</th> 
+			    <th>{l s='Result Capture'}</th>
+			  </tr>
+			{foreach from=$list_captures item=list}
+			  <tr>
+			    <td>{$list.date}</td>
+			    <td>{$list.capture_amount}</td> 
+			    <td>{$list.result}</td>
+			  </tr>
+			{/foreach}
+			</table>
 			<form method="post" action="{$smarty.server.REQUEST_URI|escape:htmlall}">
 				<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 				<p><b>{l s='Information:' mod='paypal'}</b> {l s='Payment accepted' mod='paypal'}</p>
@@ -47,6 +61,20 @@
 	<legend><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" />{l s='PayPal Refund' mod='paypal'}</legend>
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='Payment accepted' mod='paypal'}</p>
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='When you refund a product, a partial refund is made unless you select "Generate a voucher".' mod='paypal'}</p>
+	<table class="table" width="100%" cellspacing="0" cellpadding="0">
+		  <tr>
+		    <th>{l s='Capture date'}</th>
+		    <th>{l s='Capture Amount'}</th> 
+		    <th>{l s='Result Capture'}</th>
+		  </tr>
+		{foreach from=$list_captures item=list}
+		  <tr>
+		    <td>{$list.date}</td>
+		    <td>{$list.capture_amount}</td> 
+		    <td>{$list.result}</td>
+		  </tr>
+		{/foreach}
+		</table>
 	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 		<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 		<p class="center">

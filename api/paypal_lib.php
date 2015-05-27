@@ -63,8 +63,7 @@ class PaypalLib
 		// Making connection
 		$result = $this->makeSimpleCall($host, $script, $request, true);
 		$response = explode('&', $result);
-		$logs_request = $this->_logs;
-
+		
 		if ($this->enable_log === true)
 		{
 			$handle = fopen(dirname(__FILE__) . '/Results.txt', 'a+');
@@ -93,9 +92,6 @@ class PaypalLib
 				continue;
 			$this->_logs[] = $key.' -> '.$value;
 		}
-
-		if(count($this->_logs) <= 2)
-			$this->_logs = array_merge($this->_logs, $logs_request);
 
 		return $return;
 	}

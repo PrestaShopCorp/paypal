@@ -1,4 +1,5 @@
-{*
+<?php
+/*
 * 2007-2014 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -21,22 +22,31 @@
 *  @copyright  2007-2014 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*}
+*/
 
-<div id="container_express_checkout" style="float:right; margin: 10px 40px 0 0">
-	{if isset($use_mobile) && $use_mobile}
-		<div style="margin-left:30px">
-			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl}modules/paypal/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" alt="" />
-		</div>
-	{else}
-		{if $paypal_express_checkout_shortcut_logo != false}
-		<img id="payment_paypal_express_checkout" src="{$paypal_express_checkout_shortcut_logo}" alt="" />
-		{else}
-		<img id="payment_paypal_express_checkout" src="https://www.paypal.com/{$PayPal_lang_code}/i/btn/btn_xpressCheckout.gif" alt="" />
-		{/if}
-	{/if}
-	{if isset($include_form) && $include_form}
-		{include file="$template_dir./express_checkout_shortcut_form.tpl"}
-	{/if}
-</div>
-<div class="clearfix"></div>
+if (!defined('_PS_VERSION_'))
+	exit;
+
+function upgrade_module_3_8($object, $install = false)
+{
+	$paypal_version = Configuration::get('PAYPAL_VERSION');
+
+	if ((!$paypal_version) || (empty($paypal_version)) || ($paypal_version < $object->version))
+	{
+		if (!Db::getInstance()->Execute('
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_capture` (
+			  `id_order` int(11) NOT NULL,
+			  `capture_amount` float NOT NULL,
+			  `result` text NOT NULL,
+			  `date_add` datetime NOT NULL,
+			  `date_upd` datetime NOT NULL,
+			  `id_paypal_capture` int(11) NOT NULL AUTO_INCREMENT,
+			  PRIMARY KEY (`id_paypal_capture`)
+			) ENGINE='._MYSQL_ENGINE_.'  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;'))
+			return false;
+		Configuration::updateValue('PAYPAL_VERSION', '3.8.0');
+	}
+
+
+	return true;
+}
