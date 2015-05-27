@@ -269,7 +269,7 @@ function validateOrder($customer, $cart, $ppec)
 				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
 				$message = $ppec->l('eCheck').'<br />';
 			}
-			elseif (strcmp($payment_status, 'Pending') === 0)
+			elseif (strcasecmp($payment_status, 'Pending') === 0)
 			{
 				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
 				$message = $ppec->l('Pending payment confirmation.').'<br />';
