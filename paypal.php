@@ -377,9 +377,12 @@ class PayPal extends PaymentModule
 		else
 			Tools::addCSS(_MODULE_DIR_.$this->name.'/css/paypal.css');
 
-		$process = '<script type="text/javascript">'.$this->fetchTemplate('js/paypal.js').'</script>';
-
 		$smarty = $this->context->smarty;
+		$smarty->assign(array(
+			'ssl_enabled' => Configuration::get('PS_SSL_ENABLED'),
+		));
+
+		$process = '<script type="text/javascript">'.$this->fetchTemplate('js/paypal.js').'</script>';
 
 		if ((
 			(method_exists($smarty, 'getTemplateVars') && ($smarty->getTemplateVars('page_name') == 'authentication' || $smarty->getTemplateVars('page_name') == 'order-opc' ))
@@ -401,6 +404,8 @@ class PayPal extends PaymentModule
 
 		return $process;
 	}
+
+
 
 	public function getLocale()
 	{
@@ -457,6 +462,53 @@ class PayPal extends PaymentModule
 	{
 		return $this->hookHeader();
 	}
+
+		public function hookDisplayPaymentEU($params) {
+		if (!$this->active)
+			return;
+
+		if ($this->hookPayment($params) == null)
+			return null;
+
+		$use_mobile = $this->useMobile();
+
+		if ($use_mobile)
+			$method = ECS;
+		else
+			$method = (int)Configuration::get('PAYPAL_PAYMENT_METHOD');
+
+		if (isset($this->context->cookie->express_checkout))
+			$this->redirectToConfirmation();
+
+		$logos = $this->paypal_logos->getLogos();
+
+		if (isset($logos['LocalPayPalHorizontalSolutionPP']) && $method == WPS)
+		{
+			$logo = $logos['LocalPayPalHorizontalSolutionPP'];
+		}
+		else
+		{
+			$logo = $logos['LocalPayPalLogoMedium'];
+		}
+		
+		if ($method == HSS)
+		{
+			return array(
+				'cta_text' => $this->l('Paypal'),
+				'logo' => $logo,
+				'form' => $this->fetchTemplate('integral_evolution_payment_eu.tpl')
+			);
+		}
+		elseif ($method == WPS || $method == ECS)
+		{
+			return array(
+				'cta_text' => $this->l('Paypal'),
+				'logo' => $logo,
+				'form' => $this->fetchTemplate('express_checkout_payment_eu.tpl')
+			);
+		}
+	}
+
 
 	public function hookDisplayMobileShoppingCartTop()
 	{
