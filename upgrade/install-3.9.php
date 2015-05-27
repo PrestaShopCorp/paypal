@@ -27,7 +27,7 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-function upgrade_module_3_8($object, $install = false)
+function upgrade_module_3_9($object, $install = false)
 {
 	$paypal_version = Configuration::get('PAYPAL_VERSION');
 
@@ -44,7 +44,7 @@ function upgrade_module_3_8($object, $install = false)
 			  PRIMARY KEY (`id_paypal_capture`)
 			) ENGINE='._MYSQL_ENGINE_.'  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;'))
 			return false;
-		Configuration::updateValue('PAYPAL_VERSION', '3.8.0');
+		Configuration::updateValue('PAYPAL_VERSION', '3.9.0');
 	}
 
 
