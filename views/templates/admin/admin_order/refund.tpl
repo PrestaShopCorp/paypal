@@ -35,7 +35,7 @@
 			  </tr>
 			{foreach from=$list_captures item=list}
 			  <tr>
-			    <td>{$list.date}</td>
+			    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)}</td>
 			    <td>{$list.capture_amount}</td> 
 			    <td>{$list.result}</td>
 			  </tr>

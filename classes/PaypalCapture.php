@@ -118,21 +118,16 @@ class PaypalCapture extends ObjectModel
 
 	public function getRestToPaid(Order $order)
 	{
-		if (version_compare(_PS_VERSION_, '1.5', '>'))
-			$totalPaid = Tools::ps_round($order->getTotalPaid(), 2);
-		else
-			$totalPaid = Tools::ps_round($order->total_paid, 2);
-
+		$cart = new Cart($order->id_cart);
+		$totalPaid = Tools::ps_round($cart->getOrderTotal(), 2);
 		return  Tools::ps_round($totalPaid,2) -  Tools::ps_round(self::getTotalAmountCapturedByIdOrder($order->id),2);
 	}
 
 	public function getRestToCapture($id_order)
 	{
-		$order = new Order((int)$id_order);
-		if (version_compare(_PS_VERSION_, '1.5', '>'))
-			$total = Tools::ps_round($order->getTotalPaid(), 2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($id_order),2);
-		else
-			$total = Tools::ps_round($order->total_paid, 2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($id_order),2);
+
+		$cart = Cart::getCartByOrderId($id_order);
+		$total = Tools::ps_round($cart->getOrderTotal(), 2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($id_order),2);
 
 		if($total > Tools::ps_round(0,2))
 			return true;
