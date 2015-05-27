@@ -35,12 +35,12 @@ function upgrade_module_3_9($object, $install = false)
 	{
 		if (!Db::getInstance()->Execute('
 		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_capture` (
+			  `id_paypal_capture` int(11) NOT NULL AUTO_INCREMENT,
 			  `id_order` int(11) NOT NULL,
 			  `capture_amount` float NOT NULL,
 			  `result` text NOT NULL,
 			  `date_add` datetime NOT NULL,
 			  `date_upd` datetime NOT NULL,
-			  `id_paypal_capture` int(11) NOT NULL AUTO_INCREMENT,
 			  PRIMARY KEY (`id_paypal_capture`)
 			) ENGINE='._MYSQL_ENGINE_.'  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;'))
 			return false;
