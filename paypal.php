@@ -570,7 +570,8 @@ class PayPal extends PaymentModule
 		return null;
 	}
 
-	public function hookDisplayPaymentEU($params) {
+	public function hookDisplayPaymentEU($params) 
+	{
 		if (!$this->active)
 			return;
 
@@ -590,13 +591,9 @@ class PayPal extends PaymentModule
 		$logos = $this->paypal_logos->getLogos();
 
 		if (isset($logos['LocalPayPalHorizontalSolutionPP']) && $method == WPS)
-		{
 			$logo = $logos['LocalPayPalHorizontalSolutionPP'];
-		}
 		else
-		{
 			$logo = $logos['LocalPayPalLogoMedium'];
-		}
 		
 		if ($method == HSS)
 		{
@@ -677,26 +674,28 @@ class PayPal extends PaymentModule
 
 	public function hookAdminOrder($params)
 	{
-		if (Tools::isSubmit('submitPayPalCapture')){
-			if($capture_amount = Tools::getValue('totalCaptureMoney')){
-				if($capture_amount = PaypalCapture::parsePrice($capture_amount))
+		if (Tools::isSubmit('submitPayPalCapture'))
+		{
+			if ($capture_amount = Tools::getValue('totalCaptureMoney'))
+			{
+				if ($capture_amount = PaypalCapture::parsePrice($capture_amount))
 				{
-					if(Validate::isFloat($capture_amount))
+					if (Validate::isFloat($capture_amount))
 					{
 						$capture_amount = Tools::ps_round($capture_amount, '6');
 						$ord = new Order((int)$params['id_order']);
 						$cpt = new PaypalCapture();
 						
-						if(($capture_amount > Tools::ps_round(0, '6')) &&  (Tools::ps_round($cpt->getRestToPaid($ord), '6') >= $capture_amount))
+						if (($capture_amount > Tools::ps_round(0, '6')) && (Tools::ps_round($cpt->getRestToPaid($ord), '6') >= $capture_amount))
 						{
 							$complete = false;
 							
-							if($capture_amount > Tools::ps_round((float)$ord->total_paid, '6'))
+							if ($capture_amount > Tools::ps_round((float)$ord->total_paid, '6'))
 							{
 								$capture_amount = Tools::ps_round((float)$ord->total_paid, '6');
 								$complete = true;
 							}
-							if($capture_amount == Tools::ps_round($cpt->getRestToPaid($ord), '6'))
+							if ($capture_amount == Tools::ps_round($cpt->getRestToPaid($ord), '6'))
 								$complete = true;
 							$this->_doCapture($params['id_order'], $capture_amount, $complete);
 						}
@@ -875,7 +874,7 @@ class PayPal extends PaymentModule
 		//Get Seamless checkout
 		
 		$login_user = false;
-		if(Configuration::get('PAYPAL_LOGIN'))
+		if (Configuration::get('PAYPAL_LOGIN'))
 		{
 			$login_user = PaypalLoginUser::getByIdCustomer((int)$this->context->customer->id);
 
@@ -1257,7 +1256,7 @@ class PayPal extends PaymentModule
 		Tools::redirect($_SERVER['HTTP_REFERER']);
 	}
 
-	private function _doCapture($id_order, $capture_amount=false, $is_complete = false)
+	private function _doCapture($id_order, $capture_amount = false, $is_complete = false)
 	{
 		$paypal_order = PayPalOrder::getOrderById((int)$id_order);
 		if (!$this->isPayPalAPIAvailable() || !$paypal_order)
@@ -1268,11 +1267,11 @@ class PayPal extends PaymentModule
 
 		
 
-		if(!$capture_amount)
+		if (!$capture_amount)
 			$capture_amount = (float)$order->total_paid;
 
 		$complete = 'Complete';
-		if(!$is_complete)
+		if (!$is_complete)
 			$complete = 'NotComplete';
 
 		$paypal_lib	= new PaypalLib();
@@ -1292,8 +1291,10 @@ class PayPal extends PaymentModule
 		if ((array_key_exists('ACK', $response)) && ($response['ACK'] == 'Success') && ($response['PAYMENTSTATUS'] == 'Completed'))
 		{
 			$capture->result = pSQL($response['PAYMENTSTATUS']);
-			if($capture->save()){
-				if(!($capture->getRestToCapture($capture->id_order))){
+			if ($capture->save())
+			{
+				if (!($capture->getRestToCapture($capture->id_order)))
+				{
 					//plus d'argent a capturer
 					if (!Db::getInstance()->Execute('
 					UPDATE `'._DB_PREFIX_.'paypal_order`
@@ -1313,7 +1314,8 @@ class PayPal extends PaymentModule
 				}
 			}			
 		}
-		elseif (isset($response['PAYMENTSTATUS'])){
+		elseif (isset($response['PAYMENTSTATUS']))
+		{
 			$capture->result = pSQL($response['PAYMENTSTATUS']);
 			$capture->save();
 			$message .= $this->l('Transaction error!');
@@ -1564,7 +1566,7 @@ class PayPal extends PaymentModule
 	public function comp($num1, $num2, $scale = null)
 	{
 		// check if they're valid positive numbers, extract the whole numbers and decimals
-		if (!preg_match("/^\+?(\d+)(\.\d+)?$/", $num1, $tmp1)|| !preg_match("/^\+?(\d+)(\.\d+)?$/", $num2, $tmp2))
+		if (!preg_match("/^\+?(\d+)(\.\d+)?$/", $num1, $tmp1) || !preg_match("/^\+?(\d+)(\.\d+)?$/", $num2, $tmp2))
 			return ('0');
 
 		// remove leading zeroes from whole numbers
@@ -1607,8 +1609,8 @@ class PayPal extends PaymentModule
 				{
 					if ((int)$num1{$i} > (int)$num2{$i})
 						return 1;
-					elseif((int)$num1{$i} < (int)$num2{$i})
-				 	 	return -1;
+					elseif ((int)$num1{$i} < (int)$num2{$i})
+						return -1;
 				}
 
 				// if the two numbers have no difference (they're the same).. return 0

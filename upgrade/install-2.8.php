@@ -25,7 +25,7 @@
 */
 
 if (!defined('_PS_VERSION_'))
-    exit;
+	exit;
 
 function upgrade_module_2_8($object, $install = false)
 {
@@ -59,7 +59,7 @@ function upgrade_module_2_8($object, $install = false)
 
 		/* Create Table */
 		if (!Db::getInstance()->Execute('
-		CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'paypal_order` (
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_order` (
 		`id_order` int(10) unsigned NOT null auto_increment,
 		`id_transaction` varchar(255) NOT null,
 		PRIMARY KEY (`id_order`)
@@ -67,7 +67,7 @@ function upgrade_module_2_8($object, $install = false)
 			$result = false;
 
 		if (!Db::getInstance()->Execute('
-		ALTER TABLE `' . _DB_PREFIX_ . 'paypal_order` ADD `payment_method` INT NOT null,
+		ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `payment_method` INT NOT null,
 		ADD `payment_status` VARCHAR(255) NOT null,
 		ADD `capture` INT NOT null'))
 			$result = false;

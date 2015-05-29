@@ -261,7 +261,8 @@ function validateOrder($customer, $cart, $ppec)
 				$payment_type = (int)Configuration::get('PS_OS_PAYMENT');
 				$message = $ppec->l('Payment accepted.').'<br />';
 			}
-			elseif (Tools::getValue('banktxnpendingurl') && Tools::getValue('banktxnpendingurl') == 'true'){
+			elseif (Tools::getValue('banktxnpendingurl') && Tools::getValue('banktxnpendingurl') == 'true')
+			{
 				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
 				$message = $ppec->l('eCheck').'<br />';
 			}
@@ -309,7 +310,7 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		$ppec->doExpressCheckout();
 		
 
-		if($ppec->result['RedirectRequired'] == 'true')
+		if ($ppec->result['RedirectRequired'] == 'true')
 			$ppec->redirectToAPI();
 			
 		validateOrder($customer, $cart, $ppec);
@@ -325,7 +326,7 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		}
 
 		/* Check payment details to display the appropriate content */
-		if (isset($order) && ($ppec->result['ACK'] != "Failure"))
+		if (isset($order) && ($ppec->result['ACK'] != 'Failure'))
 		{
 			$values = array(
 				'key' => $customer->secure_key,

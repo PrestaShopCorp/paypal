@@ -83,7 +83,7 @@ class PayPalExpressCheckoutSubmit extends OrderConfirmationControllerCore
 				)
 			);
 
-			if(version_compare(_PS_VERSION_, '1.5', '>'))
+			if (version_compare(_PS_VERSION_, '1.5', '>'))
 			{
 				
 				$this->context->smarty->assign(array(
@@ -95,7 +95,7 @@ class PayPalExpressCheckoutSubmit extends OrderConfirmationControllerCore
 			$template = 'order-confirmation.tpl';
 		}
 		
-		$this->context->smarty->assign('use_mobile', (bool) $this->paypal->useMobile());
+		$this->context->smarty->assign('use_mobile', (bool)$this->paypal->useMobile());
 		echo $this->paypal->fetchTemplate($template);
 	}
 }

@@ -154,8 +154,8 @@ class PaypalExpressCheckout extends Paypal
 		if ($access_token)
 			$fields['IDENTITYACCESSTOKEN'] = $access_token;
 		
-		if(Country::getIsoById(Configuration::get('PAYPAL_COUNTRY_DEFAULT')) == 'de')
-			$fields['BANKTXNPENDINGURL']='payment.php?banktxnpendingurl=true';
+		if (Country::getIsoById(Configuration::get('PAYPAL_COUNTRY_DEFAULT')) == 'de')
+			$fields['BANKTXNPENDINGURL'] = 'payment.php?banktxnpendingurl=true';
 
 		$this->callAPI($fields);
 		$this->_storeToken();
@@ -205,8 +205,8 @@ class PaypalExpressCheckout extends Paypal
 		$fields['TOKEN'] = $this->token;
 		$fields['PAYERID'] = $this->payer_id;
 
-		if(Configuration::get('PAYPAL_COUNTRY_DEFAULT') == 1)
-			$fields['BANKTXNPENDINGURL']='';
+		if (Configuration::get('PAYPAL_COUNTRY_DEFAULT') == 1)
+			$fields['BANKTXNPENDINGURL'] = '';
 
 		if (count($this->product_list) <= 0)
 			$this->initParameters();
@@ -373,7 +373,7 @@ class PaypalExpressCheckout extends Paypal
 		}
 		else
 		{
-			if($currency->iso_code == "HUF")
+			if ($currency->iso_code == 'HUF')
 			{ 
 				$fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = round($shipping_cost_wt); 
 				$fields['PAYMENTREQUEST_0_ITEMAMT'] = Tools::ps_round($total, $this->decimals); 
@@ -508,7 +508,7 @@ class PaypalExpressCheckout extends Paypal
 		else
 			$url = '/websc&cmd=_express-checkout';
 
-		if(($this->method == 'SetExpressCheckout') && (Configuration::get('PAYPAL_COUNTRY_DEFAULT') == 1) && ($this->type == 'payment_cart'))
+		if (($this->method == 'SetExpressCheckout') && (Configuration::get('PAYPAL_COUNTRY_DEFAULT') == 1) && ($this->type == 'payment_cart'))
 			$url .= '&useraction=commit';
 		
 		Tools::redirectLink('https://'.$this->getPayPalURL().$url.'&token='.urldecode($this->token));

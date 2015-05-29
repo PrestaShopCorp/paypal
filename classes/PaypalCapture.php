@@ -53,8 +53,8 @@ class PaypalCapture extends ObjectModel
 
 
 
-	 public function __construct($id = null, $id_lang = null, $id_shop = null) 
-	 {
+	public function __construct($id = null, $id_lang = null, $id_shop = null) 
+	{
 		if (version_compare(_PS_VERSION_, '1.5', '>'))
 			self::$definition = array(
 				'table' => 'paypal_capture',
@@ -123,13 +123,13 @@ class PaypalCapture extends ObjectModel
 	{
 		$cart = new Cart($order->id_cart);
 		$totalPaid = Tools::ps_round($cart->getOrderTotal(), 2);
-		return Tools::ps_round($totalPaid,2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($order->id), 2);
+		return Tools::ps_round($totalPaid, 2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($order->id), 2);
 	}
 
 	public function getRestToCapture($id_order)
 	{
 		$cart = Cart::getCartByOrderId($id_order);
-		$total = Tools::ps_round($cart->getOrderTotal(), 2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($id_order),2);
+		$total = Tools::ps_round($cart->getOrderTotal(), 2) - Tools::ps_round(self::getTotalAmountCapturedByIdOrder($id_order), 2);
 
 		if ($total > Tools::ps_round(0, 2))
 			return true;

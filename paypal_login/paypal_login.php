@@ -144,8 +144,8 @@ class PayPalLogin
 		if ($this->enable_log === true)
 		{
 			$handle = fopen(dirname(__FILE__).'/Results.txt', 'a+');
-			fwrite($handle, "Request => ".print_r($request, true) . "\r\n");
-			fwrite($handle, "Result => ".print_r($result, true) . "\r\n");
+			fwrite($handle, "Request => ".print_r($request, true)."\r\n");
+			fwrite($handle, "Result => ".print_r($result, true)."\r\n");
 			fwrite($handle, "Journal => ".print_r($this->_logs, true."\r\n"));
 			fclose($handle);
 		}
@@ -165,9 +165,7 @@ class PayPalLogin
 
 	private function getUserInformations($access_token, &$login)
 	{
-
 		unset($this->_logs);
-
 		$headers = array(
 			// 'Content-Type:application/json',
 			'Authorization: Bearer '.$access_token
@@ -183,9 +181,9 @@ class PayPalLogin
 		if ($this->enable_log === true)
 		{
 			$handle = fopen(dirname(__FILE__).'/Results.txt', 'a+');
-			fwrite($handle, "Request => ".print_r($request, true) . "\r\n");
-			fwrite($handle, "Result => ".print_r($result, true) . "\r\n");
-			fwrite($handle, "Headers => ".print_r($headers, true) . "\r\n");
+			fwrite($handle, "Request => ".print_r($request, true)."\r\n");
+			fwrite($handle, "Result => ".print_r($result, true)."\r\n");
+			fwrite($handle, "Headers => ".print_r($headers, true)."\r\n");
 			fwrite($handle, "Journal => ".print_r($this->_logs, true."\r\n"));
 			fclose($handle);
 		}
@@ -198,9 +196,7 @@ class PayPalLogin
 			$customer = $customer->getByEmail($result->email);
 
 			if (!$customer)
-			{
 				$customer = $this->setCustomer($result);
-			}
 
 			$login->account_type = $result->account_type;
 			$login->user_id = $result->user_id;
