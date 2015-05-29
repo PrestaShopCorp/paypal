@@ -188,6 +188,7 @@ class PaypalExpressCheckout extends Paypal
 	public function getExpressCheckout()
 	{
 		$this->method = 'GetExpressCheckoutDetails';
+		$fields = array();
 		$fields['TOKEN'] = $this->token;
 
 		$this->initParameters();
@@ -200,7 +201,7 @@ class PaypalExpressCheckout extends Paypal
 	public function doExpressCheckout()
 	{
 		$this->method = 'DoExpressCheckoutPayment';
-
+		$fields = array();
 		$fields['TOKEN'] = $this->token;
 		$fields['PAYERID'] = $this->payer_id;
 
