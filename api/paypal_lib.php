@@ -68,7 +68,7 @@ class PaypalLib
 		
 		if ($this->enable_log === true)
 		{
-			$handle = fopen(dirname(__FILE__) . '/Results.txt', 'a+');
+			$handle = fopen(dirname(__FILE__).'/Results.txt', 'a+');
 			fwrite($handle, 'Host : '.print_r($host, true)."\r\n");
 			fwrite($handle, 'Request : '.print_r($request, true)."\r\n");
 			fwrite($handle, 'Result : '.print_r($result, true)."\r\n");
@@ -95,7 +95,7 @@ class PaypalLib
 			$this->_logs[] = $key.' -> '.$value;
 		}
 
-		if(count($this->_logs) <= 2)
+		if (count($this->_logs) <= 2)
 			$this->_logs = array_merge($this->_logs, $logs_request);
 
 		return $return;
