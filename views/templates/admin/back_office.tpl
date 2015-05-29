@@ -91,7 +91,7 @@
 		<div class="box">
 
 			<div class="box right half" id="paypal-call-button">
-				<div id="paypal-call" class="box right">{$PayPal_content.customer_support} {if !empty($PayPal_content.customer_support_image)}<img src="../modules/paypal/img/{$PayPal_content.customer_support_image}.png" width="14px" alt="Phone" />{/if}</div>
+				<div id="paypal-call" class="box right">{$PayPal_content.customer_support} {if !empty($PayPal_content.customer_support_image)}<img src="../modules/paypal/views/img/{$PayPal_content.customer_support_image}.png" width="14px" alt="Phone" />{/if}</div>
 				<div id="paypal-call-foonote" class="box right clear">{$PayPal_content.support_foonote}</div>
 			</div>
 
@@ -244,7 +244,7 @@
 						<p class="description">
 						{$PayPal_content.template_to_choose|escape:'htmlall':'UTF-8'}
 						</p>
-						<img src="../modules/paypal/img/template.png" alt=""><br/>
+						<img src="../modules/paypal/views/img/template.png" alt=""><br/>
 						<input type="radio" name="integral_evolution_template" id="integral_evolution_template_A" value="A" {if $PayPal_integral_evolution_template == "A"}checked="checked"{/if}  style="margin-left:60px"/> <label for="integral_evolution_template">A</label> &nbsp;&nbsp;&nbsp;&nbsp;
 						&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="integral_evolution_template" id="integral_evolution_template_B" value="B" {if $PayPal_integral_evolution_template == "B"}checked="checked"{/if} style="margin-left:80px"/> <label for="integral_evolution_template">B</label>&nbsp;&nbsp;&nbsp;&nbsp;
 						&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="integral_evolution_template" id="integral_evolution_template_C" value="C" {if $PayPal_integral_evolution_template == "C"}checked="checked"{/if} style="margin-left:70px" /> <label for="integral_evolution_template">C</label>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -294,12 +294,12 @@
 							<dd>
 								<input type="radio" name="paypal_login_client_template" id="paypal_login_client_template_paypal_blue" value="1"{if $PayPal_login_tpl == 1} checked{/if} />
 								<label for="paypal_login_client_template_paypal_blue">
-									<img src="../modules/paypal/img/paypal_login_blue.png" alt=""> 
+									<img src="../modules/paypal/views/img/paypal_login_blue.png" alt=""> 
 								</label>
 								<br />
 								<input type="radio" name="paypal_login_client_template" id="paypal_login_client_template_neutral" value="2"{if $PayPal_login_tpl == 2} checked{/if} />
 								<label for="paypal_login_client_template_neutral">
-									<img src="../modules/paypal/img/paypal_login_grey.png" alt=""> 
+									<img src="../modules/paypal/views/img/paypal_login_grey.png" alt=""> 
 								</label>
 							</dd>
 						</dl>

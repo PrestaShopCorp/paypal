@@ -29,4 +29,4 @@
 	var PayPal_ECS = '{$PayPal_ECS|intval}';
 </script>
 
-<script type="text/javascript" src="{$PayPal_module_dir|escape:'htmlall':'UTF-8'}/js/back_office.js"></script>
+<script type="text/javascript" src="{$PayPal_module_dir|escape:'htmlall':'UTF-8'}/views/js/back_office.js"></script>

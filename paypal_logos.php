@@ -98,17 +98,17 @@ class PayPalLogos
 
 				if ((count($logo) == 2) && (strstr($key, 'Local') === false))
 				{
-					$destination = _PAYPAL_MODULE_DIRNAME_.'/img/logos/'.$iso_code.'_'.$logo[1];
+					$destination = _PAYPAL_MODULE_DIRNAME_.'/views/img/logos/'.$iso_code.'_'.$logo[1];
 					$this->updatePictures($logo[0], $destination);
 
 					// Define the local path after picture have been downloaded
 					$values['Local'.$key] = _MODULE_DIR_.$destination;
 
 					// Load back office cards path
-					if (file_exists(dirname(__FILE__).'/img/bo-cards/'.Tools::strtoupper($iso_code).'_bo_cards.png'))
-						$values['BackOfficeCards'] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.'/img/bo-cards/'.Tools::strtoupper($iso_code).'_bo_cards.png';
-					else if (file_exists(dirname(__FILE__).'/img/bo-cards/default.png'))
-						$values['BackOfficeCards'] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.'/img/bo-cards/default.png';
+					if (file_exists(dirname(__FILE__).'/views/img/bo-cards/'.Tools::strtoupper($iso_code).'_bo_cards.png'))
+						$values['BackOfficeCards'] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.'/views/img/bo-cards/'.Tools::strtoupper($iso_code).'_bo_cards.png';
+					else if (file_exists(dirname(__FILE__).'/views/img/bo-cards/default.png'))
+						$values['BackOfficeCards'] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.'/views/img/bo-cards/default.png';
 				}
 				// Use the local version
 				else if (isset($values['Local'.$key]))

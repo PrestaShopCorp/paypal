@@ -26,7 +26,7 @@
 <div id="container_express_checkout" style="float:right; margin: 10px 40px 0 0">
 	{if isset($use_mobile) && $use_mobile}
 		<div style="margin-left:30px">
-			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl}modules/paypal/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" alt="" />
+			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" alt="" />
 		</div>
 	{else}
 		{if $paypal_express_checkout_shortcut_logo != false}

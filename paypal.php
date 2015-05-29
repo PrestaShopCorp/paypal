@@ -375,16 +375,16 @@ class PayPal extends PaymentModule
 
 		/* Added for PrestaBox */
 		if (method_exists($this->context->controller, 'addCSS'))
-			$this->context->controller->addCSS(_MODULE_DIR_.$this->name.'/css/paypal.css');
+			$this->context->controller->addCSS(_MODULE_DIR_.$this->name.'/views/css/paypal.css');
 		else
-			Tools::addCSS(_MODULE_DIR_.$this->name.'/css/paypal.css');
+			Tools::addCSS(_MODULE_DIR_.$this->name.'/views/css/paypal.css');
 
 		$smarty = $this->context->smarty;
 		$smarty->assign(array(
 			'ssl_enabled' => Configuration::get('PS_SSL_ENABLED'),
 		));
 
-		$process = '<script type="text/javascript">'.$this->fetchTemplate('js/paypal.js').'</script>';
+		$process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
 
 		if ((
 			(method_exists($smarty, 'getTemplateVars') && ($smarty->getTemplateVars('page_name') == 'authentication' || $smarty->getTemplateVars('page_name') == 'order-opc' ))
@@ -401,7 +401,7 @@ class PayPal extends PaymentModule
 			));
 			$process .= '
 				<script src="https://www.paypalobjects.com/js/external/api.js"></script>
-				<script>'.$this->fetchTemplate('js/paypal_login.js').'</script>';
+				<script>'.$this->fetchTemplate('views/js/paypal_login.js').'</script>';
 		}
 
 		return $process;
@@ -786,13 +786,13 @@ class PayPal extends PaymentModule
 				$output = '<script type="text/javascript" src="'.__PS_BASE_URI__.'js/jquery/jquery-ui-1.8.10.custom.min.js"></script>
 					<script type="text/javascript" src="'.__PS_BASE_URI__.'js/jquery/jquery.fancybox-1.3.4.js"></script>
 					<link type="text/css" rel="stylesheet" href="'.__PS_BASE_URI__.'css/jquery.fancybox-1.3.4.css" />
-					<link type="text/css" rel="stylesheet" href="'._MODULE_DIR_.$this->name.'/css/paypal.css" />';
+					<link type="text/css" rel="stylesheet" href="'._MODULE_DIR_.$this->name.'/views/css/paypal.css" />';
 			}
 			else
 			{
 				$this->context->controller->addJquery();
 				$this->context->controller->addJQueryPlugin('fancybox');
-				$this->context->controller->addCSS(_MODULE_DIR_.$this->name.'/css/paypal.css');
+				$this->context->controller->addCSS(_MODULE_DIR_.$this->name.'/views/css/paypal.css');
 			}
 
 			$this->context->smarty->assign(array(
