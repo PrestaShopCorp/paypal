@@ -231,7 +231,7 @@ class PayPalIPN extends PayPal
 		$request = '';
 		foreach($_POST as $key => $value) 
 		{         
-			$value = urlencode(stripslashes($value));  
+			$value = urlencode(Tools::stripslashes($value));  
 			$request .= "&$key=$value";           
 		}
 		

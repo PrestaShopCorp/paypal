@@ -859,7 +859,7 @@ class PayPal extends PaymentModule
 
 	public function getTrackingCode($method)
 	{
-		if ((_PS_VERSION_ < '1.5') && (_THEME_NAME_ == 'prestashop_mobile' || (isset($_GET['ps_mobile_site']) && $_GET['ps_mobile_site'] == 1)))
+		if ((_PS_VERSION_ < '1.5') && (_THEME_NAME_ == 'prestashop_mobile' || Tools::getValue('ps_mobile_site') == 1))
 		{
 			if (_PS_MOBILE_TABLET_)
 				return TABLET_TRACKING_CODE;
@@ -1579,14 +1579,14 @@ class PayPal extends PaymentModule
 			{
 
 				// remove ending zeroes from decimals and remove point
-				$dec1 = isset($tmp1[2]) ? rtrim(substr($tmp1[2], 1), '0') : '';
-				$dec2 = isset($tmp2[2]) ? rtrim(substr($tmp2[2], 1), '0') : '';
+				$dec1 = isset($tmp1[2]) ? rtrim(Tools::substr($tmp1[2], 1), '0') : '';
+				$dec2 = isset($tmp2[2]) ? rtrim(Tools::substr($tmp2[2], 1), '0') : '';
 
 				// if the user defined $scale, then make sure we use that only
 				if ($scale != null)
 				{
-					$dec1 = substr($dec1, 0, $scale);
-					$dec2 = substr($dec2, 0, $scale);
+					$dec1 = Tools::substr($dec1, 0, $scale);
+					$dec2 = Tools::substr($dec2, 0, $scale);
 				}
 
 				// calculate the longest length of decimals
