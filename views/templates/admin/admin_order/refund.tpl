@@ -29,9 +29,9 @@
 			<div class="panel-heading"><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" /> {l s='PayPal Refund' mod='paypal'}</div>
 			<table class="table" width="100%" cellspacing="0" cellpadding="0">
 			  <tr>
-			    <th>{l s='Capture date'}</th>
-			    <th>{l s='Capture Amount'}</th> 
-			    <th>{l s='Result Capture'}</th>
+			    <th>{l s='Capture date' mod="paypal"}</th>
+			    <th>{l s='Capture Amount' mod="paypal"}</th> 
+			    <th>{l s='Result Capture' mod="paypal"}</th>
 			  </tr>
 			{foreach from=$list_captures item=list}
 			  <tr>
@@ -63,9 +63,9 @@
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='When you refund a product, a partial refund is made unless you select "Generate a voucher".' mod='paypal'}</p>
 	<table class="table" width="100%" cellspacing="0" cellpadding="0">
 		  <tr>
-		    <th>{l s='Capture date'}</th>
-		    <th>{l s='Capture Amount'}</th> 
-		    <th>{l s='Result Capture'}</th>
+		    <th>{l s='Capture date' mod="paypal"}</th>
+		    <th>{l s='Capture Amount' mod="paypal"}</th> 
+		    <th>{l s='Result Capture' mod="paypal"}</th>
 		  </tr>
 		{foreach from=$list_captures item=list}
 		  <tr>
