@@ -41,7 +41,7 @@
 			  </tr>
 			{/foreach}
 			</table>
-			<form method="post" action="{$smarty.server.REQUEST_URI|escape:htmlall}">
+			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 				<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 				<p><b>{l s='Information:' mod='paypal'}</b> {l s='Payment accepted' mod='paypal'}</p>
 				<p><b>{l s='Information:' mod='paypal'}</b> {l s='When you refund a product, a partial refund is made unless you select "Generate a voucher".' mod='paypal'}</p>

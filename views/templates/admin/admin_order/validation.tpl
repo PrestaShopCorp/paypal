@@ -28,7 +28,7 @@
 	<div class="col-lg-12">
 		<div class="panel">
 			<div class="panel-heading"><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" /> {l s='PayPal Validation' mod='paypal'}</div>
-			<form method="post" action="{$smarty.server.REQUEST_URI|escape:htmlall}">
+			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 				<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 				<p><b>{l s='Information:' mod='paypal'}</b> {if $order_state == $authorization}{l s='Pending Capture - No shipping' mod='paypal'}{else}{l s='Pending Payment - No shipping' mod='paypal'}{/if}</p>				
 				<p class="center">

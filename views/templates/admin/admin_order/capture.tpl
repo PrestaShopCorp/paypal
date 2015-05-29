@@ -44,7 +44,7 @@
 				{/foreach}
 				</table>
 			{/if}
-			<form method="post" action="{$smarty.server.REQUEST_URI|escape:htmlall}">
+			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 				<p>{l s='There is still' mod='paypal'} {$rest_to_capture} {$id_currency} {l s='to capture.' mod='paypal'} {l s='How many do you want to capture :' mod='paypal'}</p>
 				<input type="text" onchange="captureEdit();" name="totalCaptureMoney" style="width80%;" placeholder="{l s='Enter the money you want to capture (ex: 200.00)' mod='paypal'}"/>
 		
