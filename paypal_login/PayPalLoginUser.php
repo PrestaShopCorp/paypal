@@ -59,6 +59,7 @@ class PaypalLoginUser extends ObjectModel {
 	public function getFields()
 	{
 		parent::validateFields();
+		$fields = array();
 		foreach (array_keys($this->fieldsValidate) as $field)
 			$fields[$field] = $this->$field;
 		return $fields;

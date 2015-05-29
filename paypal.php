@@ -496,6 +496,12 @@ class PayPal extends PaymentModule
 		if (isset($this->context->cookie->express_checkout))
 			$this->redirectToConfirmation();
 
+		$iso_lang = array(
+			'en' => 'en_US',
+			'fr' => 'fr_FR', 
+			'de' => 'de_DE',
+		);
+
 		$this->context->smarty->assign(array(
 			'logos' => $this->paypal_logos->getLogos(),
 			'sandbox_mode' => Configuration::get('PAYPAL_SANDBOX'),

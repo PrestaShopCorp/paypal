@@ -48,7 +48,8 @@ class PayPalLogos
 			return false;
 
 		$xml = simplexml_load_file($file);
-
+		$logos = array();
+		
 		if (isset($xml) && $xml != false)
 		{
 			foreach ($xml->country as $item)

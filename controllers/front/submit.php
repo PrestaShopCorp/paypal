@@ -111,6 +111,7 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
 
 			if (Validate::isLoadedObject($order))
 			{
+				$params = array();
 				$params['objOrder'] = $order;
 				$params['currencyObj'] = $currency;
 				$params['currency'] = $currency->sign;

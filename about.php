@@ -28,11 +28,13 @@ require_once(dirname(__FILE__).'/../../config/config.inc.php');
 require_once(dirname(__FILE__).'/../../init.php');
 
 include_once(dirname(__FILE__).'/paypal.php');
-include_once(dirname(__FILE__).'/backward_compatibility/Display.php');
+include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
 
 $paypal = new PayPal();
 
-$id_lang = (int)($cookie->id_lang ? $cookie->id_lang : Configuration::get('PS_LANG_DEFAULT'));
+$context = Context::getContext();
+
+$id_lang = (int)($context->cookie->id_lang ? $context->cookie->id_lang : Configuration::get('PS_LANG_DEFAULT'));
 $iso_lang = Tools::strtolower(Language::getIsoById($id_lang));
 
 $paypal->context->smarty->assign('iso_code', $iso_lang);

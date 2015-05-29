@@ -121,7 +121,7 @@ class PayPalConnect
 
 			fclose($fp);
 
-			if (!isset($result) || $result == false)
+			if (!isset($tmp) || $tmp == false)
 				$this->_logs[] = $this->paypal->l('Send with fsockopen method failed !');
 			else
 				$this->_logs[] = $this->paypal->l('Send with fsockopen method successful');

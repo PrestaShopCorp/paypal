@@ -50,10 +50,6 @@ $ppec = new PaypalExpressCheckout($request_type);
 $token = Tools::getValue('token');
 $payer_id = Tools::getValue('PayerID');
 
-if(Tools::getValue('banktxnpendingurl') && Tools::getValue('banktxnpendingurl') == 'true')
-	$banktxnpendingurl = true;
-else
-	$banktxnpendingurl = false;
 
 function setContextData($ppec)
 {
@@ -265,7 +261,7 @@ function validateOrder($customer, $cart, $ppec)
 				$payment_type = (int)Configuration::get('PS_OS_PAYMENT');
 				$message = $ppec->l('Payment accepted.').'<br />';
 			}
-			elseif ($banktxnpendingurl){
+			elseif (Tools::getValue('banktxnpendingurl') && Tools::getValue('banktxnpendingurl') == 'true'){
 				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
 				$message = $ppec->l('eCheck').'<br />';
 			}

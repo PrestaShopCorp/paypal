@@ -64,7 +64,8 @@ class PaypalLib
 		$result = $this->makeSimpleCall($host, $script, $request, true);
 		$response = explode('&', $result);
 		$logs_request = $this->_logs;
-
+		$return = array();
+		
 		if ($this->enable_log === true)
 		{
 			$handle = fopen(dirname(__FILE__) . '/Results.txt', 'a+');

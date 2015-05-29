@@ -134,6 +134,7 @@ class PaypalExpressCheckout extends Paypal
 	public function setExpressCheckout($access_token = false)
 	{
 		$this->method = 'SetExpressCheckout';
+		$fields = array();
 		$this->setCancelUrl($fields);
 
 		// Only this call need to get the value from the $_GET / $_POST array
