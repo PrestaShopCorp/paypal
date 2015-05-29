@@ -31,9 +31,9 @@
 			{if  $list_captures|@count gt 0} 
 				<table class="table" width="100%" cellspacing="0" cellpadding="0">
 				  <tr>
-				    <th>{l s='Capture date' mod="paypal"}</th>
-				    <th>{l s='Capture Amount' mod="paypal"}</th> 
-				    <th>{l s='Result Capture' mod="paypal"}</th>
+				    <th>{l s='Capture date' mod='paypal'}</th>
+				    <th>{l s='Capture Amount' mod='paypal'}</th> 
+				    <th>{l s='Result Capture' mod='paypal'}</th>
 				  </tr>
 				{foreach from=$list_captures item=list}
 				  <tr>
@@ -68,9 +68,9 @@
 	{if  $list_captures|@count gt 0} 
  		<table class="table" width="100%" cellspacing="0" cellpadding="0">
 		  <tr>
-		    <th>{l s='Capture date' mod="paypal"}</th>
-		    <th>{l s='Capture Amount' mod="paypal"}</th> 
-		    <th>{l s='Result Capture' mod="paypal"}</th>
+		    <th>{l s='Capture date' mod='paypal'}</th>
+		    <th>{l s='Capture Amount' mod='paypal'}</th> 
+		    <th>{l s='Result Capture' mod='paypal'}</th>
 		  </tr>
 		{foreach from=$list_captures item=list}
 		  <tr>
