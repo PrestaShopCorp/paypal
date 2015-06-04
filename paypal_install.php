@@ -178,7 +178,7 @@ class PayPalInstall
 			{
 				$source = dirname(__FILE__).'/../../img/os/'.Configuration::get('PS_OS_PAYPAL').'.gif';
 				$destination = dirname(__FILE__).'/../../img/os/'.(int)$order_state->id.'.gif';
-				Tools::copy($source, $destination);
+				copy($source, $destination);
 			}
 			Configuration::updateValue('PAYPAL_OS_AUTHORIZATION', (int)$order_state->id);
 		}

@@ -98,7 +98,7 @@ function upgrade_module_2_8($object, $install = false)
 			$order_state->invoice = true;
 
 			if ($order_state->add())
-				Tools::copy(_PS_ROOT_DIR_.'/img/os/'.Configuration::get('PS_OS_PAYPAL').'.gif', _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif');
+				copy(_PS_ROOT_DIR_.'/img/os/'.Configuration::get('PS_OS_PAYPAL').'.gif', _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif');
 
 			Configuration::updateValue('PAYPAL_OS_AUTHORIZATION', (int)$order_state->id);
 		}
