@@ -17,8 +17,8 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
 *  @license	http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -91,7 +91,7 @@
 		<div class="box">
 
 			<div class="box right half" id="paypal-call-button">
-				<div id="paypal-call" class="box right">{$PayPal_content.customer_support} {if !empty($PayPal_content.customer_support_image)}<img src="../modules/paypal/img/{$PayPal_content.customer_support_image}.png" width="14px" alt="Phone" />{/if}</div>
+				<div id="paypal-call" class="box right">{$PayPal_content.customer_support} {if !empty($PayPal_content.customer_support_image)}<img src="../modules/paypal/views/img/{$PayPal_content.customer_support_image}.png" width="14px" alt="Phone" />{/if}</div>
 				<div id="paypal-call-foonote" class="box right clear">{$PayPal_content.support_foonote}</div>
 			</div>
 
@@ -154,26 +154,26 @@
 
 			<div id="signup">
 				{* Use cases 1 - 3 *}
-				<a href="{$PayPal_content.u1->signUpRedirectLink|escape:'htmlall':'UTF-8'}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u1">{$PayPal_content.u1->signUpCallButton|escape:'htmlall':'UTF-8'}</a>
-				<a href="{$PayPal_content.u2->signUpRedirectLink|escape:'htmlall':'UTF-8'}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u2">{$PayPal_content.u2->signUpCallButton|escape:'htmlall':'UTF-8'}</a>
-				<a href="{$PayPal_content.u3->signUpRedirectLink|escape:'htmlall':'UTF-8'}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u3">{$PayPal_content.u3->signUpCallButton|escape:'htmlall':'UTF-8'}</a>
+				<a href="{$PayPal_content.u1->signUpRedirectLink}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u1">{$PayPal_content.u1->signUpCallButton}</a>
+				<a href="{$PayPal_content.u2->signUpRedirectLink}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u2">{$PayPal_content.u2->signUpCallButton}</a>
+				<a href="{$PayPal_content.u3->signUpRedirectLink}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u3">{$PayPal_content.u3->signUpCallButton}</a>
 
 				{* Use cases 4 - 6 *}
-				{*<a href="{$PayPal_content.u4->signUpRedirectLink|escape:'htmlall':'UTF-8'}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u4">{$PayPal_content.u4->signUpCallButton|escape:'htmlall':'UTF-8'}</a>*}
-				<a href="{$PayPal_content.u5->signUpRedirectLink|escape:'htmlall':'UTF-8'}#" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u5">{$PayPal_content.u5->signUpCallButton|escape:'htmlall':'UTF-8'}</a>
-				{*<a href="{$PayPal_content.u6->signUpRedirectLink|escape:'htmlall':'UTF-8'}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u6">{$PayPal_content.u6->signUpCallButton|escape:'htmlall':'UTF-8'}</a>*}
+				{*<a href="{$PayPal_content.u4->signUpRedirectLink}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u4">{$PayPal_content.u4->signUpCallButton}</a>*}
+				<a href="{$PayPal_content.u5->signUpRedirectLink}#" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u5">{$PayPal_content.u5->signUpCallButton}</a>
+				{*<a href="{$PayPal_content.u6->signUpRedirectLink}" target="_blank" class="paypal-button paypal-signup-button" id="paypal-signup-button-u6">{$PayPal_content.u6->signUpCallButton}</a>*}
 
 				<br /><br />
 
 				{* Use cases 1 - 3 *}
-				<span class="paypal-signup-content" id="paypal-signup-content-u1">{$PayPal_content.u1->content|escape:'htmlall':'UTF-8'}</span>
-				<span class="paypal-signup-content" id="paypal-signup-content-u2">{$PayPal_content.u2->content|escape:'htmlall':'UTF-8'}</span>
-				<span class="paypal-signup-content" id="paypal-signup-content-u3">{$PayPal_content.u3->content|escape:'htmlall':'UTF-8'}</span>
+				<span class="paypal-signup-content" id="paypal-signup-content-u1">{$PayPal_content.u1->content}</span>
+				<span class="paypal-signup-content" id="paypal-signup-content-u2">{$PayPal_content.u2->content}</span>
+				<span class="paypal-signup-content" id="paypal-signup-content-u3">{$PayPal_content.u3->content}</span>
 
 				{* Use cases 4 - 6 *}
-				<span class="paypal-signup-content" id="paypal-signup-content-u4">{$PayPal_content.u4->content|escape:'htmlall':'UTF-8'}</span>
-				<span class="paypal-signup-content" id="paypal-signup-content-u5">{$PayPal_content.u5->content|escape:'htmlall':'UTF-8'}</span>
-				<span class="paypal-signup-content" id="paypal-signup-content-u6">{$PayPal_content.u6->content|escape:'htmlall':'UTF-8'}</span>
+				<span class="paypal-signup-content" id="paypal-signup-content-u4">{$PayPal_content.u4->content}</span>
+				<span class="paypal-signup-content" id="paypal-signup-content-u5">{$PayPal_content.u5->content}</span>
+				<span class="paypal-signup-content" id="paypal-signup-content-u6">{$PayPal_content.u6->content}</span>
 
 			</div>
 
@@ -244,7 +244,7 @@
 						<p class="description">
 						{$PayPal_content.template_to_choose|escape:'htmlall':'UTF-8'}
 						</p>
-						<img src="../modules/paypal/img/template.png" alt=""><br/>
+						<img src="../modules/paypal/views/img/template.png" alt=""><br/>
 						<input type="radio" name="integral_evolution_template" id="integral_evolution_template_A" value="A" {if $PayPal_integral_evolution_template == "A"}checked="checked"{/if}  style="margin-left:60px"/> <label for="integral_evolution_template">A</label> &nbsp;&nbsp;&nbsp;&nbsp;
 						&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="integral_evolution_template" id="integral_evolution_template_B" value="B" {if $PayPal_integral_evolution_template == "B"}checked="checked"{/if} style="margin-left:80px"/> <label for="integral_evolution_template">B</label>&nbsp;&nbsp;&nbsp;&nbsp;
 						&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="integral_evolution_template" id="integral_evolution_template_C" value="C" {if $PayPal_integral_evolution_template == "C"}checked="checked"{/if} style="margin-left:70px" /> <label for="integral_evolution_template">C</label>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -294,12 +294,12 @@
 							<dd>
 								<input type="radio" name="paypal_login_client_template" id="paypal_login_client_template_paypal_blue" value="1"{if $PayPal_login_tpl == 1} checked{/if} />
 								<label for="paypal_login_client_template_paypal_blue">
-									<img src="../modules/paypal/img/paypal_login_blue.png" alt=""> 
+									<img src="../modules/paypal/views/img/paypal_login_blue.png" alt=""> 
 								</label>
 								<br />
 								<input type="radio" name="paypal_login_client_template" id="paypal_login_client_template_neutral" value="2"{if $PayPal_login_tpl == 2} checked{/if} />
 								<label for="paypal_login_client_template_neutral">
-									<img src="../modules/paypal/img/paypal_login_grey.png" alt=""> 
+									<img src="../modules/paypal/views/img/paypal_login_grey.png" alt=""> 
 								</label>
 							</dd>
 						</dl>
