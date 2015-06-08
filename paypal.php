@@ -124,7 +124,7 @@ class PayPal extends PaymentModule
 		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('displayPaymentEU') || !$this->registerHook('paymentReturn') ||
 		!$this->registerHook('shoppingCartExtra') || !$this->registerHook('backBeforePayment') || !$this->registerHook('rightColumn') ||
 		!$this->registerHook('cancelProduct') || !$this->registerHook('productFooter') || !$this->registerHook('header') ||
-		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader'))
+		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader') || !$this->registerHook('actionPSCleanerGetModulesTables'))
 			return false;
 
 		if ((_PS_VERSION_ >= '1.5') && (!$this->registerHook('displayMobileHeader') ||
@@ -739,6 +739,11 @@ class PayPal extends PaymentModule
 		$refund = $this->_makeRefund($paypal_order['id_transaction'], (int)$order->id, $amount);
 		$this->formatMessage($refund, $message);
 		$this->_addNewPrivateMessage((int)$order->id, $message);
+	}
+
+	public function hookActionPSCleanerGetModulesTables()
+	{
+		return array('paypal_customer', 'paypal_order');
 	}
 
 	public function hookBackOfficeHeader()
