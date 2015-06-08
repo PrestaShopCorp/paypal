@@ -18,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -87,7 +87,6 @@ class PayPalConnect
 			@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 			@curl_setopt($ch, CURLOPT_SSLVERSION, defined('CURL_SSLVERSION_TLSv1') ? CURL_SSLVERSION_TLSv1 : 1);
 			@curl_setopt($ch, CURLOPT_VERBOSE, false);
-
 			if ($http_header)
 				@curl_setopt($ch, CURLOPT_HTTPHEADER, $http_header);
 
@@ -122,7 +121,7 @@ class PayPalConnect
 
 			fclose($fp);
 
-			if (!isset($result) || $result == false)
+			if (!isset($tmp) || $tmp == false)
 				$this->_logs[] = $this->paypal->l('Send with fsockopen method failed !');
 			else
 				$this->_logs[] = $this->paypal->l('Send with fsockopen method successful');

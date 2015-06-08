@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -18,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -229,9 +229,9 @@ class PayPalIPN extends PayPal
 			$action_url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_notify-validate';
 		
 		$request = '';
-		foreach($_POST as $key => $value) 
+		foreach ($_POST as $key => $value) 
 		{         
-			$value = urlencode(stripslashes($value));  
+			$value = urlencode(Tools::stripslashes($value));  
 			$request .= "&$key=$value";           
 		}
 		
