@@ -1,5 +1,5 @@
 {*
-* 2007-2014 PrestaShop
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -17,9 +17,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
@@ -31,9 +31,9 @@
 			{if  $list_captures|@count gt 0} 
 				<table class="table" width="100%" cellspacing="0" cellpadding="0">
 				  <tr>
-				    <th>{l s='Capture date'}</th>
-				    <th>{l s='Capture Amount'}</th> 
-				    <th>{l s='Result Capture'}</th>
+				    <th>{l s='Capture date' mod='paypal'}</th>
+				    <th>{l s='Capture Amount' mod='paypal'}</th> 
+				    <th>{l s='Result Capture' mod='paypal'}</th>
 				  </tr>
 				{foreach from=$list_captures item=list}
 				  <tr>
@@ -44,7 +44,7 @@
 				{/foreach}
 				</table>
 			{/if}
-			<form method="post" action="{$smarty.server.REQUEST_URI|escape:htmlall}">
+			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 				<p>{l s='There is still' mod='paypal'} {$rest_to_capture} {$id_currency} {l s='to capture.' mod='paypal'} {l s='How many do you want to capture :' mod='paypal'}</p>
 				<input type="text" onchange="captureEdit();" name="totalCaptureMoney" style="width80%;" placeholder="{l s='Enter the money you want to capture (ex: 200.00)' mod='paypal'}"/>
 		
@@ -68,9 +68,9 @@
 	{if  $list_captures|@count gt 0} 
  		<table class="table" width="100%" cellspacing="0" cellpadding="0">
 		  <tr>
-		    <th>{l s='Capture date'}</th>
-		    <th>{l s='Capture Amount'}</th> 
-		    <th>{l s='Result Capture'}</th>
+		    <th>{l s='Capture date' mod='paypal'}</th>
+		    <th>{l s='Capture Amount' mod='paypal'}</th> 
+		    <th>{l s='Result Capture' mod='paypal'}</th>
 		  </tr>
 		{foreach from=$list_captures item=list}
 		  <tr>

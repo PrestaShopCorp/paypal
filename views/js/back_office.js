@@ -1,3 +1,28 @@
+/*
+* 2007-2015 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*/
+
 $(document).ready( function() {
 	var identificationButtonClicked = false;
 
@@ -7,7 +32,7 @@ $(document).ready( function() {
 
 		var paypal_business = $('input[name="business"]:checked').val();
 		var paypal_payment_method = $('input[name="paypal_payment_method"]:checked').val();
-
+		var integral_evolution_solution = $('input[name="integral_evolution_solution"]:checked').val();
 		$('#signup span.paypal-signup-content').hide();
 		$('#signup .paypal-signup-button').hide();
 
@@ -25,6 +50,7 @@ $(document).ready( function() {
 						$('#standard-credentials').slideDown();
 						$('#paypal-signup-button-u1').show();
 						$('#paypal-signup-content-u1').show();
+						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
 						break;
 					case PayPal_HSS:
@@ -36,7 +62,17 @@ $(document).ready( function() {
 						$('#standard-credentials').slideUp();
 						$('#express_checkout_shortcut').slideUp();
 						$('#integral-credentials').slideDown();
+						$('#integral_evolution_solution').slideDown();
 						$('label[for="paypal_payment_wpp"] .toolbox').slideDown();
+						switch (integral_evolution_solution)
+						{
+							case "1": //Iframe
+								$('#integral_evolution_template').slideUp();
+							break;
+							case "0": //Redirection
+								$('#integral_evolution_template').slideDown();
+							break;
+						}
 						break;
 					case PayPal_ECS:
 						$('.toolbox').slideUp();
@@ -44,6 +80,7 @@ $(document).ready( function() {
 						$('#standard-credentials').slideDown();
 						$('#paypal-signup-button-u3').show();
 						$('#paypal-signup-content-u3').show();
+						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
 						break;
 				}
@@ -60,6 +97,7 @@ $(document).ready( function() {
 						$('#integral-credentials').slideUp();
 						$('#standard-credentials').slideDown();
 						$('#paypal-signup-button-u4').show();
+						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
 						break;
 					case PayPal_HSS:
@@ -70,13 +108,24 @@ $(document).ready( function() {
 						$('#standard-credentials').slideUp();
 						$('#express_checkout_shortcut').slideUp();
 						$('#integral-credentials').slideDown();
+						$('#integral_evolution_solution').slideDown();
 						$('label[for="paypal_payment_wpp"] .toolbox').slideDown();
+						switch (integral_evolution_solution)
+						{
+							case "1": //Iframe
+								$('#integral_evolution_template').slideUp();
+							break;
+							case "0": //Redirection
+								$('#integral_evolution_template').slideDown();
+							break;
+						}
 						break;
 					case PayPal_ECS:
 						$('#signup').slideUp();
 						$('#integral-credentials').slideUp();
 						$('#standard-credentials').slideDown();
 						$('#paypal-signup-button-u6').show();
+						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
 						break;
 				}
@@ -125,7 +174,7 @@ $(document).ready( function() {
 		}
 	}
 
-	$('input[name="business"], input[name="paypal_payment_method"]').live('change', function() {
+	$('input[name="business"], input[name="paypal_payment_method"], input[name="integral_evolution_solution"]').live('change', function() {
 		displayConfiguration();
 	});
 
@@ -167,6 +216,8 @@ $(document).ready( function() {
 		}
 		return true;
 	});
+
+
 
 	if ($("#paypal-wrapper").length > 0) {
 		$('input[type="submit"]').live('click', function() {
@@ -211,8 +262,10 @@ $(document).ready( function() {
 			$.fancybox({'hideOnOverlayClick' : true, 'content' : $('<div id="paypal-save-failure">').append($('#paypal-save-failure').clone().html())});
 
 		$('#paypal-get-identification').live('click', function() {
+
 			identificationButtonClicked = true;
-			var url = 'https://www.paypal.com/us/cgi-bin/webscr?cmd=_get-api-signature&generic-flow=true';
+			sandbox_prefix = $('#paypal_payment_test_mode').is(':checked') ? 'sandbox.' : '';
+			var url = 'https://www.'+sandbox_prefix+'paypal.com/us/cgi-bin/webscr?cmd=_get-api-signature&generic-flow=true';
 			var title = 'PayPal identification informations';
 			window.open (url, title, config='height=500, width=360, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
 			return false;
@@ -229,6 +282,20 @@ $(document).ready( function() {
 			var form = $('#paypal_configuration');
 			form.append('<input type="hidden" name="paypal_country_only" value="'+$(this).val()+'" />');
 			form.submit();
+		});
+
+
+		$("#paypal_login_yes_or_no input[name='paypal_login']").change(function(){
+			var val = parseInt($(this).val());
+			if (val === 1)
+			{
+				$("#paypal_login_configuration").slideDown();
+			}
+			else
+			{
+				$("#paypal_login_configuration").slideUp();
+			}
+
 		});
 	}
 

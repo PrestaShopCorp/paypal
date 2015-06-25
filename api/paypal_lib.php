@@ -1,6 +1,6 @@
 <?php
-/*
-* 2007-2014 PrestaShop
+/**
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -63,10 +63,12 @@ class PaypalLib
 		// Making connection
 		$result = $this->makeSimpleCall($host, $script, $request, true);
 		$response = explode('&', $result);
+		$logs_request = $this->_logs;
+		$return = array();
 		
 		if ($this->enable_log === true)
 		{
-			$handle = fopen(dirname(__FILE__) . '/Results.txt', 'a+');
+			$handle = fopen(dirname(__FILE__).'/Results.txt', 'a+');
 			fwrite($handle, 'Host : '.print_r($host, true)."\r\n");
 			fwrite($handle, 'Request : '.print_r($request, true)."\r\n");
 			fwrite($handle, 'Result : '.print_r($result, true)."\r\n");
@@ -92,6 +94,9 @@ class PaypalLib
 				continue;
 			$this->_logs[] = $key.' -> '.$value;
 		}
+
+		if (count($this->_logs) <= 2)
+			$this->_logs = array_merge($this->_logs, $logs_request);
 
 		return $return;
 	}

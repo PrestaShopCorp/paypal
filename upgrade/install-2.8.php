@@ -1,6 +1,6 @@
 <?php
-/*
-* 2007-2014 PrestaShop
+/**
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,14 +18,14 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
 if (!defined('_PS_VERSION_'))
-    exit;
+	exit;
 
 function upgrade_module_2_8($object, $install = false)
 {
@@ -59,7 +59,7 @@ function upgrade_module_2_8($object, $install = false)
 
 		/* Create Table */
 		if (!Db::getInstance()->Execute('
-		CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'paypal_order` (
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_order` (
 		`id_order` int(10) unsigned NOT null auto_increment,
 		`id_transaction` varchar(255) NOT null,
 		PRIMARY KEY (`id_order`)
@@ -67,7 +67,7 @@ function upgrade_module_2_8($object, $install = false)
 			$result = false;
 
 		if (!Db::getInstance()->Execute('
-		ALTER TABLE `' . _DB_PREFIX_ . 'paypal_order` ADD `payment_method` INT NOT null,
+		ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `payment_method` INT NOT null,
 		ADD `payment_status` VARCHAR(255) NOT null,
 		ADD `capture` INT NOT null'))
 			$result = false;
@@ -98,7 +98,7 @@ function upgrade_module_2_8($object, $install = false)
 			$order_state->invoice = true;
 
 			if ($order_state->add())
-				@copy(_PS_ROOT_DIR_.'/img/os/'.Configuration::get('PS_OS_PAYPAL').'.gif', _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif');
+				copy(_PS_ROOT_DIR_.'/img/os/'.Configuration::get('PS_OS_PAYPAL').'.gif', _PS_ROOT_DIR_.'/img/os/'.(int)$order_state->id.'.gif');
 
 			Configuration::updateValue('PAYPAL_OS_AUTHORIZATION', (int)$order_state->id);
 		}
