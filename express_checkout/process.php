@@ -1,6 +1,6 @@
 <?php
-/*
-* 2007-2014 PrestaShop
+/**
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -134,6 +134,7 @@ class PaypalExpressCheckout extends Paypal
 	public function setExpressCheckout($access_token = false)
 	{
 		$this->method = 'SetExpressCheckout';
+		$fields = array();
 		$this->setCancelUrl($fields);
 
 		// Only this call need to get the value from the $_GET / $_POST array
@@ -152,6 +153,9 @@ class PaypalExpressCheckout extends Paypal
 
 		if ($access_token)
 			$fields['IDENTITYACCESSTOKEN'] = $access_token;
+		
+		if (Country::getIsoById(Configuration::get('PAYPAL_COUNTRY_DEFAULT')) == 'de')
+			$fields['BANKTXNPENDINGURL'] = 'payment.php?banktxnpendingurl=true';
 
 		$this->callAPI($fields);
 		$this->_storeToken();
@@ -184,6 +188,7 @@ class PaypalExpressCheckout extends Paypal
 	public function getExpressCheckout()
 	{
 		$this->method = 'GetExpressCheckoutDetails';
+		$fields = array();
 		$fields['TOKEN'] = $this->token;
 
 		$this->initParameters();
@@ -196,9 +201,12 @@ class PaypalExpressCheckout extends Paypal
 	public function doExpressCheckout()
 	{
 		$this->method = 'DoExpressCheckoutPayment';
-
+		$fields = array();
 		$fields['TOKEN'] = $this->token;
 		$fields['PAYERID'] = $this->payer_id;
+
+		if (Configuration::get('PAYPAL_COUNTRY_DEFAULT') == 1)
+			$fields['BANKTXNPENDINGURL'] = '';
 
 		if (count($this->product_list) <= 0)
 			$this->initParameters();
@@ -365,7 +373,7 @@ class PaypalExpressCheckout extends Paypal
 		}
 		else
 		{
-			if($currency->iso_code == "HUF")
+			if ($currency->iso_code == 'HUF')
 			{ 
 				$fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = round($shipping_cost_wt); 
 				$fields['PAYMENTREQUEST_0_ITEMAMT'] = Tools::ps_round($total, $this->decimals); 
@@ -500,6 +508,9 @@ class PaypalExpressCheckout extends Paypal
 		else
 			$url = '/websc&cmd=_express-checkout';
 
+		if (($this->method == 'SetExpressCheckout') && (Configuration::get('PAYPAL_COUNTRY_DEFAULT') == 1) && ($this->type == 'payment_cart'))
+			$url .= '&useraction=commit';
+		
 		Tools::redirectLink('https://'.$this->getPayPalURL().$url.'&token='.urldecode($this->token));
 		exit(0);
 	}

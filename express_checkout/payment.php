@@ -1,6 +1,6 @@
 <?php
-/*
-* 2007-2014 PrestaShop
+/**
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,9 +18,9 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2014 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2015 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
@@ -49,6 +49,7 @@ $ppec = new PaypalExpressCheckout($request_type);
 
 $token = Tools::getValue('token');
 $payer_id = Tools::getValue('PayerID');
+
 
 function setContextData($ppec)
 {
@@ -260,6 +261,11 @@ function validateOrder($customer, $cart, $ppec)
 				$payment_type = (int)Configuration::get('PS_OS_PAYMENT');
 				$message = $ppec->l('Payment accepted.').'<br />';
 			}
+			elseif (Tools::getValue('banktxnpendingurl') && Tools::getValue('banktxnpendingurl') == 'true')
+			{
+				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
+				$message = $ppec->l('eCheck').'<br />';
+			}
 			elseif (strcasecmp($payment_status, 'Pending') === 0)
 			{
 				$payment_type = (int)Configuration::get('PS_OS_PAYPAL');
@@ -302,7 +308,11 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		// When all information are checked before, we can validate the payment to paypal
 		// and create the prestashop order
 		$ppec->doExpressCheckout();
+		
 
+		if ($ppec->result['RedirectRequired'] == 'true')
+			$ppec->redirectToAPI();
+			
 		validateOrder($customer, $cart, $ppec);
 
 		unset($ppec->context->cookie->{PaypalExpressCheckout::$cookie_name});
@@ -316,7 +326,7 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		}
 
 		/* Check payment details to display the appropriate content */
-		if (isset($order) && ($ppec->result['ACK'] != "Failure"))
+		if (isset($order) && ($ppec->result['ACK'] != 'Failure'))
 		{
 			$values = array(
 				'key' => $customer->secure_key,

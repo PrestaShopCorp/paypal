@@ -1,4 +1,5 @@
-{*
+<?php
+/**
 * 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -21,10 +22,31 @@
 *  @copyright 2007-2015 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*}
-<form id="paypal_payment_form" action="{$base_dir_ssl}modules/paypal/express_checkout/payment.php" data-ajax="false" title="{l s='Pay with PayPal' mod='paypal'}" method="post">
-	@hiddenSubmit
-	<input type="hidden" name="express_checkout" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
-	<input type="hidden" name="current_shop_url" value="{$PayPal_current_page|escape:'htmlall':'UTF-8'}" />
-	<input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
-</form>
+*/
+
+if (!defined('_PS_VERSION_'))
+	exit;
+
+function upgrade_module_3_9($object, $install = false)
+{
+	$paypal_version = Configuration::get('PAYPAL_VERSION');
+
+	if ((!$paypal_version) || (empty($paypal_version)) || ($paypal_version < $object->version))
+	{
+		if (!Db::getInstance()->Execute('
+		CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_capture` (
+			  `id_paypal_capture` int(11) NOT NULL AUTO_INCREMENT,
+			  `id_order` int(11) NOT NULL,
+			  `capture_amount` float NOT NULL,
+			  `result` text NOT NULL,
+			  `date_add` datetime NOT NULL,
+			  `date_upd` datetime NOT NULL,
+			  PRIMARY KEY (`id_paypal_capture`)
+			) ENGINE='._MYSQL_ENGINE_.'  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;'))
+			return false;
+		Configuration::updateValue('PAYPAL_VERSION', '3.9.0');
+	}
+
+
+	return true;
+}

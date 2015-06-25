@@ -10,8 +10,8 @@
 		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
-		<LocalPayPalHorizontalSolutionPP>/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="AU">
@@ -26,7 +26,7 @@
         <PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_AU/AU/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
 
         <PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-        <LocalPayPalVerticalSolutionPP>/img/default_logos/AU_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+        <LocalPayPalVerticalSolutionPP>/views/img/default_logos/AU_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="BE">
@@ -40,10 +40,10 @@
 		<PayPalMarkGiant>https://www.paypal.com/fr_FR/i/logo/PayPal_mark_180x113.gif</PayPalMarkGiant>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/img/default_logos/BE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/BE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/BE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/BE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="CN">
@@ -59,16 +59,23 @@
 	</country>
 
 	<country iso_code="DE">
-		<PayPalLogoSmall>https://www.paypal-deutschland.de/external/logocenter-update/logo-paypal-100x27.gif</PayPalLogoSmall>
-		<PayPalLogoMedium>https://www.paypal-deutschland.de/external/logocenter-update/logo-paypal-150x41.gif</PayPalLogoMedium>
-		<PayPalLogoLarge>https://www.paypal-deutschland.de/external/logocenter-update/logo-paypal-200x55.gif</PayPalLogoLarge>
+		<PayPalLogoSmall>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-100px.png</PayPalLogoSmall>
+		<PayPalLogoMedium>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-150px.png</PayPalLogoMedium>
+		<PayPalLogoLarge>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalLogoLarge>
 
-		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
+		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
+
+		<ExpressCheckoutShortcutButton>https://www.paypalobjects.com/webstatic/de_DE/i/de-btn-expresscheckout.gif</ExpressCheckoutShortcutButton>
+
+		<PayPalMarkSmall>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg</PayPalMarkSmall>
+		<PayPalMarkMedium>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg</PayPalMarkMedium>
+		<PayPalMarkLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalMarkLarge>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/DE_vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/DE_vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
 	</country>
+
 
 	<country iso_code="ES">
 		<PayPalLogoSmall>https://www.paypal.com/es_ES/ES/Marketing/i/logo/PayPal_logo_80x35.gif</PayPalLogoSmall>
@@ -96,7 +103,7 @@
 
 		<!-- Distant object must be declared to use the local object -->
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/FR_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/FR_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="GB">
@@ -224,10 +231,10 @@
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/img/default_logos/PL_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/PL_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/PL_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/PL_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="PT">
@@ -265,10 +272,10 @@
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/img/default_logos/RA_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/RA_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/RA_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/RA_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="RE">
@@ -281,10 +288,10 @@
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/img/default_logos/RE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/RE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/img/default_logos/RE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/RE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="SG">
