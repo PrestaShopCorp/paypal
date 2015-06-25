@@ -50,7 +50,8 @@ class PayPalConfirmModuleFrontController extends ModuleFrontController
 			'form_action' => PayPal::getShopDomainSsl(true, true)._MODULE_DIR_.$this->paypal->name.'/express_checkout/payment.php',
 			'total' => Tools::displayPrice($this->context->cart->getOrderTotal(true), $currency),
 			'logos' => $this->paypal->paypal_logos->getLogos(),
-			'use_mobile' => (bool)$this->paypal->useMobile()
+			'use_mobile' => (bool)$this->paypal->useMobile(), 
+			'address' => new Address($this->context->cart->id_address_delivery)
 		));
 
 		$this->setTemplate('order-summary.tpl');
