@@ -42,6 +42,11 @@
 			<br/><br />
 		{l s='Here is a short summary of your order:' mod='paypal'}
 		</p>
+		<p class="shipping_address">
+			<strong>{l s='Shipping address' mod='paypal'}</strong><br/>
+			{AddressFormat::generateAddress($address, array(), '<br/>')}
+			
+		</p>
 		<p style="margin-top:20px;">
 			- {l s='The total amount of your order is' mod='paypal'}
 			<span id="amount" class="price"><strong>{$total|escape:'htmlall':'UTF-8'}</strong></span> {if $use_taxes == 1}{l s='(tax incl.)' mod='paypal'}{/if}
