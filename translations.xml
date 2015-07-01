@@ -22,6 +22,11 @@
 		<change_country>change</change_country>
 		<country_change_title>Select your country</country_change_title>
 		
+		
+		<in_context_checkout_title>Use PayPal In Context Checkout</in_context_checkout_title>
+		<in_context_checkout_tagline>Make your client pay without leaving your website</in_context_checkout_tagline>
+		<in_context_checkout_merchant_id>Merchant ID</in_context_checkout_merchant_id>
+
 		<translated_in_lang>Translated in your language</translated_in_lang>
 
 		<customer_support><![CDATA[<span style="font-weight: bold">Need help ?</span>]]> Give us a call : xxxx</customer_support>
