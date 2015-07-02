@@ -389,7 +389,7 @@ class PayPal extends PaymentModule
 			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_MERCHANT_ID')
 		));
 		
-		$process = '<script type="text/javascript">'.$this->fetchTemplate('js/paypal.js').'</script>';
+		$process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
 		if(Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
 			$process .= '<script async src="//www.paypalobjects.com/api/checkout.js"></script>';
 
