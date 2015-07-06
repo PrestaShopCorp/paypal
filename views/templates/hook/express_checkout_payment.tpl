@@ -28,7 +28,11 @@
 <div class="row">
 	<div class="col-xs-12 col-md-6">
         <p class="payment_module paypal">
-			<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+        	{if $PayPal_in_context_checkout == 1}
+				<a href="javascript:void(0)" onclick="" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+			{else}
+				<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" title="{l s='Pay with PayPal' mod='paypal'}">
+			{/if}
 				{if isset($use_mobile) && $use_mobile}
 					<img src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code|escape:'htmlall':'UTF-8'}_orange_295x43.png" />
 				{else}
@@ -53,7 +57,7 @@
 </style>
 {else}
 <p class="payment_module">
-	<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
+		<a href="javascript:void(0)" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
 		{if isset($use_mobile) && $use_mobile}
 			<img src="{$base_dir_ssl}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" />
 		{else}
@@ -70,6 +74,18 @@
 
 {/if}
 
+
+{if $PayPal_in_context_checkout == 1}
+	<input type="hidden" id="in_context_checkout_enabled" value="1">
+{else}
+<script>
+	$(document).ready(function(){
+		$('#paypal_process_payment').click(function(){
+			$('#paypal_payment_form').submit();
+		})
+	});
+</script>
+{/if}
 <form id="paypal_payment_form" action="{$base_dir_ssl}modules/paypal/express_checkout/payment.php" data-ajax="false" title="{l s='Pay with PayPal' mod='paypal'}" method="post">
 	<input type="hidden" name="express_checkout" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
 	<input type="hidden" name="current_shop_url" value="{$PayPal_current_page|escape:'htmlall':'UTF-8'}" />

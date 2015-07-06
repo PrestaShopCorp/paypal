@@ -31,7 +31,7 @@ define('PAYPAL_API_VERSION', '106.0');
 class PaypalLib
 {
 
-	private $enable_log = false;
+	private $enable_log = true;
 	private $_logs = array();
 	protected $paypal = null;
 	public function __construct()

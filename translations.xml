@@ -22,6 +22,11 @@
 		<change_country>change</change_country>
 		<country_change_title>Select your country</country_change_title>
 		
+		
+		<in_context_checkout_title>Use PayPal In Context Checkout</in_context_checkout_title>
+		<in_context_checkout_tagline>Make your client pay without leaving your website</in_context_checkout_tagline>
+		<in_context_checkout_merchant_id>Merchant ID</in_context_checkout_merchant_id>
+
 		<translated_in_lang>Translated in your language</translated_in_lang>
 
 		<customer_support><![CDATA[<span style="font-weight: bold">Need help ?</span>]]> Give us a call : xxxx</customer_support>
@@ -942,6 +947,10 @@
 
 		<express_checkout_shortcut_title>Utilisez PayPal Express</express_checkout_shortcut_title>
 		<express_checkout_shortcut_tagline>Offrez à vos clients la possibilité de payer en 2 clics</express_checkout_shortcut_tagline>
+
+		<in_context_checkout_title>Utilisez PayPal In Context Checkout</in_context_checkout_title>
+		<in_context_checkout_tagline>Faites payer votre client sans quitter votre site</in_context_checkout_tagline>
+		<in_context_checkout_merchant_id>ID du marchant</in_context_checkout_merchant_id>
 
 		<sandbox_title>Utilisez la Sandbox</sandbox_title>
 		<sandbox_recommended>(recommandé)</sandbox_recommended>
