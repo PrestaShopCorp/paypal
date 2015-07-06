@@ -52,6 +52,7 @@ $(document).ready( function() {
 						$('#paypal-signup-content-u1').show();
 						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
+						$('#in_context_checkout').slideDown();
 						break;
 					case PayPal_HSS:
 						$('#signup').slideDown();
@@ -64,6 +65,7 @@ $(document).ready( function() {
 						$('#integral-credentials').slideDown();
 						$('#integral_evolution_solution').slideDown();
 						$('label[for="paypal_payment_wpp"] .toolbox').slideDown();
+						$('#in_context_checkout').slideUp();
 						switch (integral_evolution_solution)
 						{
 							case "1": //Iframe
@@ -82,6 +84,7 @@ $(document).ready( function() {
 						$('#paypal-signup-content-u3').show();
 						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
+						$('#in_context_checkout').slideDown();
 						break;
 				}
 				break;
@@ -99,6 +102,7 @@ $(document).ready( function() {
 						$('#paypal-signup-button-u4').show();
 						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
+						$('#in_context_checkout').slideDown();
 						break;
 					case PayPal_HSS:
 						$('#signup').slideDown();
@@ -110,6 +114,7 @@ $(document).ready( function() {
 						$('#integral-credentials').slideDown();
 						$('#integral_evolution_solution').slideDown();
 						$('label[for="paypal_payment_wpp"] .toolbox').slideDown();
+						$('#in_context_checkout').slideUp();
 						switch (integral_evolution_solution)
 						{
 							case "1": //Iframe
@@ -127,6 +132,7 @@ $(document).ready( function() {
 						$('#paypal-signup-button-u6').show();
 						$('#integral_evolution_solution').slideUp();
 						$('#express_checkout_shortcut').slideDown();
+						$('#in_context_checkout').slideDown();
 						break;
 				}
 				break;

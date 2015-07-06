@@ -125,6 +125,7 @@ $_MODULE['<{paypal}prestashop>order-summary_f1d3b424cd68795ecaa552883759aceb'] =
 $_MODULE['<{paypal}prestashop>order-summary_dd23adc5fb6bda9c384397b31e57fc53'] = 'PayPal-Zahlung';
 $_MODULE['<{paypal}prestashop>order-summary_62d74398cb6ebaa69ab7339052ca5c92'] = 'Sie möchten mit PayPal bezahlen.';
 $_MODULE['<{paypal}prestashop>order-summary_c884ed19483d45970c5bf23a681e2dd2'] = 'Ihre Bestellübersicht:';
+$_MODULE['<{paypal}prestashop>order-summary_0c458988127eb2150776881e2ef3f0c4'] = 'Liefeadresse';
 $_MODULE['<{paypal}prestashop>order-summary_e2867a925cba382f1436d1834bb52a1c'] = 'Der Gesamtbetrag Ihrer Bestellung:';
 $_MODULE['<{paypal}prestashop>order-summary_1f87346a16cf80c372065de3c54c86d9'] = '(inkl. Steuer)';
 $_MODULE['<{paypal}prestashop>order-summary_8ed356c32b198c9cb2abab7c3d262b93'] = 'Wir akzeptieren die folgende Währung:';

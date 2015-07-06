@@ -50,3 +50,9 @@ label span.description{display:block;padding-left:16px}
 #paypal-wrapper .left,#paypal-wrapper dl > *{float:left}
 #paypal-wrapper .right,.box ul.tick{float:right}
 .paypal-hide{display:none}
+#paypal-wrapper .merchant_id {
+	margin-top: 0px;
+}
+#paypal-wrapper .merchant_id label {
+	padding-left: 0px;
+}
