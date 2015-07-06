@@ -454,6 +454,14 @@ class PaypalExpressCheckout extends Paypal
 		$this->context->cookie->{self::$cookie_name} = serialize($tab);
 	}
 
+	public function displayPaypalInContextCheckout()
+	{
+		$this->secure_key = $this->getSecureKey();
+		$this->_storeCookieInfo();
+		echo $this->token;
+		die;
+	}
+
 	public function hasSucceedRequest()
 	{
 		if (is_array($this->result))
