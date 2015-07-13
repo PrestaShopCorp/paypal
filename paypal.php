@@ -330,7 +330,7 @@ class PayPal extends PaymentModule
 			'PayPal_api_business_account' => Configuration::get('PAYPAL_BUSINESS_ACCOUNT'),
 			'PayPal_express_checkout_shortcut' => (int)Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
 			'PayPal_in_context_checkout' => (int)Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
-			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_MERCHANT_ID'),
+			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID'),
 			'PayPal_sandbox_mode' => (int)Configuration::get('PAYPAL_SANDBOX'),
 			'PayPal_payment_capture' => (int)Configuration::get('PAYPAL_CAPTURE'),
 			'PayPal_country_default' => (int)$this->default_country,
@@ -386,7 +386,7 @@ class PayPal extends PaymentModule
 			'ssl_enabled' => Configuration::get('PS_SSL_ENABLED'),
 			'PAYPAL_SANDBOX' => Configuration::get('PAYPAL_SANDBOX'),
 			'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
-			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_MERCHANT_ID')
+			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID')
 		));
 		
 		$process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
@@ -570,7 +570,7 @@ class PayPal extends PaymentModule
 				'PayPal_current_page' => $this->getCurrentUrl(),
 				'PayPal_tracking_code' => $this->getTrackingCode($method),
 				'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
-				'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_MERCHANT_ID')
+				'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID')
 			));
 
 			return $this->fetchTemplate('express_checkout_payment.tpl');
@@ -1143,7 +1143,7 @@ class PayPal extends PaymentModule
 				Configuration::updateValue('PAYPAL_API_SIGNATURE', trim(Tools::getValue('api_signature')));
 				Configuration::updateValue('PAYPAL_BUSINESS_ACCOUNT', trim(Tools::getValue('api_business_account')));
 				Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', (int)Tools::getValue('express_checkout_shortcut'));
-				Configuration::updateValue('PAYPAL_IN_CONTEXT_CHECKOUT_MERCHANT_ID', Tools::getValue('in_context_checkout_merchant_id'));
+				Configuration::updateValue('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID', Tools::getValue('in_context_checkout_merchant_id'));
 				Configuration::updateValue('PAYPAL_SANDBOX', (int)Tools::getValue('sandbox_mode'));
 				Configuration::updateValue('PAYPAL_CAPTURE', (int)Tools::getValue('payment_capture'));
 				/* USE PAYPAL LOGIN */
