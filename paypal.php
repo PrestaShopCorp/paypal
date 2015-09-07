@@ -391,7 +391,7 @@ class PayPal extends PaymentModule
 		
 		$process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
 		if(Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
-			$process .= '<script async src="//www.paypalobjects.com/api/checkout.js"></script>';
+			$process .= '<script defer src="//www.paypalobjects.com/api/checkout.js"></script>';
 
 		if ((
 			(method_exists($smarty, 'getTemplateVars') && ($smarty->getTemplateVars('page_name') == 'authentication' || $smarty->getTemplateVars('page_name') == 'order-opc' ))
