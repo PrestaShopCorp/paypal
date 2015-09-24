@@ -87,7 +87,7 @@
 	<input type="hidden" name="zip" value="{$delivery_address->postcode|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="country" value="{$delivery_address->country->iso_code|escape:'htmlall':'UTF-8'}" />
 	{if ($delivery_address->id_state != 0)}
-		<input type="hidden" name="billing_state" value="{$delivery_address->state->name|escape:'htmlall':'UTF-8'}" />
+		<input type="hidden" name="state" value="{$delivery_address->state->name|escape:'htmlall':'UTF-8'}" />
 	{/if}
 
 	<input type="hidden" name="address_override" value="true" />
