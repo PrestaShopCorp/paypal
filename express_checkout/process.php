@@ -127,7 +127,7 @@ class PaypalExpressCheckout extends Paypal
 		}
 
 		$this->context->currency = $currency_module;
-		$this->product_list = $this->context->cart->getProducts();
+		$this->product_list = $this->context->cart->getProducts(true);
 		return (bool)count($this->product_list);
 	}
 
