@@ -853,10 +853,22 @@ class PayPal extends PaymentModule
 		if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && !$this->useMobile()) || !in_array(ECS, $this->getPaymentMethods()) ||
 		(((int)Configuration::get('PAYPAL_BUSINESS') == 1) && ((int)Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->useMobile()))
 			return;
+
+		$id_product = (int)Tools::getValue('id_product');
+		$id_product_attribute = (int)Product::getDefaultAttribute($id_product);
+		if ($id_product_attribute)
+			$minimal_quantity = Attribute::getAttributeMinimalQty($id_product_attribute);
+		else
+		{
+			$product = new Product($id_product);
+			$minimal_quantity = $product->minimal_quantity;
+		}
 		
 		$this->context->smarty->assign(array(
 			'PayPal_payment_type' => $type,
 			'PayPal_current_page' => $this->getCurrentUrl(),
+			'id_product_attribute' => $id_product_attribute,
+			'product_minimal_quantity' => $minimal_quantity,
 			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')),
 			
 		));
