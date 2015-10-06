@@ -279,7 +279,7 @@ function validateOrder($customer, $cart, $ppec)
 		if ($ppec->result['L_ERRORCODE0'] == 10486)
 			$ppec->redirectToAPI();
 
-		$payment_status = $ppec->result['PAYMENTINFO_0_PAYMENTSTATUS'];
+		$payment_status = isset($ppec->result['PAYMENTINFO_0_PAYMENTSTATUS']) ? $ppec->result['PAYMENTINFO_0_PAYMENTSTATUS'] : false;
 		$payment_type = (int)Configuration::get('PS_OS_ERROR');
 
 		if ($amount_match)
@@ -309,7 +309,7 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		$ppec->doExpressCheckout();
 		
 
-		if ($ppec->result['RedirectRequired'] == 'true')
+		if (isset($ppec->result['RedirectRequired']) && $ppec->result['RedirectRequired'] == 'true')
 			$ppec->redirectToAPI();
 			
 		validateOrder($customer, $cart, $ppec);
