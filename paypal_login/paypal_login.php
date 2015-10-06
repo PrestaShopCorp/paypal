@@ -73,8 +73,11 @@ class PayPalLogin
 	public function getAuthorizationCode()
 	{
 		unset($this->_logs);
-
-		if (Context::getContext()->cookie->isLogged())
+		
+		$context = Context::getContext();
+		$is_logged = (method_exists($context->customer, 'isLogged') ? $context->customer->isLogged() : $context->cookie->isLogged());
+		
+		if ($is_logged)
 			return $this->getRefreshToken();
 
 		$params = array(
@@ -107,7 +110,7 @@ class PayPalLogin
 			if (!$customer)
 				return false;
 
-			$temp = PaypalLoginUser::getByIdCustomer((int)Context::getContext()->customer->id);
+			$temp = PaypalLoginUser::getByIdCustomer((int)$context->customer->id);
 
 			if ($temp)
 				$login = $temp;
@@ -216,7 +219,7 @@ class PayPalLogin
 		$customer = new Customer();
 		$customer->firstname = $result->given_name;
 		$customer->lastname = $result->family_name;
-		if (version_compare(_PS_VERSION_, '1.5.0', '>'))
+		if (version_compare(_PS_VERSION_, '1.5.3.1', '>'))
 			$customer->id_lang = Language::getIdByIso(strstr($result->language, '_', true));
 		$customer->birthday = $result->birthday;
 		$customer->email = $result->email;
