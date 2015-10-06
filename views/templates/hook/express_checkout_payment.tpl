@@ -28,7 +28,7 @@
 <div class="row">
 	<div class="col-xs-12 col-md-6">
         <p class="payment_module paypal">
-        	{if $PayPal_in_context_checkout == 1}
+        	{if $use_paypal_in_context}
 				<a href="javascript:void(0)" onclick="" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
 			{else}
 				<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" title="{l s='Pay with PayPal' mod='paypal'}">
@@ -75,7 +75,7 @@
 {/if}
 
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	<input type="hidden" id="in_context_checkout_enabled" value="1">
 {else}
 <script>

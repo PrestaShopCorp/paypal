@@ -148,7 +148,7 @@ if ($request_type && $ppec->type)
 	/* Set details for a payment */
 	$ppec->setExpressCheckout(($login_user ? $login_user->access_token : false));
 
-	if(Tools::getValue('ajax') && Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
+	if(Tools::getValue('ajax') && $ppec->useInContextCheckout() )
 	{
 		$ppec->displayPaypalInContextCheckout();
 	}

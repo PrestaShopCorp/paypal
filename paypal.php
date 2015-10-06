@@ -330,6 +330,7 @@ class PayPal extends PaymentModule
 			'PayPal_api_business_account' => Configuration::get('PAYPAL_BUSINESS_ACCOUNT'),
 			'PayPal_express_checkout_shortcut' => (int)Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
 			'PayPal_in_context_checkout' => (int)Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
+			'use_paypal_in_context' => (int)$this->useInContextCheckout(),
 			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID'),
 			'PayPal_sandbox_mode' => (int)Configuration::get('PAYPAL_SANDBOX'),
 			'PayPal_payment_capture' => (int)Configuration::get('PAYPAL_CAPTURE'),
@@ -386,11 +387,12 @@ class PayPal extends PaymentModule
 			'ssl_enabled' => Configuration::get('PS_SSL_ENABLED'),
 			'PAYPAL_SANDBOX' => Configuration::get('PAYPAL_SANDBOX'),
 			'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
+			'use_paypal_in_context' => (int)$this->useInContextCheckout(),
 			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID')
 		));
 		
 		$process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
-		if(Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
+		if($this->useInContextCheckout())
 			$process .= '<script defer src="//www.paypalobjects.com/api/checkout.js"></script>';
 
 		if ((
@@ -411,6 +413,11 @@ class PayPal extends PaymentModule
 		}
 
 		return $process;
+	}
+
+	public function useInContextCheckout()
+	{
+		return Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT') && Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID') != null;
 	}
 
 
@@ -570,7 +577,9 @@ class PayPal extends PaymentModule
 				'PayPal_current_page' => $this->getCurrentUrl(),
 				'PayPal_tracking_code' => $this->getTrackingCode($method),
 				'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
+				'use_paypal_in_context' => (int)$this->useInContextCheckout(),
 				'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID')
+				
 			));
 
 			return $this->fetchTemplate('express_checkout_payment.tpl');

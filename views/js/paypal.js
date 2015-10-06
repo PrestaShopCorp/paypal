@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	window.paypalCheckoutReady = function() {
 	        paypal.checkout.setup("{$PayPal_in_context_checkout_merchant_id}", {
 	            environment: {if $PAYPAL_SANDBOX}"sandbox"{else}"production"{/if},
