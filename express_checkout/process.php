@@ -266,7 +266,15 @@ class PaypalExpressCheckout extends Paypal
 	{
 		$address = new Address($id_address);
 
-		$fields['ADDROVERRIDE'] = '1';
+		//We allow address modification when using express checkout shortcut
+		if($this->type != 'payment_cart')
+		{
+			$fields['ADDROVERRIDE'] = '0';
+			$fields['NOSHIPPING'] = '0';
+		}
+		else
+			$fields['ADDROVERRIDE'] = '1';
+
 		$fields['EMAIL'] = $this->context->customer->email;
 		$fields['PAYMENTREQUEST_0_SHIPTONAME'] = $address->firstname.' '.$address->lastname;
 		$fields['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = (empty($address->phone)) ? $address->phone_mobile : $address->phone;
@@ -549,7 +557,7 @@ class PaypalExpressCheckout extends Paypal
 
 		if ($redirect)
 		{
-			$link = $this->context->link->getPageLink('order.php', false, null, array('step' => '3'));
+			$link = $this->context->link->getPageLink('order.php', false, null, array('step' => '1'));
 			Tools::redirectLink($link);
 			exit(0);
 		}

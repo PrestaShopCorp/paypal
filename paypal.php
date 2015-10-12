@@ -881,7 +881,7 @@ class PayPal extends PaymentModule
 		$this->context->smarty->assign(array(
 			'PayPal_payment_type' => $type,
 			'PayPal_current_page' => $this->getCurrentUrl(),
-			'id_product_attribute' => $id_product_attribute,
+			'id_product_attribute_ecs' => $id_product_attribute,
 			'product_minimal_quantity' => $minimal_quantity,
 			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')),
 			
