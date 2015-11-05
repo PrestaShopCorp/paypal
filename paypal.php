@@ -123,14 +123,14 @@ class PayPal extends PaymentModule
 
 	public function install()
 	{
-		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('displayPaymentEU') || !$this->registerHook('paymentReturn') ||
+		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') ||
 		!$this->registerHook('shoppingCartExtra') || !$this->registerHook('backBeforePayment') || !$this->registerHook('rightColumn') ||
 		!$this->registerHook('cancelProduct') || !$this->registerHook('productFooter') || !$this->registerHook('header') ||
-		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader') || !$this->registerHook('actionPSCleanerGetModulesTables'))
+		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader'))
 			return false;
 
 		if ((_PS_VERSION_ >= '1.5') && (!$this->registerHook('displayMobileHeader') ||
-		!$this->registerHook('displayMobileShoppingCartTop') || !$this->registerHook('displayMobileAddToCartTop')))
+		!$this->registerHook('displayMobileShoppingCartTop') || !$this->registerHook('displayMobileAddToCartTop') || !$this->registerHook('displayPaymentEU') || !$this->registerHook('actionPSCleanerGetModulesTables')))
 			return false;
 
 		include_once(_PS_MODULE_DIR_.$this->name.'/paypal_install.php');
