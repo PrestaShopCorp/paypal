@@ -28,6 +28,7 @@ if (!defined('_PS_VERSION_'))
 	exit;
 
 include_once(_PS_MODULE_DIR_.'paypal/api/paypal_lib.php');
+include_once(_PS_MODULE_DIR_.'paypal/api/CallApiPaypalPlus.php');
 include_once(_PS_MODULE_DIR_.'paypal/paypal_logos.php');
 include_once(_PS_MODULE_DIR_.'paypal/paypal_orders.php');
 include_once(_PS_MODULE_DIR_.'paypal/paypal_tools.php');
@@ -38,10 +39,12 @@ include_once(_PS_MODULE_DIR_.'paypal/classes/PaypalCapture.php');
 define('WPS', 1); //Paypal Integral
 define('HSS', 2); //Paypal Integral Evolution
 define('ECS', 4); //Paypal Option +
+define('PPP', 5); //Paypal Plus
 
 define('TRACKING_INTEGRAL_EVOLUTION', 'FR_PRESTASHOP_H3S');
 define('TRACKING_INTEGRAL', 'PRESTASHOP_EC');
 define('TRACKING_OPTION_PLUS', 'PRESTASHOP_ECM');
+define('TRACKING_PAYPAL_PLUS', 'PRESTASHOP_PPP');
 define('PAYPAL_HSS_REDIRECTION', 0);
 define('PAYPAL_HSS_IFRAME', 1);
 define('TRACKING_EXPRESS_CHECKOUT_SEAMLESS', 'PrestaShopCEMEA_Cart_LIPP');
@@ -80,7 +83,7 @@ class PayPal extends PaymentModule
 	const ONLY_WRAPPING	= 6;
 	const ONLY_PRODUCTS_WITHOUT_SHIPPING = 7;
 
-	public function __construct()
+        public function __construct()
 	{
 		$this->name = 'paypal';
 		$this->tab = 'payments_gateways';
@@ -123,15 +126,16 @@ class PayPal extends PaymentModule
 
 	public function install()
 	{
-		if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') ||
-		!$this->registerHook('shoppingCartExtra') || !$this->registerHook('backBeforePayment') || !$this->registerHook('rightColumn') ||
-		!$this->registerHook('cancelProduct') || !$this->registerHook('productFooter') || !$this->registerHook('header') ||
-		!$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader'))
-			return false;
+        if (!parent::install() || !$this->registerHook('payment') || !$this->registerHook('paymentReturn') ||
+        !$this->registerHook('shoppingCartExtra') || !$this->registerHook('backBeforePayment') || !$this->registerHook('rightColumn') ||
+        !$this->registerHook('cancelProduct') || !$this->registerHook('productFooter') || !$this->registerHook('header') ||
+        !$this->registerHook('adminOrder') || !$this->registerHook('backOfficeHeader'))
+            return false;
 
-		if ((_PS_VERSION_ >= '1.5') && (!$this->registerHook('displayMobileHeader') ||
-		!$this->registerHook('displayMobileShoppingCartTop') || !$this->registerHook('displayMobileAddToCartTop') || !$this->registerHook('displayPaymentEU') || !$this->registerHook('actionPSCleanerGetModulesTables')))
-			return false;
+        if ((_PS_VERSION_ >= '1.5') && (!$this->registerHook('displayMobileHeader') ||
+        !$this->registerHook('displayMobileShoppingCartTop') || !$this->registerHook('displayMobileAddToCartTop') || !$this->registerHook('displayPaymentEU') || !$this->registerHook('actionPSCleanerGetModulesTables')))
+            return false;
+
 
 		include_once(_PS_MODULE_DIR_.$this->name.'/paypal_install.php');
 		$paypal_install = new PayPalInstall();
@@ -196,11 +200,14 @@ class PayPal extends PaymentModule
 	public function isPayPalAPIAvailable()
 	{
 		$payment_method = Configuration::get('PAYPAL_PAYMENT_METHOD');
-
-		if ($payment_method != HSS && !is_null(Configuration::get('PAYPAL_API_USER')) &&
-		!is_null(Configuration::get('PAYPAL_API_PASSWORD')) && !is_null(Configuration::get('PAYPAL_API_SIGNATURE')))
+			
+		if( ( $payment_method == WPS || $payment_method == ECS ) && ( !is_null(Configuration::get('PAYPAL_API_USER')) && !is_null(Configuration::get('PAYPAL_API_PASSWORD')) && !is_null(Configuration::get('PAYPAL_API_SIGNATURE') ) ) )
 			return true;
-		elseif ($payment_method == HSS && !is_null(Configuration::get('PAYPAL_BUSINESS_ACCOUNT')))
+			
+		if( $payment_method == PPP && ( !is_null(Configuration::get('PAYPAL_PLUS_CLIENT_ID')) || !is_null(Configuration::get('PAYPAL_PLUS_SECRET') ) ) )
+			return true;
+		
+		if($payment_method == HSS && !is_null(Configuration::get('PAYPAL_BUSINESS_ACCOUNT')))
 			return true;
 
 		return false;
@@ -317,6 +324,7 @@ class PayPal extends PaymentModule
 			'PayPal_WPS' => (int)WPS,
 			'PayPal_HSS' => (int)HSS,
 			'PayPal_ECS' => (int)ECS,
+			'PayPal_PPP' => (int)PPP,
 			'PP_errors' => $this->_errors,
 			'PayPal_logo' => $this->paypal_logos->getLogos(),
 			'PayPal_allowed_methods' => $this->getPaymentMethods(),
@@ -345,6 +353,8 @@ class PayPal extends PaymentModule
 			'PayPal_login_secret' => Configuration::get('PAYPAL_LOGIN_SECRET'),
 			'PayPal_login_tpl' => (int)Configuration::get('PAYPAL_LOGIN_TPL'),
 			'default_lang_iso' => Language::getIsoById($this->context->employee->id_lang),
+			'PayPal_plus_client' => Configuration::get('PAYPAL_PLUS_CLIENT_ID'),
+			'PayPal_plus_secret' => Configuration::get('PAYPAL_PLUS_SECRET'),
 		));
 
 		$this->getTranslations();
@@ -353,7 +363,7 @@ class PayPal extends PaymentModule
 
 		if ($this->active == false)
 			return $output.$this->hookBackOfficeHeader();
-
+                
 		return $output;
 	}
 
@@ -400,17 +410,28 @@ class PayPal extends PaymentModule
 				|| (isset($smarty->_tpl_vars) && ($smarty->_tpl_vars['page_name'] == 'authentication' || $smarty->_tpl_vars['page_name'] == 'order-opc')))
 			&&
 			(int)Configuration::get('PAYPAL_LOGIN') == 1)
-		{
-			$this->context->smarty->assign(array(
-				'paypal_locale' => $this->getLocale(),
-				'PAYPAL_LOGIN_CLIENT_ID' => Configuration::get('PAYPAL_LOGIN_CLIENT_ID'),
-				'PAYPAL_LOGIN_TPL' => Configuration::get('PAYPAL_LOGIN_TPL'),
-				'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
-			));
-			$process .= '
-				<script src="https://www.paypalobjects.com/js/external/api.js"></script>
-				<script>'.$this->fetchTemplate('views/js/paypal_login.js').'</script>';
-		}
+			{
+				$this->context->smarty->assign(array(
+					'paypal_locale' => $this->getLocale(),
+					'PAYPAL_LOGIN_CLIENT_ID' => Configuration::get('PAYPAL_LOGIN_CLIENT_ID'),
+					'PAYPAL_LOGIN_TPL' => Configuration::get('PAYPAL_LOGIN_TPL'),
+					'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
+				));
+				$process .= '
+					<script src="https://www.paypalobjects.com/js/external/api.js"></script>
+					<script>'.$this->fetchTemplate('views/js/paypal_login.js').'</script>';
+			}
+
+			if (Configuration::get('PAYPAL_PAYMENT_METHOD') == PPP) {
+
+				$this->context->smarty->assign(array(
+					'paypal_locale' => $this->getLocale(),
+					'PAYPAL_LOGIN_CLIENT_ID' => Configuration::get('PAYPAL_LOGIN_CLIENT_ID'),
+					'PAYPAL_LOGIN_TPL' => Configuration::get('PAYPAL_LOGIN_TPL'),
+					'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
+				));
+				$process = '<script src="https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js" type="text/javascript"></script>';
+			}
 
 		return $process;
 	}
@@ -419,8 +440,6 @@ class PayPal extends PaymentModule
 	{
 		return Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT') && Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID') != null;
 	}
-
-
 
 	public function getLocale()
 	{
@@ -515,6 +534,7 @@ class PayPal extends PaymentModule
 			'de' => 'de_DE',
 		);
 
+                
 		$this->context->smarty->assign(array(
 			'logos' => $this->paypal_logos->getLogos(),
 			'sandbox_mode' => Configuration::get('PAYPAL_SANDBOX'),
@@ -584,8 +604,26 @@ class PayPal extends PaymentModule
 
 			return $this->fetchTemplate('express_checkout_payment.tpl');
 		}
+                elseif ($method == PPP)
+                {
 
-		return null;
+                    $CallApiPaypalPlus = new CallApiPaypalPlus();
+                    $CallApiPaypalPlus->setParams($params);
+                              
+                    $approuval_url = $CallApiPaypalPlus->getApprovalUrl();
+					
+                    $this->context->smarty->assign(
+                        array(
+                                'approval_url' => $approuval_url,
+                                'language' => $this->context->language->language_code,
+                                'country' => $this->context->language->iso_code,
+                                'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live'
+                        )
+                    );
+
+                    return $this->fetchTemplate('paypal_plus_payment.tpl');
+
+                }
 	}
 
 	public function hookDisplayPaymentEU($params) 
@@ -827,7 +865,8 @@ class PayPal extends PaymentModule
 				'PayPal_module_dir' => _MODULE_DIR_.$this->name,
 				'PayPal_WPS' => (int)WPS,
 				'PayPal_HSS' => (int)HSS,
-				'PayPal_ECS' => (int)ECS
+				'PayPal_ECS' => (int)ECS,
+				'PayPal_PPP' => (int)PPP
 			));
 
 			return (isset($output) ? $output : null).$this->fetchTemplate('/views/templates/admin/header.tpl');
@@ -936,6 +975,10 @@ class PayPal extends PaymentModule
 			else
 				return TRACKING_OPTION_PLUS;
 		}
+		if ($method == PPP)
+		{
+			return TRACKING_PAYPAL_PLUS;
+		}
 
 		return TRACKING_CODE;
 	}
@@ -1029,8 +1072,9 @@ class PayPal extends PaymentModule
 		// WPS -> Web Payment Standard
 		// HSS -> Web Payment Pro / Integral Evolution
 		// ECS -> Express Checkout Solution
+		// PPP -> PAYPAL PLUS
 
-		$payment_method = array('AU' => array(WPS, HSS, ECS), 'BE' => array(WPS, ECS), 'CN' => array(WPS, ECS), 'CZ' => array(), 'DE' => array(WPS, ECS),
+		$payment_method = array('AU' => array(WPS, HSS, ECS), 'BE' => array(WPS, ECS), 'CN' => array(WPS, ECS), 'CZ' => array(), 'DE' => array(WPS, ECS, PPP),
 		'ES' => array(WPS, HSS, ECS), 'FR' => array(WPS, HSS, ECS), 'GB' => array(WPS, HSS, ECS), 'HK' => array(WPS, HSS, ECS),
 		'IL' => array(WPS, ECS), 'IN' => array(WPS, ECS), 'IT' => array(WPS, HSS, ECS), 'JP' => array(WPS, HSS, ECS), 'MY' => array(WPS, ECS),
 		'NL' => array(WPS, ECS), 'NZ' => array(WPS, ECS), 'PL' => array(WPS, ECS), 'PT' => array(WPS, ECS), 'RA' => array(WPS, ECS), 'RE' => array(WPS, ECS),
@@ -1100,7 +1144,7 @@ class PayPal extends PaymentModule
 			FROM `'._DB_PREFIX_.'paypal_order`
 			WHERE `id_order` = '.(int)$id_order);
 
-		return $paypal_order && $paypal_order['payment_status'] == 'Completed' && $paypal_order['capture'] == 0;
+		return $paypal_order && ($paypal_order['payment_status'] == 'Completed' || $paypal_order['payment_status'] == 'approved' ) && $paypal_order['capture'] == 0;
 	}
 
 	private function _needValidation($id_order)
@@ -1140,10 +1184,23 @@ class PayPal extends PaymentModule
 
 			if ($this->default_country === false || $sandbox_mode === false || $payment_capture === false || $business === false || $payment_method === false)
 				$this->_errors[] = $this->l('Some fields are empty.');
-			elseif (($business == 0 || ($business == 1 && $payment_method != HSS)) && (!Tools::getValue('api_username') || !Tools::getValue('api_password') || !Tools::getValue('api_signature')))
+			
+			
+			elseif ($business == 0)
 				$this->_errors[] = $this->l('Credentials fields cannot be empty');
-			elseif ($business == 1 && $payment_method == HSS && !Tools::getValue('api_business_account'))
-				$this->_errors[] = $this->l('Business e-mail field cannot be empty');
+			
+			elseif ($business == 1){
+			
+				if( ($payment_method == WPS || $payment_method == ECS ) && (!Tools::getValue('api_username') || !Tools::getValue('api_password') || !Tools::getValue('api_signature')))
+					$this->_errors[] = $this->l('Credentials fields cannot be empty');
+				
+				if($payment_method == PPP && (!Tools::getValue('client_id') || !Tools::getValue('secret') ) )
+					$this->_errors[] = $this->l('Credentials fields cannot be empty');
+			
+				if($payment_method == HSS && !Tools::getValue('api_business_account'))
+					$this->_errors[] = $this->l('Business e-mail field cannot be empty');
+			}
+			
 		}
 
 		return !count($this->_errors);
@@ -1173,7 +1230,10 @@ class PayPal extends PaymentModule
 				Configuration::updateValue('PAYPAL_LOGIN_SECRET', Tools::getValue('paypal_login_client_secret'));
 				Configuration::updateValue('PAYPAL_LOGIN_TPL', (int)Tools::getValue('paypal_login_client_template'));
 				/* /USE PAYPAL LOGIN */
-
+                                if ((int)Tools::getValue('paypal_payment_method') == 5) {
+                                    Configuration::updateValue('PAYPAL_PLUS_CLIENT_ID', Tools::getValue('client_id'));
+                                    Configuration::updateValue('PAYPAL_PLUS_SECRET', Tools::getValue('secret'));
+                                }
 				/* IS IN_CONTEXT_CHECKOUT ENABLED */
 				if((int)Tools::getValue('paypal_payment_method') != 2)
 					Configuration::updateValue('PAYPAL_IN_CONTEXT_CHECKOUT', (int)Tools::getValue('in_context_checkout'));
@@ -1206,22 +1266,59 @@ class PayPal extends PaymentModule
 		elseif (!$id_transaction)
 			die(Tools::displayError('Fatal Error: id_transaction is null'));
 
-		if (!$amt)
-			$params = array('TRANSACTIONID' => $id_transaction, 'REFUNDTYPE' => 'Full');
-		else
-		{
-			$iso_currency = Db::getInstance()->getValue('
-				SELECT `iso_code`
-				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'currency` c ON (o.`id_currency` = c.`id_currency`)
-				WHERE o.`id_order` = '.(int)$id_order);
+	
+		$payment_method = Configuration::get('PAYPAL_PAYMENT_METHOD');
+		
+		if($payment_method != PPP){
+	
+			if (!$amt)
+				$params = array('TRANSACTIONID' => $id_transaction, 'REFUNDTYPE' => 'Full');
+			else
+			{
+				$iso_currency = Db::getInstance()->getValue('
+					SELECT `iso_code`
+					FROM `'._DB_PREFIX_.'orders` o
+					LEFT JOIN `'._DB_PREFIX_.'currency` c ON (o.`id_currency` = c.`id_currency`)
+					WHERE o.`id_order` = '.(int)$id_order);
 
-			$params = array('TRANSACTIONID'	=> $id_transaction,	'REFUNDTYPE' => 'Partial', 'AMT' => (float)$amt, 'CURRENCYCODE' => Tools::strtoupper($iso_currency));
+				$params = array('TRANSACTIONID'	=> $id_transaction,	'REFUNDTYPE' => 'Partial', 'AMT' => (float)$amt, 'CURRENCYCODE' => Tools::strtoupper($iso_currency));
+			}
+
+			$paypal_lib	= new PaypalLib();
+			
+			return $paypal_lib->makeCall($this->getAPIURL(), $this->getAPIScript(), 'RefundTransaction', '&'.http_build_query($params, '', '&'));
+		
+		
+		}else{
+
+			if (!$amt){
+			
+				$params = new stdClass();
+				
+			}else{
+			
+				$result = Db::getInstance()->ExecuteS('SELECT * FROM '. _DB_PREFIX_ . 'paypal_order WHERE id_transaction = "' . $id_transaction . '"');
+				$result = current($result);
+				
+			
+				$amount = new stdClass();
+				$amount->total = $amt;
+				$amount->currency = $result['currency'];
+				
+				$params = new stdClass();
+				$params->amount = $amount;
+			
+			}
+			
+			
+			
+			$callApiPaypalPlus = new CallApiPaypalPlus();
+
+			return json_decode($callApiPaypalPlus->executeRefund($id_transaction, $params));
+		
 		}
 
-		$paypal_lib	= new PaypalLib();
-
-		return $paypal_lib->makeCall($this->getAPIURL(), $this->getAPIScript(), 'RefundTransaction', '&'.http_build_query($params, '', '&'));
+		
 	}
 
 	public function _addNewPrivateMessage($id_order, $message)
@@ -1275,11 +1372,17 @@ class PayPal extends PaymentModule
 		else
 			$response = $this->_makeRefund($paypal_order['id_transaction'], $id_order, (float)($amt));
 
-		$message = $this->l('Refund operation result:').'<br>';
-		foreach ($response as $key => $value)
-			$message .= $key.': '.$value.'<br>';
+		$message = $this->l('Refund operation result:'). " \r\n";
+		foreach ($response as $key => $value){
+                        if(is_object($value) || is_array($value)){
+                            $message .= $key.': '.json_encode($value). " \r\n";
 
-		if (array_key_exists('ACK', $response) && $response['ACK'] == 'Success' && $response['REFUNDTRANSACTIONID'] != '')
+                        }else{
+                            $message .= $key.': '.$value. " \r\n";
+                        }
+			
+                }
+		if ((array_key_exists('ACK', $response) && $response['ACK'] == 'Success' && $response['REFUNDTRANSACTIONID'] != '') || (isset($response->state) && $response->state == 'completed'))
 		{
 			$message .= $this->l('PayPal refund successful!');
 			if (!Db::getInstance()->Execute('UPDATE `'._DB_PREFIX_.'paypal_order` SET `payment_status` = \'Refunded\' WHERE `id_order` = '.(int)$id_order))
@@ -1431,6 +1534,7 @@ class PayPal extends PaymentModule
 			elseif (@filemtime(dirname(__FILE__).'/'.$views.'admin/'.$name))
 				return $this->display(__FILE__, $views.'admin/'.$name);
 		}
+                
 
 		return $this->display(__FILE__, $name);
 	}

@@ -629,6 +629,13 @@
 		<website_payment_pro_tagline>Eine professionelle Plattform für eingehende Kreditkarten- und PayPal-Zahlungen, inklusive Verkäuferschutz.<![CDATA[<br />]]>Angepasste Zahlungsseiten. 25,00 EUR monatlich.</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Klicken Sie erst dann auf "Speichern", nachdem PayPal dieses Produkt für Sie freigeschaltet hat. Das dauert in der Regel 3-5 Tage.</website_payment_pro_disclaimer>
 
+                <website_payment_plus>Website PAYPAL Plus</website_payment_plus>
+		<website_payment_plus_tagline>Tagline</website_payment_plus_tagline>
+		<website_payment_plus_disclaimer>Disclaimer</website_payment_plus_disclaimer>
+
+                <credentials_clientid>Client ID</credentials_clientid>
+		<credentials_secret>Secret</credentials_secret>
+		
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Steigern Sie Ihre Online-Umsätze um 30%*</express_checkout_tagline>
 		<express_checkout_tagline_source>* Quelle: Forrester-Studie vom März 2011</express_checkout_tagline_source>
