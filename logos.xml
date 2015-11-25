@@ -99,9 +99,10 @@
 		<PayPalMarkMedium>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg</PayPalMarkMedium>
 		<PayPalMarkLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalMarkLarge>
 
-		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/webstatic/mktg/logo-center/logo_paypal_moyens_paiement_fr.jpg</PayPalHorizontalSolutionPP>
-
 		<!-- Distant object must be declared to use the local object -->
+		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/FR_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
 		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/FR_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
