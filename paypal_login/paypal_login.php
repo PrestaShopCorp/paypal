@@ -28,9 +28,9 @@ class PayPalLogin
 {
 	private	$_logs = array();
 	private $enable_log = false;
-	
+
 	private $paypal_connect = null;
-	
+
 	public function __construct()
 	{
 		$this->paypal_connect = new PayPalConnect();
@@ -61,14 +61,8 @@ class PayPalLogin
 
 	public static function getReturnLink()
 	{
-		// return 'http://requestb.in/1jlaizq1';
-		if (method_exists(Context::getContext()->shop, 'getBaseUrl'))
-			return Context::getContext()->shop->getBaseUrl().'modules/paypal/paypal_login/paypal_login_token.php';
-		else
-			return 'http://'.Configuration::get('PS_SHOP_DOMAIN').'/modules/paypal/paypal_login/paypal_login_token.php';
+		return PayPal::getShopDomainSsl(true, true)._MODULE_DIR_.'paypal/paypal_login/paypal_login_token.php';
 	}
-
-
 
 	public function getAuthorizationCode()
 	{
@@ -91,7 +85,7 @@ class PayPalLogin
 			$handle = fopen(dirname(__FILE__).'/Results.txt', 'a+');
 			fwrite($handle, "Request => ".print_r($request, true)."\r\n");
 			fwrite($handle, "Result => ".print_r($result, true)."\r\n");
-			fwrite($handle, "Journal => ".print_r($this->_logs, true."\r\n"));
+			fwrite($handle, "Journal => ".print_r($this->_logs, true)."\r\n");
 			fclose($handle);
 		}
 
@@ -146,7 +140,7 @@ class PayPalLogin
 			$handle = fopen(dirname(__FILE__).'/Results.txt', 'a+');
 			fwrite($handle, "Request => ".print_r($request, true)."\r\n");
 			fwrite($handle, "Result => ".print_r($result, true)."\r\n");
-			fwrite($handle, "Journal => ".print_r($this->_logs, true."\r\n"));
+			fwrite($handle, "Journal => ".print_r($this->_logs, true)."\r\n");
 			fclose($handle);
 		}
 
@@ -184,7 +178,7 @@ class PayPalLogin
 			fwrite($handle, "Request => ".print_r($request, true)."\r\n");
 			fwrite($handle, "Result => ".print_r($result, true)."\r\n");
 			fwrite($handle, "Headers => ".print_r($headers, true)."\r\n");
-			fwrite($handle, "Journal => ".print_r($this->_logs, true."\r\n"));
+			fwrite($handle, "Journal => ".print_r($this->_logs, true)."\r\n");
 			fclose($handle);
 		}
 
