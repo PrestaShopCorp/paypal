@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	window.paypalCheckoutReady = function() {
 	        paypal.checkout.setup("{$PayPal_in_context_checkout_merchant_id}", {
 	            environment: {if $PAYPAL_SANDBOX}"sandbox"{else}"production"{/if},
@@ -48,22 +48,22 @@
 	                    async: true,
 	                    crossDomain: true,
 
-	                    //Load the minibrowser with the redirection url in the success handler
+	                    
 	                    success: function (token) {
 	                        var url = paypal.checkout.urlPrefix +token;
-	                        //Loading Mini browser with redirect url, true for async AJAX calls
+	                    
 	                        paypal.checkout.startFlow(url);
 	                    },
 	                    error: function (responseData, textStatus, errorThrown) {
 	                        alert("Error in ajax post"+responseData.statusText);
-	                        //Gracefully Close the minibrowser in case of AJAX errors
+	                    
 	                        paypal.checkout.closeFlow();
 	                    }
 	                });
 	            },
 	            button: ['paypal_process_payment', 'payment_paypal_express_checkout']
 	        });
-	    }
+	    };
 {/if}
 {literal}
 

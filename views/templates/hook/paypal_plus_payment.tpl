@@ -23,11 +23,20 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<script type="text/javascript">
-	var PayPal_WPS = '{$PayPal_WPS|intval}';
-	var PayPal_HSS = '{$PayPal_HSS|intval}';
-	var PayPal_ECS = '{$PayPal_ECS|intval}';
-	var PayPal_PPP = '{$PayPal_PPP|intval}';
-</script>
+{*Displaying a button or the iframe*}
+<div id="ppplus"></div>
 
-<script type="text/javascript" src="{$PayPal_module_dir|escape:'htmlall':'UTF-8'}/views/js/back_office.js"></script>
+{literal}
+    <script type="application/javascript">
+    
+        var ppp = PAYPAL.apps.PPP({
+            "approvalUrl": "{/literal}{$approval_url}{literal}",
+            "placeholder": "ppplus",
+            "mode": "{/literal}{$mode}{literal}",
+            "language": "{/literal}{$language}{literal}",
+            "country": "{/literal}{$country}{literal}",
+        });
+   
+    </script>
+{/literal}
+

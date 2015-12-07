@@ -56,3 +56,63 @@ label span.description{display:block;padding-left:16px}
 #paypal-wrapper .merchant_id label {
 	padding-left: 0px;
 }
+
+.inforeturn .alert {
+  padding: 15px;
+  margin-bottom: 18px;
+  border: 1px solid transparent;
+  border-radius: 0px; }
+  .inforeturn .alert h4 {
+    margin-top: 0;
+    color: inherit; }
+  .inforeturn .alert.alert-link {
+    font-weight: bold; }
+  .inforeturn .alert > p,
+  .inforeturn .alert > ul {
+    margin-bottom: 0; }
+  .inforeturn .alert > p + p {
+    margin-top: 5px; }
+
+.inforeturn .alert-dismissable {
+  padding-right: 35px; }
+  .inforeturn .alert-dismissable.close {
+    position: relative;
+    top: -2px;
+    right: -21px;
+    color: inherit; }
+
+.inforeturn .alert-success {
+  background-color: #55c65e;
+  border-color: #48b151;
+  color: #fff; }
+  .inforeturn .alert-success hr {
+    border-top-color: #419f49; }
+  .inforeturn .alert-success.alert-link {
+    color: #e6e6e6; }
+
+.inforeturn .alert-info {
+  background-color: #5192f3;
+  border-color: #4b80c3;
+  color: #fff; }
+  .inforeturn .alert-info hr {
+    border-top-color: #3d73b7; }
+  .inforeturn .alert-info.alert-link {
+    color: #e6e6e6; }
+
+.inforeturn .alert-warning {
+  background-color: #fe9126;
+  border-color: #e4752b;
+  color: #fff; }
+  .inforeturn .alert-warning hr {
+    border-top-color: #da681c; }
+  .inforeturn .alert-warning.alert-link {
+    color: #e6e6e6; }
+
+.inforeturn .alert-danger {
+  background-color: #f3515c;
+  border-color: #d4323d;
+  color: #fff; }
+  .inforeturn .alert-danger hr {
+    border-top-color: #c32933; }
+  .inforeturn .alert-danger.alert-link {
+    color: #e6e6e6; }

@@ -26,14 +26,22 @@
 <form id="paypal_payment_form" action="{$base_dir_ssl}modules/paypal/express_checkout/payment.php" title="{l s='Pay with PayPal' mod='paypal'}" method="post" data-ajax="false">
 	{if isset($smarty.get.id_product)}<input type="hidden" name="id_product" value="{$smarty.get.id_product|intval}" />{/if}
 	<!-- Change dynamicaly when the form is submitted -->
+	{if isset($product_minimal_quantity)}
+	<input type="hidden" name="quantity" value="{$product_minimal_quantity|escape:'htmlall':'UTF-8'}" />
+	{else}
 	<input type="hidden" name="quantity" value="1" />
+	{/if}
+	{if isset($id_product_attribute_ecs)}
+	<input type="hidden" name="id_p_attr" value="{$id_product_attribute_ecs|escape:'htmlall':'UTF-8'}" />
+	{else}
 	<input type="hidden" name="id_p_attr" value="" />
+	{/if}
 	<input type="hidden" name="express_checkout" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
 	<input type="hidden" name="current_shop_url" value="{$PayPal_current_page|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
 </form>
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	<input type="hidden" id="in_context_checkout_enabled" value="1">
 {else}
 	<input type="hidden" id="in_context_checkout_enabled" value="0">

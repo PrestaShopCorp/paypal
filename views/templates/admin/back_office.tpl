@@ -26,7 +26,6 @@
 <div id="paypal-wrapper">
 
 	{* PayPal configuration page header *}
-
 	<div class="box half left">
 		{if isset($PayPal_logo.LocalPayPalLogoLarge)}
 			<img src="{$PayPal_logo.LocalPayPalLogoLarge}" alt="" style="margin-bottom: -5px" />
@@ -112,7 +111,7 @@
 							<span class="description">{$PayPal_content.website_payment_standard_tagline}</span>
 						</label>
 					{/if}
-
+                                        <div class="clear"></div>
 					{if (in_array($PayPal_HSS, $PayPal_allowed_methods))}
 						{* WEBSITE PAYMENT PRO *}
 						<br />
@@ -123,9 +122,20 @@
 							<p class="toolbox">{$PayPal_content.website_payment_pro_disclaimer}</p>
 						</label>
 					{/if}
+                                        <div class="clear"></div>
+                                        {if (in_array($PayPal_PPP, $PayPal_allowed_methods))}
+                                            {* WEBSITE PAYMENT PLUS *}
+                                            <br />
+                                            <label for="paypal_payment_ppp">
+                                                    <input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
+                                                    {$PayPal_content.choose} {$PayPal_content.website_payment_plus}<br />
+                                                    <span class="description">{$PayPal_content.website_payment_plus_tagline}</span>
+                                                    <p class="toolbox">{$PayPal_content.website_payment_plus_disclaimer}</p>
+                                            </label>
+                                        {/if}
 				</div>
 			{/if}
-
+                        <div class="clear"></div>
 			{if (in_array($PayPal_ECS, $PayPal_allowed_methods))}
 			<h4 class="inline">{$PayPal_content.additional_solution_tagline}</h4> <img src="{$PayPal_logo.LocalPayPalMarkSmall}" />
 			<div class="form-block">
@@ -215,7 +225,20 @@
 					<span class="description">{$PayPal_content.credentials_fields_disclaimer|escape:'htmlall':'UTF-8'}</span>
 				</div>
 
+                                <div id="paypalplus-credentials">
+					<h4>{$PayPal_content.credentials_description|escape:'htmlall':'UTF-8'}</h4>
 
+					<br />
+
+					<dl>
+						<dt><label for="client_id">{$PayPal_content.credentials_clientid|escape:'htmlall':'UTF-8'} : </label></dt>
+						<dd><input type='text' name="client_id" id="client_id" value="{$PayPal_plus_client|escape:'html':'UTF-8'}" autocomplete="off" size="85"/></dd>
+						<dt><label for="secret">{$PayPal_content.credentials_secret|escape:'htmlall':'UTF-8'} : </label></dt>
+						<dd><input type='password' size="85" name="secret" id="secret" value="{$PayPal_plus_secret|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
+					</dl>
+					<div class="clear"></div>
+				</div>                                
+                                
 				<div id="integral-credentials" class="paypal-hide">
 					<h4>{$PayPal_content.credentials_integral_description|escape:'htmlall':'UTF-8'}</h4>
 

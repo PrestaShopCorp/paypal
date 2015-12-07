@@ -93,8 +93,8 @@ function setCustomerAddress($ppec, $customer, $id = null)
 	if ($id == null)
 		$address->alias = 'Paypal_Address';
 
-	$address->lastname = $customer->lastname;
-	$address->firstname = $customer->firstname;
+	$address->lastname = $ppec->result['LASTNAME'];
+	$address->firstname =  $ppec->result['FIRSTNAME'];
 	$address->address1 = $ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET'];
 	if (isset($ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET2']))
 		$address->address2 = $ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET2'];
@@ -107,6 +107,46 @@ function setCustomerAddress($ppec, $customer, $id = null)
 	$address->id_customer = $customer->id;
 	return $address;
 }
+
+function checkAndModifyAddress($ppec, $customer)
+{
+	$context = Context::getContext();
+	$customer_addresses = $customer->getAddresses($context->cookie->id_lang);
+	$paypal_address = false;
+	if(count($customer_addresses) == 0)
+	{
+		$paypal_address = setCustomerAddress($ppec, $customer); 
+	}
+	else
+	{
+		foreach ($customer_addresses as $address) 
+		{
+			if($address['alias'] == 'Paypal_Address')
+			{//If a PayPal address already exists we use it to override new address from paypal
+				$paypal_address = setCustomerAddress($ppec, $customer, $address['id_address']);
+				break;
+			}
+			else
+			{//We check if an address exists with the same country / city / street
+				if($address['firstname'] == $ppec->result['FIRSTNAME'] &&
+					$address['lastname'] == $ppec->result['LASTNAME'] && 
+					$address['id_country'] == Country::getByIso($ppec->result['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']) &&
+					$address['address1'] == $ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET'] && 
+					$address['address2'] == $ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET2'] && 
+					$address['city'] == $ppec->result['PAYMENTREQUEST_0_SHIPTOCITY'])
+				{
+					$paypal_address = new Address($address['id_address']);
+					break;
+				}
+			}
+		}
+	}
+	if($paypal_address == false)
+		$paypal_address = setCustomerAddress($ppec, $customer); 
+	$paypal_address->save(); 
+	return $paypal_address; 
+}
+
 if ($request_type && $ppec->type)
 {
 	$id_product = (int)Tools::getValue('id_product');
@@ -148,7 +188,7 @@ if ($request_type && $ppec->type)
 	/* Set details for a payment */
 	$ppec->setExpressCheckout(($login_user ? $login_user->access_token : false));
 
-	if(Tools::getValue('ajax') && Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
+	if(Tools::getValue('ajax') && $ppec->useInContextCheckout() )
 	{
 		$ppec->displayPaypalInContextCheckout();
 	}
@@ -211,6 +251,10 @@ elseif (!empty($ppec->token) && ($ppec->token == $token) && ($ppec->payer_id = $
 			$address = setCustomerAddress($ppec, $customer);
 			$address->add();
 		}
+		else if($ppec->type != 'payment_cart')
+		{//We used Express Checkout Shortcut => we override address 
+			$address = checkAndModifyAddress($ppec, $customer);
+		}
 
 		if ($customer->id && !$address->id)
 			$ppec->logs[] = $ppec->l('Cannot create Address');
@@ -219,6 +263,8 @@ elseif (!empty($ppec->token) && ($ppec->token == $token) && ($ppec->payer_id = $
 		if ($customer->id && $address->id)
 		{
 			$ppec->context->cart->id_customer = $customer->id;
+			$ppec->context->cart->id_address_delivery = $address->id;
+			$ppec->context->cart->id_address_invoice = $address->id;
 			$ppec->context->cart->id_guest = $ppec->context->cookie->id_guest;
 
 			if (!$ppec->context->cart->update())
@@ -279,7 +325,7 @@ function validateOrder($customer, $cart, $ppec)
 		if ($ppec->result['L_ERRORCODE0'] == 10486)
 			$ppec->redirectToAPI();
 
-		$payment_status = $ppec->result['PAYMENTINFO_0_PAYMENTSTATUS'];
+		$payment_status = isset($ppec->result['PAYMENTINFO_0_PAYMENTSTATUS']) ? $ppec->result['PAYMENTINFO_0_PAYMENTSTATUS'] : false;
 		$payment_type = (int)Configuration::get('PS_OS_ERROR');
 
 		if ($amount_match)
@@ -309,7 +355,7 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		$ppec->doExpressCheckout();
 		
 
-		if ($ppec->result['RedirectRequired'] == 'true')
+		if (isset($ppec->result['RedirectRequired']) && $ppec->result['RedirectRequired'] == 'true')
 			$ppec->redirectToAPI();
 			
 		validateOrder($customer, $cart, $ppec);
