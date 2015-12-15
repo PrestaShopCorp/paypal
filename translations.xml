@@ -54,6 +54,12 @@
 			Customized payments pages. Monthly subscription of 25€.
 		</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Click on the SAVE button only when PayPal has approved your subscription for this product. This process can take up to 3-5 days.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%*.</express_checkout_tagline>
@@ -206,6 +212,12 @@
 		<website_payment_pro>Website Payments Pro - Hosted Solution</website_payment_pro>
 		<website_payment_pro_tagline>A professional platform that enables you to accept debit card, credit card and PayPal payments.<![CDATA[<br />]]>Customised payment pages. Monthly subscription of 25$.</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Please click on the SAVE button at the bottom of the page  only  once PayPal has approved your application for this product, otherwise you won’t be able to process any card payments. This process can take up to 3-5 days.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -346,6 +358,12 @@
         <website_payment_pro></website_payment_pro>
         <website_payment_pro_tagline></website_payment_pro_tagline>
         <website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
         <express_checkout>Express Checkout</express_checkout>
         <express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -485,6 +503,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -629,11 +653,10 @@
 		<website_payment_pro_tagline>Eine professionelle Plattform für eingehende Kreditkarten- und PayPal-Zahlungen, inklusive Verkäuferschutz.<![CDATA[<br />]]>Angepasste Zahlungsseiten. 25,00 EUR monatlich.</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Klicken Sie erst dann auf "Speichern", nachdem PayPal dieses Produkt für Sie freigeschaltet hat. Das dauert in der Regel 3-5 Tage.</website_payment_pro_disclaimer>
 
-                <website_payment_plus>Website PAYPAL Plus</website_payment_plus>
+		<website_payment_plus>Website Paypal Plus</website_payment_plus>
 		<website_payment_plus_tagline>Tagline</website_payment_plus_tagline>
 		<website_payment_plus_disclaimer>Disclaimer</website_payment_plus_disclaimer>
-
-                <credentials_clientid>Client ID</credentials_clientid>
+		<credentials_clientid>Client ID</credentials_clientid>
 		<credentials_secret>Secret</credentials_secret>
 		
 		<express_checkout>Express Checkout</express_checkout>
@@ -782,6 +805,12 @@
         </website_payment_pro_tagline>
         <website_payment_pro_disclaimer>Haga clic en el botón GUARDAR solo cuando PayPal apruebe su suscripción para este producto. Este proceso puede tardar 3-5 días.</website_payment_pro_disclaimer>
 
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
+		
         <express_checkout>Pago exprés</express_checkout>
         <express_checkout_tagline>Aumente sus ventas online en un 18%*</express_checkout_tagline>
         <express_checkout_tagline_source>*Fuente: Estudio independiente realizado por Ipsos Public Affairs en julio de 2010, los vendedores online reportaron un incremento medio del 18% en sus ventas al añadir Pago exprés en su web.</express_checkout_tagline_source>
@@ -922,6 +951,12 @@
             <![CDATA[<br /><span style="font-size: 0.8em;">]]>*Soumis à conditions, voir les <![CDATA[<a href="https://cms.paypal.com/fr/cgi-bin/?cmd=_render-content&content_ID=ua/ProVT_full" target="_blank">]]>conditions d'utilisation<![CDATA[</a></span>]]>
 		</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>PayPal Integral Evolution est soumis à conditions et le traitement de votre inscription peut prendre 3 à 5 jours ouvrés. Merci de ne cliquer sur le bouton "Sauvegardez" en bas de la page qu'une fois votre inscription validée par PayPal.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>PayPal Option +</express_checkout>
 		<express_checkout_tagline>Ajoutez PayPal Option + peut générer 20 à 30 % de ventes additionnelles*.</express_checkout_tagline>
@@ -1065,6 +1100,12 @@
         <website_payment_pro>Website Payments Pro Hosted</website_payment_pro>
         <website_payment_pro_tagline>A professional platform that enables you to accept debit card, credit card and PayPal payments. Customised payment pages.<![CDATA[<br />]]> Monthly subscription of £20. </website_payment_pro_tagline>
         <website_payment_pro_disclaimer>Please click on the SAVE button at the bottom of the page  only  once PayPal has approved your application for this product, otherwise you won’t be able to process any card payments. This process can take up to 3-5 days.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
         <express_checkout>Express Checkout</express_checkout>
         <express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -1205,6 +1246,12 @@
 		<website_payment_pro>Website Payments Pro Hosted Solution</website_payment_pro>
 		<website_payment_pro_tagline>A professional platform that enables you to accept debit card, credit card and PayPal payments. Customised payment pages.<![CDATA[<br />]]>Monthly subscription of HKD$200. To sign-up, please contact a PayPal customer service representative.</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Please only click the SAVE button at the bottom of the page once PayPal has approved your application for this product, otherwise you won't be able to process any card payments. This process can take up to 3-5 days</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -1350,6 +1397,12 @@
         <website_payment_pro></website_payment_pro>
         <website_payment_pro_tagline></website_payment_pro_tagline>
         <website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
         <express_checkout>Express Checkout</express_checkout>
         <express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -1624,6 +1677,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -1772,6 +1831,12 @@
         </website_payment_pro_tagline>
         <website_payment_pro_disclaimer>Clicca il pulsante SALVA in fondo alla pagina solo dopo che PayPal avrà approvato la tua richiesta per PayPal Pro. Può richiedere 3-5 giorni.</website_payment_pro_disclaimer>
 
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
+		
         <express_checkout>Pagamento express</express_checkout>
         <express_checkout_tagline>Puoi conquistare nuovi clienti in tutto il mondo e aumentare le vendite. Gli acquirenti pagano in 3 clic e tu vendi anche su cellulare.</express_checkout_tagline>
         <express_checkout_tagline_source></express_checkout_tagline_source>
@@ -1910,6 +1975,12 @@
 		<website_payment_pro>Website Payments Plus</website_payment_pro>
 		<website_payment_pro_tagline>A professional platform that enables you to accept debit card, credit card and PayPal payments. Customised payment pages. Monthly subscription of JPY 3,000. To sign-up, please contact a PayPal customer service representative.</website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Please click on the SAVE button at the bottom of the page  only  once PayPal has approved your application for this product, otherwise you won’t be able to process any card payments. This process can take up to 3-5 days.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -2051,6 +2122,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -2191,6 +2268,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>u vergroot uw omzet en ontvangt uw betaling in slechts drie klikken (ook op mobiele apparaten).</express_checkout_tagline>
@@ -2327,6 +2410,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -2467,6 +2556,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>PayPal Express</express_checkout>
 		<express_checkout_tagline>
@@ -2608,6 +2703,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Checkout Express</express_checkout>
 		<express_checkout_tagline>Aumente em 30% suas vendas on-line * com um simples processo de 3 cliques para a finalização da compra.</express_checkout_tagline>
@@ -2750,6 +2851,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -2892,6 +2999,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -3031,6 +3144,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -3173,6 +3292,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -3312,6 +3437,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>PayPal Express Checkout</express_checkout>
 		<express_checkout_tagline>Satışlarınızı artırmanın güvenli yolu</express_checkout_tagline>
@@ -3451,6 +3582,12 @@
 		<website_payment_pro></website_payment_pro>
 		<website_payment_pro_tagline></website_payment_pro_tagline>
 		<website_payment_pro_disclaimer></website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -3593,6 +3730,12 @@
 		<website_payment_pro>Website Payments Pro Hosted</website_payment_pro>
 		<website_payment_pro_tagline>A professional platform that enables you to accept debit card, credit card and PayPal payments. Customised payment pages.<![CDATA[<br />]]> Monthly subscription of £20. </website_payment_pro_tagline>
 		<website_payment_pro_disclaimer>Please click on the SAVE button at the bottom of the page  only  once PayPal has approved your application for this product, otherwise you won’t be able to process any card payments. This process can take up to 3-5 days.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
 		<express_checkout>Express Checkout</express_checkout>
 		<express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
@@ -3733,6 +3876,12 @@
         <website_payment_pro>Website Payments Pro Hosted</website_payment_pro>
         <website_payment_pro_tagline>A professional platform that enables you to accept debit card, credit card and PayPal payments. Customised payment pages.<![CDATA[<br />]]> Monthly subscription of £20. </website_payment_pro_tagline>
         <website_payment_pro_disclaimer>Please click on the SAVE button at the bottom of the page  only  once PayPal has approved your application for this product, otherwise you won’t be able to process any card payments. This process can take up to 3-5 days.</website_payment_pro_disclaimer>
+		
+		<website_payment_plus></website_payment_plus>
+		<website_payment_plus_tagline></website_payment_plus_tagline>
+		<website_payment_plus_disclaimer></website_payment_plus_disclaimer>
+		<credentials_clientid></credentials_clientid>
+		<credentials_secret></credentials_secret>
 
         <express_checkout>Express Checkout</express_checkout>
         <express_checkout_tagline>Boost your online sales by 30%* with a simple 3-click checkout process.</express_checkout_tagline>
