@@ -59,7 +59,7 @@ class AuthenticatePaymentMethods
             'BE' => array(WPS, ECS),
             'CN' => array(WPS, ECS),
             'CZ' => array(),
-            'DE' => array(WPS, ECS, PPP),
+            'DE' => array(WPS, ECS),
             'ES' => array(WPS, HSS, ECS),
             'FR' => array(WPS, HSS, ECS),
             'HK' => array(WPS, HSS, ECS),
