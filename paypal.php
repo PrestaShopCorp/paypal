@@ -360,6 +360,7 @@ class PayPal extends PaymentModule
             'default_lang_iso' => Language::getIsoById($this->context->employee->id_lang),
             'PayPal_plus_client' => Configuration::get('PAYPAL_PLUS_CLIENT_ID'),
             'PayPal_plus_secret' => Configuration::get('PAYPAL_PLUS_SECRET'),
+            'PayPal_plus_webprofile' => (Configuration::get('PAYPAL_WEB_PROFILE_ID') != '0') ? Configuration::get('PAYPAL_WEB_PROFILE_ID') : 0,
         ));
 
         $this->getTranslations();
@@ -429,7 +430,7 @@ class PayPal extends PaymentModule
         if (Configuration::get('PAYPAL_PAYMENT_METHOD') == PPP) {
 
             $this->context->smarty->assign(array(
-                'paypal_locale' => $this->getLocale(),
+                'paypal_locale' => $this->getLocalePayPalPlus(),
                 'PAYPAL_LOGIN_CLIENT_ID' => Configuration::get('PAYPAL_LOGIN_CLIENT_ID'),
                 'PAYPAL_LOGIN_TPL' => Configuration::get('PAYPAL_LOGIN_TPL'),
                 'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
@@ -444,6 +445,56 @@ class PayPal extends PaymentModule
     {
         return Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT') && Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID')
                 != null;
+    }
+
+    public function getLocalePayPalPlus()
+    {
+        switch (strtolower($this->getCountryCode())) {
+            case 'fr':
+                return 'fr_FR';
+            case 'hk':
+                return 'zh_HK';
+            case 'cn':
+                return 'zh_CN';
+            case 'tw':
+                return 'zh_TW';
+            case 'xc':
+                return 'zh_XC';
+            case 'dk':
+                return 'da_DK';
+            case 'nl':
+                return 'nl_NL';
+            case 'gb':
+                return 'en_GB';
+            case 'de':
+                return 'de_DE';
+            case 'il':
+                return 'he_IL';
+            case 'id':
+                return 'id_ID';
+            case 'il':
+                return 'it_IT';
+            case 'jp':
+                return 'ja_JP';
+            case 'no':
+                return 'no_NO';
+            case 'pt':
+                return 'pt_PT';
+            case 'pl':
+                return 'pl_PL';
+            case 'ru':
+                return 'ru_RU';
+            case 'es':
+                return 'es_ES';
+            case 'se':
+                return 'sv_SE';
+            case 'th':
+                return 'th_TH';
+            case 'tr':
+                return 'tr_TR';
+            default :
+                return 'en_GB';
+        }
     }
 
     public function getLocale()
@@ -1044,9 +1095,9 @@ class PayPal extends PaymentModule
 
     public function getPaymentMethods()
     {
-        if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK'))
+        if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')){
                 return AuthenticatePaymentMethods::AuthenticatePaymentMethodByLang(Tools::strtoupper($this->context->language->iso_code));
-        else {
+        }else {
             $country = new Country((int) Configuration::get('PS_COUNTRY_DEFAULT'));
             return AuthenticatePaymentMethods::AuthenticatePaymentMethodByCountry($country->iso_code);
         }
@@ -1165,7 +1216,8 @@ class PayPal extends PaymentModule
                         || !Tools::getValue('api_password') || !Tools::getValue('api_signature')))
                         $this->_errors[] = $this->l('Credentials fields cannot be empty');
 
-                if ($payment_method == PPP && (!Tools::getValue('client_id') || !Tools::getValue('secret') ))
+                if ($payment_method == PPP && (Tools::getValue('paypalplus_webprofile')
+                        != 0 && (!Tools::getValue('client_id') && !Tools::getValue('secret')) ))
                         $this->_errors[] = $this->l('Credentials fields cannot be empty');
 
                 if ($payment_method == HSS && !Tools::getValue('api_business_account'))
@@ -1212,12 +1264,27 @@ class PayPal extends PaymentModule
                         Tools::getValue('paypal_login_client_secret'));
                 Configuration::updateValue('PAYPAL_LOGIN_TPL',
                         (int) Tools::getValue('paypal_login_client_template'));
-                /* /USE PAYPAL LOGIN */
+               
+                /* USE PAYPAL PLUS */
                 if ((int) Tools::getValue('paypal_payment_method') == 5) {
                     Configuration::updateValue('PAYPAL_PLUS_CLIENT_ID',
                             Tools::getValue('client_id'));
                     Configuration::updateValue('PAYPAL_PLUS_SECRET',
                             Tools::getValue('secret'));
+
+                    if ((int) Tools::getValue('paypalplus_webprofile') == 1) {
+
+                        $ApiPaypalPlus = new ApiPaypalPlus();
+                        $idWebProfile = $ApiPaypalPlus->getWebProfile();
+
+                        if ($idWebProfile) {
+                            Configuration::updateValue('PAYPAL_WEB_PROFILE_ID',
+                                    $idWebProfile);
+                        } else {
+                            Configuration::updateValue('PAYPAL_WEB_PROFILE_ID',
+                                    0);
+                        }
+                    }
                 }
                 /* IS IN_CONTEXT_CHECKOUT ENABLED */
                 if ((int) Tools::getValue('paypal_payment_method') != 2)

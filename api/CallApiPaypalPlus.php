@@ -10,6 +10,7 @@ require_once(_PS_MODULE_DIR_.'paypal/api/ApiPaypalPlus.php');
 define('URL_PPP_CREATE_TOKEN', '/v1/oauth2/token');
 define('URL_PPP_CREATE_PAYMENT', '/v1/payments/payment');
 define('URL_PPP_LOOK_UP', '/v1/payments/payment/');
+define('URL_PPP_WEBPROFILE', '/v1/payment-experience/web-profiles');
 define('URL_PPP_EXECUTE_PAYMENT', '/v1/payments/payment/');
 define('URL_PPP_EXECUTE_REFUND', '/v1/payments/sale/');
 
@@ -31,19 +32,21 @@ class CallApiPaypalPlus extends ApiPaypalPlus
          */
         $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN, array('grant_type' => 'client_credentials'));
 
-        $result = json_decode($this->createPayment($this->customer, $this->cart, $accessToken));
+        if ($accessToken != false) {
 
-        if (isset($result->links)) {
+            $result = json_decode($this->createPayment($this->customer, $this->cart, $accessToken));
 
-            foreach ($result->links as $link) {
+            if (isset($result->links)) {
 
-                if ($link->rel == 'approval_url') {
-                    return $link->href;
+                foreach ($result->links as $link) {
+
+                    if ($link->rel == 'approval_url') {
+                        return $link->href;
+                    }
                 }
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function lookUpPayment($paymentId)
@@ -82,8 +85,8 @@ class CallApiPaypalPlus extends ApiPaypalPlus
 
         return $this->sendByCURL(URL_PPP_EXECUTE_PAYMENT.$paymentId.'/execute/', json_encode($data), $header);
     }
-	
-	public function executeRefund($paymentId, $data)
+
+    public function executeRefund($paymentId, $data)
     {
 
         if ($paymentId == 'NULL' || !is_object($data)) {
@@ -91,7 +94,7 @@ class CallApiPaypalPlus extends ApiPaypalPlus
         }
 
         $accessToken = $this->refreshToken();
-		
+
         $header = array(
             'Content-Type:application/json',
             'Authorization:Bearer '.$accessToken

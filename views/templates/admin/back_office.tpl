@@ -111,28 +111,28 @@
 								<span class="description">{$PayPal_content.website_payment_standard_tagline}</span>
 							</label>
 						{/if}
-											<div class="clear"></div>
+                                                <div class="clear"></div>
 						{if (in_array($PayPal_HSS, $PayPal_allowed_methods))}
 							{* WEBSITE PAYMENT PRO *}
 							<br />
 							<label for="paypal_payment_wpp">
-								<input type="radio" name="paypal_payment_method" id="paypal_payment_wpp" value='{$PayPal_HSS}' {if $PayPal_payment_method == $PayPal_HSS}checked="checked"{/if} />
-								{$PayPal_content.choose} {$PayPal_content.website_payment_pro}<br />
-								<span class="description">{$PayPal_content.website_payment_pro_tagline}</span>
-								<p class="toolbox">{$PayPal_content.website_payment_pro_disclaimer}</p>
+                                                            <input type="radio" name="paypal_payment_method" id="paypal_payment_wpp" value='{$PayPal_HSS}' {if $PayPal_payment_method == $PayPal_HSS}checked="checked"{/if} />
+                                                            {$PayPal_content.choose} {$PayPal_content.website_payment_pro}<br />
+                                                            <span class="description">{$PayPal_content.website_payment_pro_tagline}</span>
+                                                            <p class="toolbox">{$PayPal_content.website_payment_pro_disclaimer}</p>
 							</label>
 						{/if}
-											<div class="clear"></div>
-											{if (in_array($PayPal_PPP, $PayPal_allowed_methods))}
-												{* WEBSITE PAYMENT PLUS *}
-												<br />
-												<label for="paypal_payment_ppp">
-														<input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
-														{$PayPal_content.choose} {$PayPal_content.website_payment_plus}<br />
-														<span class="description">{$PayPal_content.website_payment_plus_tagline}</span>
-														<p class="toolbox">{$PayPal_content.website_payment_plus_disclaimer}</p>
-												</label>
-											{/if}
+                                                <div class="clear"></div>
+                                                {if (in_array($PayPal_PPP, $PayPal_allowed_methods))}
+                                                        {* WEBSITE PAYMENT PLUS *}
+                                                        <br />
+                                                        <label for="paypal_payment_ppp">
+                                                            <input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
+                                                            {$PayPal_content.choose} {$PayPal_content.website_payment_plus}<br />
+                                                            <span class="description">{$PayPal_content.website_payment_plus_tagline}</span>
+                                                            <p class="toolbox">{$PayPal_content.website_payment_plus_disclaimer}</p>
+                                                        </label>
+                                                {/if}
 					</div>
 				{/if}
 				<div class="clear"></div>
@@ -235,7 +235,12 @@
 							<dd><input type='text' name="client_id" id="client_id" value="{$PayPal_plus_client|escape:'html':'UTF-8'}" autocomplete="off" size="85"/></dd>
 							<dt><label for="secret">{$PayPal_content.credentials_secret|escape:'htmlall':'UTF-8'} : </label></dt>
 							<dd><input type='password' size="85" name="secret" id="secret" value="{$PayPal_plus_secret|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
-						</dl>
+                                                        <dt><label for="webprofile">{$PayPal_content.credentials_webprofile|escape:'html':'UTF-8'}</label></dt>
+                                                        <dd>
+                                                            <input type="radio" name="paypalplus_webprofile" value="1" id="paypal_plus_webprofile_yes" {if $PayPal_plus_webprofile}checked="checked"{/if} /> <label for="paypal_plus_webprofile_yes">{$PayPal_content.yes|escape:'htmlall':'UTF-8'}</label><br />
+                                                            <input type="radio" name="paypalplus_webprofile"  value="0" id="paypal_plus_webprofile_no" {if $PayPal_plus_webprofile == '0'}checked="checked"{/if} /> <label for="paypal_plus_webprofile_no">{$PayPal_content.no|escape:'htmlall':'UTF-8'}</label>
+                                                        </dd>
+                                                </dl>            
 						<div class="clear"></div>
 					</div>                                
 									
