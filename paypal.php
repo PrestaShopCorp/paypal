@@ -93,7 +93,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '3.10.4';
+        $this->version = '3.10.5';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -172,7 +172,7 @@ class PayPal extends PaymentModule
     public function runUpgrades($install = false)
     {
         if (version_compare(_PS_VERSION_, '1.5', '<'))
-                foreach (array('2.8', '3.0', '3.7', '3.8.3', '3.9', '3.10.1') as $version) {
+                foreach (array('2.8', '3.0', '3.7', '3.8.3', '3.9', '3.10.1', '3.10.4') as $version) {
                 $file = dirname(__FILE__) . '/upgrade/install-' . $version . '.php';
                 if (Configuration::get('PAYPAL_VERSION') < $version && file_exists($file)) {
                     include_once($file);
@@ -547,6 +547,19 @@ class PayPal extends PaymentModule
         }
     }
 
+    public function canBeUsed()
+    {
+        if (!$this->active) 
+            return false;
+
+        
+        //If merchant has not upgraded and payment method is out of country's specs
+        if(!Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK') && !in_array((int) Configuration::get('PAYPAL_PAYMENT_METHOD'), $this->getPaymentMethods()))
+            return false;
+
+        return true;
+    }
+
     public function hookDisplayMobileHeader()
     {
         return $this->hookHeader();
@@ -571,8 +584,9 @@ class PayPal extends PaymentModule
 
     public function hookPayment($params)
     {
-        if (!$this->active) return;
-
+        if(!$this->canBeUsed())
+            return;
+        
         $use_mobile = $this->useMobile();
 
         if ($use_mobile) $method = ECS;
@@ -992,11 +1006,9 @@ class PayPal extends PaymentModule
         if ((_PS_VERSION_ < '1.5') && (_THEME_NAME_ == 'prestashop_mobile' || Tools::getValue('ps_mobile_site')
                 == 1)) {
             if (_PS_MOBILE_TABLET_)
-                    if ($isApacCountry) return APAC_TABLET_TRACKING_CODE;
-                else return TABLET_TRACKING_CODE;
+                return $isApacCountry ? APAC_TABLET_TRACKING_CODE : TABLET_TRACKING_CODE;
             elseif (_PS_MOBILE_PHONE_)
-                    if ($isApacCountry) return APAC_SMARTPHONE_TRACKING_CODE;
-                else return SMARTPHONE_TRACKING_CODE;
+                return $isApacCountry ? APAC_SMARTPHONE_TRACKING_CODE : SMARTPHONE_TRACKING_CODE;
         }
         //Get Seamless checkout
 
@@ -1012,27 +1024,21 @@ class PayPal extends PaymentModule
 
         if ($method == WPS) {
             if ($login_user)
-                    if ($isApacCountry)
-                        return APAC_TRACKING_EXPRESS_CHECKOUT_SEAMLESS;
-                else return TRACKING_EXPRESS_CHECKOUT_SEAMLESS;
-            else return TRACKING_INTEGRAL;
+                return $isApacCountry ? APAC_TRACKING_EXPRESS_CHECKOUT_SEAMLESS : TRACKING_EXPRESS_CHECKOUT_SEAMLESS;
+            else 
+                return $isApacCountry ? APAC_TRACKING_INTEGRAL : TRACKING_INTEGRAL;
         }
         if ($method == HSS)
-                if ($isApacCountry) return APAC_TRACKING_INTEGRAL_EVOLUTION;
-            else return TRACKING_INTEGRAL_EVOLUTION;
+            return $isApacCountry ? APAC_TRACKING_INTEGRAL_EVOLUTION : TRACKING_INTEGRAL_EVOLUTION;
 
         if ($method == ECS) {
             if ($login_user)
-                    if ($isApacCountry)
-                        return APAC_TRACKING_EXPRESS_CHECKOUT_SEAMLESS;
-                else return TRACKING_EXPRESS_CHECKOUT_SEAMLESS;
+                return $isApacCountry ? APAC_TRACKING_EXPRESS_CHECKOUT_SEAMLESS : TRACKING_EXPRESS_CHECKOUT_SEAMLESS;
             else
-            if ($isApacCountry) return APAC_TRACKING_OPTION_PLUS;
-            else return TRACKING_OPTION_PLUS;
+                return $isApacCountry ? APAC_TRACKING_OPTION_PLUS : TRACKING_OPTION_PLUS;
         }
         if ($method == PPP) {
-            if ($isApacCountry) return APAC_TRACKING_PAYPAL_PLUS;
-            else return TRACKING_PAYPAL_PLUS;
+            return $isApacCountry ? APAC_TRACKING_PAYPAL_PLUS : TRACKING_PAYPAL_PLUS;
         }
 
         return TRACKING_CODE;
