@@ -162,7 +162,7 @@ class AuthenticatePaymentMethods
             'US' => array(WPS, ECS),
             'ZA' => array(WPS, ECS));
 
-        return isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : false;
+        return isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : $payment_method['GB'];
     }
 
     static public function AuthenticatePaymentMethodByLang($iso_code)
