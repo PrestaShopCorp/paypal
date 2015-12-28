@@ -305,7 +305,9 @@ class ApiPaypalPlus
         $payment->transactions = array($transaction);
         $payment->payer = $payer;
         $payment->intent = "sale";
-        $payment->experience_profile_id = Configuration::get('PAYPAL_WEB_PROFILE_ID');
+        if(Configuration::get('PAYPAL_WEB_PROFILE_ID')){
+            $payment->experience_profile_id = Configuration::get('PAYPAL_WEB_PROFILE_ID');
+        }
         $payment->redirect_urls = $redirectUrls;
 
         return $payment;
