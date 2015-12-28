@@ -38,7 +38,7 @@
 		<ul class="tick">
             <li><span class="bold">{l s='Get more buyers' mod='paypal'}</span><br />{l s='100 million-plus PayPal accounts worldwide' mod='paypal'}</li>
             <li><span class="bold">{l s='Access international buyers' mod='paypal'}</span><br />{l s='190 countries, 25 currencies' mod='paypal'}</li>
-            <li><span class="bold">{l s='Reassure your buyers' mod='paypal'}</span><br />{l s='Buyers don’t need to share their private data' mod='paypal'}</li>
+            <li><span class="bold">{l s='Reassure your buyers' mod='paypal'}</span><br />{l s='Buyers don\'t need to share their private data' mod='paypal'}</li>
             <li><span class="bold">{l s='Accept all major payment method' mod='paypal'}</span></li>      
         </ul>
 	</div>
@@ -95,7 +95,7 @@
 			<div class="box">
 
 				<div class="box right half" id="paypal-call-button">
-					<div id="paypal-call" class="box right"><span style="font-weight: bold">{l s='Need help ?' mod='paypal'}</span> {l s='Give us a call : xxxx' mod='paypal'} <img src="../modules/paypal/views/img/call.png" width="14px" alt="Phone" />{/if}</div>
+					<div id="paypal-call" class="box right"><span style="font-weight: bold">{l s='Need help ?' mod='paypal'}</span> {l s='Give us a call : xxxx' mod='paypal'} <img src="../modules/paypal/views/img/call.png" width="14px" alt="Phone" /></div>
 					<div id="paypal-call-foonote" class="box right clear">{l s=' ' mod='paypal'}</div>
 				</div>
 
@@ -127,17 +127,17 @@
                                                             <p class="toolbox">{l s='Click on the SAVE button only when PayPal has approved your subscription for this product. This process can take up to 3-5 days.' mod='paypal'}</p>
 							</label>
 						{/if}
-                                                <div class="clear"></div>
-                                                {if (in_array($PayPal_PPP, $PayPal_allowed_methods))}
-                                                        {* WEBSITE PAYMENT PLUS *}
-                                                        <br />
-                                                        <label for="paypal_payment_ppp">
-                                                            <input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
-                                                            {l s='Choose' mod='paypal'} {l s='PayPal Plus' mod='paypal'}<br />
-                                                            <span class="description"></span>
-                                                            <p class="toolbox"></p>
-                                                        </label>
-                                                {/if}
+                        <div class="clear"></div>
+                        {if (in_array($PayPal_PPP, $PayPal_allowed_methods))}
+                                {* WEBSITE PAYMENT PLUS *}
+                                <br />
+                                <label for="paypal_payment_ppp">
+                                    <input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
+                                    {l s='Choose' mod='paypal'} {l s='PayPal Plus' mod='paypal'}<br />
+                                    <span class="description"></span>
+                                    <p class="toolbox"></p>
+                                </label>
+                        {/if}
 					</div>
 				{/if}
 				<div class="clear"></div>
@@ -185,8 +185,7 @@
 
 					{* Use cases 4 - 6 *}
 					<span class="paypal-signup-content" id="paypal-signup-content-u5">{l s='Click on the SAVE button only when PayPal has approved your subscription for this product, otherwise you won\'t be able to process payment. This process can take up to 3-5 days.' mod='paypal'}<br/>
-                    {l s='If your application for Website Payments Pro has already been approved by PayPal, please go directly to step 3' mod='paypal'}
-                .</span>
+                    {l s='If your application for Website Payments Pro has already been approved by PayPal, please go directly to step 3' mod='paypal'}.</span>
 
 				</div>
 
@@ -371,10 +370,10 @@
 				<div class="box paypal-hide" id="paypal-test-mode-confirmation">
 					<h3>{l s='Activating the test mode implies that' mod='paypal'} :</h3>
 					<ul>
-						<li>{l s='You won’t be able to accept payment' mod='paypal'}</li>
+						<li>{l s='You won\'t be able to accept payment' mod='paypal'}</li>
                         <li>{l s='You will need to come back to the PayPal module page in order to complete the Step 3 before going live.' mod='paypal'}</li>
-                        <li>{l s='You’ll need to create an account on the PayPal sandbox site' mod='paypal'} (<a href="https://developer.paypal.com/" target="_blank">{l s='learn more' mod='paypal'}</a>)</li>
-                        <li>{l s='You’ll need programming skills' mod='paypal'}</li>
+                        <li>{l s='You\'ll need to create an account on the PayPal sandbox site' mod='paypal'} (<a href="https://developer.paypal.com/" target="_blank">{l s='learn more' mod='paypal'}</a>)</li>
+                        <li>{l s='You\'ll need programming skills' mod='paypal'}</li>
 					</ul>
 
 					<h4>{l s='Are you sure you want to activate the test mode ?' mod='paypal'}</h4>
@@ -391,20 +390,20 @@
 					{if $PayPal_sandbox_mode == 0}
 					<p>{l s='You can now start accepting Payment  with PayPal.' mod='paypal'}</p>
 					{elseif  $PayPal_sandbox_mode == 1}
-					<p>{l s='You can now start testing PayPal solutions. Don’t forget to comeback to this page and activate the live mode in order to start accepting payements.' mod='paypal'}</p>
+					<p>{l s='You can now start testing PayPal solutions. Don\'t forget to comeback to this page and activate the live mode in order to start accepting payements.' mod='paypal'}</p>
 					{/if}
 				</div>
 				{/if}
 				{if isset($PayPal_save_failure)}
 				<div class="box paypal-hide" id="paypal-save-failure">
 					<h3>{l s='Error !' mod='paypal'}</h3>
-					<p>{l s='You need to complete the PayPal identification Information in step 3 otherwise you won’t be able to accept payment.' mod='paypal'}</p>
+					<p>{l s='You need to complete the PayPal identification Information in step 3 otherwise you won\'t be able to accept payment.' mod='paypal'}</p>
 				</div>
 				{/if}
 
 				<div class="box paypal-hide" id="js-paypal-save-failure">
 					<h3>{l s='Error !' mod='paypal'}</h3>
-					<p>{l s='You need to complete the PayPal identification Information in step 3 otherwise you won’t be able to accept payment.' mod='paypal'}</p>
+					<p>{l s='You need to complete the PayPal identification Information in step 3 otherwise you won\'t be able to accept payment.' mod='paypal'}</p>
 				</div>
 
 				<hr />
@@ -416,7 +415,7 @@
 				{l s='*Source: Forrester research realized in march 2011' mod='paypal'}
 			</p>
 		</div>
-	{else}
+    {else}
 		<div class="clear"></div><hr />
 			<div class="box">
 				<p>{l s='Your country is not available for this module please go on Prestashop addons to see the different possibilities.' mod='paypal'}</p>
