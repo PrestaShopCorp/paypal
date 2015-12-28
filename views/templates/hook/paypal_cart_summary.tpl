@@ -5,7 +5,7 @@
         {l s='Here is a short summary of your order:' mod='paypal'}
         </p>
 
-        <p class="shipping_address col-sm-3">
+        <p class="shipping_address col-sm-3 column grid_2">
             <strong>{l s='Shipping address' mod='paypal'}</strong><br/>
             {AddressFormat::generateAddress($address_shipping, $patternRules, '<br/>')}
             
@@ -27,7 +27,6 @@
                     <th>{l s='Name' mod='paypal'}</th>
                     <th>{l s='Quantity' mod='paypal'}</th>
                 </tr>
-                
             </thead>
             {foreach from=$cart->getProducts() item=product}
                 <tr>
@@ -88,5 +87,14 @@
         opacity: 0.2;
     }
 
+</style>
+{/if}
+
+{if $useStyle15}
+<style>
+    #cart_summary, .cart_container
+    {
+        width:100%;
+    }
 </style>
 {/if}
