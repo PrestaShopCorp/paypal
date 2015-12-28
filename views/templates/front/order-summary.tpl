@@ -45,19 +45,19 @@
 
 		<p class="shipping_address col-sm-3">
 			<strong>{l s='Shipping address' mod='paypal'}</strong><br/>
-			{AddressFormat::generateAddress($address_shipping, array(), '<br/>')}
+			{AddressFormat::generateAddress($address_shipping, $patternRules, '<br/>')}
 			
 		</p>
-        <p class="shipping_address col-sm-3">
+        <p class="billing_address col-sm-3">
             <strong>{l s='Billing address' mod='paypal'}</strong><br/>
-            {AddressFormat::generateAddress($address_billing, array(), '<br/>')}
+            {AddressFormat::generateAddress($address_billing, $patternRules, '<br/>')}
             
         </p>
 
         <div class="clearfix"></div>
         
-        <div class="col-sm-12">
-            <strong>{l s='Your cart' mod='paypal'}</strong>
+        <div class="col-sm-12 cart_container">
+            <strong class="title">{l s='Your cart' mod='paypal'}</strong>
             <table id="cart_summary" class="table table-bordered stock-management-on">
             <thead>
                 <tr>
@@ -70,12 +70,11 @@
             {foreach from=$cart->getProducts() item=product}
                 <tr>
                     <td>
-                        <img src="{$link->getImageLink('small', $product.id_image, 'cart_default')}" alt="">
+                        <img src="{$link->getImageLink('small', $product.id_image, $cart_image_size)}" alt="">
                     </td>
                     <td>
                         {$product.name}<br/>
-                        {if $product.reference}<small class="cart_ref">{$product.reference|escape:'html':'UTF-8'}</small>{/if} :
-                        {if isset($product.attributes) && $product.attributes}<small><a href="{$link->getProductLink($product.id_product, $product.link_rewrite, $product.category, null, null, $product.id_shop, $product.id_product_attribute, false, false, true)|escape:'html':'UTF-8'}">{$product.attributes|escape:'html':'UTF-8'}</a></small>{/if}
+                        {if isset($product.attributes) && $product.attributes}<small>{$product.attributes|escape:'html':'UTF-8'}</small>{/if}
                     </td>
                     <td>
                         {$product.quantity}
@@ -99,4 +98,36 @@
 			<input type="submit" name="confirmation" value="{l s='I confirm my order' mod='paypal'}" class="exclusive_large" />
 		</p>
 	</form>
+{/if}
+
+{if $useStyle14}
+<style>
+    .shipping_address{
+        width:35%;
+        float:left;
+    }
+    .billing_address{
+        width:35%;
+        float:left;
+    }
+    .clearfix
+    {
+        clear:both;
+    }
+    .cart_container
+    {
+        margin-top:30px;
+    }
+
+    .cart_container .title
+    {
+        margin-bottom:20px;
+        display:block;
+    }
+
+    #cart_summary
+    {
+        width:100%;
+    }
+</style>
 {/if}

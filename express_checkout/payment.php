@@ -438,6 +438,12 @@ if ($ppec->ready && $payment_confirmation && (_PS_VERSION_ < '1.5'))
 		'form_action' => $form_action,
 		'total' => Tools::displayPrice($order_total, $currency),
 		'logos' => $ppec->paypal_logos->getLogos(),
+        'address_shipping' => new Address($ppec->context->cart->id_address_delivery),
+        'address_billing' => new Address($ppec->context->cart->id_address_invoice),
+        'cart' => $ppec->context->cart,
+        'patternRules' => array('avoid' => array()),
+        'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : 'cart_default',
+        'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),
 	));
 
 	$template = 'order-summary.tpl';

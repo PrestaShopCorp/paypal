@@ -54,6 +54,9 @@ class PayPalConfirmModuleFrontController extends ModuleFrontController
             'address_shipping' => new Address($this->context->cart->id_address_delivery),
 			'address_billing' => new Address($this->context->cart->id_address_invoice),
             'cart' => $this->context->cart,
+            'patternRules' => array(),
+            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : 'cart_default',
+            'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),
 		));
 
 		$this->setTemplate('order-summary.tpl');
