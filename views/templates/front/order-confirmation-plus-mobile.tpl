@@ -84,22 +84,10 @@
 
                             if (typeof json.success != 'undefined') {
                                 $('.inforeturn').html('<p class="alert alert-success">' + json.success + '</p>');
-
-
-                                setTimeout(function () {
-                                   document.location.href="{$base_dir}";
-                                }, 2000);
-
                             }
 
                             if (typeof json.error != 'undefined') {
                                 $('.inforeturn').html('<p class="alert alert-warning paypal-error">' + json.error + '</p>');
-
-
-                                setTimeout(function () {
-                                    document.location.href="{$base_dir}";
-                                }, 2000);
-
                             }
                         }
                     });

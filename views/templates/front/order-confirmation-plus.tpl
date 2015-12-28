@@ -44,8 +44,8 @@
 <div class="inforeturn"></div>
 <div class="confirm_PPP">
     {if $state == 'approved' || $state == 'created'}
-        <h2>{l s="Confirmation de votre commande ?" mod='paypal'}</h2>
-        <p>{l s="Voulez-vous confirmer votre commande d'un montant de " mod='paypal'}{$totalAmount}</p>
+        <h2>{l s="Order Confirmation ?" mod='paypal'}</h2>
+        <p>{l s="Do you want to confirm your order for total amount of " mod='paypal'}{$totalAmount}</p>
         <form method="POST" action="" id="formConfirm">
             <input type="hidden" name="payerID" value="{$PayerID}" />
             <input type="hidden" name="paymentId" value="{$paymentId}" />
@@ -84,22 +84,10 @@
 
                             if (typeof json.success != 'undefined') {
                                 $('.inforeturn').html('<p class="alert alert-success">' + json.success + '</p>');
-
-
-                                setTimeout(function () {
-                                   document.location.href="{$base_dir}";
-                                }, 2000);
-
                             }
 
                             if (typeof json.error != 'undefined') {
                                 $('.inforeturn').html('<p class="alert alert-warning paypal-error">' + json.error + '</p>');
-
-
-                                setTimeout(function () {
-                                    document.location.href="{$base_dir}";
-                                }, 2000);
-
                             }
                         }
                     });
@@ -111,7 +99,7 @@
 
         </script>
         <div style="margin-top:15px;">
-            {if $is_guest}
+            {if isset($is_guest) && $is_guest}
                 <a href="{$link->getPageLink('guest-tracking.php', true)}?id_order={$order_reference}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">
                     {if $smarty.const._PS_VERSION_ < 1.6}
                         <img src="{$img_dir}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
