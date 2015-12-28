@@ -677,8 +677,8 @@ class PayPal extends PaymentModule
             $this->context->smarty->assign(
                     array(
                         'approval_url' => $approuval_url,
-                        'language' => $this->context->language->language_code,
-                        'country' => $this->context->language->iso_code,
+                        'language' => $this->getLocalePayPalPlus(),
+                        'country' => $this->getCountryCode(),
                         'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox'
                                     : 'live'
                     )
