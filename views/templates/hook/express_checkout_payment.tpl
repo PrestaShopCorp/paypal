@@ -67,6 +67,7 @@
 				<img src="{$logos.LocalPayPalLogoMedium}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" />
 			{/if}
 			{l s='Pay with your card or your PayPal account' mod='paypal'}	
+        {/if}
 	</a>
 </p>
 
