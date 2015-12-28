@@ -73,7 +73,9 @@
                         <img src="{$link->getImageLink('small', $product.id_image, 'cart_default')}" alt="">
                     </td>
                     <td>
-                        {$product.name}
+                        {$product.name}<br/>
+                        {if $product.reference}<small class="cart_ref">{$product.reference|escape:'html':'UTF-8'}</small>{/if} :
+                        {if isset($product.attributes) && $product.attributes}<small><a href="{$link->getProductLink($product.id_product, $product.link_rewrite, $product.category, null, null, $product.id_shop, $product.id_product_attribute, false, false, true)|escape:'html':'UTF-8'}">{$product.attributes|escape:'html':'UTF-8'}</a></small>{/if}
                     </td>
                     <td>
                         {$product.quantity}
