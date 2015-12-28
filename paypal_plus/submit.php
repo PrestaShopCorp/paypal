@@ -78,7 +78,7 @@ function displayConfirm($context){
 
 			$context->smarty->assign('state', $payment->state);
 
-            $this->module->assignCartSummary();
+            $paypal->assignCartSummary();
 
 			$transaction = array(
 				'id_transaction' => $payment->id,

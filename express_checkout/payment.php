@@ -432,7 +432,7 @@ if ($ppec->ready && $payment_confirmation && (_PS_VERSION_ < '1.5'))
 	$shop_domain = PayPal::getShopDomainSsl(true, true);
 	$form_action = $shop_domain._MODULE_DIR_.$ppec->name.'/express_checkout/payment.php';
 	
-    $ppec->module->assignCartSummary();
+    $ppec->assignCartSummary();
 	$ppec->context->smarty->assign(array(
 		'form_action' => $form_action,
 	));

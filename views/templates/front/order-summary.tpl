@@ -46,34 +46,3 @@
 	</form>
 {/if}
 
-{if $useStyle14}
-<style>
-    .shipping_address{
-        width:35%;
-        float:left;
-    }
-    .billing_address{
-        width:35%;
-        float:left;
-    }
-    .clearfix
-    {
-        clear:both;
-    }
-    .cart_container
-    {
-        margin-top:30px;
-    }
-
-    .cart_container .title
-    {
-        margin-bottom:20px;
-        display:block;
-    }
-
-    #cart_summary
-    {
-        width:100%;
-    }
-</style>
-{/if}
