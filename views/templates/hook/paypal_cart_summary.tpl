@@ -53,3 +53,40 @@
         <p>
             - {l s='We accept the following currency to be sent by PayPal:' mod='paypal'}&nbsp;<b>{$currency->name|escape:'htmlall':'UTF-8'}</b>
         </p>
+
+{if $useStyle14}
+<style>
+    .shipping_address{
+        width:35%;
+        float:left;
+    }
+    .billing_address{
+        width:35%;
+        float:left;
+    }
+    .clearfix
+    {
+        clear:both;
+    }
+    .cart_container
+    {
+        margin-top:30px;
+    }
+
+    .cart_container .title
+    {
+        margin-bottom:20px;
+        display:block;
+    }
+
+    #cart_summary
+    {
+        width:100%;
+    }
+
+    input.button_large[disabled="disabled"] {
+        opacity: 0.2;
+    }
+
+</style>
+{/if}
