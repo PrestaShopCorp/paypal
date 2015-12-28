@@ -42,11 +42,47 @@
 			<br/><br />
 		{l s='Here is a short summary of your order:' mod='paypal'}
 		</p>
-		<p class="shipping_address">
+
+		<p class="shipping_address col-sm-3">
 			<strong>{l s='Shipping address' mod='paypal'}</strong><br/>
-			{AddressFormat::generateAddress($address, array(), '<br/>')}
+			{AddressFormat::generateAddress($address_shipping, array(), '<br/>')}
 			
 		</p>
+        <p class="shipping_address col-sm-3">
+            <strong>{l s='Billing address' mod='paypal'}</strong><br/>
+            {AddressFormat::generateAddress($address_billing, array(), '<br/>')}
+            
+        </p>
+
+        <div class="clearfix"></div>
+        
+        <div class="col-sm-12">
+            <strong>{l s='Your cart' mod='paypal'}</strong>
+            <table id="cart_summary" class="table table-bordered stock-management-on">
+            <thead>
+                <tr>
+                    <th>{l s='Image' mod='paypal'}</th>
+                    <th>{l s='Name' mod='paypal'}</th>
+                    <th>{l s='Quantity' mod='paypal'}</th>
+                </tr>
+                
+            </thead>
+            {foreach from=$cart->getProducts() item=product}
+                <tr>
+                    <td>
+                        <img src="{$link->getImageLink('small', $product.id_image, 'cart_default')}" alt="">
+                    </td>
+                    <td>
+                        {$product.name}
+                    </td>
+                    <td>
+                        {$product.quantity}
+                    </td>
+                </tr>
+            {/foreach}
+            </table>
+        </div>
+
 		<p style="margin-top:20px;">
 			- {l s='The total amount of your order is' mod='paypal'}
 			<span id="amount" class="price"><strong>{$total|escape:'htmlall':'UTF-8'}</strong></span> {if $use_taxes == 1}{l s='(tax incl.)' mod='paypal'}{/if}

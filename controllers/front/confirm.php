@@ -51,7 +51,9 @@ class PayPalConfirmModuleFrontController extends ModuleFrontController
 			'total' => Tools::displayPrice($this->context->cart->getOrderTotal(true), $currency),
 			'logos' => $this->paypal->paypal_logos->getLogos(),
 			'use_mobile' => (bool)$this->paypal->useMobile(), 
-			'address' => new Address($this->context->cart->id_address_delivery)
+            'address_shipping' => new Address($this->context->cart->id_address_delivery),
+			'address_billing' => new Address($this->context->cart->id_address_invoice),
+            'cart' => $this->context->cart,
 		));
 
 		$this->setTemplate('order-summary.tpl');
