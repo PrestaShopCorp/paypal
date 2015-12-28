@@ -93,8 +93,22 @@ function setCustomerAddress($ppec, $customer, $id = null)
 	if ($id == null)
 		$address->alias = 'Paypal_Address';
 
-	$address->lastname = $ppec->result['LASTNAME'];
-	$address->firstname =  $ppec->result['FIRSTNAME'];
+    $name = $ppec->result['PAYMENTREQUEST_0_SHIPTONAME'];
+    $name = explode(' ', $name);
+    if(isset($name[1]))
+    {
+        $firstname = $name[0]; 
+        unset($name[0]);
+        $lastname = implode(' ', $name);
+    }
+    else
+    {
+        $lastname = $ppec->result['LASTNAME'];        
+        $firstname = $ppec->result['FIRSTNAME'];
+    }
+
+	$address->lastname = $lastname;
+	$address->firstname =  $firstname;
 	$address->address1 = $ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET'];
 	if (isset($ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET2']))
 		$address->address2 = $ppec->result['PAYMENTREQUEST_0_SHIPTOSTREET2'];
@@ -128,6 +142,7 @@ function checkAndModifyAddress($ppec, $customer)
 			}
 			else
 			{//We check if an address exists with the same country / city / street
+
 				if($address['firstname'] == $ppec->result['FIRSTNAME'] &&
 					$address['lastname'] == $ppec->result['LASTNAME'] && 
 					$address['id_country'] == Country::getByIso($ppec->result['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']) &&
