@@ -78,6 +78,8 @@ function displayConfirm($context){
 
 			$context->smarty->assign('state', $payment->state);
 
+            $this->module->assignCartSummary();
+
 			$transaction = array(
 				'id_transaction' => $payment->id,
 				'payment_status' => $payment->state,

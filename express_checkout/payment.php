@@ -431,19 +431,10 @@ if ($ppec->ready && $payment_confirmation && (_PS_VERSION_ < '1.5'))
 {
 	$shop_domain = PayPal::getShopDomainSsl(true, true);
 	$form_action = $shop_domain._MODULE_DIR_.$ppec->name.'/express_checkout/payment.php';
-	$order_total = $ppec->context->cart->getOrderTotal(true);
-	$currency = new Currency((int)$ppec->context->cart->id_currency);
-
+	
+    $ppec->module->assignCartSummary();
 	$ppec->context->smarty->assign(array(
 		'form_action' => $form_action,
-		'total' => Tools::displayPrice($order_total, $currency),
-		'logos' => $ppec->paypal_logos->getLogos(),
-        'address_shipping' => new Address($ppec->context->cart->id_address_delivery),
-        'address_billing' => new Address($ppec->context->cart->id_address_invoice),
-        'cart' => $ppec->context->cart,
-        'patternRules' => array('avoid' => array()),
-        'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : 'cart_default',
-        'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),
 	));
 
 	$template = 'order-summary.tpl';

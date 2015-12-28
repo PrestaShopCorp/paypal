@@ -40,9 +40,11 @@
 {if $smarty.const._PS_VERSION_ < 1.5}
 	<link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_4.css">
 {/if}
-
+{$paypal_cart_summary}
 <div class="inforeturn"></div>
 <div class="confirm_PPP">
+    
+
     {if $state == 'approved' || $state == 'created'}
         <h2>{l s="Confirmation de votre commande ?" mod='paypal'}</h2>
         <p>{l s="Voulez-vous confirmer votre commande d'un montant de " mod='paypal'}{$totalAmount}</p>

@@ -41,8 +41,11 @@
 	<link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_4.css">
 {/if}
 
+{$paypal_cart_summary}
 <div class="inforeturn"></div>
 <div class="confirm_PPP">
+    
+
     {if $state == 'approved' || $state == 'created'}
         <h2>{l s="Order Confirmation ?" mod='paypal'}</h2>
         <p>{l s="Do you want to confirm your order for total amount of " mod='paypal'}{$totalAmount}</p>

@@ -126,6 +126,9 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             /* If guest we clear the cookie for security reason */
             $this->context->customer->mylogout();
         }
+
+        $this->module->assignCartSummary();
+
         if ($this->context->getMobileDevice() == true) {
             $this->setTemplate('order-confirmation-plus-mobile.tpl');
         } else {

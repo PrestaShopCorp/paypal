@@ -46,17 +46,10 @@ class PayPalConfirmModuleFrontController extends ModuleFrontController
 
 		$currency = new Currency((int)$this->context->cart->id_currency);
 
+        $this->module->assignCartSummary();
+        
 		$this->context->smarty->assign(array(
 			'form_action' => PayPal::getShopDomainSsl(true, true)._MODULE_DIR_.$this->paypal->name.'/express_checkout/payment.php',
-			'total' => Tools::displayPrice($this->context->cart->getOrderTotal(true), $currency),
-			'logos' => $this->paypal->paypal_logos->getLogos(),
-			'use_mobile' => (bool)$this->paypal->useMobile(), 
-            'address_shipping' => new Address($this->context->cart->id_address_delivery),
-			'address_billing' => new Address($this->context->cart->id_address_invoice),
-            'cart' => $this->context->cart,
-            'patternRules' => array(),
-            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : 'cart_default',
-            'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),
 		));
 
 		$this->setTemplate('order-summary.tpl');

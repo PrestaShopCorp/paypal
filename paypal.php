@@ -435,7 +435,7 @@ class PayPal extends PaymentModule
                 'PAYPAL_LOGIN_TPL' => Configuration::get('PAYPAL_LOGIN_TPL'),
                 'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
             ));
-            $process = '<script src="https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js" type="text/javascript"></script>';
+            $process .= '<script src="https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js" type="text/javascript"></script>';
         }
 
         return $process;
@@ -1838,6 +1838,27 @@ class PayPal extends PaymentModule
                 return 0;
             }
         }
+    }
+
+    public function assignCartSummary()
+    {
+        $currency = new Currency((int)$this->context->cart->id_currency);
+
+        $this->context->smarty->assign(array(
+            'total' => Tools::displayPrice($this->context->cart->getOrderTotal(true), $currency),
+            'logos' => $this->paypal_logos->getLogos(),
+            'use_mobile' => (bool)$this->useMobile(), 
+            'address_shipping' => new Address($this->context->cart->id_address_delivery),
+            'address_billing' => new Address($this->context->cart->id_address_invoice),
+            'cart' => $this->context->cart,
+            'patternRules' => array(),
+            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : 'cart_default',
+            'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),            
+        ));
+
+        $this->context->smarty->assign(array(
+            'paypal_cart_summary' => $this->display(__FILE__, 'views/templates/hook/paypal_cart_summary.tpl')
+        ));
     }
 
 }
