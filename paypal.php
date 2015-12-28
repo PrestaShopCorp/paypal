@@ -1852,8 +1852,9 @@ class PayPal extends PaymentModule
             'address_billing' => new Address($this->context->cart->id_address_invoice),
             'cart' => $this->context->cart,
             'patternRules' => array('avoid' => array()),
-            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : 'cart_default',
+            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : version_compare(_PS_VERSION_, '1.6', '<') ? 'small_default' : 'cart_default',
             'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),            
+            'useStyle15' => version_compare(_PS_VERSION_, '1.5', '>') && version_compare(_PS_VERSION_, '1.6', '<'),            
         ));
 
         $this->context->smarty->assign(array(
