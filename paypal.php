@@ -174,7 +174,7 @@ class PayPal extends PaymentModule
         if (version_compare(_PS_VERSION_, '1.5', '<'))
                 foreach (array('2.8', '3.0', '3.7', '3.8.3', '3.9', '3.10.1', '3.10.4') as $version) {
                 $file = dirname(__FILE__) . '/upgrade/install-' . $version . '.php';
-                if (Configuration::get('PAYPAL_VERSION') < $version && file_exists($file)) {
+                if (version_compare(Configuration::get('PAYPAL_VERSION'), $version, '<') && file_exists($file)) {
                     include_once($file);
                     call_user_func('upgrade_module_' . str_replace('.', '_',
                                     $version), $this, $install);
@@ -239,9 +239,9 @@ class PayPal extends PaymentModule
             $version = Db::getInstance()->getValue('SELECT version FROM `' . _DB_PREFIX_ . 'module` WHERE name = \'' . $this->name . '\'');
             if (empty($version) === true)
                     Db::getInstance()->execute('
-					UPDATE `' . _DB_PREFIX_ . 'module` m
-					SET m.version = \'' . bqSQL($this->version) . '\'
-					WHERE m.name = \'' . bqSQL($this->name) . '\'');
+                    UPDATE `' . _DB_PREFIX_ . 'module` m
+                    SET m.version = \'' . bqSQL($this->version) . '\'
+                    WHERE m.name = \'' . bqSQL($this->name) . '\'');
         }
 
         if (defined('_PS_ADMIN_DIR_')) {
@@ -423,8 +423,8 @@ class PayPal extends PaymentModule
                 'PAYPAL_RETURN_LINK' => PayPalLogin::getReturnLink(),
             ));
             $process .= '
-					<script src="https://www.paypalobjects.com/js/external/api.js"></script>
-					<script>' . $this->fetchTemplate('views/js/paypal_login.js') . '</script>';
+                    <script src="https://www.paypalobjects.com/js/external/api.js"></script>
+                    <script>' . $this->fetchTemplate('views/js/paypal_login.js') . '</script>';
         }
 
         if (Configuration::get('PAYPAL_PAYMENT_METHOD') == PPP) {
@@ -899,9 +899,9 @@ class PayPal extends PaymentModule
                 (strcmp(Tools::getValue('module_name'), $this->name) === 0)) {
             if (version_compare(_PS_VERSION_, '1.5', '<')) {
                 $output = '<script type="text/javascript" src="' . __PS_BASE_URI__ . 'js/jquery/jquery-ui-1.8.10.custom.min.js"></script>
-					<script type="text/javascript" src="' . __PS_BASE_URI__ . 'js/jquery/jquery.fancybox-1.3.4.js"></script>
-					<link type="text/css" rel="stylesheet" href="' . __PS_BASE_URI__ . 'css/jquery.fancybox-1.3.4.css" />
-					<link type="text/css" rel="stylesheet" href="' . _MODULE_DIR_ . $this->name . '/views/css/paypal.css" />';
+                    <script type="text/javascript" src="' . __PS_BASE_URI__ . 'js/jquery/jquery.fancybox-1.3.4.js"></script>
+                    <link type="text/css" rel="stylesheet" href="' . __PS_BASE_URI__ . 'css/jquery.fancybox-1.3.4.css" />
+                    <link type="text/css" rel="stylesheet" href="' . _MODULE_DIR_ . $this->name . '/views/css/paypal.css" />';
             } else {
                 $this->context->controller->addJquery();
                 $this->context->controller->addJQueryPlugin('fancybox');
@@ -1162,9 +1162,9 @@ class PayPal extends PaymentModule
         if (!(bool) $id_order) return false;
 
         $paypal_order = Db::getInstance()->getRow('
-			SELECT `payment_status`, `capture`
-			FROM `' . _DB_PREFIX_ . 'paypal_order`
-			WHERE `id_order` = ' . (int) $id_order);
+            SELECT `payment_status`, `capture`
+            FROM `' . _DB_PREFIX_ . 'paypal_order`
+            WHERE `id_order` = ' . (int) $id_order);
 
         return $paypal_order && ($paypal_order['payment_status'] == 'Completed' || $paypal_order['payment_status']
                 == 'approved' ) && $paypal_order['capture'] == 0;
@@ -1175,9 +1175,9 @@ class PayPal extends PaymentModule
         if (!(int) $id_order) return false;
 
         $order = Db::getInstance()->getRow('
-			SELECT `payment_method`, `payment_status`
-			FROM `' . _DB_PREFIX_ . 'paypal_order`
-			WHERE `id_order` = ' . (int) $id_order);
+            SELECT `payment_method`, `payment_status`
+            FROM `' . _DB_PREFIX_ . 'paypal_order`
+            WHERE `id_order` = ' . (int) $id_order);
 
         return $order && $order['payment_method'] != HSS && $order['payment_status']
                 == 'Pending_validation';
@@ -1188,9 +1188,9 @@ class PayPal extends PaymentModule
         if (!(int) $id_order) return false;
 
         $result = Db::getInstance()->getRow('
-			SELECT `payment_method`, `payment_status`
-			FROM `' . _DB_PREFIX_ . 'paypal_order`
-			WHERE `id_order` = ' . (int) $id_order . ' AND `capture` = 1');
+            SELECT `payment_method`, `payment_status`
+            FROM `' . _DB_PREFIX_ . 'paypal_order`
+            WHERE `id_order` = ' . (int) $id_order . ' AND `capture` = 1');
 
         return $result && $result['payment_method'] != HSS && $result['payment_status']
                 == 'Pending_capture';
@@ -1337,10 +1337,10 @@ class PayPal extends PaymentModule
                     $params = array('TRANSACTIONID' => $id_transaction, 'REFUNDTYPE' => 'Full');
             else {
                 $iso_currency = Db::getInstance()->getValue('
-					SELECT `iso_code`
-					FROM `' . _DB_PREFIX_ . 'orders` o
-					LEFT JOIN `' . _DB_PREFIX_ . 'currency` c ON (o.`id_currency` = c.`id_currency`)
-					WHERE o.`id_order` = ' . (int) $id_order);
+                    SELECT `iso_code`
+                    FROM `' . _DB_PREFIX_ . 'orders` o
+                    LEFT JOIN `' . _DB_PREFIX_ . 'currency` c ON (o.`id_currency` = c.`id_currency`)
+                    WHERE o.`id_order` = ' . (int) $id_order);
 
                 $params = array('TRANSACTIONID' => $id_transaction, 'REFUNDTYPE' => 'Partial',
                     'AMT' => (float) $amt, 'CURRENCYCODE' => Tools::strtoupper($iso_currency));
@@ -1499,9 +1499,9 @@ class PayPal extends PaymentModule
                 if (!($capture->getRestToCapture($capture->id_order))) {
                     //plus d'argent a capturer
                     if (!Db::getInstance()->Execute('
-					UPDATE `' . _DB_PREFIX_ . 'paypal_order`
-					SET `capture` = 0, `payment_status` = \'' . pSQL($response['PAYMENTSTATUS']) . '\', `id_transaction` = \'' . pSQL($response['TRANSACTIONID']) . '\'
-					WHERE `id_order` = ' . (int) $id_order))
+                    UPDATE `' . _DB_PREFIX_ . 'paypal_order`
+                    SET `capture` = 0, `payment_status` = \'' . pSQL($response['PAYMENTSTATUS']) . '\', `id_transaction` = \'' . pSQL($response['TRANSACTIONID']) . '\'
+                    WHERE `id_order` = ' . (int) $id_order))
                             die(Tools::displayError('Error when updating PayPal database'));
 
                     $order_history = new OrderHistory();
@@ -1561,10 +1561,10 @@ class PayPal extends PaymentModule
                 $history->addWithemail();
 
                 if (!Db::getInstance()->Execute('
-				UPDATE `' . _DB_PREFIX_ . 'paypal_order`
-				SET `payment_status` = \'' . pSQL($response['PAYMENTSTATUS']) . ($response['PENDINGREASON']
+                UPDATE `' . _DB_PREFIX_ . 'paypal_order`
+                SET `payment_status` = \'' . pSQL($response['PAYMENTSTATUS']) . ($response['PENDINGREASON']
                                 == 'authorization' ? '_authorization' : '') . '\'
-				WHERE `id_order` = ' . (int) $id_order))
+                WHERE `id_order` = ' . (int) $id_order))
                         die(Tools::displayError('Error when updating PayPal database'));
             }
 
@@ -1601,25 +1601,25 @@ class PayPal extends PaymentModule
     public static function getPayPalCustomerIdByEmail($email)
     {
         return Db::getInstance()->getValue('
-			SELECT `id_customer`
-			FROM `' . _DB_PREFIX_ . 'paypal_customer`
-			WHERE paypal_email = \'' . pSQL($email) . '\'');
+            SELECT `id_customer`
+            FROM `' . _DB_PREFIX_ . 'paypal_customer`
+            WHERE paypal_email = \'' . pSQL($email) . '\'');
     }
 
     public static function getPayPalEmailByIdCustomer($id_customer)
     {
         return Db::getInstance()->getValue('
-			SELECT `paypal_email`
-			FROM `' . _DB_PREFIX_ . 'paypal_customer`
-			WHERE `id_customer` = ' . (int) $id_customer);
+            SELECT `paypal_email`
+            FROM `' . _DB_PREFIX_ . 'paypal_customer`
+            WHERE `id_customer` = ' . (int) $id_customer);
     }
 
     public static function addPayPalCustomer($id_customer, $email)
     {
         if (!PayPal::getPayPalEmailByIdCustomer($id_customer)) {
             Db::getInstance()->Execute('
-				INSERT INTO `' . _DB_PREFIX_ . 'paypal_customer` (`id_customer`, `paypal_email`)
-				VALUES(' . (int) $id_customer . ', \'' . pSQL($email) . '\')');
+                INSERT INTO `' . _DB_PREFIX_ . 'paypal_customer` (`id_customer`, `paypal_email`)
+                VALUES(' . (int) $id_customer . ', \'' . pSQL($email) . '\')');
 
             return Db::getInstance()->Insert_ID();
         }
