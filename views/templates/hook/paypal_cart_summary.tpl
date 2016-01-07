@@ -1,5 +1,5 @@
-<p>
-            <img src="{$logos.LocalPayPalLogoMedium}" alt="{l s='PayPal' mod='paypal'}" style="margin-bottom: 5px" />
+        <p>
+            <img src="{$logos.LocalPayPalLogoMedium}" alt="{l s='PayPal' mod='paypal'}" class="paypal_logo" />
             <br />{l s='You have chosen to pay with PayPal.' mod='paypal'}
             <br/><br />
         {l s='Here is a short summary of your order:' mod='paypal'}
@@ -45,7 +45,7 @@
             </table>
         </div>
 
-        <p style="margin-top:20px;">
+        <p class="paypal_total_amount">
             - {l s='The total amount of your order is' mod='paypal'}
             <span id="amount" class="price"><strong>{$total|escape:'htmlall':'UTF-8'}</strong></span> {if $use_taxes == 1}{l s='(tax incl.)' mod='paypal'}{/if}
         </p>
@@ -53,48 +53,12 @@
             - {l s='We accept the following currency to be sent by PayPal:' mod='paypal'}&nbsp;<b>{$currency->name|escape:'htmlall':'UTF-8'}</b>
         </p>
 
+        
+<link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal-cart_summary.css">
 {if $useStyle14}
-<style>
-    .shipping_address{
-        width:35%;
-        float:left;
-    }
-    .billing_address{
-        width:35%;
-        float:left;
-    }
-    .clearfix
-    {
-        clear:both;
-    }
-    .cart_container
-    {
-        margin-top:30px;
-    }
-
-    .cart_container .title
-    {
-        margin-bottom:20px;
-        display:block;
-    }
-
-    #cart_summary
-    {
-        width:100%;
-    }
-
-    input.button_large[disabled="disabled"] {
-        opacity: 0.2;
-    }
-
-</style>
+    <link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_4_paypal-cart_summary.css">
 {/if}
 
 {if $useStyle15}
-<style>
-    #cart_summary, .cart_container
-    {
-        width:100%;
-    }
-</style>
+    <link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_5_paypal-cart_summary.css">
 {/if}
