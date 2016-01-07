@@ -100,7 +100,7 @@
             });
 
         </script>
-        <div style="margin-top:15px;">
+        <div>
             {if $is_guest}
                 <a href="{$link->getPageLink('guest-tracking.php', true)}?id_order={$order_reference}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">
                     {if $smarty.const._PS_VERSION_ < 1.6}
