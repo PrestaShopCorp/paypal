@@ -259,6 +259,6 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
          * order_canceled
          * refund
          */
-        return Db::getInstance()->getValue('SELECT id_order_state FROM '._DB_PREFIX_.'order_state_lang WHERE template = "'.$template.'" AND id_lang = "'.$this->context->language->id.'"');
+        return Db::getInstance()->getValue('SELECT id_order_state FROM '._DB_PREFIX_.'order_state_lang WHERE template = "'.pSQL($template).'" AND id_lang = "'.(int)$this->context->language->id.'"');
     }
 }
