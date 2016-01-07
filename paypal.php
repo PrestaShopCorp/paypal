@@ -1358,7 +1358,7 @@ class PayPal extends PaymentModule
                 $params = new stdClass();
             } else {
 
-                $result = Db::getInstance()->ExecuteS('SELECT * FROM ' . _DB_PREFIX_ . 'paypal_order WHERE id_transaction = "' . $id_transaction . '"');
+                $result = Db::getInstance()->ExecuteS('SELECT * FROM ' . _DB_PREFIX_ . 'paypal_order WHERE id_transaction = "' . pSQL($id_transaction) . '"');
                 $result = current($result);
 
 
