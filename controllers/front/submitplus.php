@@ -40,8 +40,6 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
 	
     public function __construct()
     {
-		
-	
         parent::__construct();
 
         if (class_exists('Context')) {
@@ -161,7 +159,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
     {
         $ajax = Tools::getValue('ajax');
         if (!$ajax) {
-            $return['error'][] = 'Une erreur est survenue pendant le paiement.';
+            $return['error'][] = $this->module->l('An error occured during the payment');
             echo json_encode($return);
             die();
         }
@@ -203,7 +201,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                             $this->id_cart, $this->getOrderStatus('payment'), $payment->transactions[0]->amount->total,
                             $payment->payer->payment_method, null, $transaction
                         );
-                        $return['success'][] = 'Votre paiement a bien été pris en compte.';
+                        $return['success'][] = $this->module->l('Your payment has been taken into account');
                     } else {
 
                         $paypal->validateOrder(
@@ -211,7 +209,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                             $payment->transactions[0]->amount->total, $payment->payer->payment_method, null,
                             $transaction
                         );
-                        $return['error'][] = 'Une erreur est survenue pendant le paiement.';
+                        $return['error'][] = $this->module->l('An error occured during the payment');
                     }
                 } elseif ($submit == 'confirmCancel') {
 
@@ -219,13 +217,13 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                         $this->id_cart, $this->getOrderStatus('order_canceled'),
                         $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
                     );
-                    $return['success'][] = 'Votre commande a bien été annulé.';
+                    $return['success'][] = $this->module->l('Your order has been canceled');
                 } else
-                    $return['error'][] = 'Une erreur est survenue pendant le paiement.';
+                    $return['error'][] = $this->module->l('An order occured during the payment');
             } else
-                $return['error'][] = 'Une erreur est survenue pendant le paiement.';
+                $return['error'][] = $this->module->l('An error occured during the payment');
         } else
-            $return['error'][] = 'Une erreur est survenue pendant le paiement.';
+            $return['error'][] = $this->module->l('An error occured during the payment');
 
         echo json_encode($return);
         die();

@@ -46,8 +46,8 @@
     
 
     {if $state == 'approved' || $state == 'created'}
-        <h2>{l s="Confirmation de votre commande ?" mod='paypal'}</h2>
-        <p>{l s="Voulez-vous confirmer votre commande d'un montant de " mod='paypal'}{$totalAmount}</p>
+        <h2>{l s='Order confirmation ?' mod='paypal'}</h2>
+        <p>{l s='Do you want to confirm your order for total amount of ' mod='paypal'}{$totalAmount}</p>
         <form method="POST" action="" id="formConfirm">
             <input type="hidden" name="payerID" value="{$PayerID}" />
             <input type="hidden" name="paymentId" value="{$paymentId}" />
@@ -121,10 +121,10 @@
     </div>
 
 {elseif $state == 'failed' || $state == 'expired'}
-    <p class="alert alert-warning paypal-error">{l s="Une erreur est survenue pendant votre commande" mod='paypal'}</p>
+    <p class="alert alert-warning paypal-error">{l s='An error occured during your payment' mod='paypal'}</p>
 
 {elseif $state == 'canceled'}
-    <p class="alert alert-warning paypal-error">{l s="Votre commande a été annulé" mod='paypal'}</p>
+    <p class="alert alert-warning paypal-error">{l s='Your order has been canceled' mod='paypal'}</p>
 {/if}
 </div>
 {/if}

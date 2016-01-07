@@ -139,22 +139,22 @@ function displayAjax($context){
 	$payerID   = Tools::getValue('payerID');
 	$paymentId = Tools::getValue('paymentId');
 	$submit    = Tools::getValue('submit');
+	$paypal = new PayPal();
 
-	if (
-		(!empty($id_cart) && $context->cart->id == $id_cart ) &&
-		!empty($payerID) &&
-		!empty($paymentId) &&
-		!empty($submit)
-	) {
-		
-		include_once(_PS_MODULE_DIR_.'paypal/paypal.php');
-	
-		$CallApiPaypalPlus = new CallApiPaypalPlus();
-		$payment           = json_decode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+    if (
+        (!empty($id_cart) && $context->cart->id == $id_cart ) &&
+        !empty($payerID) &&
+        !empty($paymentId) &&
+        !empty($submit)
+    ) {
+        
+        include_once(_PS_MODULE_DIR_.'paypal/paypal.php');
+    
+        $CallApiPaypalPlus = new CallApiPaypalPlus();
+        $payment           = json_decode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
-		if (isset($payment->state)) {
+        if (isset($payment->state)) {
 
-			$paypal = new PayPal();
 
 			$transaction = array(
 				'id_transaction' => $payment->transactions[0]->related_resources[0]->sale->id,
@@ -174,7 +174,7 @@ function displayAjax($context){
 						$id_cart, getOrderStatus('payment'), $payment->transactions[0]->amount->total,
 						$payment->payer->payment_method, null, $transaction
 					);
-					$return['success'][] = 'Votre paiement a bien été pris en compte.';
+					$return['success'][] = $paypal->l('Your payment has been taken into account');
 				} else {
 
 					$paypal->validateOrder(
@@ -182,7 +182,7 @@ function displayAjax($context){
 						$payment->transactions[0]->amount->total, $payment->payer->payment_method, null,
 						$transaction
 					);
-					$return['error'][] = 'Une erreur est survenue pendant le paiement.';
+					$return['error'][] = $paypal->l('An error occured during the payment');
 				}
 			} elseif ($submit == 'confirmCancel') {
 
@@ -190,13 +190,13 @@ function displayAjax($context){
 					$id_cart, getOrderStatus('order_canceled'),
 					$payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
 				);
-				$return['success'][] = 'Votre commande a bien été annulé.';
+				$return['success'][] = $paypal->l('Your order has been canceled');
 			} else
-				$return['error'][] = 'Une erreur est survenue pendant le paiement.';
+				$return['error'][] = $paypal->l('An error occured during the payment');
 		} else
-			$return['error'][] = 'Une erreur est survenue pendant le paiement.';
+			$return['error'][] = $paypal->l('An error occured during the payment');
 	} else
-		$return['error'][] = 'Une erreur est survenue pendant le paiement.';
+		$return['error'][] = $paypal->l('An error occured during the payment');
 
 	echo json_encode($return);
 	die();
