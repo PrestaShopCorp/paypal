@@ -219,7 +219,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                     );
                     $return['success'][] = $this->module->l('Your order has been canceled');
                 } else
-                    $return['error'][] = $this->module->l('An order occured during the payment');
+                    $return['error'][] = $this->module->l('An error occured during the payment');
             } else
                 $return['error'][] = $this->module->l('An error occured during the payment');
         } else

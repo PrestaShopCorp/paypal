@@ -53,8 +53,8 @@
             <input type="hidden" name="paymentId" value="{$paymentId}" />
             <input type="hidden" name="id_cart" value="{$id_cart}" />
 
-            <input id="cancel" class="{if $smarty.const._PS_VERSION_ < 1.5}button_large{else}button btn btn-large{/if}" type="submit" name="confirmCancel" value="{l s='Annulation de votre achat' mod='paypal'}" />
-            <input id="confirm" class="{if $smarty.const._PS_VERSION_ < 1.5}button_large{else}button btn btn-large{/if}" type="submit" name="confirmPayment" value="{l s='Confirmation de votre achat' mod='paypal'}" />
+            <input id="cancel" class="{if $smarty.const._PS_VERSION_ < 1.5}button_large{else}button btn btn-large{/if}" type="submit" name="confirmCancel" value="{l s='Cancel you order' mod='paypal'}" />
+            <input id="confirm" class="{if $smarty.const._PS_VERSION_ < 1.5}button_large{else}button btn btn-large{/if}" type="submit" name="confirmPayment" value="{l s='Confirm your payment' mod='paypal'}" />
         </form>
         <script type="text/javascript">
 
