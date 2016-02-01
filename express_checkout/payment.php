@@ -309,7 +309,7 @@ if ($ppec->ready && !empty($ppec->token) && (Tools::isSubmit('confirmation') || 
 		$ppec->doExpressCheckout();
 		
 
-		if ($ppec->result['RedirectRequired'] == 'true')
+		if (isset($ppec->result['RedirectRequired']) && $ppec->result['RedirectRequired'] == 'true')
 			$ppec->redirectToAPI();
 			
 		validateOrder($customer, $cart, $ppec);
