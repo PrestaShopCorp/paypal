@@ -61,6 +61,8 @@ class PayPalOrder
 		if ($ppec && $payment_status)
 		{
 			$transaction_id = pSQL($ppec->result['PAYMENTINFO_0_TRANSACTIONID']);
+			if (!isset($ppec->result['PAYMENTREQUEST_0_SHIPPINGAMT']))
+				$ppec->result['PAYMENTREQUEST_0_SHIPPINGAMT'] = 0;			
 			return array(
 				'currency' => pSQL($ppec->result['PAYMENTINFO_0_CURRENCYCODE']),
 				'id_invoice' => null,
