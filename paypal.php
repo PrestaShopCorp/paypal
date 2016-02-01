@@ -219,6 +219,9 @@ class PayPal extends PaymentModule
 		if (Tools::getValue('paypal_ec_canceled') || $this->context->cart === false)
 			unset($this->context->cookie->express_checkout);
 
+		if (isset($this->context->cookie->express_checkout) && isset($this->context->controller->php_self) && $this->context->controller->php_self  == 'order')
+			$this->redirectToConfirmation();
+
 		if (version_compare(_PS_VERSION_, '1.5.0.2', '>='))
 		{
 			$version = Db::getInstance()->getValue('SELECT version FROM `'._DB_PREFIX_.'module` WHERE name = \''.$this->name.'\'');
@@ -388,7 +391,7 @@ class PayPal extends PaymentModule
 			'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
 			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID')
 		));
-		
+
 		$process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
 		if(Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'))
 			$process .= '<script async src="//www.paypalobjects.com/api/checkout.js"></script>';
@@ -504,7 +507,7 @@ class PayPal extends PaymentModule
 
 		$iso_lang = array(
 			'en' => 'en_US',
-			'fr' => 'fr_FR', 
+			'fr' => 'fr_FR',
 			'de' => 'de_DE',
 		);
 
@@ -579,7 +582,7 @@ class PayPal extends PaymentModule
 		return null;
 	}
 
-	public function hookDisplayPaymentEU($params) 
+	public function hookDisplayPaymentEU($params)
 	{
 		if (!$this->active)
 			return;
@@ -603,7 +606,7 @@ class PayPal extends PaymentModule
 			$logo = $logos['LocalPayPalHorizontalSolutionPP'];
 		else
 			$logo = $logos['LocalPayPalLogoMedium'];
-		
+
 		if ($method == HSS)
 		{
 			return array(
@@ -694,11 +697,11 @@ class PayPal extends PaymentModule
 						$capture_amount = Tools::ps_round($capture_amount, '6');
 						$ord = new Order((int)$params['id_order']);
 						$cpt = new PaypalCapture();
-						
+
 						if (($capture_amount > Tools::ps_round(0, '6')) && (Tools::ps_round($cpt->getRestToPaid($ord), '6') >= $capture_amount))
 						{
 							$complete = false;
-							
+
 							if ($capture_amount > Tools::ps_round((float)$ord->total_paid, '6'))
 							{
 								$capture_amount = Tools::ps_round((float)$ord->total_paid, '6');
@@ -837,7 +840,7 @@ class PayPal extends PaymentModule
 		$paypal_logos = $this->paypal_logos->getLogos();
 		$iso_lang = array(
 			'en' => 'en_US',
-			'fr' => 'fr_FR', 
+			'fr' => 'fr_FR',
 			'de' => 'de_DE',
 		);
 
@@ -858,12 +861,12 @@ class PayPal extends PaymentModule
 		if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && !$this->useMobile()) || !in_array(ECS, $this->getPaymentMethods()) ||
 		(((int)Configuration::get('PAYPAL_BUSINESS') == 1) && ((int)Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->useMobile()))
 			return;
-		
+
 		$this->context->smarty->assign(array(
 			'PayPal_payment_type' => $type,
 			'PayPal_current_page' => $this->getCurrentUrl(),
 			'PayPal_tracking_code' => $this->getTrackingCode((int)Configuration::get('PAYPAL_PAYMENT_METHOD')),
-			
+
 		));
 
 		return $this->fetchTemplate('express_checkout_shortcut_form.tpl');
@@ -886,7 +889,7 @@ class PayPal extends PaymentModule
 				return SMARTPHONE_TRACKING_CODE;
 		}
 		//Get Seamless checkout
-		
+
 		$login_user = false;
 		if (Configuration::get('PAYPAL_LOGIN'))
 		{
@@ -1283,11 +1286,11 @@ class PayPal extends PaymentModule
 		$paypal_order = PayPalOrder::getOrderById((int)$id_order);
 		if (!$this->isPayPalAPIAvailable() || !$paypal_order)
 			return false;
-		
+
 		$order = new Order((int)$id_order);
 		$currency = new Currency((int)$order->id_currency);
 
-		
+
 
 		if (!$capture_amount)
 			$capture_amount = (float)$order->total_paid;
@@ -1305,7 +1308,7 @@ class PayPal extends PaymentModule
 		foreach ($response as $key => $value)
 			$message .= $key.': '.$value.'<br>';
 
-		
+
 		$capture = new PaypalCapture();
 		$capture->id_order = (int)$id_order;
 		$capture->capture_amount = (float)$capture_amount;
@@ -1334,7 +1337,7 @@ class PayPal extends PaymentModule
 					$order_history->addWithemail();
 					$message .= $this->l('Order finished with PayPal!');
 				}
-			}			
+			}
 		}
 		elseif (isset($response['PAYMENTSTATUS']))
 		{
@@ -1342,7 +1345,7 @@ class PayPal extends PaymentModule
 			$capture->save();
 			$message .= $this->l('Transaction error!');
 		}
-		
+
 
 		$this->_addNewPrivateMessage((int)$id_order, $message);
 
@@ -1547,6 +1550,8 @@ class PayPal extends PaymentModule
 			else
 				Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'confirm', $values));
 		}
+		elseif (isset($this->context->cookie->express_checkout))
+			unset($this->context->cookie->express_checkout);
 	}
 
 	/**
