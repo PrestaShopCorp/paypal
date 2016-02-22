@@ -35,6 +35,7 @@ include_once(_PS_MODULE_DIR_ . 'paypal/paypal_login/paypal_login.php');
 include_once(_PS_MODULE_DIR_ . 'paypal/paypal_login/PayPalLoginUser.php');
 include_once(_PS_MODULE_DIR_ . 'paypal/classes/PaypalCapture.php');
 include_once(_PS_MODULE_DIR_ . 'paypal/classes/AuthenticatePaymentMethods.php');
+include_once(_PS_MODULE_DIR_ . 'paypal/classes/TLSVerificator.php');
 
 define('WPS', 1); //Paypal Integral
 define('HSS', 2); //Paypal Integral Evolution
@@ -123,6 +124,8 @@ class PayPal extends PaymentModule
             elseif ($mobile_enabled && !$this->active)
                     $this->checkMobileNeeds();
         } else $this->checkMobileNeeds();
+
+        $tls_verificator = new TLSVerificator(true, $this);
     }
 
     public function install()
