@@ -741,7 +741,7 @@ class PayPal extends PaymentModule
 			$this->context->smarty->assign(
 				array(
 					'authorization' => (int)Configuration::get('PAYPAL_OS_AUTHORIZATION'),
-					'base_url' => _PS_BASE_URL_.__PS_BASE_URI__,
+					'base_url' => Tools::getHttpHost(true).__PS_BASE_URI__,
 					'module_name' => $this->name,
 					'order_state' => $order_state,
 					'params' => $params,
