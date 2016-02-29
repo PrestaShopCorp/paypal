@@ -24,8 +24,8 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once(dirname(__FILE__).'/../../../config/config.inc.php');
-include_once(dirname(__FILE__).'/../../../init.php');
+include_once dirname(__FILE__).'/../../../config/config.inc.php';
+include_once dirname(__FILE__).'/../../../init.php';
 
 /*
  * Init var
@@ -33,185 +33,192 @@ include_once(dirname(__FILE__).'/../../../init.php');
 
 if (version_compare(_PS_VERSION_, '1.5', '<')) {
 
-	include_once(_PS_MODULE_DIR_.'paypal/backward_compatibility/backward.php');
-	$context = Context::getContext();
-	$ajax = Tools::getValue('ajax');
-	/*
-	* Pour la version 1.4
-	*/
-	if($ajax){
-		displayAjax($context);
-	}else{
-		displayConfirm($context);
-	}
-	
-	
-}else{
-	$values = array(
-		'id_cart' => (int) Tools::getValue('id_cart'),
-		'id_module' => (int) Module::getInstanceByName('paypal')->id,
-		'paymentId' => Tools::getValue('paymentId'),
-		'token' => Tools::getValue('token'),
-	);
-	$values['key'] = Context::getContext()->customer->secure_key;
-	$link          = Context::getContext()->link->getModuleLink('paypal', 'submitplus', $values);
-	Tools::redirect($link);
-	die();
+    include_once _PS_MODULE_DIR_.'paypal/backward_compatibility/backward.php';
+    $context = Context::getContext();
+    $ajax = Tools::getValue('ajax');
+    /*
+     * Pour la version 1.4
+     */
+    if ($ajax) {
+        displayAjax($context);
+    } else {
+        displayConfirm($context);
+    }
+
+} else {
+    $values = array(
+        'id_cart' => (int) Tools::getValue('id_cart'),
+        'id_module' => (int) Module::getInstanceByName('paypal')->id,
+        'paymentId' => Tools::getValue('paymentId'),
+        'token' => Tools::getValue('token'),
+    );
+    $values['key'] = Context::getContext()->customer->secure_key;
+    $link = Context::getContext()->link->getModuleLink('paypal', 'submitplus', $values);
+    Tools::redirect($link);
+    die();
 }
 
-function displayConfirm($context){
-		
-	include(_PS_ROOT_DIR_.'/header.php');
-	
-	$paypal = new PayPal();
+function displayConfirm($context)
+{
 
-	$id_module = (int) Module::getInstanceByName('paypal')->id;
-	$id_cart   = Tools::getValue('id_cart');
-	$paymentId = Tools::getValue('paymentId');
-	$token     = Tools::getValue('token');
+    include _PS_ROOT_DIR_.'/header.php';
 
-	if(!empty($id_cart) && !empty($paymentId) && !empty($token) ){
-		
-		$CallApiPaypalPlus = new CallApiPaypalPlus();
-		$payment           = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($paymentId));
+    $paypal = new PayPal();
 
-		if (isset($payment->state)) {
+    $id_module = (int) Module::getInstanceByName('paypal')->id;
+    $id_cart = Tools::getValue('id_cart');
+    $paymentId = Tools::getValue('paymentId');
+    $token = Tools::getValue('token');
 
-			$context->smarty->assign('state', $payment->state);
+    if (!empty($id_cart) && !empty($paymentId) && !empty($token)) {
+
+        $CallApiPaypalPlus = new CallApiPaypalPlus();
+        $payment = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($paymentId));
+
+        if (isset($payment->state)) {
+
+            $context->smarty->assign('state', $payment->state);
 
             $paypal->assignCartSummary();
 
-			$transaction = array(
-				'id_transaction' => $payment->id,
-				'payment_status' => $payment->state,
-				'currency' => $payment->transactions[0]->amount->currency,
-				'payment_date' => date("Y-m-d H:i:s"),
-				'total_paid' => $payment->transactions[0]->amount->total,
-				'id_invoice' => 0,
-				'shipping' => 0,
-			);
+            $transaction = array(
+                'id_transaction' => $payment->id,
+                'payment_status' => $payment->state,
+                'currency' => $payment->transactions[0]->amount->currency,
+                'payment_date' => date("Y-m-d H:i:s"),
+                'total_paid' => $payment->transactions[0]->amount->total,
+                'id_invoice' => 0,
+                'shipping' => 0,
+            );
 
-			switch ($payment->state) {
-				case 'created':
-					/* LookUp OK */
-					/* Affichage bouton confirmation */
-				   
-					$context->smarty->assign(array(
-						'PayerID' => $payment->payer->payer_info->payer_id,
-						'paymentId' => $paymentId,
-						'id_cart' => $id_cart,
-						'totalAmount' => Tools::displayPrice(Cart::getTotalCart($id_cart)),
-						'linkSubmitPlus' => _MODULE_DIR_.'paypal/paypal_plus/submit.php',
-					));
-					break;
+            switch ($payment->state) {
+                case 'created':
+                    /* LookUp OK */
+                    /* Affichage bouton confirmation */
 
-				case 'canceled':
-					/* LookUp cancel */
-					$paypal->validateOrder(
-						$id_cart, getOrderStatus('order_canceled'),
-						$payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
-					);
-					break;
+                    $context->smarty->assign(array(
+                        'PayerID' => $payment->payer->payer_info->payer_id,
+                        'paymentId' => $paymentId,
+                        'id_cart' => $id_cart,
+                        'totalAmount' => Tools::displayPrice(Cart::getTotalCart($id_cart)),
+                        'linkSubmitPlus' => _MODULE_DIR_.'paypal/paypal_plus/submit.php',
+                    ));
+                    break;
 
-				default:
-					/* Erreur de payment */
-					$paypal->validateOrder(
-						$id_cart, getOrderStatus('payment_error'),
-						$payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
-					);
+                case 'canceled':
+                    /* LookUp cancel */
+                    $paypal->validateOrder(
+                        $id_cart, getOrderStatus('order_canceled'),
+                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                    );
+                    break;
 
-					break;
-			}
-		} else
-			$context->smarty->assign('state', 'failed');
-	}else
-		$context->smarty->assign('state', 'failed');
-		
+                default:
+                    /* Erreur de payment */
+                    $paypal->validateOrder(
+                        $id_cart, getOrderStatus('payment_error'),
+                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                    );
 
-	echo $context->smarty->fetch(_PS_MODULE_DIR_.'paypal/views/templates/front/order-confirmation-plus.tpl');
-	
-	include(_PS_ROOT_DIR_.'/footer.php');
-	
-	die();
+                    break;
+            }
+        } else {
+            $context->smarty->assign('state', 'failed');
+        }
+
+    } else {
+        $context->smarty->assign('state', 'failed');
+    }
+
+    echo $context->smarty->fetch(_PS_MODULE_DIR_.'paypal/views/templates/front/order-confirmation-plus.tpl');
+
+    include _PS_ROOT_DIR_.'/footer.php';
+
+    die();
 }
 
-function displayAjax($context){
-	$id_cart   = Tools::getValue('id_cart');
-	$payerID   = Tools::getValue('payerID');
-	$paymentId = Tools::getValue('paymentId');
-	$submit    = Tools::getValue('submit');
-	$paypal = new PayPal();
+function displayAjax($context)
+{
+    $id_cart = Tools::getValue('id_cart');
+    $payerID = Tools::getValue('payerID');
+    $paymentId = Tools::getValue('paymentId');
+    $submit = Tools::getValue('submit');
+    $paypal = new PayPal();
     $return = array();
-    
+
     if (
-        (!empty($id_cart) && $context->cart->id == $id_cart ) &&
+        (!empty($id_cart) && $context->cart->id == $id_cart) &&
         !empty($payerID) &&
         !empty($paymentId) &&
         !empty($submit)
     ) {
-        
-        include_once(_PS_MODULE_DIR_.'paypal/paypal.php');
-    
+
+        include_once _PS_MODULE_DIR_.'paypal/paypal.php';
+
         $CallApiPaypalPlus = new CallApiPaypalPlus();
-        $payment           = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+        $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
         if (isset($payment->state)) {
 
+            $transaction = array(
+                'id_transaction' => $payment->transactions[0]->related_resources[0]->sale->id,
+                'payment_status' => $payment->state,
+                'total_paid' => $payment->transactions[0]->amount->total,
+                'id_invoice' => 0,
+                'shipping' => 0,
+                'currency' => $payment->transactions[0]->amount->currency,
+                'payment_date' => date("Y-m-d H:i:s"),
+            );
 
-			$transaction = array(
-				'id_transaction' => $payment->transactions[0]->related_resources[0]->sale->id,
-				'payment_status' => $payment->state,
-				'total_paid' => $payment->transactions[0]->amount->total,
-				'id_invoice' => 0,
-				'shipping' => 0,
-				'currency' => $payment->transactions[0]->amount->currency,
-				'payment_date' => date("Y-m-d H:i:s"),
-			);
+            if ($submit == 'confirmPayment') {
 
-			if ($submit == 'confirmPayment') {
+                if ($payment->state == 'approved') {
 
-				if ($payment->state == 'approved') {
+                    $paypal->validateOrder(
+                        $id_cart, getOrderStatus('payment'), $payment->transactions[0]->amount->total,
+                        $payment->payer->payment_method, null, $transaction
+                    );
+                    $return['success'][] = $paypal->l('Your payment has been taken into account');
+                } else {
 
-					$paypal->validateOrder(
-						$id_cart, getOrderStatus('payment'), $payment->transactions[0]->amount->total,
-						$payment->payer->payment_method, null, $transaction
-					);
-					$return['success'][] = $paypal->l('Your payment has been taken into account');
-				} else {
+                    $paypal->validateOrder(
+                        $id_cart, getOrderStatus('payment_error'),
+                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null,
+                        $transaction
+                    );
+                    $return['error'][] = $paypal->l('An error occured during the payment');
+                }
+            } elseif ($submit == 'confirmCancel') {
 
-					$paypal->validateOrder(
-						$id_cart, getOrderStatus('payment_error'),
-						$payment->transactions[0]->amount->total, $payment->payer->payment_method, null,
-						$transaction
-					);
-					$return['error'][] = $paypal->l('An error occured during the payment');
-				}
-			} elseif ($submit == 'confirmCancel') {
+                $paypal->validateOrder(
+                    $id_cart, getOrderStatus('order_canceled'),
+                    $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                );
+                $return['success'][] = $paypal->l('Your order has been canceled');
+            } else {
+                $return['error'][] = $paypal->l('An error occured during the payment');
+            }
 
-				$paypal->validateOrder(
-					$id_cart, getOrderStatus('order_canceled'),
-					$payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
-				);
-				$return['success'][] = $paypal->l('Your order has been canceled');
-			} else
-				$return['error'][] = $paypal->l('An error occured during the payment');
-		} else
-			$return['error'][] = $paypal->l('An error occured during the payment');
-	} else
-		$return['error'][] = $paypal->l('An error occured during the payment');
+        } else {
+            $return['error'][] = $paypal->l('An error occured during the payment');
+        }
 
-	echo Tools::jsonEncode($return);
-	die();
+    } else {
+        $return['error'][] = $paypal->l('An error occured during the payment');
+    }
+
+    echo Tools::jsonEncode($return);
+    die();
 }
 
-	function getOrderStatus($template)
-    {
-        /*
-         * payment
-         * payment_error
-         * order_canceled
-         * refund
-         */
-        $context = Context::getContext();
-        return Db::getInstance()->getValue('SELECT id_order_state FROM '._DB_PREFIX_.'order_state_lang WHERE template = "'.pSQL($template).'" AND id_lang = "'.(int)$context->cookie->id_lang.'"');
-    }
+function getOrderStatus($template)
+{
+    /*
+     * payment
+     * payment_error
+     * order_canceled
+     * refund
+     */
+    $context = Context::getContext();
+    return Db::getInstance()->getValue('SELECT id_order_state FROM '._DB_PREFIX_.'order_state_lang WHERE template = "'.pSQL($template).'" AND id_lang = "'.(int) $context->cookie->id_lang.'"');
+}
