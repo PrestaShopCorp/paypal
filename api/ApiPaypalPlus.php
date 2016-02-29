@@ -81,7 +81,7 @@ class ApiPaypalPlus
         /*
          * Init variable
          */
-        $oPayPalToken = json_decode($result);
+        $oPayPalToken = Tools::jsonDecode($result);
 
         if (isset($oPayPalToken->error)) {
             return false;
@@ -111,7 +111,7 @@ class ApiPaypalPlus
         $presentation = new stdClass();
         $presentation->brand_name = Configuration::get('PS_SHOP_NAME');
         $presentation->logo_image = _PS_BASE_URL_ . __PS_BASE_URI__ . 'img/logo.jpg';
-        $presentation->locale_code = strtoupper(Language::getIsoById($this->context->language->id));
+        $presentation->locale_code = Tools::strtoupper(Language::getIsoById($this->context->language->id));
 
         $input_fields = new stdClass();
         $input_fields->allow_note = true;
@@ -144,8 +144,8 @@ class ApiPaypalPlus
                 'Authorization:Bearer ' . $accessToken
             );
 
-            $result = json_decode($this->sendByCURL(URL_PPP_WEBPROFILE,
-                            json_encode($data), $header));
+            $result = Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE,
+                            Tools::jsonEncode($data), $header));
 
             if (isset($result->id)) {
                 return $result->id;
@@ -177,7 +177,7 @@ class ApiPaypalPlus
                 'Authorization:Bearer ' . $accessToken
             );
 
-            return json_decode($this->sendByCURL(URL_PPP_WEBPROFILE, false,
+            return Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE, false,
                             $header));
         }
     }
@@ -323,7 +323,7 @@ class ApiPaypalPlus
             'Authorization:Bearer ' . $access_token
         );
 
-        $result = $this->sendByCURL(URL_PPP_CREATE_PAYMENT, json_encode($data),
+        $result = $this->sendByCURL(URL_PPP_CREATE_PAYMENT, Tools::jsonEncode($data),
                 $header);
 
         return $result;

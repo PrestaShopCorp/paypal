@@ -72,7 +72,7 @@ function displayConfirm($context){
 	if(!empty($id_cart) && !empty($paymentId) && !empty($token) ){
 		
 		$CallApiPaypalPlus = new CallApiPaypalPlus();
-		$payment           = json_decode($CallApiPaypalPlus->lookUpPayment($paymentId));
+		$payment           = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($paymentId));
 
 		if (isset($payment->state)) {
 
@@ -151,7 +151,7 @@ function displayAjax($context){
         include_once(_PS_MODULE_DIR_.'paypal/paypal.php');
     
         $CallApiPaypalPlus = new CallApiPaypalPlus();
-        $payment           = json_decode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+        $payment           = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
         if (isset($payment->state)) {
 
@@ -198,18 +198,18 @@ function displayAjax($context){
 	} else
 		$return['error'][] = $paypal->l('An error occured during the payment');
 
-	echo json_encode($return);
+	echo Tools::jsonEncode($return);
 	die();
 }
 
 	function getOrderStatus($template)
     {
-		global $cookie;
         /*
          * payment
          * payment_error
          * order_canceled
          * refund
          */
-        return Db::getInstance()->getValue('SELECT id_order_state FROM '._DB_PREFIX_.'order_state_lang WHERE template = "'.pSQL($template).'" AND id_lang = "'.(int)$cookie->id_lang.'"');
+        $context = Context::getContext();
+        return Db::getInstance()->getValue('SELECT id_order_state FROM '._DB_PREFIX_.'order_state_lang WHERE template = "'.pSQL($template).'" AND id_lang = "'.(int)$context->cookie->id_lang.'"');
     }

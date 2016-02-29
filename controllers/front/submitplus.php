@@ -67,7 +67,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         if(!empty($this->id_cart) && !empty($this->paymentId) && !empty($this->token) ){
             
             $CallApiPaypalPlus = new CallApiPaypalPlus();
-            $payment           = json_decode($CallApiPaypalPlus->lookUpPayment($this->paymentId));
+            $payment           = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($this->paymentId));
 
             if (isset($payment->state)) {
 
@@ -160,7 +160,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         $ajax = Tools::getValue('ajax');
         if (!$ajax) {
             $return['error'][] = $this->module->l('An error occured during the payment');
-            echo json_encode($return);
+            echo Tools::jsonEncode($return);
             die();
         }
 
@@ -177,7 +177,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         ) {
 
             $CallApiPaypalPlus = new CallApiPaypalPlus();
-            $payment           = json_decode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+            $payment           = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
             if (isset($payment->state)) {
 
@@ -225,7 +225,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         } else
             $return['error'][] = $this->module->l('An error occured during the payment');
 
-        echo json_encode($return);
+        echo Tools::jsonEncode($return);
         die();
     }
 

@@ -449,7 +449,7 @@ class PayPal extends PaymentModule
 
     public function getLocalePayPalPlus()
     {
-        switch (strtolower($this->getCountryCode())) {
+        switch (Tools::strtolower($this->getCountryCode())) {
             case 'fr':
                 return 'fr_FR';
             case 'hk':
@@ -1374,7 +1374,7 @@ class PayPal extends PaymentModule
 
             $callApiPaypalPlus = new CallApiPaypalPlus();
 
-            return json_decode($callApiPaypalPlus->executeRefund($id_transaction,
+            return Tools::jsonDecode($callApiPaypalPlus->executeRefund($id_transaction,
                             $params));
         }
     }
@@ -1435,7 +1435,7 @@ class PayPal extends PaymentModule
         $message = $this->l('Refund operation result:') . " \r\n";
         foreach ($response as $key => $value) {
             if (is_object($value) || is_array($value)) {
-                $message .= $key . ': ' . json_encode($value) . " \r\n";
+                $message .= $key . ': ' . Tools::jsonEncode($value) . " \r\n";
             } else {
                 $message .= $key . ': ' . $value . " \r\n";
             }
