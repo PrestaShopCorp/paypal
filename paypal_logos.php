@@ -113,9 +113,8 @@ class PayPalLogos
                         $values['BackOfficeCards'] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.'/views/img/bo-cards/default.png';
                     }
 
-                }
-                // Use the local version
-                else if (isset($values['Local'.$key])) {
+                } else if (isset($values['Local'.$key])) {
+                    // Use the local version
                     $values['Local'.$key] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.$values['Local'.$key];
                 }
 

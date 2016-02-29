@@ -118,8 +118,8 @@ class PayPalOrder
             $transaction['payment_status'] = 'NULL';
         }
 
-        Db::getInstance()->Execute('
-			INSERT INTO `'._DB_PREFIX_.'paypal_order`
+        Db::getInstance()->Execute(
+            'INSERT INTO `'._DB_PREFIX_.'paypal_order`
 			(`id_order`, `id_transaction`, `id_invoice`, `currency`, `total_paid`, `shipping`, `capture`, `payment_date`, `payment_method`, `payment_status`)
 			VALUES ('.(int) $id_order.', \''.pSQL($transaction['id_transaction']).'\', \''.pSQL($transaction['id_invoice']).'\',
 				\''.pSQL($transaction['currency']).'\',
