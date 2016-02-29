@@ -30,8 +30,8 @@
 		{if isset($PayPal_logo.LocalPayPalLogoLarge)}
 			<img src="{$PayPal_logo.LocalPayPalLogoLarge}" alt="" style="margin-bottom: -5px" />
 		{/if}
-		<p id="paypal-slogan"><span class="dark">{l s='Leader in' mod='module'}</span> <span class="light">{l s='online payments' mod='module'}</span></p>
-		<p>{l s='Easy, secure, fast payments for your buyers.' mod='module'}</p>
+		<p id="paypal-slogan"><span class="dark">{l s='Leader in' mod='paypal'}</span> <span class="light">{l s='online payments' mod='paypal'}</span></p>
+		<p>{l s='Easy, secure, fast payments for your buyers.' mod='paypal'}</p>
 	</div>
 
 	<div class="box half right">
