@@ -287,7 +287,8 @@ class PayPal extends PaymentModule
                     $link = $shop_url._MODULE_DIR_.$this->name.'/express_checkout/payment.php';
                     $this->context->smarty->assign(
                         'paypal_confirmation',
-                        $link.'?'.http_build_query(array('get_confirmation' => true), '', '&'));
+                        $link.'?'.http_build_query(array('get_confirmation' => true), '', '&')
+                    );
                 } else {
                     $values = array('fc' => 'module', 'module' => 'paypal', 'controller' => 'confirm',
                         'get_confirmation' => true);
@@ -1251,7 +1252,8 @@ class PayPal extends PaymentModule
                 null, 
                 null,
                 null, 
-                _PS_MODULE_DIR_.$this->name.'/mails/');
+                _PS_MODULE_DIR_.$this->name.'/mails/'
+            );
         }
 
         return $this->fetchTemplate('error.tpl');
@@ -1399,8 +1401,7 @@ class PayPal extends PaymentModule
 
                 $this->context->smarty->assign('PayPal_save_success', true);
             } else {
-                $this->_html = $this->displayError(implode('<br />',
-                    $this->_errors)); // Not displayed at this time
+                $this->_html = $this->displayError(implode('<br />', $this->_errors)); // Not displayed at this time
                 $this->context->smarty->assign('PayPal_save_failure', true);
             }
         }
@@ -1437,7 +1438,8 @@ class PayPal extends PaymentModule
 
             return $paypal_lib->makeCall($this->getAPIURL(),
                 $this->getAPIScript(), 'RefundTransaction',
-                '&'.http_build_query($params, '', '&'));
+                '&'.http_build_query($params, '', '&')
+            );
         } else {
 
             if (!$amt) {
@@ -1576,7 +1578,8 @@ class PayPal extends PaymentModule
             $this->getAPIURL(), 
             $this->getAPIScript(), 
             'DoCapture',
-            '&'.http_build_query(array('AMT' => $capture_amount, 'AUTHORIZATIONID' => $paypal_order['id_transaction'], 'CURRENCYCODE' => $currency->iso_code, 'COMPLETETYPE' => $complete), '', '&'));
+            '&'.http_build_query(array('AMT' => $capture_amount, 'AUTHORIZATIONID' => $paypal_order['id_transaction'], 'CURRENCYCODE' => $currency->iso_code, 'COMPLETETYPE' => $complete), '', '&')
+        );
         $message = $this->l('Capture operation result:').'<br>';
 
         foreach ($response as $key => $value) {
@@ -1596,7 +1599,8 @@ class PayPal extends PaymentModule
                     if (!Db::getInstance()->Execute(
                     'UPDATE `'._DB_PREFIX_.'paypal_order`
                     SET `capture` = 0, `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).'\', `id_transaction` = \''.pSQL($response['TRANSACTIONID']).'\'
-                    WHERE `id_order` = '.(int) $id_order)) {
+                    WHERE `id_order` = '.(int) $id_order)
+                        ) {
                         die(Tools::displayError('Error when updating PayPal database'));
                     }
 
@@ -1640,7 +1644,8 @@ class PayPal extends PaymentModule
             $this->getAPIURL(),
             $this->getAPIScript(), 
             'GetTransactionDetails',
-            '&'.http_build_query(array('TRANSACTIONID' => $paypal_order['id_transaction']), '', '&'));
+            '&'.http_build_query(array('TRANSACTIONID' => $paypal_order['id_transaction']), '', '&')
+        );
 
         if (array_key_exists('ACK', $response)) {
             if ($response['ACK'] == 'Success' && isset($response['PAYMENTSTATUS'])) {
@@ -1662,7 +1667,8 @@ class PayPal extends PaymentModule
                 'UPDATE `'._DB_PREFIX_.'paypal_order`
                 SET `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).($response['PENDINGREASON']
                     == 'authorization' ? '_authorization' : '').'\'
-                WHERE `id_order` = '.(int) $id_order)) {
+                WHERE `id_order` = '.(int) $id_order)
+                    ) {
                     die(Tools::displayError('Error when updating PayPal database'));
                 }
 
@@ -1704,7 +1710,8 @@ class PayPal extends PaymentModule
         return Db::getInstance()->getValue(
             'SELECT `id_customer`
             FROM `'._DB_PREFIX_.'paypal_customer`
-            WHERE paypal_email = \''.pSQL($email).'\'');
+            WHERE paypal_email = \''.pSQL($email).'\''
+        );
     }
 
     public static function getPayPalEmailByIdCustomer($id_customer)
@@ -1712,7 +1719,8 @@ class PayPal extends PaymentModule
         return Db::getInstance()->getValue(
             'SELECT `paypal_email`
             FROM `'._DB_PREFIX_.'paypal_customer`
-            WHERE `id_customer` = '.(int) $id_customer);
+            WHERE `id_customer` = '.(int) $id_customer
+        );
     }
 
     public static function addPayPalCustomer($id_customer, $email)
@@ -1720,7 +1728,8 @@ class PayPal extends PaymentModule
         if (!PayPal::getPayPalEmailByIdCustomer($id_customer)) {
             Db::getInstance()->Execute(
                 'INSERT INTO `'._DB_PREFIX_.'paypal_customer` (`id_customer`, `paypal_email`)
-                VALUES('.(int) $id_customer.', \''.pSQL($email).'\')');
+                VALUES('.(int) $id_customer.', \''.pSQL($email).'\')'
+            );
 
             return Db::getInstance()->Insert_ID();
         }
@@ -1818,7 +1827,8 @@ class PayPal extends PaymentModule
                     $transaction, 
                     $currency_special, 
                     $dont_touch_amount,
-                    $secure_key);
+                    $secure_key
+                );
             } else {
                 parent::validateOrder(
                     (int) $id_cart, 
@@ -1830,7 +1840,8 @@ class PayPal extends PaymentModule
                     $currency_special, 
                     $dont_touch_amount,
                     $secure_key, 
-                    $shop);
+                    $shop
+                );
             }
 
             if (count($transaction) > 0) {
