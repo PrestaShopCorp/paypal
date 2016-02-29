@@ -360,14 +360,8 @@ class PaypalExpressCheckout extends Paypal
 			$fields['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Authorization';
 		else
 			$fields['PAYMENTREQUEST_0_PAYMENTACTION'] = 'Sale';
-
-		if (isset($this->context->cookie->id_currency))
-			$id_currency = $this->context->cookie->id_currency;
-		else
-			$id_currency = $this->context->currency->id;
 		
-		$currency = new Currency((int)$id_currency);
-
+		$currency = new Currency((int)$this->context->cart->id_currency);
 		$fields['PAYMENTREQUEST_0_CURRENCYCODE'] = $currency->iso_code;
 
 		/**
