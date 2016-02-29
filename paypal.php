@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2007-2016 PrestaShop
  *
@@ -24,6 +23,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
+
 if (!defined('_PS_VERSION_')) exit;
 
 include_once(_PS_MODULE_DIR_ . 'paypal/api/paypal_lib.php');
