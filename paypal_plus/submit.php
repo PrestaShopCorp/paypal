@@ -140,7 +140,8 @@ function displayAjax($context){
 	$paymentId = Tools::getValue('paymentId');
 	$submit    = Tools::getValue('submit');
 	$paypal = new PayPal();
-
+    $return = array();
+    
     if (
         (!empty($id_cart) && $context->cart->id == $id_cart ) &&
         !empty($payerID) &&

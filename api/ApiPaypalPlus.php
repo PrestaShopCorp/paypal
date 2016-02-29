@@ -255,6 +255,7 @@ class ApiPaypalPlus
         $payer->payment_method = "paypal";
         //$payer->payer_info = $payer_info; // Objet set by PayPal
 
+        $aItems = array();
         /* Item */
         foreach ($cartItems as $cartItem) {
 

@@ -158,6 +158,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
     public function displayAjax()
     {
         $ajax = Tools::getValue('ajax');
+        $return = array();
         if (!$ajax) {
             $return['error'][] = $this->module->l('An error occured during the payment');
             echo Tools::jsonEncode($return);

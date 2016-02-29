@@ -170,7 +170,7 @@ class AuthenticatePaymentMethods
         return self::getPaymentMethodsRetroCompatibilite(self::getCountryDependencyRetroCompatibilite($iso_code));
     }
 
-    static function AuthenticatePaymentMethodByCountry($iso_code)
+    static public function AuthenticatePaymentMethodByCountry($iso_code)
     {
         return self::getPaymentMethodsByIsoCode(self::getCountryDependency($iso_code));
     }
