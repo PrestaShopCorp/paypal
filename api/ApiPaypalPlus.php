@@ -49,15 +49,13 @@ class ApiPaypalPlus
         if ($ch) {
 
             if ((int) Configuration::get('PAYPAL_SANDBOX') == 1) {
-                curl_setopt($ch, CURLOPT_URL,
-                    'https://api.sandbox.paypal.com'.$url);
+                curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com'.$url);
             } else {
                 curl_setopt($ch, CURLOPT_URL, 'https://api.paypal.com'.$url);
             }
 
             if ($identify) {
-                curl_setopt($ch, CURLOPT_USERPWD,
-                    Configuration::get('PAYPAL_PLUS_CLIENT_ID').':'.Configuration::get('PAYPAL_PLUS_SECRET'));
+                curl_setopt($ch, CURLOPT_USERPWD, Configuration::get('PAYPAL_PLUS_CLIENT_ID').':'.Configuration::get('PAYPAL_PLUS_SECRET'));
             }
 
             if ($http_header) {
@@ -66,8 +64,7 @@ class ApiPaypalPlus
             if ($body) {
                 curl_setopt($ch, CURLOPT_POST, true);
                 if ($identify) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS,
-                        http_build_query($body));
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($body));
                 } else {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
                 }
@@ -79,8 +76,7 @@ class ApiPaypalPlus
             curl_setopt($ch, CURLOPT_TIMEOUT, 60);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-            curl_setopt($ch, CURLOPT_SSLVERSION,
-                defined('CURL_SSLVERSION_TLSv1') ? CURL_SSLVERSION_TLSv1 : 1);
+            curl_setopt($ch, CURLOPT_SSLVERSION, defined('CURL_SSLVERSION_TLSv1') ? CURL_SSLVERSION_TLSv1 : 1);
             curl_setopt($ch, CURLOPT_VERBOSE, false);
 
             $result = curl_exec($ch);
@@ -110,10 +106,8 @@ class ApiPaypalPlus
             /*
              * Set Token in Cookie
              */
-            $this->context->cookie->__set('paypal_access_token_time_max',
-                $time_max);
-            $this->context->cookie->__set('paypal_access_token_access_token',
-                $access_token);
+            $this->context->cookie->__set('paypal_access_token_time_max', $time_max);
+            $this->context->cookie->__set('paypal_access_token_access_token', $access_token);
             $this->context->cookie->write();
 
             return $access_token;
@@ -147,8 +141,7 @@ class ApiPaypalPlus
 
     public function getWebProfile()
     {
-        $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN,
-            array('grant_type' => 'client_credentials'));
+        $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN, array('grant_type' => 'client_credentials'));
 
         if ($accessToken) {
 
@@ -159,8 +152,7 @@ class ApiPaypalPlus
                 'Authorization:Bearer '.$accessToken,
             );
 
-            $result = Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE,
-                Tools::jsonEncode($data), $header));
+            $result = Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE, Tools::jsonEncode($data), $header));
 
             if (isset($result->id)) {
                 return $result->id;
@@ -182,8 +174,7 @@ class ApiPaypalPlus
     public function getListProfile()
     {
 
-        $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN,
-            array('grant_type' => 'client_credentials'));
+        $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN, array('grant_type' => 'client_credentials'));
 
         if ($accessToken) {
 
@@ -192,16 +183,14 @@ class ApiPaypalPlus
                 'Authorization:Bearer '.$accessToken,
             );
 
-            return Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE, false,
-                $header));
+            return Tools::jsonDecode($this->sendByCURL(URL_PPP_WEBPROFILE, false, $header));
         }
     }
 
     public function refreshToken()
     {
         if ($this->context->cookie->paypal_access_token_time_max < time()) {
-            return $this->getToken(URL_PPP_CREATE_TOKEN,
-                array('grant_type' => 'client_credentials'));
+            return $this->getToken(URL_PPP_CREATE_TOKEN, array('grant_type' => 'client_credentials'));
         } else {
             return $this->context->cookie->paypal_access_token_access_token;
         }
@@ -219,11 +208,9 @@ class ApiPaypalPlus
         $iso_code = $country->iso_code;
 
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            $totalShippingCostWithoutTax = $cart->getOrderShippingCost(null,
-                false);
+            $totalShippingCostWithoutTax = $cart->getOrderShippingCost(null, false);
         } else {
-            $totalShippingCostWithoutTax = $cart->getTotalShippingCost(null,
-                false);
+            $totalShippingCostWithoutTax = $cart->getTotalShippingCost(null, false);
         }
 
         $totalCartWithTax = $cart->getOrderTotal(true);
@@ -281,8 +268,7 @@ class ApiPaypalPlus
             $item->currency = $oCurrency->iso_code;
             $item->quantity = $cartItem['quantity'];
             $item->price = number_format(round($cartItem['price'], 2), 2);
-            $item->tax = number_format(round($cartItem['price_wt'] - $cartItem['price'],
-                2), 2);
+            $item->tax = number_format(round($cartItem['price_wt'] - $cartItem['price'], 2), 2);
             $aItems[] = $item;
             unset($item);
         }
@@ -296,8 +282,7 @@ class ApiPaypalPlus
         $details->shipping = number_format($totalShippingCostWithoutTax, 2);
         $details->tax = number_format($total_tax, 2);
         $details->handling_fee = number_format($giftWithoutTax, 2);
-        $details->subtotal = number_format($totalCartWithoutTax - $totalShippingCostWithoutTax
-             - $giftWithoutTax, 2);
+        $details->subtotal = number_format($totalCartWithoutTax - $totalShippingCostWithoutTax - $giftWithoutTax, 2);
 
         /* Amount */
         $amount = new stdClass();
@@ -340,8 +325,7 @@ class ApiPaypalPlus
             'Authorization:Bearer '.$access_token,
         );
 
-        $result = $this->sendByCURL(URL_PPP_CREATE_PAYMENT, Tools::jsonEncode($data),
-            $header);
+        $result = $this->sendByCURL(URL_PPP_CREATE_PAYMENT, Tools::jsonEncode($data), $header);
 
         return $result;
     }

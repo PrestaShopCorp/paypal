@@ -169,5 +169,4 @@ class PaypalCapture extends ObjectModel
         }
 
     }
-
 }

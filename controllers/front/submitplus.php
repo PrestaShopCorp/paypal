@@ -100,16 +100,24 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                     case 'canceled':
                         /* LookUp cancel */
                         $paypal->validateOrder(
-                            $this->id_cart, $this->getOrderStatus('order_canceled'),
-                            $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                            $this->id_cart,
+                            $this->getOrderStatus('order_canceled'),
+                            $payment->transactions[0]->amount->total,
+                            $payment->payer->payment_method,
+                            null,
+                            $transaction
                         );
                         break;
 
                     default:
                         /* Erreur de payment */
                         $paypal->validateOrder(
-                            $this->id_cart, $this->getOrderStatus('payment_error'),
-                            $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                            $this->id_cart,
+                            $this->getOrderStatus('payment_error'),
+                            $payment->transactions[0]->amount->total,
+                            $payment->payer->payment_method,
+                            null,
+                            $transaction
                         );
 
                         break;
@@ -202,15 +210,22 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                     if ($payment->state == 'approved') {
 
                         $paypal->validateOrder(
-                            $this->id_cart, $this->getOrderStatus('payment'), $payment->transactions[0]->amount->total,
-                            $payment->payer->payment_method, null, $transaction
+                            $this->id_cart,
+                            $this->getOrderStatus('payment'),
+                            $payment->transactions[0]->amount->total,
+                            $payment->payer->payment_method,
+                            null,
+                            $transaction
                         );
                         $return['success'][] = $this->module->l('Your payment has been taken into account');
                     } else {
 
                         $paypal->validateOrder(
-                            $this->id_cart, $this->getOrderStatus('payment_error'),
-                            $payment->transactions[0]->amount->total, $payment->payer->payment_method, null,
+                            $this->id_cart,
+                            $this->getOrderStatus('payment_error'),
+                            $payment->transactions[0]->amount->total,
+                            $payment->payer->payment_method,
+                            null,
                             $transaction
                         );
                         $return['error'][] = $this->module->l('An error occured during the payment');
@@ -218,8 +233,12 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                 } elseif ($submit == 'confirmCancel') {
 
                     $paypal->validateOrder(
-                        $this->id_cart, $this->getOrderStatus('order_canceled'),
-                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                        $this->id_cart,
+                        $this->getOrderStatus('order_canceled'),
+                        $payment->transactions[0]->amount->total,
+                        $payment->payer->payment_method,
+                        null,
+                        $transaction
                     );
                     $return['success'][] = $this->module->l('Your order has been canceled');
                 } else {

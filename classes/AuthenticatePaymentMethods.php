@@ -184,14 +184,13 @@ class AuthenticatePaymentMethods
         return isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : $payment_method['GB'];
     }
 
-    public static function AuthenticatePaymentMethodByLang($iso_code)
+    public static function authenticatePaymentMethodByLang($iso_code)
     {
         return self::getPaymentMethodsRetroCompatibilite(self::getCountryDependencyRetroCompatibilite($iso_code));
     }
 
-    public static function AuthenticatePaymentMethodByCountry($iso_code)
+    public static function authenticatePaymentMethodByCountry($iso_code)
     {
         return self::getPaymentMethodsByIsoCode(self::getCountryDependency($iso_code));
     }
-
 }

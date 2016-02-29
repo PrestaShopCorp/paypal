@@ -25,9 +25,9 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-	/**
-	 * @since 1.5.0
-	 */
+/**
+ * @since 1.5.0
+ */
 
 include_once(dirname(__FILE__).'/submit.php');
 include_once(dirname(__FILE__).'/../../integral_evolution/submit.php');
