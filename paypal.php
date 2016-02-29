@@ -1556,7 +1556,7 @@ class PayPal extends PaymentModule
         Tools::redirect($_SERVER['HTTP_REFERER']);
     }
 
-    private function _doCapture($id_order, $capture_amount = false, $is_complete = false) 
+    private function _doCapture($id_order, $capture_amount = false, $is_complete = false)
     {
         $paypal_order = PayPalOrder::getOrderById((int) $id_order);
         if (!$this->isPayPalAPIAvailable() || !$paypal_order) {
@@ -1599,10 +1599,10 @@ class PayPal extends PaymentModule
                 if (!($capture->getRestToCapture($capture->id_order))) {
                     //plus d'argent a capturer
                     if (!Db::getInstance()->Execute(
-                            'UPDATE `'._DB_PREFIX_.'paypal_order`
-                            SET `capture` = 0, `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).'\', `id_transaction` = \''.pSQL($response['TRANSACTIONID']).'\'
-                            WHERE `id_order` = '.(int) $id_order
-                        )
+                        'UPDATE `'._DB_PREFIX_.'paypal_order`
+                        SET `capture` = 0, `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).'\', `id_transaction` = \''.pSQL($response['TRANSACTIONID']).'\'
+                        WHERE `id_order` = '.(int) $id_order
+                    )
                     ) {
                         die(Tools::displayError('Error when updating PayPal database'));
                     }
@@ -1667,10 +1667,10 @@ class PayPal extends PaymentModule
                 $history->addWithemail();
 
                 if (!Db::getInstance()->Execute(
-                        'UPDATE `'._DB_PREFIX_.'paypal_order`
-                        SET `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).($response['PENDINGREASON'] == 'authorization' ? '_authorization' : '').'\'
-                        WHERE `id_order` = '.(int) $id_order
-                    )
+                    'UPDATE `'._DB_PREFIX_.'paypal_order`
+                    SET `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).($response['PENDINGREASON'] == 'authorization' ? '_authorization' : '').'\'
+                    WHERE `id_order` = '.(int) $id_order
+                )
                 ) {
                     die(Tools::displayError('Error when updating PayPal database'));
                 }

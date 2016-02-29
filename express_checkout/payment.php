@@ -203,9 +203,8 @@ if ($request_type && $ppec->type) {
     }
     if ($ppec->hasSucceedRequest() && !empty($ppec->token)) {
         $ppec->redirectToAPI();
-    }
-    else {
-        // Display Error and die with this method 
+    } else {
+        // Display Error and die with this method
         $ppec->displayPayPalAPIError($ppec->l('Error during the preparation of the Express Checkout payment'), $ppec->logs);
     }
 
