@@ -329,5 +329,4 @@ class ApiPaypalPlus
 
         return $result;
     }
-
 }

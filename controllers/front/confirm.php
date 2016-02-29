@@ -35,19 +35,20 @@ class PayPalConfirmModuleFrontController extends ModuleFrontController
 
     public function initContent()
     {
-        if (!$this->context->customer->isLogged(true) || empty($this->context->cart))
+        if (!$this->context->customer->isLogged(true) || empty($this->context->cart)) {
             Tools::redirect('index.php');
+        }
 
         parent::initContent();
 
         $this->paypal = new PayPal();
         $this->context = Context::getContext();
-        $this->id_module = (int)Tools::getValue('id_module');
+        $this->id_module = (int) Tools::getValue('id_module');
 
-        $currency = new Currency((int)$this->context->cart->id_currency);
+        $currency = new Currency((int) $this->context->cart->id_currency);
 
         $this->module->assignCartSummary();
-        
+
         $this->context->smarty->assign(array(
             'form_action' => PayPal::getShopDomainSsl(true, true)._MODULE_DIR_.$this->paypal->name.'/express_checkout/payment.php',
         ));

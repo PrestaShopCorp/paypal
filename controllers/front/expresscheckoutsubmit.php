@@ -25,9 +25,9 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-	/**
-	 * @since 1.5.0
-	 */
+/**
+ * @since 1.5.0
+ */
 
 include_once(dirname(__FILE__).'/payment.php');
 include_once(dirname(__FILE__).'/../../express_checkout/payment.php');

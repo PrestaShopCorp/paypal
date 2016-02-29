@@ -1556,7 +1556,8 @@ class PayPal extends PaymentModule
         Tools::redirect($_SERVER['HTTP_REFERER']);
     }
 
-    private function _doCapture($id_order, $capture_amount = false, $is_complete = false) {
+    private function _doCapture($id_order, $capture_amount = false, $is_complete = false) 
+    {
         $paypal_order = PayPalOrder::getOrderById((int) $id_order);
         if (!$this->isPayPalAPIAvailable() || !$paypal_order) {
             return false;
@@ -1598,9 +1599,9 @@ class PayPal extends PaymentModule
                 if (!($capture->getRestToCapture($capture->id_order))) {
                     //plus d'argent a capturer
                     if (!Db::getInstance()->Execute(
-                        'UPDATE `'._DB_PREFIX_.'paypal_order`
-                        SET `capture` = 0, `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).'\', `id_transaction` = \''.pSQL($response['TRANSACTIONID']).'\'
-                        WHERE `id_order` = '.(int) $id_order
+                            'UPDATE `'._DB_PREFIX_.'paypal_order`
+                            SET `capture` = 0, `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).'\', `id_transaction` = \''.pSQL($response['TRANSACTIONID']).'\'
+                            WHERE `id_order` = '.(int) $id_order
                         )
                     ) {
                         die(Tools::displayError('Error when updating PayPal database'));
@@ -1666,9 +1667,9 @@ class PayPal extends PaymentModule
                 $history->addWithemail();
 
                 if (!Db::getInstance()->Execute(
-                    'UPDATE `'._DB_PREFIX_.'paypal_order`
-                    SET `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).($response['PENDINGREASON'] == 'authorization' ? '_authorization' : '').'\'
-                    WHERE `id_order` = '.(int) $id_order
+                        'UPDATE `'._DB_PREFIX_.'paypal_order`
+                        SET `payment_status` = \''.pSQL($response['PAYMENTSTATUS']).($response['PENDINGREASON'] == 'authorization' ? '_authorization' : '').'\'
+                        WHERE `id_order` = '.(int) $id_order
                     )
                 ) {
                     die(Tools::displayError('Error when updating PayPal database'));
@@ -1812,7 +1813,7 @@ class PayPal extends PaymentModule
         }
     }
 
-    public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null) 
+    public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
         if ($this->active) {
             // Set transaction details if pcc is defined in PaymentModule class_exists
@@ -1946,8 +1947,7 @@ class PayPal extends PaymentModule
         } else {
             if (Tools::strlen($num1) < Tools::strlen($num2)) {
                 return -1;
-            }
-            else {
+            } else {
                 // if the two numbers are of equal length, we check digit-by-digit
 
                 // remove ending zeroes from decimals and remove point

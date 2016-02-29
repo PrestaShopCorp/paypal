@@ -204,15 +204,13 @@ if ($request_type && $ppec->type) {
     if ($ppec->hasSucceedRequest() && !empty($ppec->token)) {
         $ppec->redirectToAPI();
     }
-
-    /* Display Error and die with this method */
     else {
+        // Display Error and die with this method 
         $ppec->displayPayPalAPIError($ppec->l('Error during the preparation of the Express Checkout payment'), $ppec->logs);
     }
 
-}
-//If a token exist with payer_id, then we are back from the PayPal API
-elseif (!empty($ppec->token) && ($ppec->token == $token) && ($ppec->payer_id = $payer_id)) {
+} elseif (!empty($ppec->token) && ($ppec->token == $token) && ($ppec->payer_id = $payer_id)) {
+    //If a token exist with payer_id, then we are back from the PayPal API
     /* Get payment infos from paypal */
     $ppec->getExpressCheckout();
 
@@ -249,7 +247,7 @@ elseif (!empty($ppec->token) && ($ppec->token == $token) && ($ppec->payer_id = $
         $addresses = $customer->getAddresses($ppec->context->language->id);
         foreach ($addresses as $address) {
             if ($address['alias'] == 'Paypal_Address') {
-//If address has already been created
+                //If address has already been created
                 $address = new Address($address['id_address']);
                 break;
             }
@@ -261,11 +259,11 @@ elseif (!empty($ppec->token) && ($ppec->token == $token) && ($ppec->payer_id = $
         }
 
         if ((!$address || !$address->id) && $customer->id) {
-//If address does not exists, we create it
+            //If address does not exists, we create it
             $address = setCustomerAddress($ppec, $customer);
             $address->add();
         } else if ($ppec->type != 'payment_cart') {
-//We used Express Checkout Shortcut => we override address
+            //We used Express Checkout Shortcut => we override address
             $address = checkAndModifyAddress($ppec, $customer);
         }
 
@@ -321,9 +319,8 @@ function validateOrder($customer, $cart, $ppec)
                 $message = $ppec->l('Pending payment confirmation.').'<br />';
             }
         }
-    }
-    // Payment error
-    else {
+    } else {
+        // Payment error
         //Check if error is 10486, if it is redirect user to paypal
         if ($ppec->result['L_ERRORCODE0'] == 10486) {
             $ppec->redirectToAPI();
@@ -343,8 +340,18 @@ function validateOrder($customer, $cart, $ppec)
     $transaction = PayPalOrder::getTransactionDetails($ppec, $payment_status);
     $ppec->context->cookie->id_cart = $cart->id;
 
-    $ppec->validateOrder((int) $cart->id, $payment_type, $order_total, $ppec->displayName, $message, $transaction,
-        (int) $cart->id_currency, false, $customer->secure_key, $ppec->context->shop);
+    $ppec->validateOrder(
+        (int) $cart->id,
+        $payment_type,
+        $order_total,
+        $ppec->displayName,
+        $message,
+        $transaction,
+        (int) $cart->id_currency,
+        false,
+        $customer->secure_key,
+        $ppec->context->shop
+    );
 }
 
 /* If Previous steps succeed, ready (means 'ready to pay') will be set to true */
@@ -417,9 +424,8 @@ if ($ppec->ready && $payment_confirmation && (_PS_VERSION_ < '1.5')) {
     ));
 
     $template = 'order-summary.tpl';
-}
-/* Display result if error occurred */
-else {
+} else {
+    /* Display result if error occurred */
     if (!$ppec->context->cart->id) {
         $ppec->context->cart->delete();
         $ppec->logs[] = $ppec->l('Your cart is empty.');

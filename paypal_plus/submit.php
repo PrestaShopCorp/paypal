@@ -108,16 +108,24 @@ function displayConfirm($context)
                 case 'canceled':
                     /* LookUp cancel */
                     $paypal->validateOrder(
-                        $id_cart, getOrderStatus('order_canceled'),
-                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                        $id_cart,
+                        getOrderStatus('order_canceled'),
+                        $payment->transactions[0]->amount->total,
+                        $payment->payer->payment_method,
+                        null,
+                        $transaction
                     );
                     break;
 
                 default:
                     /* Erreur de payment */
                     $paypal->validateOrder(
-                        $id_cart, getOrderStatus('payment_error'),
-                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                        $id_cart,
+                        getOrderStatus('payment_error'),
+                        $payment->transactions[0]->amount->total,
+                        $payment->payer->payment_method,
+                        null,
+                        $transaction
                     );
 
                     break;
@@ -175,15 +183,22 @@ function displayAjax($context)
                 if ($payment->state == 'approved') {
 
                     $paypal->validateOrder(
-                        $id_cart, getOrderStatus('payment'), $payment->transactions[0]->amount->total,
-                        $payment->payer->payment_method, null, $transaction
+                        $id_cart,
+                        getOrderStatus('payment'),
+                        $payment->transactions[0]->amount->total,
+                        $payment->payer->payment_method,
+                        null,
+                        $transaction
                     );
                     $return['success'][] = $paypal->l('Your payment has been taken into account');
                 } else {
 
                     $paypal->validateOrder(
-                        $id_cart, getOrderStatus('payment_error'),
-                        $payment->transactions[0]->amount->total, $payment->payer->payment_method, null,
+                        $id_cart,
+                        getOrderStatus('payment_error'),
+                        $payment->transactions[0]->amount->total,
+                        $payment->payer->payment_method,
+                        null,
                         $transaction
                     );
                     $return['error'][] = $paypal->l('An error occured during the payment');
@@ -191,8 +206,12 @@ function displayAjax($context)
             } elseif ($submit == 'confirmCancel') {
 
                 $paypal->validateOrder(
-                    $id_cart, getOrderStatus('order_canceled'),
-                    $payment->transactions[0]->amount->total, $payment->payer->payment_method, null, $transaction
+                    $id_cart,
+                    getOrderStatus('order_canceled'),
+                    $payment->transactions[0]->amount->total,
+                    $payment->payer->payment_method,
+                    null,
+                    $transaction
                 );
                 $return['success'][] = $paypal->l('Your order has been canceled');
             } else {

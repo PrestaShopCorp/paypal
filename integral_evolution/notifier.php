@@ -104,7 +104,6 @@ class PayPalNotifier extends PayPal
         $request = '&'.http_build_query($_POST, '&');
         return Tools::file_get_contents($action_url.$request);
     }
-
 }
 
 if ($custom = Tools::getValue('custom')) {

@@ -218,7 +218,6 @@ class PayPalIPN extends PayPal
         fwrite($handle, $action_url.$request);
         return Tools::file_get_contents($action_url.$request);
     }
-
 }
 
 if (Tools::getIsset('custom')) {
