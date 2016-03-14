@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2016 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -31,20 +31,20 @@
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
 		<p class="payment_module paypal" >
-			<a href="javascript:void(0)" style="padding-left:17px;" onclick="$('#paypal_form').submit();" id="paypal_process_payment" title="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}">
+			<a href="javascript:void(0)" style="padding-left:17px;" onclick="$('#paypal_form').submit();" id="paypal_process_payment" title="{l s='Pay with your card or your PayPal account' mod='paypal'}">
 				
-						<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}" height="48px" />		
-					{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}
+						<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />		
+					{l s='Pay with your card or your PayPal account' mod='paypal'}
 			</a>
 		</p>
 		</div>
 	</div>
 	{else}
 	<p class="payment_module">
-		<a href="javascript:void(0)" onclick="$('#paypal_form').submit();" id="paypal_process_payment" title="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}">
+		<a href="javascript:void(0)" onclick="$('#paypal_form').submit();" id="paypal_process_payment" title="{l s='Pay with your card or your PayPal account' mod='paypal'}">
 			
-					<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}" height="48px" />		
-				{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}
+					<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />		
+				{l s='Pay with your card or your PayPal account' mod='paypal'}
 		</a>
 	</p>
 	{/if}

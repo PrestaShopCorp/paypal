@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2016 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -28,7 +28,7 @@
 <div class="row">
 	<div class="col-xs-12 col-md-6">
         <p class="payment_module paypal">
-        	{if $PayPal_in_context_checkout == 1}
+        	{if $use_paypal_in_context}
 				<a href="javascript:void(0)" onclick="" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
 			{else}
 				<a href="javascript:void(0)" onclick="$('#paypal_payment_form').submit();" title="{l s='Pay with PayPal' mod='paypal'}">
@@ -37,11 +37,11 @@
 					<img src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code|escape:'htmlall':'UTF-8'}_orange_295x43.png" />
 				{else}
 					{if isset($logos.LocalPayPalHorizontalSolutionPP) && $PayPal_payment_method == $PayPal_integral}
-						<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}" height="48px" />
+						<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}}" height="48px" />
 					{else}
-						<img src="{$logos.LocalPayPalLogoMedium|escape:'htmlall':'UTF-8'}" alt="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}" />
+						<img src="{$logos.LocalPayPalLogoMedium|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" />
 					{/if}
-					{$PayPal_content.payment_choice}
+					{l s='Pay with your card or your PayPal account' mod='paypal'}
 				{/if}
 				
 			</a>
@@ -62,20 +62,19 @@
 			<img src="{$base_dir_ssl}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" />
 		{else}
 			{if isset($logos.LocalPayPalHorizontalSolutionPP) && $PayPal_payment_method == $PayPal_integral}
-				<img src="{$logos.LocalPayPalHorizontalSolutionPP}" alt="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}" height="48px" />
+				<img src="{$logos.LocalPayPalHorizontalSolutionPP}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />
 			{else}
-				<img src="{$logos.LocalPayPalLogoMedium}" alt="{$PayPal_content.payment_choice|escape:'htmlall':'UTF-8'}" />
+				<img src="{$logos.LocalPayPalLogoMedium}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" />
 			{/if}
-			{$PayPal_content.payment_choice}
-		{/if}
-		
+			{l s='Pay with your card or your PayPal account' mod='paypal'}	
+        {/if}
 	</a>
 </p>
 
 {/if}
 
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	<input type="hidden" id="in_context_checkout_enabled" value="1">
 {else}
 <script>

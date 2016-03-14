@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2015 PrestaShop
+ * 2007-2016 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2015 PrestaShop SA
+ *  @copyright 2007-2016 PrestaShop SA
  *  @version  Release: $Revision: 13573 $
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
@@ -31,29 +31,28 @@
 
 class PayPalConfirmModuleFrontController extends ModuleFrontController
 {
-	public $display_column_left = false;
+    public $display_column_left = false;
 
-	public function initContent()
-	{
-		if (!$this->context->customer->isLogged(true) || empty($this->context->cart))
-			Tools::redirect('index.php');
+    public function initContent()
+    {
+        if (!$this->context->customer->isLogged(true) || empty($this->context->cart)) {
+            Tools::redirect('index.php');
+        }
 
-		parent::initContent();
+        parent::initContent();
 
-		$this->paypal = new PayPal();
-		$this->context = Context::getContext();
-		$this->id_module = (int)Tools::getValue('id_module');
+        $this->paypal = new PayPal();
+        $this->context = Context::getContext();
+        $this->id_module = (int) Tools::getValue('id_module');
 
-		$currency = new Currency((int)$this->context->cart->id_currency);
+        $currency = new Currency((int) $this->context->cart->id_currency);
 
-		$this->context->smarty->assign(array(
-			'form_action' => PayPal::getShopDomainSsl(true, true)._MODULE_DIR_.$this->paypal->name.'/express_checkout/payment.php',
-			'total' => Tools::displayPrice($this->context->cart->getOrderTotal(true), $currency),
-			'logos' => $this->paypal->paypal_logos->getLogos(),
-			'use_mobile' => (bool)$this->paypal->useMobile(), 
-			'address' => new Address($this->context->cart->id_address_delivery)
-		));
+        $this->module->assignCartSummary();
 
-		$this->setTemplate('order-summary.tpl');
-	}
+        $this->context->smarty->assign(array(
+            'form_action' => PayPal::getShopDomainSsl(true, true)._MODULE_DIR_.$this->paypal->name.'/express_checkout/payment.php',
+        ));
+
+        $this->setTemplate('order-summary.tpl');
+    }
 }

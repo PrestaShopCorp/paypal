@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,12 +18,12 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2016 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	window.paypalCheckoutReady = function() {
 	        paypal.checkout.setup("{$PayPal_in_context_checkout_merchant_id}", {
 	            environment: {if $PAYPAL_SANDBOX}"sandbox"{else}"production"{/if},
@@ -48,22 +48,22 @@
 	                    async: true,
 	                    crossDomain: true,
 
-	                    //Load the minibrowser with the redirection url in the success handler
+	                    
 	                    success: function (token) {
 	                        var url = paypal.checkout.urlPrefix +token;
-	                        //Loading Mini browser with redirect url, true for async AJAX calls
+	                    
 	                        paypal.checkout.startFlow(url);
 	                    },
 	                    error: function (responseData, textStatus, errorThrown) {
 	                        alert("Error in ajax post"+responseData.statusText);
-	                        //Gracefully Close the minibrowser in case of AJAX errors
+	                    
 	                        paypal.checkout.closeFlow();
 	                    }
 	                });
 	            },
 	            button: ['paypal_process_payment', 'payment_paypal_express_checkout']
 	        });
-	    }
+	    };
 {/if}
 {literal}
 
