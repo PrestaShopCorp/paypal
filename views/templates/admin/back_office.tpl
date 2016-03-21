@@ -42,7 +42,20 @@
             <li><span class="bold">{l s='Accept all major payment method' mod='paypal'}</span></li>      
         </ul>
 	</div>
-	
+
+	<div class="clear"></div>
+
+	<div class="bootstrap">
+		{if $PayPal_version_tls_checked == '1.2'}
+			<div class="{if version_compare($Presta_version, '1.5', '<')} conf {else} alert alert-success{/if}">
+				{l s='Your configuration use version 1.2 of protocol TLS'}
+			</div>
+		{else}
+			<div class="{if version_compare($Presta_version, '1.5', '<')} alert warning_paypal {else}alert alert-danger{/if}">
+				{l s='Your configuration use version 1.0 to communicate with PayPal.From July, all payments will be blocked.Thank you to approach your hosting company to enable the TLS version 1.2'}
+			</div>
+		{/if}
+	</div>
 	{if $PayPal_allowed_methods}
 		{if $default_lang_iso == 'fr'}
 			<div class="clear"></div><hr />
