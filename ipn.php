@@ -242,9 +242,13 @@ class PayPalIPN extends PayPal
 
 }
 
-if (Tools::getIsset('custom'))
+
+if(Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACCOUNT'))
 {
-	$ipn = new PayPalIPN();
-	$custom = Tools::jsonDecode(Tools::getValue('custom'), true);
-	$ipn->confirmOrder($custom);
+	if (Tools::getIsset('custom'))
+	{
+		$ipn = new PayPalIPN();
+		$custom = Tools::jsonDecode(Tools::getValue('custom'), true);
+		$ipn->confirmOrder($custom);
+	}
 }
