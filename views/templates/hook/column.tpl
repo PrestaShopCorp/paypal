@@ -24,5 +24,5 @@
 *}
 
 <div id="paypal-column-block">
-	<p><a href="{$base_dir_ssl}modules/paypal/about.php" rel="nofollow"><img src="{$logo}" alt="PayPal" title="{l s='Pay with PayPal' mod='paypal'}" style="max-width: 100%" /></a></p>
+	<p><a href="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/about.php" rel="nofollow"><img src="{$logo|escape:'htmlall':'UTF-8'}" alt="PayPal" title="{l s='Pay with PayPal' mod='paypal'}" style="max-width: 100%" /></a></p>
 </div>

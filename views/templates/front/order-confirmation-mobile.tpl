@@ -54,14 +54,14 @@
 	<br />
 	
 	{if !$is_guest}
-		<a href="{$link->getPageLink('index', true)}" data-role="button" data-theme="a" data-icon="back" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
+		<a href="{$link->getPageLink('index', true)|escape:'htmlall':'UTF-8'}" data-role="button" data-theme="a" data-icon="back" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
 	{else}
 		<ul data-role="listview" data-inset="true" id="list_myaccount">
 			<li data-theme="a" data-icon="check">
-				<a href="{$link->getPageLink('index', true)}" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
+				<a href="{$link->getPageLink('index', true)|escape:'htmlall':'UTF-8'}" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
 			</li>
 			<li data-theme="b" data-icon="back">
-				<a href="{$link->getPageLink('history.php', true, NULL, 'step=1&amp;back={$back}')}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
+				<a href="{$link->getPageLink('history.php', true, NULL, 'step=1&amp;back={$back|escape:'htmlall':'UTF-8'}')}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
 			</li>
 		</ul>
 	{/if}

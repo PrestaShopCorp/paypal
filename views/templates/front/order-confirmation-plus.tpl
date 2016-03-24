@@ -38,21 +38,21 @@
 {include file="$tpl_dir./errors.tpl"}
 
 {if $smarty.const._PS_VERSION_ < 1.5}
-	<link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_4.css">
+	<link rel="stylesheet" href="{$base_dir|escape:'htmlall':'UTF-8'}/modules/paypal/views/css/paypal_1_4.css">
 {/if}
 
-{$paypal_cart_summary}
+{$paypal_cart_summary|escape:'htmlall':'UTF-8'}
 <div class="inforeturn"></div>
 <div class="confirm_PPP">
     
 
     {if $state == 'approved' || $state == 'created'}
         <h2>{l s='Order Confirmation ?' mod='paypal'}</h2>
-        <p>{l s='Do you want to confirm your order for total amount of ' mod='paypal'}{$totalAmount}</p>
+        <p>{l s='Do you want to confirm your order for total amount of ' mod='paypal'}{$totalAmount|escape:'htmlall':'UTF-8'}</p>
         <form method="POST" action="" id="formConfirm">
-            <input type="hidden" name="payerID" value="{$PayerID}" />
-            <input type="hidden" name="paymentId" value="{$paymentId}" />
-            <input type="hidden" name="id_cart" value="{$id_cart}" />
+            <input type="hidden" name="payerID" value="{$PayerID|escape:'htmlall':'UTF-8'}" />
+            <input type="hidden" name="paymentId" value="{$paymentId|escape:'htmlall':'UTF-8'}" />
+            <input type="hidden" name="id_cart" value="{$id_cart|escape:'htmlall':'UTF-8'}" />
 
             <input id="cancel" class="{if $smarty.const._PS_VERSION_ < 1.5}button_large{else}button btn btn-large{/if}" type="submit" name="confirmCancel" value="{l s='Cancel your order' mod='paypal'}" />
             <input id="confirm" class="{if $smarty.const._PS_VERSION_ < 1.5}button_large{else}button btn btn-large{/if}" type="submit" name="confirmPayment" value="{l s='Confirm your payment' mod='paypal'}" />
@@ -76,7 +76,7 @@
                     $('#confirm').attr('disabled','disabled');
 
                     $.ajax({
-                        url: '{$linkSubmitPlus}',
+                        url: '{$linkSubmitPlus|escape:'htmlall':'UTF-8'}',
                         type: 'POST',
                         data: form.serialize() + '&ajax=true&submit=' + nameSubmit,
                         success: function (data) {
@@ -103,21 +103,21 @@
         </script>
         <div style="margin-top:15px;">
             {if isset($is_guest) && $is_guest}
-                <a href="{$link->getPageLink('guest-tracking.php', true)}?id_order={$order_reference}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">
+                <a href="{$link->getPageLink('guest-tracking.php', true)|escape:'htmlall':'UTF-8'}?id_order={$order_reference|escape:'htmlall':'UTF-8'}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">
                     {if $smarty.const._PS_VERSION_ < 1.6}
-                        <img src="{$img_dir}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
+                        <img src="{$img_dir|escape:'htmlall':'UTF-8'}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
                     {else}
                         <i class="icon-chevron-left"></i>
                     {/if}
                 </a>
-                <a href="{$link->getPageLink('guest-tracking.php', true)}?id_order={$order_reference}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">{l s='Follow my order' mod='paypal'}</a>
+                <a href="{$link->getPageLink('guest-tracking.php', true)|escape:'htmlall':'UTF-8'}?id_order={$order_reference|escape:'htmlall':'UTF-8'}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">{l s='Follow my order' mod='paypal'}</a>
             {else}
-                <a href="{$link->getPageLink('history.php', true)}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{if $smarty.const._PS_VERSION_ < 1.6}
-                    <img src="{$img_dir}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
+                <a href="{$link->getPageLink('history.php', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{if $smarty.const._PS_VERSION_ < 1.6}
+                    <img src="{$img_dir|escape:'htmlall':'UTF-8'}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
                 {else}
                     <i class="icon-chevron-left"></i>
                 {/if}</a>
-            <a href="{$link->getPageLink('history.php', true)}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
+            <a href="{$link->getPageLink('history.php', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
         {/if}
     </div>
 
