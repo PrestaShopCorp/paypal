@@ -120,11 +120,15 @@ class PayPal extends PaymentModule
 
         if (self::isInstalled($this->name)) {
             $this->loadDefaults();
-            if ($mobile_enabled && $this->active)
-                    $this->checkMobileCredentials();
-            elseif ($mobile_enabled && !$this->active)
-                    $this->checkMobileNeeds();
-        } else $this->checkMobileNeeds();
+            if ($mobile_enabled && $this->active) {
+                $this->checkMobileCredentials();
+            } elseif ($mobile_enabled && !$this->active) {
+                $this->checkMobileNeeds();
+            }
+
+        } else {
+            $this->checkMobileNeeds();
+        }
 
         $tls_verificator = new TLSVerificator(true, $this);
     }
@@ -966,12 +970,11 @@ class PayPal extends PaymentModule
 
     public function hookBackOfficeHeader()
     {
-        if(Configuration::get('PAYPAL_VERSION_TLS_LAST_UPDATE')<date('Ymd'))
-        {
+        if (Configuration::get('PAYPAL_VERSION_TLS_LAST_UPDATE') < date('Ymd')) {
             $paypal = new Paypal();
-            $ssl_verif = new TLSVerificator(true,$this);
-            Configuration::updateValue('PAYPAL_VERSION_TLS_CHECKED',$ssl_verif->getVersion());
-            Configuration::updateValue('PAYPAL_VERSION_TLS_LAST_UPDATE',date('Ymd'));
+            $ssl_verif = new TLSVerificator(true, $this);
+            Configuration::updateValue('PAYPAL_VERSION_TLS_CHECKED', $ssl_verif->getVersion());
+            Configuration::updateValue('PAYPAL_VERSION_TLS_LAST_UPDATE', date('Ymd'));
         }
 
         if ((strcmp(Tools::getValue('configure'), $this->name) === 0) ||

@@ -48,11 +48,11 @@
 	<div class="bootstrap">
 		{if $PayPal_version_tls_checked == '1.2'}
 			<div class="{if version_compare($Presta_version, '1.5', '<')} conf {else} alert alert-success{/if}">
-				{l s='Your configuration use version 1.2 of protocol TLS'}
+				{l s='Your configuration use version 1.2 of protocol TLS' mod='paypal'}
 			</div>
 		{else}
 			<div class="{if version_compare($Presta_version, '1.5', '<')} alert warning_paypal {else}alert alert-danger{/if}">
-				{l s='Your configuration use version 1.0 to communicate with PayPal.From July, all payments will be blocked.Thank you to approach your hosting company to enable the TLS version 1.2'}
+				{l s='Your configuration use version 1.0 to communicate with PayPal.From July, all payments will be blocked.Thank you to approach your hosting company to enable the TLS version 1.2' mod='paypal'}
 			</div>
 		{/if}
 	</div>
