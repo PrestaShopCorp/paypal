@@ -37,7 +37,7 @@
 				  </tr>
 				{foreach from=$list_captures item=list}
 				  <tr>
-				    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)}</td>
+				    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)|escape:'htmlall':'UTF-8'}</td>
 				    <td>{$list.capture_amount|escape:'htmlall':'UTF-8'}</td>
 				    <td>{$list.result|escape:'htmlall':'UTF-8'}</td>
 				  </tr>
@@ -74,7 +74,7 @@
 		  </tr>
 		{foreach from=$list_captures item=list}
 		  <tr>
-		    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)}</td>
+		    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)|escape:'htmlall':'UTF-8'}</td>
 		    <td>{$list.capture_amount|escape:'htmlall':'UTF-8'}</td>
 		    <td>{$list.result|escape:'htmlall':'UTF-8'}</td>
 		  </tr>

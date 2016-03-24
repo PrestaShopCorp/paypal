@@ -56,7 +56,7 @@
             {foreach from=$cart->getProducts() item=product}
                 <tr>
                     <td>
-                        <img src="{$link->getImageLink('small', $product.id_image, $cart_image_size)}" alt="">
+                        <img src="{$link->getImageLink('small', $product.id_image, $cart_image_size)|escape:'htmlall':'UTF-8'}" alt="">
                     </td>
                     <td>
                         {$product.name|escape:'htmlall':'UTF-8'}<br/>
