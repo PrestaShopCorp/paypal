@@ -116,3 +116,13 @@ label span.description{display:block;padding-left:16px}
     border-top-color: #c32933; }
   .inforeturn .alert-danger.alert-link {
     color: #e6e6e6; }
+
+.bootstrap .conf{
+  background: url("../../../../img/admin/ok2.png") no-repeat 10px;
+  padding-left: 40px !important;
+}
+
+.bootstrap .warning_paypal{
+  background: url("../../../../img/admin/warning.gif") no-repeat 10px;
+  padding-left: 40px !important;
+}

@@ -119,16 +119,13 @@ class PayPal extends PaymentModule
 
         if (self::isInstalled($this->name)) {
             $this->loadDefaults();
-            if ($mobile_enabled && $this->active) {
-                $this->checkMobileCredentials();
-            } elseif ($mobile_enabled && !$this->active) {
-                $this->checkMobileNeeds();
-            }
+            if ($mobile_enabled && $this->active)
+                    $this->checkMobileCredentials();
+            elseif ($mobile_enabled && !$this->active)
+                    $this->checkMobileNeeds();
+        } else $this->checkMobileNeeds();
 
-        } else {
-            $this->checkMobileNeeds();
-        }
-
+        $tls_verificator = new TLSVerificator(true, $this);
     }
 
     public function install()
@@ -391,6 +388,8 @@ class PayPal extends PaymentModule
             'PayPal_plus_client' => Configuration::get('PAYPAL_PLUS_CLIENT_ID'),
             'PayPal_plus_secret' => Configuration::get('PAYPAL_PLUS_SECRET'),
             'PayPal_plus_webprofile' => (Configuration::get('PAYPAL_WEB_PROFILE_ID') != '0') ? Configuration::get('PAYPAL_WEB_PROFILE_ID') : 0,
+            'PayPal_version_tls_checked' => Configuration::get('PAYPAL_VERSION_TLS_CHECKED'),
+            'Presta_version' => _PS_VERSION_,
         ));
 
         $this->getTranslations();
@@ -966,6 +965,14 @@ class PayPal extends PaymentModule
 
     public function hookBackOfficeHeader()
     {
+        if(Configuration::get('PAYPAL_VERSION_TLS_LAST_UPDATE')<date('Ymd'))
+        {
+            $paypal = new Paypal();
+            $ssl_verif = new TLSVerificator(true,$this);
+            Configuration::updateValue('PAYPAL_VERSION_TLS_CHECKED',$ssl_verif->getVersion());
+            Configuration::updateValue('PAYPAL_VERSION_TLS_LAST_UPDATE',date('Ymd'));
+        }
+
         if ((strcmp(Tools::getValue('configure'), $this->name) === 0) ||
             (strcmp(Tools::getValue('module_name'), $this->name) === 0)) {
             if (version_compare(_PS_VERSION_, '1.5', '<')) {
