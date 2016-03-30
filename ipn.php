@@ -214,8 +214,6 @@ class PayPalIPN extends PayPal
             $request .= "&$key=$value";
         }
 
-        $handle = fopen(dirname(__FILE__).'/log.txt', 'w+');
-        fwrite($handle, $action_url.$request);
         return Tools::file_get_contents($action_url.$request);
     }
 }

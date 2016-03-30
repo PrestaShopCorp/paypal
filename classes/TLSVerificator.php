@@ -57,7 +57,7 @@ class TLSVerificator
             return false;
         }
 
-        $tls_check = Tools::json_decode($tls_check);
+        $tls_check = Tools::jsonDecode($tls_check);
         if ($tls_check->tls_version == 'TLS 1.2') {
             $this->tls_version = 1.2;
         } else {
