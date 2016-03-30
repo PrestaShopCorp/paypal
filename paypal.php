@@ -81,7 +81,7 @@ class PayPal extends PaymentModule
     public $iso_code;
     public $default_country;
     public $paypal_logos;
-    public $module_key = '646dcec2b7ca20c4e9a5aebbbad98d7e';
+    public $module_key = '336225a5988ad434b782f2d868d7bfcd';
 
     const BACKWARD_REQUIREMENT = '0.4';
     const ONLY_PRODUCTS = 1;
