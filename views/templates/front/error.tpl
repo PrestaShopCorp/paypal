@@ -49,7 +49,7 @@
 				</p>
 			{/if}
 			
-			<p><a href="{$base_dir}" class="button_small" title="{l s='Back' mod='paypal'}">&laquo; {l s='Back' mod='paypal'}</a></p>
+			<p><a href="{$base_dir|escape:'htmlall':'UTF-8'}" class="button_small" title="{l s='Back' mod='paypal'}">&laquo; {l s='Back' mod='paypal'}</a></p>
 		</div>
 	
 	{/if}

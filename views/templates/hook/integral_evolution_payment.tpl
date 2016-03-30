@@ -103,7 +103,7 @@
 	<input type="hidden" name="notify_url" value="{$notify_url|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="paymentaction" value="sale" />
 	<input type="hidden" name="business" value="{$business_account|escape:'htmlall':'UTF-8'}" />
-	<input type="hidden" name="template" value="template{$payment_hss_template}" />
+	<input type="hidden" name="template" value="template{$payment_hss_template|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="cbt" value="{l s='Return back to the merchant\'s website' mod='paypal'}" />
 	<input type="hidden" name="cancel_return" value="{$cancel_return|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="return" value="{$return_url|escape:'htmlall':'UTF-8'}" />

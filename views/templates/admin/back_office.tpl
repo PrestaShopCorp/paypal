@@ -28,7 +28,7 @@
 	{* PayPal configuration page header *}
 	<div class="box half left">
 		{if isset($PayPal_logo.LocalPayPalLogoLarge)}
-			<img src="{$PayPal_logo.LocalPayPalLogoLarge}" alt="" style="margin-bottom: -5px" />
+			<img src="{$PayPal_logo.LocalPayPalLogoLarge|escape:'htmlall':'UTF-8'}" alt="" style="margin-bottom: -5px" />
 		{/if}
 		<p id="paypal-slogan"><span class="dark">{l s='Leader in' mod='paypal'}</span> <span class="light">{l s='online payments' mod='paypal'}</span></p>
 		<p>{l s='Easy, secure, fast payments for your buyers.' mod='paypal'}</p>
@@ -81,7 +81,7 @@
 				<div style="line-height: 20px; margin-top: 8px">
 					<div>
 						<label>{l s='Your country' mod='paypal'} :
-							{$PayPal_country}&nbsp;&nbsp;&nbsp;<a href="#" id="paypal_country_change" class="small">{l s='change' mod='paypal'}</a>
+							{$PayPal_country|escape:'htmlall':'UTF-8'}&nbsp;&nbsp;&nbsp;<a href="#" id="paypal_country_change" class="small">{l s='change' mod='paypal'}</a>
 						</label>
 
 						<div class="paypal-hide" id="paypal-country-form-content">
@@ -89,7 +89,7 @@
 
 							<select name="paypal_country_default" id="paypal_country_default">
 							{foreach from=$Countries item=country}
-								<option value="{$country.id_country}" {if $country.id_country == $PayPal_country_id}selected="selected"{/if}>{$country.name}</option>
+								<option value="{$country.id_country|escape:'htmlall':'UTF-8'}" {if $country.id_country == $PayPal_country_id}selected="selected"{/if}>{$country.name|escape:'htmlall':'UTF-8'}</option>
 							{/foreach}
 							</select>
 
@@ -119,13 +119,13 @@
 				<br /><br /><br />
 
 				{if (in_array($PayPal_WPS, $PayPal_allowed_methods) || in_array($PayPal_HSS, $PayPal_allowed_methods))}
-					<h4 class="inline">{l s='Need PayPal to process all your card payments ?' mod='paypal'}</h4> <img src="{$PayPal_logo.BackOfficeCards}" height="22px"/>
+					<h4 class="inline">{l s='Need PayPal to process all your card payments ?' mod='paypal'}</h4> <img src="{$PayPal_logo.BackOfficeCards|escape:'htmlall':'UTF-8'}" height="22px"/>
 					<div class="clear"></div>
 					<div class="form-block">
 						{if (in_array($PayPal_WPS, $PayPal_allowed_methods))}
 							{* WEBSITE PAYMENT STANDARD *}
 							<label for="paypal_payment_wps">
-								<input type="radio" name="paypal_payment_method" id="paypal_payment_wps" value='{$PayPal_WPS}' {if $PayPal_payment_method == $PayPal_WPS}checked="checked"{/if} />
+								<input type="radio" name="paypal_payment_method" id="paypal_payment_wps" value='{$PayPal_WPS|escape:'htmlall':'UTF-8'}' {if $PayPal_payment_method == $PayPal_WPS}checked="checked"{/if} />
 								{l s='Choose' mod='paypal'} {l s='Website Payments Standard' mod='paypal'}
 								<br />
 								<span class="description">{l s='Start accepting payments immediately.' mod='paypal'}<br />{l s='No subscription fees, pay only when you get paid.' mod='paypal'}</span>
@@ -136,7 +136,7 @@
 							{* WEBSITE PAYMENT PRO *}
 							<br />
 							<label for="paypal_payment_wpp">
-                                                            <input type="radio" name="paypal_payment_method" id="paypal_payment_wpp" value='{$PayPal_HSS}' {if $PayPal_payment_method == $PayPal_HSS}checked="checked"{/if} />
+                                                            <input type="radio" name="paypal_payment_method" id="paypal_payment_wpp" value='{$PayPal_HSS|escape:'htmlall':'UTF-8'}' {if $PayPal_payment_method == $PayPal_HSS}checked="checked"{/if} />
                                                             {l s='Choose' mod='paypal'} {l s='Website Payments Pro' mod='paypal'}<br />
                                                             <span class="description">{l s='A professional platform to accept payments through credit cards and PayPal account, covered by seller protection.' mod='paypal'}<br />{l s='Customized payments pages. Monthly subscription of 25€.' mod='paypal'}</span>
                                                             <p class="toolbox">{l s='Click on the SAVE button only when PayPal has approved your subscription for this product. This process can take up to 3-5 days.' mod='paypal'}</p>
@@ -147,7 +147,7 @@
                                 {* WEBSITE PAYMENT PLUS *}
                                 <br />
                                 <label for="paypal_payment_ppp">
-                                    <input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
+                                    <input type="radio" name="paypal_payment_method" id="paypal_payment_ppp" value='{$PayPal_PPP|escape:'htmlall':'UTF-8'}' {if $PayPal_payment_method == $PayPal_PPP}checked="checked"{/if} />
                                     {l s='Choose' mod='paypal'} {l s='PayPal Plus' mod='paypal'}<br />
                                     <span class="description"></span>
                                     <p class="toolbox"></p>
@@ -157,11 +157,11 @@
 				{/if}
 				<div class="clear"></div>
 				{if (in_array($PayPal_ECS, $PayPal_allowed_methods))}
-				<h4 class="inline">{l s='Need PayPal in addition to your existing card processor ?' mod='paypal'}</h4> <img src="{$PayPal_logo.LocalPayPalMarkSmall}" />
+				<h4 class="inline">{l s='Need PayPal in addition to your existing card processor ?' mod='paypal'}</h4> <img src="{$PayPal_logo.LocalPayPalMarkSmall|escape:'htmlall':'UTF-8'}" />
 				<div class="form-block">
 					{* EXPRESS CHECKOUT SOLUTION *}
 					<label for="paypal_payment_ecs">
-						<input type="radio" name="paypal_payment_method" id="paypal_payment_ecs" value='{$PayPal_ECS}' {if $PayPal_payment_method == $PayPal_ECS}checked="checked"{/if} />
+						<input type="radio" name="paypal_payment_method" id="paypal_payment_ecs" value='{$PayPal_ECS|escape:'htmlall':'UTF-8'}' {if $PayPal_payment_method == $PayPal_ECS}checked="checked"{/if} />
 						{l s='Choose' mod='paypal'} {l s='Express Checkout' mod='paypal'}<br />
 						<span class="description">{l s='Boost your online sales by 30%*.' mod='paypal'}</span>
 					</label>
@@ -309,7 +309,7 @@
 						<input type="radio" name="in_context_checkout" id="paypal_payment_ecs_in_context_checkout" value="0" {if $PayPal_in_context_checkout == 0}checked="checked"{/if} /> <label for="paypal_payment_ecs_in_context_checkout">{l s='No' mod='paypal'}</label>
 						<p class="merchant_id">
 							<label>{l s='Merchant ID' mod='paypal'}</label>
-							<input type="text" name="in_context_checkout_merchant_id" id="in_context_checkout_merchant_id" value="{if isset($PayPal_in_context_checkout_merchant_id) && $PayPal_in_context_checkout_merchant_id != ""}{$PayPal_in_context_checkout_merchant_id}{/if}" />
+							<input type="text" name="in_context_checkout_merchant_id" id="in_context_checkout_merchant_id" value="{if isset($PayPal_in_context_checkout_merchant_id) && $PayPal_in_context_checkout_merchant_id != ""}{$PayPal_in_context_checkout_merchant_id|escape:'htmlall':'UTF-8'}{/if}" />
 						</p>
 					</div>
 
@@ -332,13 +332,13 @@
 									{l s='Client ID' mod='paypal'}
 								</dt>
 								<dd>
-									<input type="text" name="paypal_login_client_id" value="{$PayPal_login_client_id}" autocomplete="off" size="85">
+									<input type="text" name="paypal_login_client_id" value="{$PayPal_login_client_id|escape:'htmlall':'UTF-8'}" autocomplete="off" size="85">
 								</dd>
 								<dt>
 									{l s='Secret' mod='paypal'}
 								</dt>
 								<dd>
-									<input type="text" name="paypal_login_client_secret" value="{$PayPal_login_secret}" autocomplete="off" size="85">
+									<input type="text" name="paypal_login_client_secret" value="{$PayPal_login_secret|escape:'htmlall':'UTF-8'}" autocomplete="off" size="85">
 								</dd>
 								
 								<dt>

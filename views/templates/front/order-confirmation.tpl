@@ -62,20 +62,20 @@
 	<br />
 	
 	{if $is_guest}
-		<a href="{$link->getPageLink('guest-tracking.php', true)}?id_order={$order_reference}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">
+		<a href="{$link->getPageLink('guest-tracking.php', true)|escape:'htmlall':'UTF-8'}?id_order={$order_reference|escape:'htmlall':'UTF-8'}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">
 			{if $smarty.const._PS_VERSION_ < 1.6}
-			<img src="{$img_dir}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
+			<img src="{$img_dir|escape:'htmlall':'UTF-8'}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
 			{else}
 			<i class="icon-chevron-left"></i>
 			{/if}
 		</a>
-		<a href="{$link->getPageLink('guest-tracking.php', true)}?id_order={$order_reference}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">{l s='Follow my order' mod='paypal'}</a>
+		<a href="{$link->getPageLink('guest-tracking.php', true)|escape:'htmlall':'UTF-8'}?id_order={$order_reference|escape:'htmlall':'UTF-8'}" title="{l s='Follow my order' mod='paypal'}" data-ajax="false">{l s='Follow my order' mod='paypal'}</a>
 	{else}
-		<a href="{$link->getPageLink('history.php', true)}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{if $smarty.const._PS_VERSION_ < 1.6}
-			<img src="{$img_dir}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
+		<a href="{$link->getPageLink('history.php', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{if $smarty.const._PS_VERSION_ < 1.6}
+			<img src="{$img_dir|escape:'htmlall':'UTF-8'}icon/order.gif" alt="{l s='Follow my order' mod='paypal'}" class="icon" />
 			{else}
 			<i class="icon-chevron-left"></i>
 			{/if}</a>
-		<a href="{$link->getPageLink('history.php', true)}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
+		<a href="{$link->getPageLink('history.php', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
 	{/if}
 {/if}

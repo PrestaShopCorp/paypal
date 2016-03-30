@@ -27,7 +27,7 @@
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel">
-			<div class="panel-heading"><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" /> {l s='PayPal Capture' mod='paypal'}</div>
+			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" /> {l s='PayPal Capture' mod='paypal'}</div>
 			{if  $list_captures|@count gt 0} 
 				<table class="table" width="100%" cellspacing="0" cellpadding="0">
 				  <tr>
@@ -37,18 +37,18 @@
 				  </tr>
 				{foreach from=$list_captures item=list}
 				  <tr>
-				    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)}</td>
-				    <td>{$list.capture_amount}</td> 
-				    <td>{$list.result}</td>
+				    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)|escape:'htmlall':'UTF-8'}</td>
+				    <td>{$list.capture_amount|escape:'htmlall':'UTF-8'}</td>
+				    <td>{$list.result|escape:'htmlall':'UTF-8'}</td>
 				  </tr>
 				{/foreach}
 				</table>
 			{/if}
 			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
-				<p>{l s='There is still' mod='paypal'} {$rest_to_capture} {$id_currency} {l s='to capture.' mod='paypal'} {l s='How many do you want to capture :' mod='paypal'}</p>
+				<p>{l s='There is still' mod='paypal'} {$rest_to_capture|escape:'htmlall':'UTF-8'} {$id_currency|escape:'htmlall':'UTF-8'} {l s='to capture.' mod='paypal'} {l s='How many do you want to capture :' mod='paypal'}</p>
 				<input type="text" onchange="captureEdit();" name="totalCaptureMoney" style="width80%;" placeholder="{l s='Enter the money you want to capture (ex: 200.00)' mod='paypal'}"/>
 		
-				<input type="hidden" name="id_order" value="{$params.id_order}" />
+				<input type="hidden" name="id_order" value="{$params.id_order|escape:'htmlall':'UTF-8'}" />
 				<p><b>{l s='Information:' mod='paypal'}</b> {l s='Funds ready to be captured before shipping' mod='paypal'}</p>
 				<p class="center">
 					<button type="submit" class="btn btn-default" name="submitPayPalCapture" onclick="if (!confirm('{l s='Are you sure you want to capture?' mod='paypal'}'))return false;">
@@ -63,7 +63,7 @@
 {else}
 <br />
 <fieldset {if isset($ps_version) && ($ps_version < '1.5')}style="width: 400px"{/if}>
-	<legend><img src="{$base_url}modules/{$module_name}/logo.gif" alt="" />{l s='PayPal Capture' mod='paypal'}</legend>
+	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" />{l s='PayPal Capture' mod='paypal'}</legend>
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='Funds ready to be captured before shipping' mod='paypal'}</p>
 	{if  $list_captures|@count gt 0} 
  		<table class="table" width="100%" cellspacing="0" cellpadding="0">
@@ -74,15 +74,15 @@
 		  </tr>
 		{foreach from=$list_captures item=list}
 		  <tr>
-		    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)}</td>
-		    <td>{$list.capture_amount}</td> 
-		    <td>{$list.result}</td>
+		    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)|escape:'htmlall':'UTF-8'}</td>
+		    <td>{$list.capture_amount|escape:'htmlall':'UTF-8'}</td>
+		    <td>{$list.result|escape:'htmlall':'UTF-8'}</td>
 		  </tr>
 		{/foreach}
 		</table>
 	{/if}
 	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
-		<p>{l s='There is still' mod='paypal'} {$rest_to_capture} {$id_currency} {l s='to capture.' mod='paypal'} {l s='How many do you want to capture :' mod='paypal'}</p>
+		<p>{l s='There is still' mod='paypal'} {$rest_to_capture|escape:'htmlall':'UTF-8'} {$id_currency|escape:'htmlall':'UTF-8'} {l s='to capture.' mod='paypal'} {l s='How many do you want to capture :' mod='paypal'}</p>
 		<input type="text" onchange="captureEdit();" name="totalCaptureMoney" style="width80%;" placeholder="{l s='Enter the money you want to capture (ex: 200.00)' mod='paypal'}"/>
 		<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 		<p class="center"><input type="submit" class="button" name="submitPayPalCapture" value="{l s='Get the money' mod='paypal'}" onclick="return confirm('{l s='Are you sure you want to capture?' mod='paypal'}');" /></p>
