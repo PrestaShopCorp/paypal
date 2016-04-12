@@ -129,8 +129,6 @@ class PayPal extends PaymentModule
         } else {
             $this->checkMobileNeeds();
         }
-
-        $tls_verificator = new TLSVerificator(true, $this);
     }
 
     public function install()
