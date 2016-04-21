@@ -51,7 +51,15 @@ class TLSVerificator
 
     public function makeCheck()
     {
-        $tls_check = $this->_connectByCURL($this->url, false, 1);
+
+        if (false && function_exists('curl_exec')) {
+            $tls_check = $this->_connectByCURL($this->url);
+        }
+        else
+        {
+            $tls_check = file_get_contents($this->url);
+        }
+
         if ($tls_check == false) {
             $this->tls_version = false; // Not detectable
             return false;
@@ -69,7 +77,7 @@ class TLSVerificator
     /************************************************************/
     /********************** CONNECT METHODS *********************/
     /************************************************************/
-    private function _connectByCURL($url, $http_header = false, $sslversion = 1)
+    private function _connectByCURL($url, $http_header = false)
     {
         $ch = @curl_init();
 
@@ -87,7 +95,6 @@ class TLSVerificator
             @curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             @curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             @curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-            @curl_setopt($ch, CURLOPT_SSLVERSION, $sslversion);
             @curl_setopt($ch, CURLOPT_VERBOSE, false);
             if ($http_header) {
                 @curl_setopt($ch, CURLOPT_HTTPHEADER, $http_header);
