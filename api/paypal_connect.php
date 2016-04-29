@@ -171,7 +171,8 @@ class PayPalConnect
                 $dir = opendir($path);
                 while($file = readdir($dir))
                 {
-                    if($file !='.' && $file != '..' && substr($file,0,8) <= $date_limit_purge)
+                    $date_file = substr($file,0,8);
+                    if($file !='.' && $file != '..' && $date_file <= $date_limit_purge)
                     {
                         unlink($path.$file);
                     }
