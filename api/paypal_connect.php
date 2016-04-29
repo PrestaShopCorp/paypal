@@ -171,7 +171,7 @@ class PayPalConnect
                 $dir = opendir($path);
                 while($file = readdir($dir))
                 {
-                    $date_file = substr($file,0,8);
+                    $date_file = Tools::substr($file,0,8);
                     if($file !='.' && $file != '..' && $date_file <= $date_limit_purge)
                     {
                         unlink($path.$file);
