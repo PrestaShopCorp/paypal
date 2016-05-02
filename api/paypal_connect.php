@@ -90,7 +90,7 @@ class PayPalConnect
             @curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             @curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             @curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-            @curl_setopt($ch, CURLOPT_SSLVERSION, Configuration::get('PAYPAL_VERSION_TLS_CHECKED') == '1.2' ? 6 : 1);
+            //@curl_setopt($ch, CURLOPT_SSLVERSION, Configuration::get('PAYPAL_VERSION_TLS_CHECKED') == '1.2' ? 6 : 1);
 
             @curl_setopt($ch, CURLOPT_VERBOSE, false);
             if ($http_header) {
