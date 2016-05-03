@@ -1354,6 +1354,11 @@ class PayPal extends PaymentModule
 
     private function _postProcess()
     {
+        if(Tools::getValue('old_partners'))
+        {
+            Configuration::updateValue('PAYPAL_UPDATED_COUNTRIES_OK',1);
+        }
+
         if (Tools::isSubmit('submitPaypal')) {
             if (Tools::getValue('paypal_country_only')) {
                 Configuration::updateValue('PAYPAL_COUNTRY_DEFAULT', (int) Tools::getValue('paypal_country_only'));
