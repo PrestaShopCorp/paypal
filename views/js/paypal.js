@@ -148,7 +148,7 @@ $(document).ready( function() {
 	{literal}
 		
 		$('#container_express_checkout').hide();
-		
+		/*
 		$('#cgv').live('click', function() {
 			if ($('#cgv:checked').length != 0)
 				$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
@@ -159,9 +159,10 @@ $(document).ready( function() {
 			if ($('#cgv:checked').length != 0)
 				$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
 		});
-		
+		*/
 	{/literal}
 	{else if isset($paypal_order_opc)}
+
 	{literal}
 	
 		$('#cgv').live('click', function() {
@@ -176,6 +177,7 @@ $(document).ready( function() {
 		});
 		
 	{/literal}
+
 	{/if}
 	{literal}
 

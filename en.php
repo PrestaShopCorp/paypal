@@ -138,7 +138,7 @@ $_MODULE['<{paypal}default-bootstrap>back_office_50f33d14f129e4548c1c270fd6725a7
 $_MODULE['<{paypal}default-bootstrap>back_office_113269a2fc804aeae74a99e168309e8b'] = 'Choose the solution you want to use';
 $_MODULE['<{paypal}default-bootstrap>back_office_a025e05161bb17cbab898f0e77b09a2b'] = 'Iframe';
 $_MODULE['<{paypal}default-bootstrap>back_office_d63bbf35e72f644c8752d4f2304f89e8'] = 'Full page redirect';
-$_MODULE['<{paypal}default-bootstrap>back_office_c7c6643c2c48aabc724f019ea0ef26cc'] = 'Choisissez un template';
+$_MODULE['<{paypal}default-bootstrap>back_office_c7c6643c2c48aabc724f019ea0ef26cc'] = 'Choose a template';
 $_MODULE['<{paypal}default-bootstrap>back_office_684c41bec3eaa8b8bc929c829c602157'] = 'Use express checkout shortcut';
 $_MODULE['<{paypal}default-bootstrap>back_office_76cfbdf3f35eb2368b8cbabfdd9f55db'] = 'Offer your customers a 2-click payment option';
 $_MODULE['<{paypal}default-bootstrap>back_office_c5192977219fb2eea3b1b41f8ce9f57d'] = 'Use PayPal In Context Checkout';

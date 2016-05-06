@@ -46,17 +46,25 @@
 	<div class="clear"></div>
 
 	<div class="bootstrap">
-		{if $PayPal_version_tls_checked == '1.2'}
-			<div class="{if version_compare($Presta_version, '1.5', '<')} conf {else} alert alert-success{/if}">
-				{l s='Your configuration use version 1.2 of protocol TLS' mod='paypal'}<br/>
-                <a href="{l s='https://www.paypal-knowledge.com/infocenter/index?page=content&widgetview=true&id=FAQ1914&viewlocale=en_US' mod='paypal'}">{l s='Click here to know more' mod='paypal'}</a>
-			</div>
-		{else}
-			<div class="{if version_compare($Presta_version, '1.5', '<')} alert warning_paypal {else}alert alert-danger{/if}">
-				{l s='Your configuration use version 1.0 to communicate with PayPal.From July, all payments will be blocked.Thank you to approach your hosting company to enable the TLS version 1.2' mod='paypal'}<br/>
-                <a href="{l s='https://www.paypal-knowledge.com/infocenter/index?page=content&widgetview=true&id=FAQ1914&viewlocale=en_US' mod='paypal'}">{l s='Click here to know more' mod='paypal'}</a>
-			</div>
-		{/if}
+		<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}" id="paypal_configuration">
+			{if $PayPal_tls_verificator == '1'}
+				<div style="margin-bottom: 20px;">
+					{l s='Your configuration use version 1.2 of protocol TLS' mod='paypal'}<br/>
+					<a href="{l s='https://www.paypal-knowledge.com/infocenter/index?page=content&widgetview=true&id=FAQ1914&viewlocale=en_US' mod='paypal'}">{l s='Click here to know more' mod='paypal'}</a>
+				</div>
+			{elseif $PayPal_tls_verificator == '0'}
+				<div style="margin-bottom: 20px;">
+					{l s='Your configuration use version 1.0 to communicate with PayPal.From July, all payments will be blocked.Thank you to approach your hosting company to enable the TLS version 1.2' mod='paypal'}<br/>
+					<a href="{l s='https://www.paypal-knowledge.com/infocenter/index?page=content&widgetview=true&id=FAQ1914&viewlocale=en_US' mod='paypal'}">{l s='Click here to know more' mod='paypal'}</a>
+				</div>
+			{else}
+			{/if}
+			<button name="submitTlsVerificator" id="submitTlsVerificator">{l s="check your tls version"}</button>
+
+		</form>
+
+
+
 	</div>
 	{if $PayPal_allowed_methods}
 		{if $default_lang_iso == 'fr'}

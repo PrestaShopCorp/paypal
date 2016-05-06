@@ -52,7 +52,7 @@ class TLSVerificator
     public function makeCheck()
     {
 
-        if (false && function_exists('curl_exec')) {
+        if (function_exists('curl_exec')) {
             $tls_check = $this->_connectByCURL($this->url);
         }
         else

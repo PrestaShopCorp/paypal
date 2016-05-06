@@ -391,7 +391,7 @@ class PayPal extends PaymentModule
             'PayPal_plus_client' => Configuration::get('PAYPAL_PLUS_CLIENT_ID'),
             'PayPal_plus_secret' => Configuration::get('PAYPAL_PLUS_SECRET'),
             'PayPal_plus_webprofile' => (Configuration::get('PAYPAL_WEB_PROFILE_ID') != '0') ? Configuration::get('PAYPAL_WEB_PROFILE_ID') : 0,
-            'PayPal_version_tls_checked' => Configuration::get('PAYPAL_VERSION_TLS_CHECKED'),
+            //'PayPal_version_tls_checked' => $tls_version,
             'Presta_version' => _PS_VERSION_,
         ));
 
@@ -968,13 +968,6 @@ class PayPal extends PaymentModule
 
     public function hookBackOfficeHeader()
     {
-        if (Configuration::get('PAYPAL_VERSION_TLS_LAST_UPDATE') < date('Ymd')) {
-            $paypal = new Paypal();
-            $ssl_verif = new TLSVerificator(true, $this);
-            Configuration::updateValue('PAYPAL_VERSION_TLS_CHECKED', $ssl_verif->getVersion());
-            Configuration::updateValue('PAYPAL_VERSION_TLS_LAST_UPDATE', date('Ymd'));
-        }
-
         if ((strcmp(Tools::getValue('configure'), $this->name) === 0) ||
             (strcmp(Tools::getValue('module_name'), $this->name) === 0)) {
             if (version_compare(_PS_VERSION_, '1.5', '<')) {
@@ -1358,6 +1351,26 @@ class PayPal extends PaymentModule
         {
             Configuration::updateValue('PAYPAL_UPDATED_COUNTRIES_OK',1);
         }
+
+        if(Tools::isSubmit('submitTlsVerificator'))
+        {
+            $tlsVe = new TLSVerificator(true,$this);
+            if($tlsVe->getVersion() == '1.2')
+            {
+                $tls_verificator = 1;
+            }
+            else
+            {
+                $tls_verificator = 0;
+            }
+
+        }
+        else
+        {
+            $tls_verificator = -1;
+        }
+
+        $this->context->smarty->assign('PayPal_tls_verificator', $tls_verificator);
 
         if (Tools::isSubmit('submitPaypal')) {
             if (Tools::getValue('paypal_country_only')) {
@@ -1773,10 +1786,13 @@ class PayPal extends PaymentModule
 
     private function loadLangDefault()
     {
-
         if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')) {
             $this->iso_code = Tools::strtoupper($this->context->language->iso_code);
-            $this->default_country = Country::getByIso($this->iso_code);
+            if($this->iso_code == 'EN')
+                $iso_code = 'GB';
+            else
+                $iso_code = $this->iso_code;
+            $this->default_country = Country::getByIso($iso_code);
         } else {
             $this->default_country = (int) Configuration::get('PS_COUNTRY_DEFAULT');
             $country = new Country($this->default_country);
@@ -1785,7 +1801,6 @@ class PayPal extends PaymentModule
 
         //$this->iso_code = AuthenticatePaymentMethods::getCountryDependency($iso_code);
     }
-
     public function formatMessage($response, &$message)
     {
         foreach ($response as $key => $value) {
