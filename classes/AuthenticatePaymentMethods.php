@@ -80,8 +80,10 @@ class AuthenticatePaymentMethods
             'DE' => array(WPS, ECS, PPP),
             'ES' => array(WPS, HSS, ECS),
             'FR' => array(WPS, HSS, ECS),
+            'GB' => array(WPS, HSS, ECS),
             'HK' => array(WPS, HSS, ECS),
             'IL' => array(WPS, ECS),
+            'IN' => array(WPS, ECS),
             'IT' => array(WPS, HSS, ECS),
             'JP' => array(WPS, HSS, ECS),
             'MY' => array(WPS, ECS),
@@ -95,7 +97,8 @@ class AuthenticatePaymentMethods
             'TH' => array(WPS, ECS),
             'TR' => array(WPS, ECS),
             'TW' => array(WPS, ECS),
-        );
+            'US' => array(WPS, ECS),
+            'ZA' => array(WPS, ECS));
 
         return isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : false;
     }
