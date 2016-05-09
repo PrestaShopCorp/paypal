@@ -60,7 +60,7 @@
 				</div>
 			{else}
 			{/if}
-			<button name="submitTlsVerificator" id="submitTlsVerificator">{l s="check your tls version"}</button>
+			<button name="submitTlsVerificator" id="submitTlsVerificator">{l s='check your tls version' mod='paypal'}</button>
 
 		</form>
 
