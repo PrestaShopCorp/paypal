@@ -45,7 +45,8 @@
 
 	<div class="clear"></div>
 
-	<div class="bootstrap">
+	{*
+	<!-- div class="bootstrap">
 		<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}" id="paypal_configuration">
 			{if $PayPal_tls_verificator == '1'}
 				<div style="margin-bottom: 20px;">
@@ -65,7 +66,8 @@
 
 
 
-	</div>
+	</div -->
+	*}
 	{if $PayPal_allowed_methods}
 		{if $default_lang_iso == 'fr'}
 			<div class="clear"></div><hr />
