@@ -510,7 +510,7 @@ class PayPal extends PaymentModule
                 return 'he_IL';
             case 'id':
                 return 'id_ID';
-            case 'il':
+            case 'it':
                 return 'it_IT';
             case 'jp':
                 return 'ja_JP';
