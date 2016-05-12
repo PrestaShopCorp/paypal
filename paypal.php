@@ -1761,7 +1761,7 @@ class PayPal extends PaymentModule
     {
 
         if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')) {
-            $this->iso_code = Tools::strtoupper($this->context->language->iso_code);
+            $this->iso_code = Tools::strtoupper($this->context->country->iso_code);
             $this->default_country = Country::getByIso($this->iso_code);
         } else {
             $this->default_country = (int) Configuration::get('PS_COUNTRY_DEFAULT');
