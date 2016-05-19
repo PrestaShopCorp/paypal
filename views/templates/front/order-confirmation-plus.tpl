@@ -41,7 +41,7 @@
 	<link rel="stylesheet" href="{$base_dir|escape:'htmlall':'UTF-8'}/modules/paypal/views/css/paypal_1_4.css">
 {/if}
 
-{$paypal_cart_summary|escape:'htmlall':'UTF-8'}
+{$paypal_cart_summary|escape:'UTF-8'}
 <div class="inforeturn"></div>
 <div class="confirm_PPP">
     
@@ -118,8 +118,8 @@
                     <i class="icon-chevron-left"></i>
                 {/if}</a>
             <a href="{$link->getPageLink('history.php', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to orders' mod='paypal'}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
-        {/if}
-    </div>
+            {/if}
+        </div>
 
 {elseif $state == 'failed' || $state == 'expired'}
     <p class="alert alert-warning paypal-error">{l s='An error occured during your payment' mod='paypal'}</p>

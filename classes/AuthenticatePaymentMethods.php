@@ -53,6 +53,7 @@ class AuthenticatePaymentMethods
             'TH' => array('TH'),
             'TR' => array('TR'),
             'TW' => array('TW'),
+            'GB' => array('GB'),
         );
 
         foreach ($localizations as $key => $value) {

@@ -221,7 +221,6 @@ class PayPalIPN extends PayPal
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($curl, CURLOPT_TIMEOUT, 5);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($curl, CURLOPT_SSLVERSION, defined('CURL_SSLVERSION_TLSv1_2') ? CURL_SSLVERSION_TLSv1_2 : 1);
 
         $content = curl_exec($curl);
         curl_close($curl);
@@ -229,7 +228,11 @@ class PayPalIPN extends PayPal
     }
 }
 
+file_put_contents('paypal.log', Tools::getValue('receiver_email').' == '.Configuration::get('PAYPAL_BUSINESS_ACCOUNT').PHP_EOL,FILE_APPEND);
+
 if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACCOUNT')) {
+    file_put_contents('paypal.log', 'Custom = '.Tools::getIsset('custom').PHP_EOL,FILE_APPEND);
+
     if (Tools::getIsset('custom')) {
         $ipn = new PayPalIPN();
         $custom = Tools::jsonDecode(Tools::getValue('custom'), true);

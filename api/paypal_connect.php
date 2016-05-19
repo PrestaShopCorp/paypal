@@ -118,7 +118,7 @@ class PayPalConnect
     private function _connectByFSOCK($host, $script, $body)
     {
         $fp = @fsockopen('tls://'.$host, 443, $errno, $errstr, 4);
-
+        
         if (!$fp) {
             $this->_logs[] = $this->paypal->l('Connect failed with fsockopen method');
         } else {
