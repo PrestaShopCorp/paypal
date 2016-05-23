@@ -24,7 +24,9 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
+
 include_once dirname(__FILE__).'/../../config/config.inc.php';
+//include_once _PS_ROOT_DIR_.'/init.php';
 include_once _PS_MODULE_DIR_.'paypal/paypal.php';
 
 /*
@@ -228,10 +230,7 @@ class PayPalIPN extends PayPal
     }
 }
 
-file_put_contents('paypal.log', Tools::getValue('receiver_email').' == '.Configuration::get('PAYPAL_BUSINESS_ACCOUNT').PHP_EOL,FILE_APPEND);
-
 if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACCOUNT')) {
-    file_put_contents('paypal.log', 'Custom = '.Tools::getIsset('custom').PHP_EOL,FILE_APPEND);
 
     if (Tools::getIsset('custom')) {
         $ipn = new PayPalIPN();
