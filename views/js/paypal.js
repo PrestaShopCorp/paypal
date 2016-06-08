@@ -86,11 +86,20 @@ $(document).ready( function() {
 		});
 	}
 
-	
 
-	$('#paypal_payment_form').live('submit', function() {
-		updateFormDatas();
-	});
+	var jquery_version = $.fn.jquery.split('.');
+	if(jquery_version[0]>=1 && jquery_version[1] >= 7)
+	{
+		$('#cgv').on('click', function() {
+			if ($('#cgv:checked').length != 0)
+				checkOrder();
+		});
+	}
+	else {
+		$('#paypal_payment_form').live('submit', function () {
+			updateFormDatas();
+		});
+	}
 
 	function displayExpressCheckoutShortcut() {
 		var id_product = $('input[name="id_product"]').val();
@@ -164,18 +173,30 @@ $(document).ready( function() {
 	{else if isset($paypal_order_opc)}
 
 	{literal}
-	
-		$('#cgv').live('click', function() {
-			if ($('#cgv:checked').length != 0)
-				checkOrder();
-		});
-		
-		// old jQuery compatibility
-		$('#cgv').click(function() {
-			if ($('#cgv:checked').length != 0)
-				checkOrder();
-		});
-		
+
+
+		var jquery_version = $.fn.jquery.split('.');
+		if(jquery_version[0]>=1 && jquery_version[1] >= 7)
+		{
+			$('#cgv').on('click', function() {
+				if ($('#cgv:checked').length != 0)
+					checkOrder();
+			});
+		}
+		else
+		{
+			$('#cgv').live('click', function() {
+				if ($('#cgv:checked').length != 0)
+					checkOrder();
+			});
+
+			// old jQuery compatibility
+			$('#cgv').click(function() {
+				if ($('#cgv:checked').length != 0)
+					checkOrder();
+			});
+		}
+
 	{/literal}
 
 	{/if}
