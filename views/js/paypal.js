@@ -156,18 +156,18 @@ $(document).ready( function() {
 	{literal}
 		
 		$('#container_express_checkout').hide();
-		/*
+
 		$('#cgv').live('click', function() {
 			if ($('#cgv:checked').length != 0)
 				$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
 		});
 		
-		// old jQuery compatibility
+		/* old jQuery compatibility */
 		$('#cgv').click(function() {
 			if ($('#cgv:checked').length != 0)
 				$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
 		});
-		*/
+
 	{/literal}
 	{else if isset($paypal_order_opc)}
 
