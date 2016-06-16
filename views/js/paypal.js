@@ -178,7 +178,7 @@ $(document).ready( function() {
 		var jquery_version = $.fn.jquery.split('.');
 		if(jquery_version[0]>=1 && jquery_version[1] >= 7)
 		{
-			$('#cgv').on('click', function() {
+			$('body').on('click','#cgv', function() {
 				if ($('#cgv:checked').length != 0)
 					checkOrder();
 			});
@@ -190,7 +190,7 @@ $(document).ready( function() {
 					checkOrder();
 			});
 
-			// old jQuery compatibility
+			/* old jQuery compatibility */
 			$('#cgv').click(function() {
 				if ($('#cgv:checked').length != 0)
 					checkOrder();
