@@ -278,10 +278,19 @@ class PayPal extends PaymentModule
                 $this->context->smarty->assign('paypal_authorization', true);
             }
 
+            $isECS = false;
+            if(isset($this->context->cookie->express_checkout))
+            {
+                $cookie_ECS = unserialize($this->context->cookie->express_checkout);
+                if(isset($cookie_ECS['token']) && isset($cookie_ECS['payer_id']))
+                {
+                    $isECS = true;
+                }
+            }
+
             if (($order_process_type == 1) && ((int) $payment_method == HSS) && !$this->useMobile()) {
                 $this->context->smarty->assign('paypal_order_opc', true);
-            } elseif (($order_process_type == 1) && ((bool) Tools::getValue('isPaymentStep')
-                == true)) {
+            } elseif (($order_process_type == 1) && ((bool) Tools::getValue('isPaymentStep') == true || $isECS)) {
                 $shop_url = PayPal::getShopDomainSsl(true, true);
                 if (version_compare(_PS_VERSION_, '1.5', '<')) {
                     $link = $shop_url._MODULE_DIR_.$this->name.'/express_checkout/payment.php';
