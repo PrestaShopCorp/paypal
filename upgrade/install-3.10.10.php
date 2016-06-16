@@ -34,5 +34,6 @@ function upgrade_module_3_10_10($object, $install = false)
     {
         return unlink(_PS_MODULE_DIR_.'paypal/api/Results.txt');
     }
+    Configuration::updateValue('PAYPAL_VERSION', '3.10.10');
     return true;
 }
