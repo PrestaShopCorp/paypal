@@ -156,7 +156,7 @@ $(document).ready( function() {
 	{literal}
 		
 		$('#container_express_checkout').hide();
-		if(jquery_version[0]>=1 && jquery_version[1] >= 7)
+		if(jquery_version[0] >= 1 && jquery_version[1] >= 7)
 		{
 			$('body').on('click',"#cgv", function () {
 				if ($('#cgv:checked').length != 0)
