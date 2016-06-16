@@ -36,14 +36,14 @@
 
 	<div class="box half right">
 		<ul class="tick">
-            <li><span class="bold">{l s='Get more buyers' mod='paypal'}</span><br />{l s='100 million-plus PayPal accounts worldwide' mod='paypal'}</li>
-            <li><span class="bold">{l s='Access international buyers' mod='paypal'}</span><br />{l s='190 countries, 25 currencies' mod='paypal'}</li>
-            <li><span class="bold">{l s='Reassure your buyers' mod='paypal'}</span><br />{l s='Buyers don\'t need to share their private data' mod='paypal'}</li>
-            <li><span class="bold">{l s='Accept all major payment method' mod='paypal'}</span></li>      
+            <li><span class="paypal-bold">{l s='Get more buyers' mod='paypal'}</span><br />{l s='100 million-plus PayPal accounts worldwide' mod='paypal'}</li>
+            <li><span class="paypal-bold">{l s='Access international buyers' mod='paypal'}</span><br />{l s='190 countries, 25 currencies' mod='paypal'}</li>
+            <li><span class="paypal-bold">{l s='Reassure your buyers' mod='paypal'}</span><br />{l s='Buyers don\'t need to share their private data' mod='paypal'}</li>
+            <li><span class="paypal-bold">{l s='Accept all major payment method' mod='paypal'}</span></li>
         </ul>
 	</div>
 
-	<div class="clear"></div>
+	<div class="paypal-clear"></div>
 
 	{*
 	<!-- div class="bootstrap">
@@ -70,19 +70,19 @@
 	*}
 	{if $PayPal_allowed_methods}
 		{if $default_lang_iso == 'fr'}
-			<div class="clear"></div><hr />
+			<div class="paypal-clear"></div><hr />
 			<div class="box">
 			{l s='Download the ' mod='paypal'}<a href="http://altfarm.mediaplex.com/ad/ck/3484-197941-8030-54"> {l s='Paypal Integration Guide' mod='paypal'}</a> {l s='on PrestaShop and follow the configuration step by step' mod='paypal'}
 				
 			</div>
 		{else}
-			<div class="clear"></div><hr />
+			<div class="paypal-clear"></div><hr />
 			<div class="box">
 			{l s='Download the ' mod='paypal'}<a href="http://altfarm.mediaplex.com/ad/ck/3484-197941-8030-169"> {l s='Paypal Integration Guide' mod='paypal'}</a> {l s='on PrestaShop and follow the configuration step by step' mod='paypal'}
 				
 			</div>
 		{/if}
-		<div class="clear"></div><hr>
+		<div class="paypal-clear"></div><hr>
 	
 		<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}" id="paypal_configuration">
 			{* PayPal configuration blocks *}
@@ -114,14 +114,14 @@
 				</div>
 			</div>
 
-			<div class="clear"></div><hr />
+			<div class="paypal-clear"></div><hr />
 
 			{* SELECT YOUR SOLUTION *}
 			<div class="box">
 
 				<div class="box right half" id="paypal-call-button">
 					<div id="paypal-call" class="box right"><span style="font-weight: bold">{l s='Need help ?' mod='paypal'}</span> {l s='Give us a call : xxxx' mod='paypal'} <img src="../modules/paypal/views/img/call.png" width="14px" alt="Phone" /></div>
-					<div id="paypal-call-foonote" class="box right clear">{l s=' ' mod='paypal'}</div>
+					<div id="paypal-call-foonote" class="box right paypal-clear">{l s=' ' mod='paypal'}</div>
 				</div>
 
 				<span class="paypal-section">1</span> <h3 class="inline">{l s='Select your solution' mod='paypal'}</h3> <a href="{l s='https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=1' mod='paypal'}" target="_blank">{l s='Learn more' mod='paypal'}</a>
@@ -130,7 +130,7 @@
 
 				{if (in_array($PayPal_WPS, $PayPal_allowed_methods) || in_array($PayPal_HSS, $PayPal_allowed_methods))}
 					<h4 class="inline">{l s='Need PayPal to process all your card payments ?' mod='paypal'}</h4> <img src="{$PayPal_logo.BackOfficeCards|escape:'htmlall':'UTF-8'}" height="22px"/>
-					<div class="clear"></div>
+					<div class="paypal-clear"></div>
 					<div class="form-block">
 						{if (in_array($PayPal_WPS, $PayPal_allowed_methods))}
 							{* WEBSITE PAYMENT STANDARD *}
@@ -141,7 +141,7 @@
 								<span class="description">{l s='Start accepting payments immediately.' mod='paypal'}<br />{l s='No subscription fees, pay only when you get paid.' mod='paypal'}</span>
 							</label>
 						{/if}
-                                                <div class="clear"></div>
+                                                <div class="paypal-clear"></div>
 						{if (in_array($PayPal_HSS, $PayPal_allowed_methods))}
 							{* WEBSITE PAYMENT PRO *}
 							<br />
@@ -152,7 +152,7 @@
                                                             <p class="toolbox">{l s='Click on the SAVE button only when PayPal has approved your subscription for this product. This process can take up to 3-5 days.' mod='paypal'}</p>
 							</label>
 						{/if}
-                        <div class="clear"></div>
+                        <div class="paypal-clear"></div>
                         {if (in_array($PayPal_PPP, $PayPal_allowed_methods))}
                                 {* WEBSITE PAYMENT PLUS *}
                                 <br />
@@ -165,7 +165,7 @@
                         {/if}
 					</div>
 				{/if}
-				<div class="clear"></div>
+				<div class="paypal-clear"></div>
 				{if (in_array($PayPal_ECS, $PayPal_allowed_methods))}
 				<h4 class="inline">{l s='Need PayPal in addition to your existing card processor ?' mod='paypal'}</h4> <img src="{$PayPal_logo.LocalPayPalMarkSmall|escape:'htmlall':'UTF-8'}" />
 				<div class="form-block">
@@ -219,7 +219,7 @@
 			</div>
 
 			{* ENABLE YOUR ONLINE SHOP TO PROCESS PAYMENT *}
-			<div class="box disabled" id="credentials">
+			<div class="box paypal-disabled" id="credentials">
 				<span class="paypal-section">3</span> <h3 class="inline">{l s='Process payments on your online shop' mod='paypal'}</h3>
 				<br /><br />
 
@@ -245,7 +245,7 @@
 							<dt><label for="api_signature">{l s='API signature' mod='paypal'} : </label></dt>
 							<dd><input type='text' size="85" name="api_signature" id="api_signature" value="{$PayPal_api_signature|escape:'html':'UTF-8'}" autocomplete="off" /></dd>
 						</dl>
-						<div class="clear"></div>
+						<div class="paypal-clear"></div>
 						<span class="description">{l s='Please check once more that you pasted all the characters.' mod='paypal'}</span>
 					</div>
 
@@ -265,7 +265,7 @@
                                                             <input type="radio" name="paypalplus_webprofile"  value="0" id="paypal_plus_webprofile_no" {if $PayPal_plus_webprofile == '0'}checked="checked"{/if} /> <label for="paypal_plus_webprofile_no">{l s='No' mod='paypal'}</label>
                                                         </dd>
                                                 </dl>            
-						<div class="clear"></div>
+						<div class="paypal-clear"></div>
 					</div>                                
 									
 					<div id="integral-credentials" class="paypal-hide">
@@ -279,11 +279,11 @@
 						</dl>
 					</div>
 
-					<div class="clear"></div>
+					<div class="paypal-clear"></div>
 
 					<h4>{l s='To finalize setting up your PayPal account, you need to' mod='paypal'} : </h4>
-					<p><span class="bold">1.</span> {l s='Confirm your email address : check the email sent by PayPal when you created your account' mod='paypal'}</p>
-					<p><span class="bold">2.</span> {l s='Link your PayPal account to a bank account or a credit card : log into your PayPal account and go to "My business setup"' mod='paypal'}</p>
+					<p><span class="paypal-bold">1.</span> {l s='Confirm your email address : check the email sent by PayPal when you created your account' mod='paypal'}</p>
+					<p><span class="paypal-bold">2.</span> {l s='Link your PayPal account to a bank account or a credit card : log into your PayPal account and go to "My business setup"' mod='paypal'}</p>
 
 					<h4>{l s='Configuration options' mod='paypal'}</h4>
 					<div id="integral_evolution_solution" class="paypal-hide">
@@ -369,7 +369,7 @@
 							</dl>
 							
 							
-							<div class="clear"></div>
+							<div class="paypal-clear"></div>
 						</div>
 					</div>
 
@@ -441,7 +441,7 @@
 			</p>
 		</div>
     {else}
-		<div class="clear"></div><hr />
+		<div class="paypal-clear"></div><hr />
 			<div class="box">
 				<p>{l s='Your country is not available for this module please go on Prestashop addons to see the different possibilities.' mod='paypal'}</p>
 			</div>
