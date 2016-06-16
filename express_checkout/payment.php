@@ -93,7 +93,7 @@ function setCustomerAddress($ppec, $customer, $id = null)
         $address->alias = 'Paypal_Address';
     }
 
-    $name = $ppec->result['PAYMENTREQUEST_0_SHIPTONAME'];
+    $name = trim($ppec->result['PAYMENTREQUEST_0_SHIPTONAME']);
     $name = explode(' ', $name);
     if (isset($name[1])) {
         $firstname = $name[0];
