@@ -90,9 +90,8 @@ $(document).ready( function() {
 	var jquery_version = $.fn.jquery.split('.');
 	if(jquery_version[0]>=1 && jquery_version[1] >= 7)
 	{
-		$('#cgv').on('click', function() {
-			if ($('#cgv:checked').length != 0)
-				checkOrder();
+		$('body').on('submit',"#paypal_payment_form", function () {
+			updateFormDatas();
 		});
 	}
 	else {
