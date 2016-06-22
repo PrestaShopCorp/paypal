@@ -24,7 +24,7 @@
 *}
 
         <p>
-            <img src="{$logos.LocalPayPalLogoMedium}" alt="{l s='PayPal' mod='paypal'}" class="paypal_logo" />
+            <img src="{$logos.LocalPayPalLogoMedium|escape:'htmlall':'UTF-8'}" alt="{l s='PayPal' mod='paypal'}" class="paypal_logo" />
             <br />{l s='You have chosen to pay with PayPal.' mod='paypal'}
             <br/><br />
         {l s='Here is a short summary of your order:' mod='paypal'}
@@ -56,14 +56,14 @@
             {foreach from=$cart->getProducts() item=product}
                 <tr>
                     <td>
-                        <img src="{$link->getImageLink('small', $product.id_image, $cart_image_size)}" alt="">
+                        <img src="{$link->getImageLink('small', $product.id_image, $cart_image_size)|escape:'htmlall':'UTF-8'}" alt="">
                     </td>
                     <td>
-                        {$product.name}<br/>
+                        {$product.name|escape:'htmlall':'UTF-8'}<br/>
                         {if isset($product.attributes) && $product.attributes}<small>{$product.attributes|escape:'html':'UTF-8'}</small>{/if}
                     </td>
                     <td>
-                        {$product.quantity}
+                        {$product.quantity|escape:'htmlall':'UTF-8'}
                     </td>
                 </tr>
             {/foreach}
@@ -79,11 +79,11 @@
         </p>
 
         
-<link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal-cart_summary.css">
+<link rel="stylesheet" href="{$base_dir|escape:'htmlall':'UTF-8'}/modules/paypal/views/css/paypal-cart_summary.css">
 {if $useStyle14}
-    <link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_4_paypal-cart_summary.css">
+    <link rel="stylesheet" href="{$base_dir|escape:'htmlall':'UTF-8'}/modules/paypal/views/css/paypal_1_4_paypal-cart_summary.css">
 {/if}
 
 {if $useStyle15}
-    <link rel="stylesheet" href="{$base_dir}/modules/paypal/views/css/paypal_1_5_paypal-cart_summary.css">
+    <link rel="stylesheet" href="{$base_dir|escape:'htmlall':'UTF-8'}/modules/paypal/views/css/paypal_1_5_paypal-cart_summary.css">
 {/if}

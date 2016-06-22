@@ -37,6 +37,7 @@ include_once _PS_MODULE_DIR_.'paypal/paypal_login/paypal_login.php';
 include_once _PS_MODULE_DIR_.'paypal/paypal_login/PayPalLoginUser.php';
 include_once _PS_MODULE_DIR_.'paypal/classes/PaypalCapture.php';
 include_once _PS_MODULE_DIR_.'paypal/classes/AuthenticatePaymentMethods.php';
+include_once _PS_MODULE_DIR_.'paypal/classes/TLSVerificator.php';
 
 define('WPS', 1); //Paypal Integral
 define('HSS', 2); //Paypal Integral Evolution
@@ -80,7 +81,7 @@ class PayPal extends PaymentModule
     public $iso_code;
     public $default_country;
     public $paypal_logos;
-    public $module_key = '646dcec2b7ca20c4e9a5aebbbad98d7e';
+    public $module_key = '336225a5988ad434b782f2d868d7bfcd';
 
     const BACKWARD_REQUIREMENT = '0.4';
     const ONLY_PRODUCTS = 1;
@@ -95,7 +96,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '3.10.5';
+        $this->version = '3.10.10';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -128,7 +129,6 @@ class PayPal extends PaymentModule
         } else {
             $this->checkMobileNeeds();
         }
-
     }
 
     public function install()
@@ -179,7 +179,7 @@ class PayPal extends PaymentModule
     public function runUpgrades($install = false)
     {
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
-            foreach (array('2.8', '3.0', '3.7', '3.8.3', '3.9', '3.10.1', '3.10.4') as $version) {
+            foreach (array('2.8', '3.0', '3.7', '3.8.3', '3.9', '3.10.1', '3.10.4','3.10.10') as $version) {
                 $file = dirname(__FILE__).'/upgrade/install-'.$version.'.php';
                 if (version_compare(Configuration::get('PAYPAL_VERSION'), $version, '<') && file_exists($file)) {
                     include_once $file;
@@ -278,10 +278,19 @@ class PayPal extends PaymentModule
                 $this->context->smarty->assign('paypal_authorization', true);
             }
 
+            $isECS = false;
+            if(isset($this->context->cookie->express_checkout))
+            {
+                $cookie_ECS = unserialize($this->context->cookie->express_checkout);
+                if(isset($cookie_ECS['token']) && isset($cookie_ECS['payer_id']))
+                {
+                    $isECS = true;
+                }
+            }
+
             if (($order_process_type == 1) && ((int) $payment_method == HSS) && !$this->useMobile()) {
                 $this->context->smarty->assign('paypal_order_opc', true);
-            } elseif (($order_process_type == 1) && ((bool) Tools::getValue('isPaymentStep')
-                == true)) {
+            } elseif (($order_process_type == 1) && ((bool) Tools::getValue('isPaymentStep') == true || $isECS)) {
                 $shop_url = PayPal::getShopDomainSsl(true, true);
                 if (version_compare(_PS_VERSION_, '1.5', '<')) {
                     $link = $shop_url._MODULE_DIR_.$this->name.'/express_checkout/payment.php';
@@ -391,6 +400,8 @@ class PayPal extends PaymentModule
             'PayPal_plus_client' => Configuration::get('PAYPAL_PLUS_CLIENT_ID'),
             'PayPal_plus_secret' => Configuration::get('PAYPAL_PLUS_SECRET'),
             'PayPal_plus_webprofile' => (Configuration::get('PAYPAL_WEB_PROFILE_ID') != '0') ? Configuration::get('PAYPAL_WEB_PROFILE_ID') : 0,
+            //'PayPal_version_tls_checked' => $tls_version,
+            'Presta_version' => _PS_VERSION_,
         ));
 
         $this->getTranslations();
@@ -508,7 +519,7 @@ class PayPal extends PaymentModule
                 return 'he_IL';
             case 'id':
                 return 'id_ID';
-            case 'il':
+            case 'it':
                 return 'it_IT';
             case 'jp':
                 return 'ja_JP';
@@ -1345,6 +1356,31 @@ class PayPal extends PaymentModule
 
     private function _postProcess()
     {
+        if(Tools::getValue('old_partners'))
+        {
+            Configuration::updateValue('PAYPAL_UPDATED_COUNTRIES_OK',1);
+        }
+
+        if(Tools::isSubmit('submitTlsVerificator'))
+        {
+            $tlsVe = new TLSVerificator(true,$this);
+            if($tlsVe->getVersion() == '1.2')
+            {
+                $tls_verificator = 1;
+            }
+            else
+            {
+                $tls_verificator = 0;
+            }
+
+        }
+        else
+        {
+            $tls_verificator = -1;
+        }
+
+        $this->context->smarty->assign('PayPal_tls_verificator', $tls_verificator);
+
         if (Tools::isSubmit('submitPaypal')) {
             if (Tools::getValue('paypal_country_only')) {
                 Configuration::updateValue('PAYPAL_COUNTRY_DEFAULT', (int) Tools::getValue('paypal_country_only'));
@@ -1759,10 +1795,13 @@ class PayPal extends PaymentModule
 
     private function loadLangDefault()
     {
-
         if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')) {
             $this->iso_code = Tools::strtoupper($this->context->language->iso_code);
-            $this->default_country = Country::getByIso($this->iso_code);
+            if($this->iso_code == 'EN')
+                $iso_code = 'GB';
+            else
+                $iso_code = $this->iso_code;
+            $this->default_country = Country::getByIso($iso_code);
         } else {
             $this->default_country = (int) Configuration::get('PS_COUNTRY_DEFAULT');
             $country = new Country($this->default_country);
@@ -1771,7 +1810,6 @@ class PayPal extends PaymentModule
 
         //$this->iso_code = AuthenticatePaymentMethods::getCountryDependency($iso_code);
     }
-
     public function formatMessage($response, &$message)
     {
         foreach ($response as $key => $value) {

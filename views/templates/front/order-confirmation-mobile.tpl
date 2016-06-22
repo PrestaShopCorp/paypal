@@ -38,30 +38,30 @@
 	<br />
 
 	{if $order}
-		<p>{l s='Total of the transaction (taxes incl.) :' mod='paypal'} <span class="bold">{$price|escape:'htmlall':'UTF-8'}</span></p>
+		<p>{l s='Total of the transaction (taxes incl.) :' mod='paypal'} <span class="paypal-bold">{$price|escape:'htmlall':'UTF-8'}</span></p>
 		<p>{l s='Your order ID is :' mod='paypal'} 
-			<span class="bold">
+			<span class="paypal-bold">
 			{if $smarty.const._PS_VERSION_ >= 1.5}
-				{Order::getUniqReferenceOf($order.id_order)}
+				{Order::getUniqReferenceOf($order.id_order)|escape:'htmlall':'UTF-8'}
 			{else}
 				{$order.id_order|intval}
 			{/if}
 			</span>
 		</p>
-		<p>{l s='Your PayPal transaction ID is :' mod='paypal'} <span class="bold">{$order.id_transaction|escape:'htmlall':'UTF-8'}</span></p>
+		<p>{l s='Your PayPal transaction ID is :' mod='paypal'} <span class="paypal-bold">{$order.id_transaction|escape:'htmlall':'UTF-8'}</span></p>
 	{/if}
 	
 	<br />
 	
 	{if !$is_guest}
-		<a href="{$link->getPageLink('index', true)}" data-role="button" data-theme="a" data-icon="back" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
+		<a href="{$link->getPageLink('index', true)|escape:'htmlall':'UTF-8'}" data-role="button" data-theme="a" data-icon="back" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
 	{else}
 		<ul data-role="listview" data-inset="true" id="list_myaccount">
 			<li data-theme="a" data-icon="check">
-				<a href="{$link->getPageLink('index', true)}" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
+				<a href="{$link->getPageLink('index', true)|escape:'htmlall':'UTF-8'}" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
 			</li>
 			<li data-theme="b" data-icon="back">
-				<a href="{$link->getPageLink('history.php', true, NULL, 'step=1&amp;back={$back}')}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
+				<a href="{$link->getPageLink('history.php', true, NULL, 'step=1&amp;back={$back|escape:'htmlall':'UTF-8'}')}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
 			</li>
 		</ul>
 	{/if}

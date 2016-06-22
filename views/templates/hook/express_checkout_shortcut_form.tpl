@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form id="paypal_payment_form" action="{$base_dir_ssl}modules/paypal/express_checkout/payment.php" title="{l s='Pay with PayPal' mod='paypal'}" method="post" data-ajax="false">
+<form id="paypal_payment_form" action="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/express_checkout/payment.php" title="{l s='Pay with PayPal' mod='paypal'}" method="post" data-ajax="false">
 	{if isset($smarty.get.id_product)}<input type="hidden" name="id_product" value="{$smarty.get.id_product|intval}" />{/if}
 	<!-- Change dynamicaly when the form is submitted -->
 	{if isset($product_minimal_quantity)}

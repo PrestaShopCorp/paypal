@@ -25,6 +25,7 @@
  */
 
 include_once dirname(__FILE__).'/../../config/config.inc.php';
+//include_once _PS_ROOT_DIR_.'/init.php';
 include_once _PS_MODULE_DIR_.'paypal/paypal.php';
 
 /*
@@ -214,14 +215,25 @@ class PayPalIPN extends PayPal
             $request .= "&$key=$value";
         }
 
-        $handle = fopen(dirname(__FILE__).'/log.txt', 'w+');
-        fwrite($handle, $action_url.$request);
-        return Tools::file_get_contents($action_url.$request);
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_URL, $action_url.$request);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+
+        $content = curl_exec($curl);
+        curl_close($curl);
+        return $content;
     }
 }
 
-if (Tools::getIsset('custom')) {
-    $ipn = new PayPalIPN();
-    $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
-    $ipn->confirmOrder($custom);
+if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACCOUNT')) {
+
+    if (Tools::getIsset('custom')) {
+        $ipn = new PayPalIPN();
+        $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
+        $ipn->confirmOrder($custom);
+    }
 }

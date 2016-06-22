@@ -44,12 +44,12 @@
 			
 			{if isset($order)}
 				<p>
-					{l s='Total of the transaction (taxes incl.) :' mod='paypal'} <span class="bold">{$price|escape:'htmlall':'UTF-8'}</span><br>
-					{l s='Your order ID is :' mod='paypal'} <span class="bold">{$order.id_order|intval}</span><br>
+					{l s='Total of the transaction (taxes incl.) :' mod='paypal'} <span class="paypal-bold">{$price|escape:'htmlall':'UTF-8'}</span><br>
+					{l s='Your order ID is :' mod='paypal'} <span class="paypal-bold">{$order.id_order|intval}</span><br>
 				</p>
 			{/if}
 			
-			<p><a href="{$base_dir}" class="button_small" title="{l s='Back' mod='paypal'}">&laquo; {l s='Back' mod='paypal'}</a></p>
+			<p><a href="{$base_dir|escape:'htmlall':'UTF-8'}" class="button_small" title="{l s='Back' mod='paypal'}">&laquo; {l s='Back' mod='paypal'}</a></p>
 		</div>
 	
 	{/if}

@@ -24,35 +24,16 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once dirname(__FILE__).'/../../../config/config.inc.php';
-include_once dirname(__FILE__).'/../../../init.php';
-include_once dirname(__FILE__).'/../paypal.php';
-
-// Ajax query
-$quantity = Tools::getValue('get_qty');
-
-if (Configuration::get('PS_CATALOG_MODE') == 1) {
-    die('0');
+if (!defined('_PS_VERSION_')) {
+    exit;
 }
 
-if ($quantity && $quantity > 0) {
-    /* Ajax response */
-    $id_product = (int) Tools::getValue('id_product');
-    $id_product_attribute = (int) Tools::getValue('id_product_attribute');
-    $product_quantity = Product::getQuantity($id_product, $id_product_attribute);
-    $product = new Product($id_product);
-
-    if (!$product->available_for_order) {
-        die('0');
+function upgrade_module_3_10_10($object, $install = false)
+{
+    if(file_exists(_PS_MODULE_DIR_.'paypal/api/Results.txt'))
+    {
+        unlink(_PS_MODULE_DIR_.'paypal/api/Results.txt');
     }
-
-    if ($product_quantity > 0) {
-        die('1');
-    }
-
-    if ($product_quantity <= 0 && $product->isAvailableWhenOutOfStock((int) $product->out_of_stock)) {
-        die('1');
-    }
-
+    Configuration::updateValue('PAYPAL_VERSION', '3.10.10');
+    return true;
 }
-die('0');

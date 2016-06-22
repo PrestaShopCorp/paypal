@@ -36,7 +36,7 @@
 
 	<h3>{l s='PayPal payment' mod='paypal'}</h3>
 	<form action="{$form_action|escape:'htmlall':'UTF-8'}" method="post" data-ajax="false">
-        {$paypal_cart_summary}
+        {$paypal_cart_summary|escape:'UTF-8'}
 		<p>
 			<b>{l s='Please confirm your order by clicking \'I confirm my order\'' mod='paypal'}.</b>
 		</p>

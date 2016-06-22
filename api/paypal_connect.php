@@ -90,7 +90,8 @@ class PayPalConnect
             @curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             @curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             @curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-            @curl_setopt($ch, CURLOPT_SSLVERSION, defined('CURL_SSLVERSION_TLSv1') ? CURL_SSLVERSION_TLSv1 : 1);
+            //@curl_setopt($ch, CURLOPT_SSLVERSION, Configuration::get('PAYPAL_VERSION_TLS_CHECKED') == '1.2' ? 6 : 1);
+
             @curl_setopt($ch, CURLOPT_VERBOSE, false);
             if ($http_header) {
                 @curl_setopt($ch, CURLOPT_HTTPHEADER, $http_header);
@@ -100,6 +101,11 @@ class PayPalConnect
 
             if (!$result) {
                 $this->_logs[] = $this->paypal->l('Send with CURL method failed ! Error:').' '.curl_error($ch);
+                if(curl_errno($ch))
+                {
+                    $this->_logPaypal(curl_error($ch));
+                }
+
             } else {
                 $this->_logs[] = $this->paypal->l('Send with CURL method successful');
             }
@@ -112,7 +118,7 @@ class PayPalConnect
     private function _connectByFSOCK($host, $script, $body)
     {
         $fp = @fsockopen('tls://'.$host, 443, $errno, $errstr, 4);
-
+        
         if (!$fp) {
             $this->_logs[] = $this->paypal->l('Connect failed with fsockopen method');
         } else {
@@ -145,5 +151,37 @@ class PayPalConnect
         'Content-Type: application/x-www-form-urlencoded'."\r\n".
         'Content-Length: '.(int) $lenght."\r\n".
             'Connection: close'."\r\n\r\n";
+    }
+
+    private function _logPaypal($message){
+        try{
+            $date = date('Ymd');
+            $path = _PS_MODULE_DIR_.'paypal/log/';
+            $context = Context::getContext();
+            file_put_contents($path.$date.'_paypal_curl.log',date('d/m/Y H:i:s').' cart : '.$context->cart->id.' => '.$message.PHP_EOL,FILE_APPEND);
+            $date_last_purge = Configuration::get('PAYPAL_PURGE_LOG_DATE');
+            // if date not set : set at yesterday
+            if(!$date_last_purge)
+            {
+                $date_last_purge = date('Ymd',strtotime('yesterday'));
+            }
+            if($date_last_purge < $date)
+            {
+                $date_limit_purge = date('Ymd',strtotime('-1 month'));
+                $dir = opendir($path);
+                while($file = readdir($dir))
+                {
+                    $date_file = Tools::substr($file,0,8);
+                    if($file !='.' && $file != '..' && $date_file <= $date_limit_purge)
+                    {
+                        unlink($path.$file);
+                    }
+                }
+                Configuration::updateValue('PAYPAL_PURGE_LOG_DATE',$date);
+            }
+
+        }catch (Exception $e){
+            return false;
+        }
     }
 }
