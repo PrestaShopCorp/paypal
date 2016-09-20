@@ -41,7 +41,7 @@
 	<input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
 </form>
 
-{if $use_paypal_in_context}
+{if isset($use_paypal_in_context) && $use_paypal_in_context}
 	<input type="hidden" id="in_context_checkout_enabled" value="1">
 {else}
 	<input type="hidden" id="in_context_checkout_enabled" value="0">
