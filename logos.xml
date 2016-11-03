@@ -272,10 +272,10 @@
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/RA_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/RA_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/RA_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/RA_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="RE">
@@ -288,10 +288,10 @@
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/RE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/RE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/RE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/RE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="SG">
