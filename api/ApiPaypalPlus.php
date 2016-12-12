@@ -119,7 +119,7 @@ class ApiPaypalPlus
 
         $presentation = new stdClass();
         $presentation->brand_name = Configuration::get('PS_SHOP_NAME');
-        $presentation->logo_image = _PS_BASE_URL_.__PS_BASE_URI__.'img/logo.jpg';
+        $presentation->logo_image = Tools::getHttpHost(true).__PS_BASE_URI__.'img/logo.jpg';
         $presentation->locale_code = Tools::strtoupper(Language::getIsoById($this->context->language->id));
 
         $input_fields = new stdClass();
