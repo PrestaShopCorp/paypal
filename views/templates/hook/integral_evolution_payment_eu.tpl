@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -62,7 +62,7 @@
 	<input type="hidden" name="notify_url" value="{$notify_url|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="paymentaction" value="sale" />
 	<input type="hidden" name="business" value="{$business_account|escape:'htmlall':'UTF-8'}" />
-	<input type="hidden" name="template" value="template{$payment_hss_template}" />
+	<input type="hidden" name="template" value="template{$payment_hss_template|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="cbt" value="{l s='Return back to the merchant\'s website' mod='paypal'}" />
 	<input type="hidden" name="cancel_return" value="{$cancel_return|escape:'htmlall':'UTF-8'}" />
 	<input type="hidden" name="return" value="{$return_url|escape:'htmlall':'UTF-8'}" />

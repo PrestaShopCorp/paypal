@@ -64,7 +64,7 @@
 		<PayPalLogoLarge>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalLogoLarge>
 
 		<PayPalHorizontalSolutionPP>https://www.paypalobjects.com/webstatic/de_DE/i/de-pp-logo-200px.png</PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/DE_horizontal_solution_PP.gif</LocalPayPalHorizontalSolutionPP>
 
 		<ExpressCheckoutShortcutButton>https://www.paypalobjects.com/webstatic/de_DE/i/de-btn-expresscheckout.gif</ExpressCheckoutShortcutButton>
 

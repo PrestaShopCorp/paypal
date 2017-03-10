@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -36,24 +36,7 @@
 
 	<h3>{l s='PayPal payment' mod='paypal'}</h3>
 	<form action="{$form_action|escape:'htmlall':'UTF-8'}" method="post" data-ajax="false">
-		<p>
-			<img src="{$logos.LocalPayPalLogoMedium}" alt="{l s='PayPal' mod='paypal'}" style="margin-bottom: 5px" />
-			<br />{l s='You have chosen to pay with PayPal.' mod='paypal'}
-			<br/><br />
-		{l s='Here is a short summary of your order:' mod='paypal'}
-		</p>
-		<p class="shipping_address">
-			<strong>{l s='Shipping address' mod='paypal'}</strong><br/>
-			{AddressFormat::generateAddress($address, array(), '<br/>')}
-			
-		</p>
-		<p style="margin-top:20px;">
-			- {l s='The total amount of your order is' mod='paypal'}
-			<span id="amount" class="price"><strong>{$total|escape:'htmlall':'UTF-8'}</strong></span> {if $use_taxes == 1}{l s='(tax incl.)' mod='paypal'}{/if}
-		</p>
-		<p>
-			- {l s='We accept the following currency to be sent by PayPal:' mod='paypal'}&nbsp;<b>{$currency->name|escape:'htmlall':'UTF-8'}</b>
-		</p>
+        {$paypal_cart_summary|escape:'UTF-8'}
 		<p>
 			<b>{l s='Please confirm your order by clicking \'I confirm my order\'' mod='paypal'}.</b>
 		</p>
@@ -62,3 +45,4 @@
 		</p>
 	</form>
 {/if}
+

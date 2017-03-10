@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -26,13 +26,13 @@
 <div id="container_express_checkout" style="float:right; margin: 10px 40px 0 0">
 	{if isset($use_mobile) && $use_mobile}
 		<div style="margin-left:30px">
-			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code}_orange_295x43.png" alt="" />
+			<img id="payment_paypal_express_checkout" src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code|escape:'htmlall':'UTF-8'}_orange_295x43.png" alt="" />
 		</div>
 	{else}
 		{if $paypal_express_checkout_shortcut_logo != false}
-		<img id="payment_paypal_express_checkout" src="{$paypal_express_checkout_shortcut_logo}" alt="" />
+		<img id="payment_paypal_express_checkout" src="{$paypal_express_checkout_shortcut_logo|escape:'htmlall':'UTF-8'}" alt="" />
 		{else}
-		<img id="payment_paypal_express_checkout" src="https://www.paypal.com/{$PayPal_lang_code}/i/btn/btn_xpressCheckout.gif" alt="" />
+		<img id="payment_paypal_express_checkout" src="https://www.paypal.com/{$PayPal_lang_code|escape:'htmlall':'UTF-8'}/i/btn/btn_xpressCheckout.gif" alt="" />
 		{/if}
 	{/if}
 	{if isset($include_form) && $include_form}

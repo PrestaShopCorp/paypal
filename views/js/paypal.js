@@ -1,5 +1,5 @@
 /*
-* 2007-2015 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,12 +18,12 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2015 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-{if $PayPal_in_context_checkout == 1}
+{if $use_paypal_in_context}
 	window.paypalCheckoutReady = function() {
 	        paypal.checkout.setup("{$PayPal_in_context_checkout_merchant_id}", {
 	            environment: {if $PAYPAL_SANDBOX}"sandbox"{else}"production"{/if},
@@ -33,12 +33,12 @@
 	                paypal.checkout.initXO();
 	                updateFormDatas();
 				    var str = '';
-					if($('#paypal_payment_form input[name="id_product"]').length > 0)
-						str += '&id_product='+$('#paypal_payment_form input[name="id_product"]').val();
-					if($('#paypal_payment_form input[name="quantity"]').length > 0)
-						str += '&quantity='+$('#paypal_payment_form input[name="quantity"]').val();
-					if($('#paypal_payment_form input[name="id_p_attr"]').length > 0)
-						str += '&id_p_attr='+$('#paypal_payment_form input[name="id_p_attr"]').val();
+					if($('.paypal_payment_form input[name="id_product"]').length > 0)
+						str += '&id_product='+$('.paypal_payment_form input[name="id_product"]').val();
+					if($('.paypal_payment_form input[name="quantity"]').length > 0)
+						str += '&quantity='+$('.paypal_payment_form input[name="quantity"]').val();
+					if($('.paypal_payment_form input[name="id_p_attr"]').length > 0)
+						str += '&id_p_attr='+$('.paypal_payment_form input[name="id_p_attr"]').val();
 
 	                $.support.cors = true;
 	                $.ajax({
@@ -48,22 +48,22 @@
 	                    async: true,
 	                    crossDomain: true,
 
-	                    //Load the minibrowser with the redirection url in the success handler
+	                    
 	                    success: function (token) {
 	                        var url = paypal.checkout.urlPrefix +token;
-	                        //Loading Mini browser with redirect url, true for async AJAX calls
+	                    
 	                        paypal.checkout.startFlow(url);
 	                    },
 	                    error: function (responseData, textStatus, errorThrown) {
 	                        alert("Error in ajax post"+responseData.statusText);
-	                        //Gracefully Close the minibrowser in case of AJAX errors
+	                    
 	                        paypal.checkout.closeFlow();
 	                    }
 	                });
 	            },
 	            button: ['paypal_process_payment', 'payment_paypal_express_checkout']
 	        });
-	    }
+	    };
 {/if}
 {literal}
 
@@ -72,8 +72,8 @@ function updateFormDatas()
 	var nb = $('#quantity_wanted').val();
 	var id = $('#idCombination').val();
 
-	$('#paypal_payment_form input[name=quantity]').val(nb);
-	$('#paypal_payment_form input[name=id_p_attr]').val(id);
+	$('.paypal_payment_form input[name=quantity]').val(nb);
+	$('.paypal_payment_form input[name=id_p_attr]').val(id);
 }
 	
 $(document).ready( function() {
@@ -81,16 +81,24 @@ $(document).ready( function() {
 	if($('#in_context_checkout_enabled').val() != 1)
 	{
 		$('#payment_paypal_express_checkout').click(function() {
-			$('#paypal_payment_form').submit();
+			$('#paypal_payment_form_cart').submit();
 			return false;
 		});
 	}
 
-	
 
-	$('#paypal_payment_form').live('submit', function() {
-		updateFormDatas();
-	});
+	var jquery_version = $.fn.jquery.split('.');
+	if(jquery_version[0]>=1 && jquery_version[1] >= 7)
+	{
+		$('body').on('submit',".paypal_payment_form", function () {
+			updateFormDatas();
+		});
+	}
+	else {
+		$('.paypal_payment_form').live('submit', function () {
+			updateFormDatas();
+		});
+	}
 
 	function displayExpressCheckoutShortcut() {
 		var id_product = $('input[name="id_product"]').val();
@@ -148,34 +156,56 @@ $(document).ready( function() {
 	{literal}
 		
 		$('#container_express_checkout').hide();
-		
-		$('#cgv').live('click', function() {
-			if ($('#cgv:checked').length != 0)
-				$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
-		});
-		
-		// old jQuery compatibility
-		$('#cgv').click(function() {
-			if ($('#cgv:checked').length != 0)
-				$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
-		});
-		
+		if(jquery_version[0] >= 1 && jquery_version[1] >= 7)
+		{
+			$('body').on('click',"#cgv", function () {
+				if ($('#cgv:checked').length != 0)
+					$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
+			});
+		}
+		else {
+			$('#cgv').live('click', function () {
+				if ($('#cgv:checked').length != 0)
+					$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
+			});
+
+			/* old jQuery compatibility */
+			$('#cgv').click(function () {
+				if ($('#cgv:checked').length != 0)
+					$(location).attr('href', '{/literal}{$paypal_confirmation}{literal}');
+			});
+		}
+
 	{/literal}
 	{else if isset($paypal_order_opc)}
+
 	{literal}
-	
-		$('#cgv').live('click', function() {
-			if ($('#cgv:checked').length != 0)
-				checkOrder();
-		});
-		
-		// old jQuery compatibility
-		$('#cgv').click(function() {
-			if ($('#cgv:checked').length != 0)
-				checkOrder();
-		});
-		
+
+
+		var jquery_version = $.fn.jquery.split('.');
+		if(jquery_version[0]>=1 && jquery_version[1] >= 7)
+		{
+			$('body').on('click','#cgv', function() {
+				if ($('#cgv:checked').length != 0)
+					checkOrder();
+			});
+		}
+		else
+		{
+			$('#cgv').live('click', function() {
+				if ($('#cgv:checked').length != 0)
+					checkOrder();
+			});
+
+			/* old jQuery compatibility */
+			$('#cgv').click(function() {
+				if ($('#cgv:checked').length != 0)
+					checkOrder();
+			});
+		}
+
 	{/literal}
+
 	{/if}
 	{literal}
 
