@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2016 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2016 PrestaShop SA
+ *  @copyright 2007-2017 PrestaShop SA
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -95,9 +95,9 @@ class PaypalLib
             $this->_logs[] = $key.' -> '.$value;
         }
 
-        if (count($this->_logs) <= 2) {
-            $this->_logs = array_merge($this->_logs, $logs_request);
-        }
+        // if (count($this->_logs) <= 2) {
+        //     $this->_logs = array_merge($this->_logs, $logs_request);
+        // }
 
         return $return;
     }

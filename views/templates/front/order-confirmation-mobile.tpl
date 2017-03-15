@@ -1,5 +1,5 @@
 {*
-* 2007-2016 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -61,7 +61,7 @@
 				<a href="{$link->getPageLink('index', true)|escape:'htmlall':'UTF-8'}" data-ajax="false">{l s='Continue shopping' mod='paypal'}</a>
 			</li>
 			<li data-theme="b" data-icon="back">
-				<a href="{$link->getPageLink('history.php', true, NULL, 'step=1&amp;back={$back|escape:'htmlall':'UTF-8'}')}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
+				<a href="{$link->getPageLink('history.php', true, NULL)}" data-ajax="false">{l s='Back to orders' mod='paypal'}</a>
 			</li>
 		</ul>
 	{/if}
