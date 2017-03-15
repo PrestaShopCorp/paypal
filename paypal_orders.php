@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2016 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2016 PrestaShop SA
+ *  @copyright 2007-2017 PrestaShop SA
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -146,7 +146,7 @@ class PayPalOrder
 				AND `id_transaction` = \''.pSQL($transaction['id_transaction']).'\'
 				AND `currency` = \''.pSQL($transaction['currency']).'\'';
         if ((int) Configuration::get('PAYPAL_SANDBOX') != 1) {
-            $sql .= 'AND `total_paid` = \''.$transaction['total_paid'].'\'
+            $sql .= 'AND `total_paid` = \''.pSQL($transaction['total_paid']).'\'
 				AND `shipping` = \''.(float) $transaction['shipping'].'\';';
         }
 

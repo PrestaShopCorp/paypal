@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2016 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2016 PrestaShop SA
+ *  @copyright 2007-2017 PrestaShop SA
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -64,7 +64,7 @@ function upgrade_module_3_0($object, $install = false)
 
         foreach ($columns as $column) {
             if (!Db::getInstance()->ExecuteS('SHOW COLUMNS FROM `'._DB_PREFIX_.'paypal_order` LIKE \''.pSQL($column['name']).'\'')) {
-                Db::getInstance()->Execute('ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `'.pSQL($column['name']).'` '.$column['type']);
+                Db::getInstance()->Execute('ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `'.pSQL($column['name']).'` '.pSQL($column['type']));
             }
         }
 
