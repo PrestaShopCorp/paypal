@@ -24,11 +24,11 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-require_once dirname(__FILE__).'/../../config/config.inc.php';
-require_once dirname(__FILE__).'/../../init.php';
+require_once(dirname(__FILE__).'/../../config/config.inc.php');
+require_once(dirname(__FILE__).'/../../init.php');
 
-include_once dirname(__FILE__).'/paypal.php';
-include_once dirname(__FILE__).'/backward_compatibility/backward.php';
+include_once(dirname(__FILE__).'/paypal.php');
+include_once(dirname(__FILE__).'/backward_compatibility/backward.php');
 
 $paypal = new PayPal();
 

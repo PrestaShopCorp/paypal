@@ -229,11 +229,7 @@ $(document).ready(function () {
         var paypal_business = $('input[name="business"]:checked').val();
         var paypal_payment_method = $('input[name="paypal_payment_method"]:checked').val();
 
-        if(paypal_payment_method == PayPal_PVZ)
-        {
-// c'est quoi cette fonction !!!
-        }
-        else if (paypal_payment_method != PayPal_HSS &&
+        if (paypal_payment_method != PayPal_HSS &&
                 ($('input[name="api_username"]').val().length > 0 ||
                         $('input[name="api_password"]').val().length > 0 ||
                         $('input[name="api_signature"]').val().length > 0)) {
@@ -264,11 +260,9 @@ $(document).ready(function () {
         }
     }
 
-    if(jquery_version[0]>=1 && jquery_version[1] >=7) {
-        $('input[name="business"], input[name="paypal_payment_method"], input[name="integral_evolution_solution"]').on('change', displayConfiguration );
-    } else {
-        $('input[name="business"], input[name="paypal_payment_method"], input[name="integral_evolution_solution"]').change( displayConfiguration );
-    }
+    $('input[name="business"], input[name="paypal_payment_method"], input[name="integral_evolution_solution"]').on('change', function () {
+        displayConfiguration();
+    });
 
     $('label, a').hover(
         function () {
