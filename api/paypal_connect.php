@@ -101,8 +101,7 @@ class PayPalConnect
 
             if (!$result) {
                 $this->_logs[] = $this->paypal->l('Send with CURL method failed ! Error:').' '.curl_error($ch);
-                if(curl_errno($ch))
-                {
+                if (curl_errno($ch)) {
                     $this->_logPaypal(curl_error($ch));
                 }
 
@@ -153,34 +152,31 @@ class PayPalConnect
             'Connection: close'."\r\n\r\n";
     }
 
-    private function _logPaypal($message){
-        try{
+    private function _logPaypal($message)
+    {
+        try {
             $date = date('Ymd');
             $path = _PS_MODULE_DIR_.'paypal/log/';
             $context = Context::getContext();
             // file_put_contents($path.$date.'_paypal_curl.log',date('d/m/Y H:i:s').' cart : '.$context->cart->id.' => '.$message.PHP_EOL,FILE_APPEND);
             $date_last_purge = Configuration::get('PAYPAL_PURGE_LOG_DATE');
             // if date not set : set at yesterday
-            if(!$date_last_purge)
-            {
-                $date_last_purge = date('Ymd',strtotime('yesterday'));
+            if (!$date_last_purge) {
+                $date_last_purge = date('Ymd', strtotime('yesterday'));
             }
-            if($date_last_purge < $date)
-            {
-                $date_limit_purge = date('Ymd',strtotime('-1 month'));
+            if ($date_last_purge < $date) {
+                $date_limit_purge = date('Ymd', strtotime('-1 month'));
                 $dir = opendir($path);
-                while($file = readdir($dir))
-                {
-                    $date_file = Tools::substr($file,0,8);
-                    if($file !='.' && $file != '..' && $date_file <= $date_limit_purge)
-                    {
+                while ($file = readdir($dir)) {
+                    $date_file = Tools::substr($file, 0, 8);
+                    if ($file !='.' && $file != '..' && $date_file <= $date_limit_purge) {
                         unlink($path.$file);
                     }
                 }
-                Configuration::updateValue('PAYPAL_PURGE_LOG_DATE',$date);
+                Configuration::updateValue('PAYPAL_PURGE_LOG_DATE', $date);
             }
 
-        }catch (Exception $e){
+        } catch (Exception $e) {
             return false;
         }
     }

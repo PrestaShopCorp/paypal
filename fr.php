@@ -32,6 +32,7 @@ $_MODULE['<{paypal}prestashop>paypal_45cfef5aff92533727d5e9a6e59d25f9'] = 'Vous 
 $_MODULE['<{paypal}prestashop>paypal_e5d5d9f40763cfe6549bef705e3529a7'] = 'Le message de paiement n\'est pas valide, veuillez vérifier votre module';
 $_MODULE['<{paypal}prestashop>paypal_ee9dc1e678d54c517f481583c3fb2db8'] = 'Devise invalide';
 $_MODULE['<{paypal}prestashop>paypal_eec39bf42bd135971fb2d838c67d1449'] = 'Opération de remboursement :';
+$_MODULE['<{paypal}prestashop>paypal_4fd060ce6ff88adac7b6112a5bf1283c'] = 'Remboursement Braintree confirmé !';
 $_MODULE['<{paypal}prestashop>paypal_2ab62d1a578713d0862b56819295630e'] = 'Remboursement PayPal confirmé !';
 $_MODULE['<{paypal}prestashop>paypal_a64db959966ba8d07c8b5d9493fcc21f'] = 'Erreur de transaction !';
 $_MODULE['<{paypal}prestashop>paypal_c5e5dfcc54400e4018e03590067f6ba4'] = 'L\'autorisation de la transaction bancaire a expiré. Pour plus d\'informations, veuillez vous référer aux cas d\'expiration.';
@@ -145,8 +146,8 @@ $_MODULE['<{paypal}prestashop>back_office_87e8014ca4e3b9c66834e626c72caeb9'] = '
 $_MODULE['<{paypal}prestashop>back_office_01d5f6aa1996398fc309837e6d7058c7'] = '(Euro uniquement)';
 $_MODULE['<{paypal}prestashop>back_office_da56bd27822c4be66ceefd6feab0de0c'] = 'Braintree';
 $_MODULE['<{paypal}prestashop>back_office_e8c466b9c179e229ae67f339a8e2476a'] = 'Souscrivez ou ouvrez un compte PayPal Professionnel';
-$_MODULE['<{paypal}prestashop>back_office_0e96222f0238ebd077c0e983e91ab4ee'] = 'https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=2';
-$_MODULE['<{paypal}prestashop>back_office_d67850bd126f070221dcfd5fa6317043'] = 'https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=4';
+$_MODULE['<{paypal}prestashop>back_office_0e96222f0238ebd077c0e983e91ab4ee'] = 'S\'inscrire';
+$_MODULE['<{paypal}prestashop>back_office_d67850bd126f070221dcfd5fa6317043'] = 'S\'inscrire';
 $_MODULE['<{paypal}prestashop>back_office_cf64055b9b156287d8791c48c6ea3e13'] = 'https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=4';
 $_MODULE['<{paypal}prestashop>back_office_b26917587d98330d93f87808fc9d7267'] = 'Souscrivez';
 $_MODULE['<{paypal}prestashop>back_office_109a4d46d869464f431abe4cf7228c24'] = 'https://altfarm.mediaplex.com/ad/ck/3484-148727-12439-23?ID=3';

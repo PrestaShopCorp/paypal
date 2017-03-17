@@ -26,21 +26,7 @@
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel">
-			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" /> {l s='PayPal Refund' mod='paypal'}</div>
-			<table class="table" width="100%" cellspacing="0" cellpadding="0">
-			  <tr>
-			    <th>{l s='Capture date' mod='paypal'}</th>
-			    <th>{l s='Capture Amount' mod='paypal'}</th> 
-			    <th>{l s='Result Capture' mod='paypal'}</th>
-			  </tr>
-			{foreach from=$list_captures item=list}
-			  <tr>
-			    <td>{Tools::displayDate($list.date_add, $smarty.const.null,true)|escape:'htmlall':'UTF-8'}</td>
-			    <td>{$list.capture_amount|escape:'htmlall':'UTF-8'}</td> 
-			    <td>{$list.result|escape:'htmlall':'UTF-8'}</td>
-			  </tr>
-			{/foreach}
-			</table>
+			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/{if $order_payment == 'paypal'}logo.gif{else}views/img/braintree.png{/if}" alt="" /> {if $order_payment == 'paypal'}{l s='PayPal Refund' mod='paypal'}{else}{l s='Braintree Refund' mod='paypal'}{/if}</div>
 			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 				<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 				<p><b>{l s='Information:' mod='paypal'}</b> {l s='Payment accepted' mod='paypal'}</p>
@@ -58,23 +44,9 @@
 {else}
 <br />
 <fieldset {if isset($ps_version) && ($ps_version < '1.5')}style="width: 400px"{/if}>
-	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" />{l s='PayPal Refund' mod='paypal'}</legend>
+	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/{if $order_payment == 'paypal'}logo.gif{else}views/img/braintree.png{/if}" alt="" />{if $order_payment == 'paypal'}{l s='PayPal Refund' mod='paypal'}{else}{l s='Braintree Refund' mod='paypal'}{/if}</legend>
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='Payment accepted' mod='paypal'}</p>
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='When you refund a product, a partial refund is made unless you select "Generate a voucher".' mod='paypal'}</p>
-	<table class="table" width="100%" cellspacing="0" cellpadding="0">
-		  <tr>
-		    <th>{l s='Capture date' mod='paypal'}</th>
-		    <th>{l s='Capture Amount' mod='paypal'}</th> 
-		    <th>{l s='Result Capture' mod='paypal'}</th>
-		  </tr>
-		{foreach from=$list_captures item=list}
-		  <tr>
-		    <td>{$list.date|escape:'htmlall':'UTF-8'}</td>
-		    <td>{$list.capture_amount|escape:'htmlall':'UTF-8'}</td>
-		    <td>{$list.result|escape:'htmlall':'UTF-8'}</td>
-		  </tr>
-		{/foreach}
-		</table>
 	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 		<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 		<p class="center">

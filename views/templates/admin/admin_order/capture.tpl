@@ -27,7 +27,7 @@
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel">
-			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" /> {l s='PayPal Capture' mod='paypal'}</div>
+			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/{if $order_payment == 'paypal'}logo.gif{else}views/img/braintree.png{/if}" alt="" /> {if $order_payment == 'paypal'}{l s='PayPal Capture' mod='paypal'}{else}{l s='Braintree Capture' mod='paypal'}{/if}</div>
 			{if  $list_captures|@count gt 0} 
 				<table class="table" width="100%" cellspacing="0" cellpadding="0">
 				  <tr>
@@ -63,7 +63,7 @@
 {else}
 <br />
 <fieldset {if isset($ps_version) && ($ps_version < '1.5')}style="width: 400px"{/if}>
-	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" />{l s='PayPal Capture' mod='paypal'}</legend>
+	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/{if $order_payment == 'paypal'}logo.gif{else}views/img/braintree.png{/if}" alt="" />{if $order_payment == 'paypal'}{l s='PayPal Capture' mod='paypal'}{else}{l s='Braintree Capture' mod='paypal'}{/if}</legend>
 	<p><b>{l s='Information:' mod='paypal'}</b> {l s='Funds ready to be captured before shipping' mod='paypal'}</p>
 	{if  $list_captures|@count gt 0} 
  		<table class="table" width="100%" cellspacing="0" cellpadding="0">

@@ -142,15 +142,15 @@ class PayPalInstall
         Configuration::updateValue('PAYPAL_SHIPPING_COST', 20.00);
         Configuration::updateValue('PAYPAL_VERSION', $paypal_version);
         Configuration::updateValue('PAYPAL_COUNTRY_DEFAULT', (int) Configuration::get('PS_COUNTRY_DEFAULT'));
-        Configuration::updateValue('PAYPAL_USE_3D_SECURE',1);
+        Configuration::updateValue('PAYPAL_USE_3D_SECURE', 0);
         // PayPal v3 configuration
         Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0);
         //$paypal = new Paypal();
         //$ssl_verif = new TLSVerificator(true, $paypal);
         //Configuration::updateValue('PAYPAL_VERSION_TLS_CHECKED', $ssl_verif->getVersion());
 
-        Configuration::updateValue('VZERO_ENABLED',0);
-        Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED',0);
+        Configuration::updateValue('VZERO_ENABLED', 0);
+        Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 0);
     }
 
     /**
@@ -227,8 +227,7 @@ class PayPalInstall
 
         // OS BRAINTREE
 
-        if(!Configuration::get('PAYPAL_BT_OS_AUTHORIZATION',false))
-        {
+        if (!Configuration::get('PAYPAL_BT_OS_AUTHORIZATION', false)) {
             $order_state_auth = new OrderState();
             $order_state_auth->name = array();
 
@@ -256,8 +255,7 @@ class PayPalInstall
         }
 
 
-        if(!Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING',false))
-        {
+        if (!Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING', false)) {
             $order_state_wait = new OrderState();
             $order_state_wait->name = array();
 

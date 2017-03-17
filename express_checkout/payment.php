@@ -274,14 +274,14 @@ if ($request_type && $ppec->type) {
 
         /* Create Order */
         if ($customer->id && $address->id) {
-            if($ppec->type != 'payment_cart') {
+            if ($ppec->type != 'payment_cart') {
                 $ppec->context->cart->id_customer = $customer->id;
-                if(version_compare(_PS_VERSION_, '1.5', '<')){
+                if (version_compare(_PS_VERSION_, '1.5', '<')) {
                     $ppec->context->cart->id_address_delivery = $address->id;
                     $ppec->context->cart->id_address_invoice = $address->id;
-                }else{
-                    $ppec->context->cart->updateAddressId($ppec->context->cart->id_address_delivery,$address->id);
-                    $ppec->context->cart->updateAddressId($ppec->context->cart->id_address_invoice,$address->id);
+                } else {
+                    $ppec->context->cart->updateAddressId($ppec->context->cart->id_address_delivery, $address->id);
+                    $ppec->context->cart->updateAddressId($ppec->context->cart->id_address_invoice, $address->id);
                 }
                 
                 $ppec->context->cart->id_guest = $ppec->context->cookie->id_guest;
