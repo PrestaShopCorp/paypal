@@ -54,10 +54,8 @@ class TLSVerificator
 
         if (function_exists('curl_exec')) {
             $tls_check = $this->_connectByCURL($this->url);
-        }
-        else
-        {
-            $tls_check = file_get_contents($this->url);
+        } else {
+            $tls_check = Tools::file_get_contents($this->url);
         }
 
         if ($tls_check == false) {

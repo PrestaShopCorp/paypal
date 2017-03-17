@@ -1,5 +1,5 @@
 {*
-* 2007-2016 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,12 +18,12 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<form id="paypal_payment_form" action="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/express_checkout/payment.php" title="{l s='Pay with PayPal' mod='paypal'}" method="post" data-ajax="false">
+<form id="paypal_payment_form_cart" class="paypal_payment_form" action="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/express_checkout/payment.php" title="{l s='Pay with PayPal' mod='paypal'}" method="post" data-ajax="false">
 	{if isset($smarty.get.id_product)}<input type="hidden" name="id_product" value="{$smarty.get.id_product|intval}" />{/if}
 	<!-- Change dynamicaly when the form is submitted -->
 	{if isset($product_minimal_quantity)}

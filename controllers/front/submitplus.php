@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2016 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2016 PrestaShop SA
+ *  @copyright 2007-2017 PrestaShop SA
  *  @version  Release: $Revision: 13573 $
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
@@ -28,6 +28,9 @@
 /**
  * @since 1.5.0
  */
+
+require_once _PS_MODULE_DIR_.'paypal/classes/PaypalPlusPui.php';
+
 class PayPalSubmitplusModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
@@ -191,6 +194,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             $CallApiPaypalPlus = new CallApiPaypalPlus();
             $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
+
             if (isset($payment->state)) {
 
                 $paypal = new PayPal();
@@ -230,6 +234,16 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                         );
                         $return['error'][] = $this->module->l('An error occured during the payment');
                     }
+                    if (isset($payment->payment_instruction)) {
+                        $id_order = Order::getOrderByCartId($this->id_cart);
+
+                        $paypal_plus_pui = new PaypalPlusPui();
+                        $paypal_plus_pui->id_order = $id_order;
+                        $paypal_plus_pui->pui_informations = Tools::jsonEncode($payment->payment_instruction);
+
+                        $paypal_plus_pui->save();
+                    }
+
                 } elseif ($submit == 'confirmCancel') {
 
                     $paypal->validateOrder(

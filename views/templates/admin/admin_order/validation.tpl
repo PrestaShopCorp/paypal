@@ -1,5 +1,5 @@
 {*
-* 2007-2016 PrestaShop
+* 2007-2017 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
+*  @copyright 2007-2017 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -27,7 +27,7 @@
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel">
-			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" /> {l s='PayPal Validation' mod='paypal'}</div>
+			<div class="panel-heading"><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/{if $order_payment == 'paypal'}logo.gif{else}views/img/braintree.png{/if}" alt="" /> {if $order_payment == 'paypal'}{l s='PayPal Validation' mod='paypal'}{else}{l s='Braintree Validation' mod='paypal'}{/if}</div>
 			<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 				<input type="hidden" name="id_order" value="{$params.id_order|intval}" />
 				<p><b>{l s='Information:' mod='paypal'}</b> {if $order_state == $authorization}{l s='Pending Capture - No shipping' mod='paypal'}{else}{l s='Pending Payment - No shipping' mod='paypal'}{/if}</p>				
@@ -44,7 +44,7 @@
 {else}
 <br />
 <fieldset {if isset($ps_version) && ($ps_version < '1.5')}style="width: 400px"{/if}>
-	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/logo.gif" alt="" />{l s='PayPal Validation' mod='paypal'}</legend>
+	<legend><img src="{$base_url|escape:'htmlall':'UTF-8'}modules/{$module_name|escape:'htmlall':'UTF-8'}/{if $order_payment == 'paypal'}logo.gif{else}views/img/braintree.png{/if}" alt="" />{if $order_payment == 'paypal'}{l s='PayPal Validation' mod='paypal'}{else}{l s='Braintree Validation' mod='paypal'}{/if}</legend>
 	<p><b>{l s='Information:' mod='paypal'}</b> {if $order_state == $authorization}{l s='Pending Capture - No shipping' mod='paypal'}{else}{l s='Pending Payment - No shipping' mod='paypal'}{/if}</p>
 	<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}">
 		<input type="hidden" name="id_order" value="{$params.id_order|intval}" />

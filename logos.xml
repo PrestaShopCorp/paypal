@@ -10,8 +10,8 @@
 		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
-		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="AU">
@@ -26,7 +26,7 @@
         <PayPalHorizontalSolutionPP>https://www.paypalobjects.com/en_AU/AU/i/bnr/horizontal_solution_PP.gif</PayPalHorizontalSolutionPP>
 
         <PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-        <LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/AU_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+        <LocalPayPalVerticalSolutionPP>/views/img/default_logos/AU_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="BE">
@@ -40,10 +40,10 @@
 		<PayPalMarkGiant>https://www.paypal.com/fr_FR/i/logo/PayPal_mark_180x113.gif</PayPalMarkGiant>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/BE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/BE_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/BE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/BE_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="CN">
@@ -73,7 +73,7 @@
 		<PayPalMarkLarge>https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg</PayPalMarkLarge>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/DE_vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/DE_vertical_solution_PP.gif</LocalPayPalVerticalSolutionPP>
 	</country>
 
 
@@ -103,7 +103,7 @@
 
 		<!-- Distant object must be declared to use the local object -->
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/FR_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/FR_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="GB">
@@ -231,10 +231,10 @@
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
 		<PayPalHorizontalSolutionPP></PayPalHorizontalSolutionPP>
-		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/PL_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/PL_horizontal_solution_PP.png</LocalPayPalHorizontalSolutionPP>
 
 		<PayPalVerticalSolutionPP></PayPalVerticalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/PL_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/PL_vertical_solution_PP.png</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="PT">

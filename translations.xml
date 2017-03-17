@@ -73,7 +73,7 @@
 		<credentials_description>Communicate your PayPal identification info to PrestaShop</credentials_description>
                 <credentials_integral_description>Indicate the email you used when you signed up for a PayPal Business account</credentials_integral_description>
 		<credentials_button>Get my PayPal identification info</credentials_button>
-		<credentials_button_disclaimer>After clicking on the “Get my PayPal identification info” button, enter your login and password in the pop up, copy your PayPal identification info from the pop up and paste them is the below fields.</credentials_button_disclaimer>
+		<credentials_button_disclaimer>After clicking on the "Get my PayPal identification info" button, enter your login and password in the pop up, copy your PayPal identification info from the pop up and paste them is the below fields.</credentials_button_disclaimer>
 		<credentials_username>API username</credentials_username>
 		<credentials_password>API password</credentials_password>
 		<credentials_signature>API signature</credentials_signature>

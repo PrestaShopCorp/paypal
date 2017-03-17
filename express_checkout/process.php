@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2016 PrestaShop
+ * 2007-2017 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2016 PrestaShop SA
+ *  @copyright 2007-2017 PrestaShop SA
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -219,6 +219,7 @@ class PaypalExpressCheckout extends Paypal
 
         // Set payment detail (reference)
         $this->_setPaymentDetails($fields);
+
         $this->callAPI($fields);
 
         $this->result += $fields;
@@ -255,6 +256,7 @@ class PaypalExpressCheckout extends Paypal
         $this->setPaymentValues($fields, $index, $total, $taxes);
 
         $id_address = (int) $this->context->cart->id_address_delivery;
+
         if (($id_address == 0) && ($this->context->customer)) {
             $id_address = Address::getFirstCustomerAddressId($this->context->customer->id);
         }
