@@ -593,10 +593,7 @@ class PayPal extends PaymentModule
 
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
-        $intent = $transaction->intent;
-        if ($intent == "authorize") {
-            $intent = "authorization";
-        }
+        
 
         $this->amount_paid_paypal = (float)$amount_paid;
 
@@ -606,10 +603,10 @@ class PayPal extends PaymentModule
         parent::validateOrder(
             (int) $id_cart,
             (int) $id_order_state,
-            (float) $total_ps,
+            (float) $amount_paid,
             $payment_method,
             $message,
-            array('transaction_id' => $transaction->transactions[0]->related_resources[0]->$intent->id),
+            $transaction,
             $currency_special,
             $dont_touch_amount,
             $secure_key,
@@ -620,13 +617,13 @@ class PayPal extends PaymentModule
 
         $paypal_order->id_order = $this->currentOrder;
         $paypal_order->id_cart = Context::getContext()->cart->id;
-        $paypal_order->id_transaction = $transaction->transactions[0]->related_resources[0]->$intent->id;
-        $paypal_order->id_payment = $transaction->id;
+        $paypal_order->id_transaction = $transaction['transaction_id'];
+        $paypal_order->id_payment = $transaction['id'];
         $paypal_order->client_token = "";
-        $paypal_order->payment_method = $transaction->payer->payment_method;
-        $paypal_order->currency = $transaction->transactions[0]->amount->currency;
+        $paypal_order->payment_method = $transaction['payment_method'];
+        $paypal_order->currency = $transaction['currency'];
         $paypal_order->total_paid = (float) $amount_paid;
-        $paypal_order->payment_status = $transaction->state;
+        $paypal_order->payment_status = $transaction['status'];
         $paypal_order->total_prestashop = (float) $total_ps;
         $paypal_order->save();
 

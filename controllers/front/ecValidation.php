@@ -34,9 +34,14 @@ class PaypalEcValidationModuleFrontController extends ModuleFrontController
     {
         $method_ec = AbstractMethodPaypal::load('EC');
 
+        $cart = Context::getContext()->cart;
+        if(!isset($cart->id))
+        {
+            header('HTTP/1.0 404 Not Found');
+            exit(0);
+        }
         $method_ec->validation();
 
-        $cart = Context::getContext()->cart;
         $customer = new Customer($cart->id_customer);
         $paypal = Module::getInstanceByName('paypal');
         Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$paypal->id.'&id_order='.$paypal->currentOrder.'&key='.$customer->secure_key);

@@ -256,7 +256,7 @@ class PaypalSDK
         $response = curl_exec($curl);
 
         if (curl_errno($curl)) {
-            die('error occured during curl exec. Additioanl info: ' . curl_errno($curl).':'. curl_error($curl));
+            //die('error occured during curl exec. Additioanl info: ' . curl_errno($curl).':'. curl_error($curl));
         }
         return json_decode($response);
     }
