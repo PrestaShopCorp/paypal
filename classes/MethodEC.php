@@ -210,7 +210,7 @@ class MethodEC extends AbstractMethodPaypal
         if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
             $order_state = Configuration::get('PS_OS_PAYMENT');
         } else {
-            $order_state = Configuration::get('PS_OS_PAYPAL');
+            $order_state = Configuration::get('PAYPAL_OS_WAITING');
         }
 
         $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $exec_payment, (int)$currency->id, false, $customer->secure_key);
