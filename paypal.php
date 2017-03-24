@@ -45,16 +45,16 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '4.0.0';
+        $this->version = '4.0.1';
         $this->author = 'PrestaShop';
-	$this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
+	    $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->controllers = array('payment', 'validation');
         $this->bootstrap = true;
 
         $this->currencies = true;
-        $this->currencies_mode = 'radio';
+        $this->currencies_mode = 'checkbox';
 
         parent::__construct();
 
@@ -76,6 +76,11 @@ class PayPal extends PaymentModule
         }
         // Registration hook
         if (!$this->registrationHook()) {
+            return false;
+        }
+
+        // Registration order status
+        if (!$this->installOrderState()) {
             return false;
         }
 
@@ -157,6 +162,40 @@ class PayPal extends PaymentModule
 
 
         return true;
+    }
+
+    /**
+     * Create order state
+     * @return boolean
+     */
+    public function installOrderState()
+    {
+        if (!Configuration::get('PAYPAL_OS_WAITING')) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                if (Tools::strtolower($language['iso_code']) == 'fr') {
+                    $order_state->name[$language['id_lang']] = 'En attente de paiment PayPal';
+                } else {
+                    $order_state->name[$language['id_lang']] = 'Awaiting for PayPal payment';
+                }
+            }
+            $order_state->send_email = false;
+            $order_state->color = '#4169E1';
+            $order_state->hidden = false;
+            $order_state->delivery = false;
+            $order_state->logable = false;
+            $order_state->invoice = false;
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'paypal/views/img/os_paypal.png';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+
+            Configuration::updateValue('PAYPAL_OS_WAITING', (int) $order_state->id);
+        }
+        return true;
+
     }
 
     public function uninstall()
