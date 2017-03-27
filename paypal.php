@@ -452,7 +452,6 @@ class PayPal extends PaymentModule
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_SANDBOX', Tools::getValue('paypal_sandbox'));
             Configuration::updateValue('PAYPAL_API_INTENT', Tools::getValue('paypal_intent'));
-           // Configuration::updateValue('PAYPAL_API_CARD', Tools::getValue('paypal_card'));
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', Tools::getValue('paypal_show_advantage'));
         }
 /*
@@ -603,7 +602,7 @@ class PayPal extends PaymentModule
         parent::validateOrder(
             (int) $id_cart,
             (int) $id_order_state,
-            (float) $amount_paid,
+            (float) $total_ps,
             $payment_method,
             $message,
             $transaction,
@@ -621,7 +620,7 @@ class PayPal extends PaymentModule
         $paypal_order->client_token = "";
         $paypal_order->payment_method = $transaction['payment_method'];
         $paypal_order->currency = $transaction['currency'];
-        $paypal_order->total_paid = (float) $total_ps;
+        $paypal_order->total_paid = (float) $amount_paid;
         $paypal_order->payment_status = $transaction['status'];
         $paypal_order->total_prestashop = (float) $total_ps;
         $paypal_order->save();
