@@ -151,7 +151,7 @@ class MethodEC extends AbstractMethodPaypal
             $params['note_to_payer'] = $paypal->l('Price of your cart was rounded with few centimes');
         }
 
-        $params['transactions'][] = array(
+        $trans = array(
             'amount' => array(
                 'total' => $total,
                 'currency' => $currency->iso_code,
@@ -171,12 +171,20 @@ class MethodEC extends AbstractMethodPaypal
                     "city" => $address->city,
                     "country_code" => $country->iso_code,
                     "postal_code" => $address->postcode,
-                    "phone" => $address->phone,
                     "state" => $state->iso_code
                 ),
             ),
         );
+
+        if(isset($address->phone) && !empty($address->phone))
+        {
+            $trans['item_list']['shipping_address']['phone'] = $address->phone;
+        }
+
+
+        $params['transactions'][] = $trans;
         $return = false;
+
         $payment = $sdk->createPayment($params);
 
         // add for security test
