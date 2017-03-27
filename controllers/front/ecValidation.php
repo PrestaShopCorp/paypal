@@ -37,8 +37,8 @@ class PaypalEcValidationModuleFrontController extends ModuleFrontController
         $cart = Context::getContext()->cart;
         if(!isset($cart->id))
         {
-            header('HTTP/1.0 404 Not Found');
-            exit(0);
+            Tools::redirect('index.php');
+            exit();
         }
         $method_ec->validation();
 

@@ -203,6 +203,9 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
+
+
+        // add security check
         if(Tools::getValue('paymentId') != $context->cookie->paymentId)
         {
             die('payment Id is invalid');
@@ -241,8 +244,8 @@ class MethodEC extends AbstractMethodPaypal
             'status' => $exec_payment->state,
             'currency' => $exec_payment->transactions[0]->amount->currency
         );
-
         $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $transaction, (int)$currency->id, false, $customer->secure_key);
+        unset($context->cookie->paymentId);
     }
 
     public function confirmCapture()

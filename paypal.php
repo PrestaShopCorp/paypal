@@ -599,7 +599,7 @@ class PayPal extends PaymentModule
 
         $cart = new Cart((int) $id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
-
+        
         parent::validateOrder(
             (int) $id_cart,
             (int) $id_order_state,
@@ -612,7 +612,6 @@ class PayPal extends PaymentModule
             $secure_key,
             $shop
         );
-
         $paypal_order = new PaypalOrder();
 
         $paypal_order->id_order = $this->currentOrder;
@@ -769,7 +768,7 @@ class PayPal extends PaymentModule
             }
         }
 
-        if ($params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
+        if (Configuration::get('PAYPAL_API_INTENT') == 'authorize' && $params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             if (!Validate::isLoadedObject($capture)) {
                 return false;
