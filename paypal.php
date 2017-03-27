@@ -621,7 +621,7 @@ class PayPal extends PaymentModule
         $paypal_order->client_token = "";
         $paypal_order->payment_method = $transaction['payment_method'];
         $paypal_order->currency = $transaction['currency'];
-        $paypal_order->total_paid = (float) $amount_paid;
+        $paypal_order->total_paid = (float) $total_ps;
         $paypal_order->payment_status = $transaction['status'];
         $paypal_order->total_prestashop = (float) $total_ps;
         $paypal_order->save();
