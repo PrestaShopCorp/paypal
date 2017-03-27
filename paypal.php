@@ -452,7 +452,7 @@ class PayPal extends PaymentModule
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_SANDBOX', Tools::getValue('paypal_sandbox'));
             Configuration::updateValue('PAYPAL_API_INTENT', Tools::getValue('paypal_intent'));
-            Configuration::updateValue('PAYPAL_API_CARD', Tools::getValue('paypal_card'));
+           // Configuration::updateValue('PAYPAL_API_CARD', Tools::getValue('paypal_card'));
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', Tools::getValue('paypal_show_advantage'));
         }
 /*
@@ -626,7 +626,8 @@ class PayPal extends PaymentModule
         $paypal_order->total_prestashop = (float) $total_ps;
         $paypal_order->save();
 
-        if ($intent == "authorization") {
+
+        if ( $transaction['intent'] == "authorization") {
             $paypal_capture = new PaypalCapture();
             $paypal_capture->id_paypal_order = $paypal_order->id;
             $paypal_capture->save();

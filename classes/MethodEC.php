@@ -240,9 +240,11 @@ class MethodEC extends AbstractMethodPaypal
         } else {
             $order_state = Configuration::get('PAYPAL_OS_WAITING');
         }
-        $intent = $exec_payment->intent;
-        if ($intent == "authorize") {
+        if ($exec_payment->intent == "authorize") {
             $intent = "authorization";
+        }
+        else {
+            $intent = $exec_payment->intent;
         }
 
         $transaction = array(
@@ -250,7 +252,8 @@ class MethodEC extends AbstractMethodPaypal
             'id' => $exec_payment->id,
             'payment_method' => $exec_payment->payer->payment_method,
             'status' => $exec_payment->state,
-            'currency' => $exec_payment->transactions[0]->amount->currency
+            'currency' => $exec_payment->transactions[0]->amount->currency,
+            'intent' => $intent
         );
         $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $transaction, (int)$currency->id, false, $customer->secure_key);
         unset($context->cookie->paymentId);
