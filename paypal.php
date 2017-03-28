@@ -702,19 +702,15 @@ class PayPal extends PaymentModule
     }
 
 
-
-    public function hookActionOrderStatusPostUpdate($params)
-    {
-
-
-    }
-
     public function hookActionOrderStatusUpdate($params)
     {
+
         $paypal_order = PaypalOrder::loadByOrderId($params['id_order']);
+
         if (!Validate::isLoadedObject($paypal_order)) {
             return false;
         }
+
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
             $method = AbstractMethodPaypal::load('EC');
@@ -768,13 +764,15 @@ class PayPal extends PaymentModule
             }
         }
 
-        if (Configuration::get('PAYPAL_API_INTENT') == 'authorize' && $params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
+
+        if ($params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             if (!Validate::isLoadedObject($capture)) {
                 return false;
             }
             $method = AbstractMethodPaypal::load('EC');
             $capture_response = $method->confirmCapture();
+
             $orderMessage = new Message();
 
             if (isset($capture_response->id)) {
@@ -797,7 +795,7 @@ class PayPal extends PaymentModule
 
             $orderMessage->save();
 
-            if (!isset($capture_response->id) && $capture_response->name != "AUTHORIZATION_ALREADY_COMPLETED") {
+            if (!isset($capture_response->id) && $capture_response->name != "AUTHORIZATION_ALREADY_COMPLETED" || $capture_response->state == 'pending') {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_capture=1');
             }
 

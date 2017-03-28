@@ -221,6 +221,10 @@ class MethodEC extends AbstractMethodPaypal
 
         $exec_payment = $sdk->executePayment(Tools::getValue('paymentId'), Tools::getValue('PayerID'));
 
+        //approved
+        echo '<pre>';
+        var_dump($exec_payment);
+        die;
 
         if(empty($exec_payment) || !isset($exec_payment->id))
         {
