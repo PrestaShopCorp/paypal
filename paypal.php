@@ -175,7 +175,7 @@ class PayPal extends PaymentModule
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
                 if (Tools::strtolower($language['iso_code']) == 'fr') {
-                    $order_state->name[$language['id_lang']] = 'En attente de paiment PayPal';
+                    $order_state->name[$language['id_lang']] = 'En attente de paiement PayPal';
                 } else {
                     $order_state->name[$language['id_lang']] = 'Awaiting for PayPal payment';
                 }
