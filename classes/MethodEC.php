@@ -151,7 +151,7 @@ class MethodEC extends AbstractMethodPaypal
             $params['note_to_payer'] = $paypal->l('Price of your cart was rounded with few centimes');
         }
 
-        $params['transactions'][] = array(
+        $trans = array(
             'amount' => array(
                 'total' => $total,
                 'currency' => $currency->iso_code,
@@ -171,14 +171,27 @@ class MethodEC extends AbstractMethodPaypal
                     "city" => $address->city,
                     "country_code" => $country->iso_code,
                     "postal_code" => $address->postcode,
-                    "phone" => $address->phone,
                     "state" => $state->iso_code
                 ),
             ),
         );
 
+        if(isset($address->phone) && !empty($address->phone))
+        {
+            $trans['item_list']['shipping_address']['phone'] = $address->phone;
+        }
+
+
+        $params['transactions'][] = $trans;
         $return = false;
+
         $payment = $sdk->createPayment($params);
+
+        // add for security test
+        if(isset($payment->id)){
+            $context->cookie->paymentId = $payment->id;
+        }
+
 
         if (isset($payment->links)) {
             foreach ($payment->links as $redirect_urls) {
@@ -192,19 +205,34 @@ class MethodEC extends AbstractMethodPaypal
 
     public function validation()
     {
+        $context = Context::getContext();
         $sdk = new PaypalSDK(
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
+
+
+        // add security check
+        if(Tools::getValue('paymentId') != $context->cookie->paymentId)
+        {
+            die('payment Id is invalid');
+        }
+
         $exec_payment = $sdk->executePayment(Tools::getValue('paymentId'), Tools::getValue('PayerID'));
 
-        $cart = Context::getContext()->cart;
+
+        if(empty($exec_payment) || !isset($exec_payment->id))
+        {
+            Tools::redirect('index.php?controller=order&step=1');
+        }
+
+        $cart = $context->cart;
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
-        $currency = Context::getContext()->currency;
+        $currency = $context->currency;
         $total = (float)$exec_payment->transactions[0]->amount->total;
         $paypal = Module::getInstanceByName('paypal');
         if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
@@ -212,8 +240,23 @@ class MethodEC extends AbstractMethodPaypal
         } else {
             $order_state = Configuration::get('PAYPAL_OS_WAITING');
         }
+        if ($exec_payment->intent == "authorize") {
+            $intent = "authorization";
+        }
+        else {
+            $intent = $exec_payment->intent;
+        }
 
-        $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $exec_payment, (int)$currency->id, false, $customer->secure_key);
+        $transaction = array(
+            'transaction_id' => $exec_payment->transactions[0]->related_resources[0]->$intent->id,
+            'id' => $exec_payment->id,
+            'payment_method' => $exec_payment->payer->payment_method,
+            'status' => $exec_payment->state,
+            'currency' => $exec_payment->transactions[0]->amount->currency,
+            'intent' => $intent
+        );
+        $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $transaction, (int)$currency->id, false, $customer->secure_key);
+        unset($context->cookie->paymentId);
     }
 
     public function confirmCapture()
@@ -238,8 +281,8 @@ class MethodEC extends AbstractMethodPaypal
             Db::getInstance()->update(
                 'paypal_capture',
                 array(
-                    'id_capture' => $response->id,
-                    'capture_amount' => $response->amount->total,
+                    'id_capture' => pSQL($response->id),
+                    'capture_amount' => pSQL($response->amount->total),
                     'result' => 'completed',
                 ),
                 'id_paypal_order = ' . (int)$id_paypal_order
@@ -279,7 +322,7 @@ class MethodEC extends AbstractMethodPaypal
                 Db::getInstance()->update(
                     'paypal_capture',
                     array(
-                        'result' => $response->state,
+                        'result' => pSQL($response->state),
                     ),
                     'id_paypal_order = '.(int)$id_paypal_order
                 );
