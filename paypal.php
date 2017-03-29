@@ -595,7 +595,14 @@ class PayPal extends PaymentModule
 
         $cart = new Cart((int) $id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
-        
+
+
+        // hack for wrong rounding -> order failed
+        if($amount_paid > $total_ps+0.10 || $amount_paid < $total_ps-0.10)
+        {
+            $total_ps = $amount_paid;
+        }
+
         parent::validateOrder(
             (int) $id_cart,
             (int) $id_order_state,
