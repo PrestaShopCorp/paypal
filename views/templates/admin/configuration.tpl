@@ -254,7 +254,7 @@
             event.preventDefault();
             $('a[href=#paypal_conf]').click();
         });
-        
+
         $('#configuration_form').insertAfter($('.parametres'));
         //var activate_link = "{*$PartnerboardingURL|escape:'html':'UTF-8'*}";
 

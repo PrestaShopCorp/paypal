@@ -36,7 +36,6 @@ include_once 'classes/PaypalOrder.php';
 
 class PayPal extends PaymentModule
 {
-    public static $dev = true;
     public $express_checkout;
     public $message;
     public $amount_paid_paypal;
@@ -47,14 +46,14 @@ class PayPal extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '4.0.1';
         $this->author = 'PrestaShop';
-	    $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
+        $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
         $this->is_eu_compatible = 1;
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7');
         $this->controllers = array('payment', 'validation');
         $this->bootstrap = true;
 
         $this->currencies = true;
-        $this->currencies_mode = 'checkbox';
+        $this->currencies_mode = 'radio';
 
         parent::__construct();
 
@@ -196,7 +195,6 @@ class PayPal extends PaymentModule
             Configuration::updateValue('PAYPAL_OS_WAITING', (int) $order_state->id);
         }
         return true;
-
     }
 
     public function uninstall()
@@ -593,8 +591,6 @@ class PayPal extends PaymentModule
 
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
-        
-
         $this->amount_paid_paypal = (float)$amount_paid;
 
         $cart = new Cart((int) $id_cart);
@@ -627,7 +623,7 @@ class PayPal extends PaymentModule
         $paypal_order->save();
 
 
-        if ( $transaction['intent'] == "authorization") {
+        if ($transaction['intent'] == "authorization") {
             $paypal_capture = new PaypalCapture();
             $paypal_capture->id_paypal_order = $paypal_order->id;
             $paypal_capture->save();
@@ -654,7 +650,6 @@ class PayPal extends PaymentModule
 
     public function hookDisplayAdminOrder($params)
     {
-
         $id_order = $params['id_order'];
         $order = new Order((int)$id_order);
         $paypal_msg = '';
@@ -703,19 +698,14 @@ class PayPal extends PaymentModule
     }
 
 
-
-    public function hookActionOrderStatusPostUpdate($params)
-    {
-
-
-    }
-
     public function hookActionOrderStatusUpdate($params)
     {
         $paypal_order = PaypalOrder::loadByOrderId($params['id_order']);
+
         if (!Validate::isLoadedObject($paypal_order)) {
             return false;
         }
+
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
             $method = AbstractMethodPaypal::load('EC');
@@ -769,13 +759,15 @@ class PayPal extends PaymentModule
             }
         }
 
-        if (Configuration::get('PAYPAL_API_INTENT') == 'authorize' && $params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
+
+        if ($params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             if (!Validate::isLoadedObject($capture)) {
                 return false;
             }
             $method = AbstractMethodPaypal::load('EC');
             $capture_response = $method->confirmCapture();
+
             $orderMessage = new Message();
 
             if (isset($capture_response->id)) {
@@ -798,11 +790,9 @@ class PayPal extends PaymentModule
 
             $orderMessage->save();
 
-            if (!isset($capture_response->id) && $capture_response->name != "AUTHORIZATION_ALREADY_COMPLETED") {
+            if (!isset($capture_response->id) && $capture_response->name != "AUTHORIZATION_ALREADY_COMPLETED" || $capture_response->state == 'pending') {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_capture=1');
             }
-
         }
-
     }
 }
