@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2007-2017 PrestaShop
  *
@@ -19,11 +18,12 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
+
 class PaypalCapture extends ObjectModel
 {
     public $id_capture;
@@ -61,7 +61,7 @@ class PaypalCapture extends ObjectModel
         $sql = new DbQuery();
         $sql->select('id_paypal_capture');
         $sql->from('paypal_capture');
-        $sql->where('id_paypal_order = ' . (int)$orderPayPalId);
+        $sql->where('id_paypal_order = '.(int)$orderPayPalId);
         $id_paypal_capture = Db::getInstance()->getValue($sql);
 
         return new self($id_paypal_capture);
@@ -73,7 +73,7 @@ class PaypalCapture extends ObjectModel
         $sql->select('*');
         $sql->from('paypal_order', 'po');
         $sql->innerJoin('paypal_capture', 'pc', 'po.`id_paypal_order` = pc.`id_paypal_order`');
-        $sql->where('po.id_order = ' . (int)$id_order);
+        $sql->where('po.id_order = '.(int)$id_order);
         return Db::getInstance()->getRow($sql);
     }
 }

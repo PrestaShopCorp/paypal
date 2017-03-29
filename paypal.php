@@ -18,9 +18,9 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -46,7 +46,7 @@ class PayPal extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '4.0.1';
         $this->author = 'PrestaShop';
-        $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
+	    $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.7');
         $this->controllers = array('payment', 'validation');
@@ -98,7 +98,7 @@ class PayPal extends PaymentModule
 
         return true;
     }
-
+    
     /**
      * Install DataBase table
      * @return boolean if install was successfull
@@ -107,7 +107,7 @@ class PayPal extends PaymentModule
     {
         $sql = array();
 
-        $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_order` (
+        $sql[] = "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."paypal_order` (
               `id_paypal_order` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
               `id_order` INT(11),
               `id_cart` INT(11),
@@ -121,7 +121,7 @@ class PayPal extends PaymentModule
               `total_prestashop` FLOAT(11),
               `date_add` DATETIME,
               `date_upd` DATETIME
-        ) ENGINE = " . _MYSQL_ENGINE_;
+        ) ENGINE = "._MYSQL_ENGINE_;
 
         $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_capture` (
               `id_paypal_capture` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -131,7 +131,7 @@ class PayPal extends PaymentModule
               `result` VARCHAR(255),
               `date_add` DATETIME,
               `date_upd` DATETIME
-        ) ENGINE = " . _MYSQL_ENGINE_;
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
 
         foreach ($sql as $q) {
             if (!DB::getInstance()->execute($q)) {
@@ -186,12 +186,12 @@ class PayPal extends PaymentModule
             $order_state->logable = false;
             $order_state->invoice = false;
             if ($order_state->add()) {
-                $source = _PS_MODULE_DIR_ . 'paypal/views/img/os_paypal.png';
-                $destination = _PS_ROOT_DIR_ . '/img/os/' . (int)$order_state->id . '.gif';
+                $source = _PS_MODULE_DIR_.'paypal/views/img/os_paypal.png';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
                 copy($source, $destination);
             }
 
-            Configuration::updateValue('PAYPAL_OS_WAITING', (int)$order_state->id);
+            Configuration::updateValue('PAYPAL_OS_WAITING', (int) $order_state->id);
         }
         return true;
 
@@ -234,9 +234,9 @@ class PayPal extends PaymentModule
     {
         $sql = array();
 
-        $sql[] = "DROP TABLE IF EXISTS `" . _DB_PREFIX_ . "paypal_capture`";
+        $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_capture`";
 
-        $sql[] = "DROP TABLE IF EXISTS `" . _DB_PREFIX_ . "paypal_order`";
+        $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_order`";
 
         foreach ($sql as $q) {
             if (!DB::getInstance()->execute($q)) {
@@ -259,8 +259,7 @@ class PayPal extends PaymentModule
     public function getContent()
     {
         $this->_postProcess();
-        $return_url = $this->context->link->getAdminLink('AdminModules',
-                true) . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
+        $return_url = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
         /*
         $PartnerboardingURL = "";
         if ((Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_LIVE_ACCESS'))
@@ -307,7 +306,7 @@ class PayPal extends PaymentModule
             'ec_paypal_active' => $ec_paypal_active,
             'need_rounding' => Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM ? 0 : 1,
         ));
-        $this->context->controller->addCSS($this->_path . 'views/css/paypal-bo.css', 'all');
+        $this->context->controller->addCSS($this->_path.'views/css/paypal-bo.css', 'all');
 
         $fields_form = array();
         $fields_form[0]['form'] = array(
@@ -415,7 +414,7 @@ class PayPal extends PaymentModule
         $helper->module = $this;
         $helper->name_controller = $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-        $helper->currentIndex = AdminController::$currentIndex . '&configure=' . $this->name;
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         $helper->title = $this->displayName;
         $helper->show_toolbar = false;
         $helper->submit_action = 'paypal_config';
@@ -426,10 +425,10 @@ class PayPal extends PaymentModule
             'fields_value' => $fields_value,
             'id_language' => $this->context->language->id,
             'back_url' => $this->context->link->getAdminLink('AdminModules')
-                . '&configure=' . $this->name
-                . '&tab_module=' . $this->tab
-                . '&module_name=' . $this->name
-                . '#paypal_params'
+                .'&configure='.$this->name
+                .'&tab_module='.$this->tab
+                .'&module_name='.$this->name
+                .'#paypal_params'
         );
         $form = $helper->generateForm($fields_form);
         if (count($this->_errors)) {
@@ -444,8 +443,7 @@ class PayPal extends PaymentModule
             $block_info = $this->display(__FILE__, 'views/templates/admin/block_info.tpl');
         }
 
-        return $this->message . $block_info . $this->display(__FILE__,
-            'views/templates/admin/configuration.tpl') . $form;
+        return $this->message.$block_info.$this->display(__FILE__, 'views/templates/admin/configuration.tpl').$form;
     }
 
     private function _postProcess()
@@ -455,15 +453,15 @@ class PayPal extends PaymentModule
             Configuration::updateValue('PAYPAL_API_INTENT', Tools::getValue('paypal_intent'));
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', Tools::getValue('paypal_show_advantage'));
         }
-        /*
-                if (Tools::getValue('activate_method')) {
-                    Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
-                    Configuration::updateValue('PAYPAL_METHOD', Tools::getValue('activate_method'));
-        
-                    Configuration::updateValue('PAYPAL_SANDBOX_ACCESS', 1);
-                    Configuration::updateValue('PAYPAL_LIVE_ACCESS', 1);
-                }
-        */
+/*
+        if (Tools::getValue('activate_method')) {
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
+            Configuration::updateValue('PAYPAL_METHOD', Tools::getValue('activate_method'));
+
+            Configuration::updateValue('PAYPAL_SANDBOX_ACCESS', 1);
+            Configuration::updateValue('PAYPAL_LIVE_ACCESS', 1);
+        }
+*/
         if (Tools::isSubmit('save_credentials')) {
             $sandbox = Tools::getValue('sandbox');
             $live = Tools::getValue('live');
@@ -486,19 +484,17 @@ class PayPal extends PaymentModule
         if (Tools::isSubmit('save_rounding_settings')) {
             Configuration::updateValue('PAYPAL_SANDBOX', 0);
             Configuration::updateValue('PS_ROUND_TYPE', Order::ROUND_ITEM);
-            Tools::redirect($this->context->link->getAdminLink('AdminModules',
-                    true) . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name);
+            Tools::redirect($this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name);
         }
 
         switch (Configuration::get('PAYPAL_METHOD')) {
             case 'EXPRESS_CHECKOUT':
                 $method = AbstractMethodPaypal::load('EC');
                 $id_experience_web = $method->setConfig(array(
-                    'name' => Configuration::get('PS_SHOP_NAME') . microtime(true),
+                    'name' => Configuration::get('PS_SHOP_NAME').microtime(true),
                     'flow_config' => array(
                         'landing_page_type' => 'login',
-                        'bank_txn_pending_url' => Context::getContext()->link->getModuleLink($this->name,
-                            'ecValidation', array(), true),
+                        'bank_txn_pending_url' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
                     ),
                 ));
 
@@ -511,11 +507,10 @@ class PayPal extends PaymentModule
 
                 if (Configuration::get('PAYPAL_API_CARD')) {
                     $id_experience_web = $method->setConfig(array(
-                        'name' => Configuration::get('PS_SHOP_NAME') . microtime(true),
+                        'name' => Configuration::get('PS_SHOP_NAME').microtime(true),
                         'flow_config' => array(
                             'landing_page_type' => 'billing',
-                            'bank_txn_pending_url' => Context::getContext()->link->getModuleLink($this->name,
-                                'ecValidation', array(), true),
+                            'bank_txn_pending_url' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
                         ),
                     ));
 
@@ -545,16 +540,15 @@ class PayPal extends PaymentModule
         if (Configuration::get('PAYPAL_EXPERIENCE_PROFILE') != '') {
             $payment_options = new PaymentOption();
             $action_text = $this->l('Pay with Paypal');
-            $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/paypal_sm.png'));
+            $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/paypal_sm.png'));
             if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
-                $action_text .= ' | ' . $this->l('It\'s easy, simple and secure');
+                $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
             }
             $this->context->smarty->assign(array(
                 'path' => $this->_path,
             ));
             $payment_options->setCallToActionText($action_text);
-            $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit',
-                array('credit_card' => '0'), true));
+            $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0'), true));
             if (!$not_refunded) {
                 $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos.tpl'));
             }
@@ -563,14 +557,14 @@ class PayPal extends PaymentModule
             ];
         }
 
+        
 
-        if (Configuration::get('PAYPAL_API_CARD') && Configuration::get('PAYPAL_EXPERIENCE_PROFILE_CARD') != '') {
+        if (Configuration::get('PAYPAL_API_CARD') && Configuration::get('PAYPAL_EXPERIENCE_PROFILE_CARD') !=  '') {
             $payment_options = new PaymentOption();
             $action_text = $this->l('Pay with debit or credit card');
-            $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/logo_card.png'));
+            $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
             $payment_options->setCallToActionText($action_text);
-            $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit',
-                array('credit_card' => '1'), true));
+            $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'1'), true));
             $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos_card.tpl'));
             $payments_options[] = $payment_options;
         }
@@ -591,34 +585,23 @@ class PayPal extends PaymentModule
         $this->context->smarty->assign(array(
             'transaction_id' => $paypal_order->id_transaction,
         ));
-        $this->context->controller->registerJavascript($this->name . '-order_confirmation_js',
-            $this->_path . '/views/js/order_confirmation.js');
+        $this->context->controller->registerJavascript($this->name.'-order_confirmation_js', $this->_path.'/views/js/order_confirmation.js');
         return $this->context->smarty->fetch('module:paypal/views/templates/hook/order_confirmation.tpl');
     }
 
-    public function validateOrder(
-        $id_cart,
-        $id_order_state,
-        $amount_paid,
-        $payment_method = 'Unknown',
-        $message = null,
-        $transaction = array(),
-        $currency_special = null,
-        $dont_touch_amount = false,
-        $secure_key = false,
-        Shop $shop = null
-    ) {
-
+    public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
+    {
+        
 
         $this->amount_paid_paypal = (float)$amount_paid;
 
-        $cart = new Cart((int)$id_cart);
+        $cart = new Cart((int) $id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
-
+        
         parent::validateOrder(
-            (int)$id_cart,
-            (int)$id_order_state,
-            (float)$total_ps,
+            (int) $id_cart,
+            (int) $id_order_state,
+            (float) $total_ps,
             $payment_method,
             $message,
             $transaction,
@@ -636,13 +619,13 @@ class PayPal extends PaymentModule
         $paypal_order->client_token = "";
         $paypal_order->payment_method = $transaction['payment_method'];
         $paypal_order->currency = $transaction['currency'];
-        $paypal_order->total_paid = (float)$amount_paid;
+        $paypal_order->total_paid = (float) $amount_paid;
         $paypal_order->payment_status = $transaction['status'];
-        $paypal_order->total_prestashop = (float)$total_ps;
+        $paypal_order->total_prestashop = (float) $total_ps;
         $paypal_order->save();
 
 
-        if ($transaction['intent'] == "authorization") {
+        if ( $transaction['intent'] == "authorization") {
             $paypal_capture = new PaypalCapture();
             $paypal_capture->id_paypal_order = $paypal_order->id;
             $paypal_capture->save();
@@ -652,16 +635,16 @@ class PayPal extends PaymentModule
     public function hookActionValidateOrder($params)
     {
         $order = $params['order'];
-        $amount_paid = (float)$this->amount_paid_paypal;
+        $amount_paid = (float) $this->amount_paid_paypal;
         if (isset($amount_paid) && $amount_paid != 0 && $order->total_paid != $amount_paid) {
             $order->total_paid = $amount_paid;
             $order->total_paid_real = $amount_paid;
             $order->total_paid_tax_incl = $amount_paid;
             $order->update();
 
-            $sql = 'UPDATE `' . _DB_PREFIX_ . 'order_payment`
-		    SET `amount` = ' . (float)$amount_paid . '
-		    WHERE  `order_reference` = "' . pSQL($order->reference) . '"';
+            $sql = 'UPDATE `'._DB_PREFIX_.'order_payment`
+		    SET `amount` = '.(float)$amount_paid.'
+		    WHERE  `order_reference` = "'.pSQL($order->reference).'"';
             Db::getInstance()->execute($sql);
         }
     }
@@ -681,40 +664,40 @@ class PayPal extends PaymentModule
 
         if (Tools::getValue('not_payed_capture')) {
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">' . $this->l('You couldn\'t refund order, it\'s not payed yet.') . '</p>'
+                '<p class="paypal-warning">'.$this->l('You couldn\'t refund order, it\'s not payed yet.').'</p>'
             );
         }
         if (Tools::getValue('error_refund')) {
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">' . $this->l('We have unexpected problem during refund operation. See massages for more details') . '</p>'
+                '<p class="paypal-warning">'.$this->l('We have unexpected problem during refund operation. See massages for more details').'</p>'
             );
         }
-        if ($order->current_state == Configuration::get('PS_OS_REFUND') && $paypal_order->payment_status == 'refunded') {
+        if ($order->current_state == Configuration::get('PS_OS_REFUND') &&  $paypal_order->payment_status == 'refunded') {
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">' . $this->l('Your order is fully refunded by PayPal.') . '</p>'
+                '<p class="paypal-warning">'.$this->l('Your order is fully refunded by PayPal.').'</p>'
             );
         }
         if ($order->current_state == Configuration::get('PS_OS_PAYMENT') && Validate::isLoadedObject($paypal_capture) && $paypal_capture->id_capture) {
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">' . $this->l('Your order is fully captured by PayPal.') . '</p>'
+                '<p class="paypal-warning">'.$this->l('Your order is fully captured by PayPal.').'</p>'
             );
         }
         if (Tools::getValue('error_capture')) {
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">' . $this->l('We have unexpected problem during capture operation. See massages for more details') . '</p>'
+                '<p class="paypal-warning">'.$this->l('We have unexpected problem during capture operation. See massages for more details').'</p>'
             );
         }
 
         if ($paypal_order->total_paid != $paypal_order->total_prestashop) {
             $preferences = $this->context->link->getAdminLink('AdminPreferences', true);
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">' . $this->l('Product pricing has been modified as your rounding settings aren\'t compliant with PayPal.') . ' ' .
-                $this->l('To avoid automatic rounding to customer for PayPal payments, please update your rounding settings.') . ' ' .
-                '<a target="_blank" href="' . $preferences . '">' . $this->l('Reed more.') . '</a></p>'
+                '<p class="paypal-warning">'.$this->l('Product pricing has been modified as your rounding settings aren\'t compliant with PayPal.').' '.
+                $this->l('To avoid automatic rounding to customer for PayPal payments, please update your rounding settings.').' '.
+                '<a target="_blank" href="'.$preferences.'">'.$this->l('Reed more.').'</a></p>'
             );
         }
 
-        return $paypal_msg . $this->display(__FILE__, 'views/templates/hook/paypal_order.tpl');
+        return $paypal_msg.$this->display(__FILE__, 'views/templates/hook/paypal_order.tpl');
     }
 
 
@@ -730,7 +713,7 @@ class PayPal extends PaymentModule
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
             $method = AbstractMethodPaypal::load('EC');
-            $response = $method->void(array('authorization_id' => $paypal_order->id_transaction));
+            $response = $method->void(array('authorization_id'=>$paypal_order->id_transaction));
             if (isset($response->state) && $response->state == 'voided') {
                 $paypalCapture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
                 $paypalCapture->result = $response->state;
@@ -749,23 +732,23 @@ class PayPal extends PaymentModule
                 $orderMessage->id_customer = $this->context->customer->id;
                 $orderMessage->private = 1;
                 $orderMessage->save();
-                Tools::redirect($_SERVER['HTTP_REFERER'] . '&not_payed_capture=1');
+                Tools::redirect($_SERVER['HTTP_REFERER'].'&not_payed_capture=1');
             }
             $method = AbstractMethodPaypal::load('EC');
             $refund_response = $method->refund();
             $orderMessage = new Message();
 
             if (isset($refund_response->id)) {
-                $orderMessage->message = $this->l('Refund id : ') . $refund_response->id . ";\r";
-                $orderMessage->message .= $this->l('Refund state : ') . $refund_response->state . ";\r";
-                $orderMessage->message .= $this->l('Refund amount : ') . $refund_response->amount->total . " " . $refund_response->amount->currency . ";\r";
-                $orderMessage->message .= $this->l('Sale id : ') . $refund_response->sale_id . ";\r";
-                $orderMessage->message .= $this->l('Parent payment : ') . $refund_response->parent_payment . ";\r";
-                $orderMessage->message .= $this->l('Creation time : ') . $refund_response->create_time . ";\r";
+                $orderMessage->message = $this->l('Refund id : ').$refund_response->id.";\r";
+                $orderMessage->message .= $this->l('Refund state : ').$refund_response->state.";\r";
+                $orderMessage->message .= $this->l('Refund amount : ').$refund_response->amount->total." ".$refund_response->amount->currency.";\r";
+                $orderMessage->message .= $this->l('Sale id : ').$refund_response->sale_id.";\r";
+                $orderMessage->message .= $this->l('Parent payment : ').$refund_response->parent_payment.";\r";
+                $orderMessage->message .= $this->l('Creation time : ').$refund_response->create_time.";\r";
             } else {
                 $orderMessage->message = "";
                 foreach ($refund_response as $key => $msg) {
-                    $orderMessage->message .= $key . " : " . $msg . ";\r";
+                    $orderMessage->message .= $key." : ".$msg.";\r";
                 }
             }
 
@@ -776,7 +759,7 @@ class PayPal extends PaymentModule
             $orderMessage->save();
 
             if (!isset($refund_response->id) && $refund_response->message != "Request was refused.This transaction has already been fully refunded") {
-                Tools::redirect($_SERVER['HTTP_REFERER'] . '&error_refund=1');
+                Tools::redirect($_SERVER['HTTP_REFERER'].'&error_refund=1');
             }
         }
 
@@ -792,16 +775,16 @@ class PayPal extends PaymentModule
             $orderMessage = new Message();
 
             if (isset($capture_response->id)) {
-                $orderMessage->message = $this->l('Capture id : ') . $capture_response->id . ";\r";
-                $orderMessage->message .= $this->l('Capture state : ') . $capture_response->state . ";\r";
-                $orderMessage->message .= $this->l('Capture amount : ') . $capture_response->amount->total . " " . $capture_response->amount->currency . ";\r";
-                $orderMessage->message .= $this->l('Transaction fee : ') . $capture_response->transaction_fee->value . " " . $capture_response->transaction_fee->currency . ";\r";
-                $orderMessage->message .= $this->l('Parent payment : ') . $capture_response->parent_payment . ";\r";
-                $orderMessage->message .= $this->l('Creation time : ') . $capture_response->create_time . ";\r";
+                $orderMessage->message = $this->l('Capture id : ').$capture_response->id.";\r";
+                $orderMessage->message .= $this->l('Capture state : ').$capture_response->state.";\r";
+                $orderMessage->message .= $this->l('Capture amount : ').$capture_response->amount->total." ".$capture_response->amount->currency.";\r";
+                $orderMessage->message .= $this->l('Transaction fee : ').$capture_response->transaction_fee->value." ".$capture_response->transaction_fee->currency.";\r";
+                $orderMessage->message .= $this->l('Parent payment : ').$capture_response->parent_payment.";\r";
+                $orderMessage->message .= $this->l('Creation time : ').$capture_response->create_time.";\r";
             } else {
                 $orderMessage->message = "";
                 foreach ($capture_response as $key => $msg) {
-                    $orderMessage->message .= $key . " : " . $msg . ";\r";
+                    $orderMessage->message .= $key." : ".$msg.";\r";
                 }
             }
 
@@ -812,7 +795,7 @@ class PayPal extends PaymentModule
             $orderMessage->save();
 
             if (!isset($capture_response->id) && $capture_response->name != "AUTHORIZATION_ALREADY_COMPLETED" || $capture_response->state == 'pending') {
-                Tools::redirect($_SERVER['HTTP_REFERER'] . '&error_capture=1');
+                Tools::redirect($_SERVER['HTTP_REFERER'].'&error_capture=1');
             }
 
         }

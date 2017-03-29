@@ -18,13 +18,13 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once _PS_MODULE_DIR_ . 'paypal/classes/AbstractMethodPaypal.php';
+include_once _PS_MODULE_DIR_.'paypal/classes/AbstractMethodPaypal.php';
 
 class PaypalEcInitModuleFrontController extends ModuleFrontController
 {
@@ -32,7 +32,7 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
     {
         $method_ec = AbstractMethodPaypal::load('EC');
 
-        $response = $method_ec->init(array('use_card' => Tools::getValue('credit_card')));
+        $response = $method_ec->init(array('use_card'=>Tools::getValue('credit_card')));
         if ($response) {
             Tools::redirect($response);
         } else {

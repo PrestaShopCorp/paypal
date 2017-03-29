@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 2007-2017 PrestaShop
  *
@@ -19,11 +18,12 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
+
 class PaypalOrder extends ObjectModel
 {
     public $id_order;
@@ -77,11 +77,11 @@ class PaypalOrder extends ObjectModel
     public static function getIdOrderByTransactionId($id_transaction)
     {
         $sql = 'SELECT `id_order`
-			FROM `' . _DB_PREFIX_ . 'paypal_order`
-			WHERE `id_transaction` = \'' . pSQL($id_transaction) . '\'';
+			FROM `'._DB_PREFIX_.'paypal_order`
+			WHERE `id_transaction` = \''.pSQL($id_transaction).'\'';
         $result = Db::getInstance()->getRow($sql);
         if ($result != false) {
-            return (int)$result['id_order'];
+            return (int) $result['id_order'];
         }
         return 0;
     }
@@ -89,8 +89,8 @@ class PaypalOrder extends ObjectModel
     public static function getOrderById($id_order)
     {
         return Db::getInstance()->getRow(
-            'SELECT * FROM `' . _DB_PREFIX_ . 'paypal_order`
-			WHERE `id_order` = ' . (int)$id_order
+            'SELECT * FROM `'._DB_PREFIX_.'paypal_order`
+			WHERE `id_order` = '.(int) $id_order
         );
     }
 
@@ -99,7 +99,7 @@ class PaypalOrder extends ObjectModel
         $sql = new DbQuery();
         $sql->select('id_paypal_order');
         $sql->from('paypal_order');
-        $sql->where('id_order = ' . (int)$id_order);
+        $sql->where('id_order = '.(int)$id_order);
         $id_paypal_order = Db::getInstance()->getValue($sql);
         return new self($id_paypal_order);
     }

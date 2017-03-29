@@ -18,13 +18,13 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2017 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @author    PrestaShop SA <contact@prestashop.com>
+ *  @copyright 2007-2017 PrestaShop SA
+ *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-include_once(_PS_MODULE_DIR_ . 'paypal/sdk/PaypalSDK.php');
+include_once(_PS_MODULE_DIR_.'paypal/sdk/PaypalSDK.php');
 
 class MethodEC extends AbstractMethodPaypal
 {
@@ -33,8 +33,8 @@ class MethodEC extends AbstractMethodPaypal
     public function setConfig($params)
     {
         $sdk = new PaypalSDK(
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_CLIENTID') : Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_SECRET') : Configuration::get('PAYPAL_LIVE_SECRET'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
         $web_experience = $sdk->createWebExperience($params);
@@ -48,8 +48,8 @@ class MethodEC extends AbstractMethodPaypal
     public function init($data)
     {
         $sdk = new PaypalSDK(
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_CLIENTID') : Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_SECRET') : Configuration::get('PAYPAL_LIVE_SECRET'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
         $context = Context::getContext();
@@ -75,7 +75,7 @@ class MethodEC extends AbstractMethodPaypal
             ),
             'redirect_urls' => array(
                 'return_url' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
-                'cancel_url' => Tools::getShopDomain(true, true) . '/index.php?controller=order&step=1',
+                'cancel_url' => Tools::getShopDomain(true, true).'/index.php?controller=order&step=1',
             ),
         );
 
@@ -91,13 +91,12 @@ class MethodEC extends AbstractMethodPaypal
             $items[] = array(
                 'quantity' => $product['cart_quantity'],
                 'name' => $product['name'],
-                'price' => str_replace(',', '.', round($product['price'], 2)),
+                'price' =>  str_replace(',', '.', round($product['price'], 2)),
                 'currency' => $currency->iso_code,
                 'description' => strip_tags($product['description_short']),
                 'tax' => str_replace(',', '.', round($product['total_wt'] - $product['total'], 2)),
             );
-            $total_products = $total_products + str_replace(',', '.',
-                    (round($product['price'], 2) * $product['cart_quantity']));
+            $total_products = $total_products + str_replace(',', '.', (round($product['price'], 2) * $product['cart_quantity']));
             $total_tax = $total_tax + $tax_product;
         }
 
@@ -107,8 +106,8 @@ class MethodEC extends AbstractMethodPaypal
             $tax_discount = -1 * str_replace(',', '.', round($discount['value_real'] - $discount['value_tax_exc'], 2));
             $items[] = array(
                 'quantity' => 1,
-                'name' => $paypal->l('Discount : ') . $discount['name'],
-                'price' => $price_discount,
+                'name' => $paypal->l('Discount : ').$discount['name'],
+                'price' =>  $price_discount,
                 'currency' => $currency->iso_code,
                 'description' => strip_tags($discount['description']),
                 'tax' => $tax_discount,
@@ -122,7 +121,7 @@ class MethodEC extends AbstractMethodPaypal
             $items[] = array(
                 'quantity' => 1,
                 'name' => $paypal->l('Gift wrapping'),
-                'price' => $gift_wrapping_price,
+                'price' =>  $gift_wrapping_price,
                 'currency' => $currency->iso_code,
                 'description' => '',
                 'tax' => 0,
@@ -162,11 +161,11 @@ class MethodEC extends AbstractMethodPaypal
                     'shipping' => $shipping,
                 ),
             ),
-            'custom' => "PS_" . _PS_VERSION_ . "_Module_" . $paypal->version,
+            'custom' => "PS_"._PS_VERSION_."_Module_".$paypal->version,
             'item_list' => array(
                 'items' => $items,
                 "shipping_address" => array(
-                    "recipient_name" => $address->firstname . ' ' . $address->lastname,
+                    "recipient_name" => $address->firstname.' '.$address->lastname,
                     "line1" => $address->address1,
                     "line2" => $address->address2,
                     "city" => $address->city,
@@ -177,7 +176,8 @@ class MethodEC extends AbstractMethodPaypal
             ),
         );
 
-        if (isset($address->phone) && !empty($address->phone)) {
+        if (isset($address->phone) && !empty($address->phone))
+        {
             $trans['item_list']['shipping_address']['phone'] = $address->phone;
         }
 
@@ -188,7 +188,7 @@ class MethodEC extends AbstractMethodPaypal
         $payment = $sdk->createPayment($params);
 
         // add for security test
-        if (isset($payment->id)) {
+        if (isset($payment->id)){
             $context->cookie->paymentId = $payment->id;
         }
 
@@ -207,21 +207,23 @@ class MethodEC extends AbstractMethodPaypal
     {
         $context = Context::getContext();
         $sdk = new PaypalSDK(
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_CLIENTID') : Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_SECRET') : Configuration::get('PAYPAL_LIVE_SECRET'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
 
 
         // add security check
-        if (Tools::getValue('paymentId') != $context->cookie->paymentId) {
+        if (Tools::getValue('paymentId') != $context->cookie->paymentId)
+        {
             die('payment Id is invalid');
         }
 
         $exec_payment = $sdk->executePayment(Tools::getValue('paymentId'), Tools::getValue('PayerID'));
+        
 
-
-        if (empty($exec_payment) || !isset($exec_payment->id)) {
+        if (empty($exec_payment) || !isset($exec_payment->id))
+        {
             Tools::redirect('index.php?controller=order&step=1');
         }
 
@@ -240,7 +242,8 @@ class MethodEC extends AbstractMethodPaypal
         }
         if ($exec_payment->intent == "authorize") {
             $intent = "authorization";
-        } else {
+        }
+        else {
             $intent = $exec_payment->intent;
         }
 
@@ -252,16 +255,15 @@ class MethodEC extends AbstractMethodPaypal
             'currency' => $exec_payment->transactions[0]->amount->currency,
             'intent' => $intent
         );
-        $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $transaction, (int)$currency->id, false,
-            $customer->secure_key);
+        $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $transaction, (int)$currency->id, false, $customer->secure_key);
         unset($context->cookie->paymentId);
     }
 
     public function confirmCapture()
     {
         $sdk = new PaypalSDK(
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_CLIENTID') : Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_SECRET') : Configuration::get('PAYPAL_LIVE_SECRET'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
@@ -297,8 +299,8 @@ class MethodEC extends AbstractMethodPaypal
     {
 
         $sdk = new PaypalSDK(
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_CLIENTID') : Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_SECRET') : Configuration::get('PAYPAL_LIVE_SECRET'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
 
@@ -322,7 +324,7 @@ class MethodEC extends AbstractMethodPaypal
                     array(
                         'result' => pSQL($response->state),
                     ),
-                    'id_paypal_order = ' . (int)$id_paypal_order
+                    'id_paypal_order = '.(int)$id_paypal_order
                 );
             }
         } else {
@@ -339,8 +341,8 @@ class MethodEC extends AbstractMethodPaypal
     public function void($params)
     {
         $sdk = new PaypalSDK(
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_CLIENTID') : Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            Configuration::get('PAYPAL_SANDBOX') ? Configuration::get('PAYPAL_SANDBOX_SECRET') : Configuration::get('PAYPAL_LIVE_SECRET'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
             Configuration::get('PAYPAL_SANDBOX')
         );
         return $sdk->voidAuthorization($params['authorization_id']);
