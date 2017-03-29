@@ -169,7 +169,8 @@ class PayPal extends PaymentModule
      */
     public function installOrderState()
     {
-        if (!Configuration::get('PAYPAL_OS_WAITING')) {
+        if (!Configuration::get('PAYPAL_OS_WAITING')
+            || !Validate::isLoadedObject(new OrderState(Configuration::get('PAYPAL_OS_WAITING')))) {
             $order_state = new OrderState();
             $order_state->name = array();
             foreach (Language::getLanguages() as $language) {
