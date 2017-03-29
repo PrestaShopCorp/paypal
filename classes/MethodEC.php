@@ -54,7 +54,10 @@ class MethodEC extends AbstractMethodPaypal
         );
         $context = Context::getContext();
         $cart = $context->cart;
-        $currency = $context->currency;
+        $module = Module::getInstanceByName('paypal');
+        $currency = $module->getCurrency($context->cart->id_currency);
+        $context->cart->id_currency = $currency->id;
+        $context->cart->save();
         $customer = $context->customer;
         $paypal = Module::getInstanceByName('paypal');
 
