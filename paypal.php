@@ -36,7 +36,6 @@ include_once 'classes/PaypalOrder.php';
 
 class PayPal extends PaymentModule
 {
-    public static $dev = true;
     public $express_checkout;
     public $message;
     public $amount_paid_paypal;
@@ -49,12 +48,12 @@ class PayPal extends PaymentModule
         $this->author = 'PrestaShop';
 	    $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
         $this->is_eu_compatible = 1;
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7');
         $this->controllers = array('payment', 'validation');
         $this->bootstrap = true;
 
         $this->currencies = true;
-        $this->currencies_mode = 'checkbox';
+        $this->currencies_mode = 'radio';
 
         parent::__construct();
 
