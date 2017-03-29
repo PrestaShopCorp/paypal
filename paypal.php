@@ -46,7 +46,7 @@ class PayPal extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '4.0.1';
         $this->author = 'PrestaShop';
-        $this->theme_key = '336225a5988ad434b782f2d868d7bfcd';
+        $this->module_key = '336225a5988ad434b782f2d868d7bfcd';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.7');
         $this->controllers = array('payment', 'validation');
