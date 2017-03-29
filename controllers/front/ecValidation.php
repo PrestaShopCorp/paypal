@@ -35,8 +35,7 @@ class PaypalEcValidationModuleFrontController extends ModuleFrontController
         $method_ec = AbstractMethodPaypal::load('EC');
 
         $cart = Context::getContext()->cart;
-        if (!isset($cart->id))
-        {
+        if (!isset($cart->id)) {
             Tools::redirect('index.php');
             exit();
         }

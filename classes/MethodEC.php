@@ -176,8 +176,7 @@ class MethodEC extends AbstractMethodPaypal
             ),
         );
 
-        if (isset($address->phone) && !empty($address->phone))
-        {
+        if (isset($address->phone) && !empty($address->phone)) {
             $trans['item_list']['shipping_address']['phone'] = $address->phone;
         }
 
@@ -188,7 +187,7 @@ class MethodEC extends AbstractMethodPaypal
         $payment = $sdk->createPayment($params);
 
         // add for security test
-        if (isset($payment->id)){
+        if (isset($payment->id)) {
             $context->cookie->paymentId = $payment->id;
         }
 
@@ -214,16 +213,14 @@ class MethodEC extends AbstractMethodPaypal
 
 
         // add security check
-        if (Tools::getValue('paymentId') != $context->cookie->paymentId)
-        {
+        if (Tools::getValue('paymentId') != $context->cookie->paymentId) {
             die('payment Id is invalid');
         }
 
         $exec_payment = $sdk->executePayment(Tools::getValue('paymentId'), Tools::getValue('PayerID'));
         
 
-        if (empty($exec_payment) || !isset($exec_payment->id))
-        {
+        if (empty($exec_payment) || !isset($exec_payment->id)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
 
@@ -242,8 +239,7 @@ class MethodEC extends AbstractMethodPaypal
         }
         if ($exec_payment->intent == "authorize") {
             $intent = "authorization";
-        }
-        else {
+        } else {
             $intent = $exec_payment->intent;
         }
 
@@ -297,7 +293,6 @@ class MethodEC extends AbstractMethodPaypal
 
     public function refund()
     {
-
         $sdk = new PaypalSDK(
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
