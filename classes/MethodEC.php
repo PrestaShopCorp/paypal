@@ -54,12 +54,16 @@ class MethodEC extends AbstractMethodPaypal
         );
         $context = Context::getContext();
         $cart = $context->cart;
+        //$currency = $context->currency;
         $module = Module::getInstanceByName('paypal');
 
+        // change currency with configuration paypal
         $currency = $module->getCurrency($context->cart->id_currency);
         $context->cart->id_currency = (int) $currency->id;
         $context->cart->save();
         $context->currency = $currency;
+        $context->cookie->id_currency = (int) $currency->id;
+
         $customer = $context->customer;
         $paypal = Module::getInstanceByName('paypal');
 
@@ -210,6 +214,7 @@ class MethodEC extends AbstractMethodPaypal
     public function validation()
     {
         $context = Context::getContext();
+
         $sdk = new PaypalSDK(
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_CLIENTID'):Configuration::get('PAYPAL_LIVE_CLIENTID'),
             Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_SANDBOX_SECRET'):Configuration::get('PAYPAL_LIVE_SECRET'),
@@ -234,9 +239,15 @@ class MethodEC extends AbstractMethodPaypal
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
-        $currency = $context->currency;
+
         $total = (float)$exec_payment->transactions[0]->amount->total;
         $paypal = Module::getInstanceByName('paypal');
+        $currency = $paypal->getCurrency($context->currency->id);
+        $context->cart->id_currency = (int) $currency->id;
+        $context->cart->update();
+        $context->currency = $currency;
+
+
         if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
             $order_state = Configuration::get('PS_OS_PAYMENT');
         } else {
