@@ -26,8 +26,13 @@
     <div class="col-sm-12">
         <div class="paypal_block_info panel">
             <p>{l s='If you have just created your PayPal account, check the email sent by PayPal to confirm your email address.' mod='paypal'}</p>
-            <p>{l s='If you encounter rounding issues with your orders, please change PrestaShop round mode in:' mod='paypal'} <a target="_blank" href="{$preference|escape:'javascript':'UTF-8'}}">{l s='Preferences > General' mod='paypal'}</a> {l s='then change for:' mod='paypal'}</p>
-            <p><b>{l s='Round mode: "Round up away from zero, when it is half way there (recommended) "' mod='paypal'}</b></p>
+            <p>{l s='If you encounter rounding issues with your orders, please change PrestaShop round mode in:' mod='paypal'}
+                <a target="_blank"
+                   href="{$preference|escape:'javascript':'UTF-8'}}">{l s='Preferences > General' mod='paypal'}</a> {l s='then change for:' mod='paypal'}
+            </p>
+            <p>
+                <b>{l s='Round mode: "Round up away from zero, when it is half way there (recommended) "' mod='paypal'}</b>
+            </p>
             <p><b>{l s='Round type: "Round on each item"' mod='paypal'}</b></p>
         </div>
     </div>

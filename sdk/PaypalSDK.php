@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2017 PrestaShop
  *
@@ -18,12 +19,11 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2017 PrestaShop SA
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2017 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-
 class PaypalSDK
 {
     private $action;
@@ -33,7 +33,7 @@ class PaypalSDK
     private $secret;
     private $urlAPI;
 
-    public function __construct($clientId, $secret, $sandbox=0)
+    public function __construct($clientId, $secret, $sandbox = 0)
     {
         $this->clientId = $clientId;
         $this->secret = $secret;
@@ -91,7 +91,7 @@ class PaypalSDK
         }
 
         $this->action = 'POST';
-        $this->endpoint = 'v1/payments/payment/'.$payment_id.'/execute';
+        $this->endpoint = 'v1/payments/payment/' . $payment_id . '/execute';
         $body = array('payer_id' => $payer_id);
         $response = $this->makeCall($this->getBody($body));
 
@@ -105,7 +105,7 @@ class PaypalSDK
         }
 
         $this->action = 'PATCH';
-        $this->endpoint = 'v1/payments/payment/'.$payment_id;
+        $this->endpoint = 'v1/payments/payment/' . $payment_id;
         $response = $this->makeCall($this->getBody($body));
 
         return $response;
@@ -118,7 +118,7 @@ class PaypalSDK
         }
 
         $this->action = 'POST';
-        $this->endpoint = 'v1/payments/sale/'.$sale_id.'/refund';
+        $this->endpoint = 'v1/payments/sale/' . $sale_id . '/refund';
         $response = $this->makeCall($this->getBody($body));
         return $response;
     }
@@ -130,7 +130,7 @@ class PaypalSDK
         }
 
         $this->action = 'GET';
-        $this->endpoint = 'v1/payments/refund/'.$sale_id;
+        $this->endpoint = 'v1/payments/refund/' . $sale_id;
         $response = $this->makeCall(null);
         return $response;
     }
@@ -142,7 +142,7 @@ class PaypalSDK
         }
 
         $this->action = 'GET';
-        $this->endpoint = 'v1/payments/authorization/'.$authorization_id;
+        $this->endpoint = 'v1/payments/authorization/' . $authorization_id;
         $response = $this->makeCall(null);
         return $response;
     }
@@ -154,7 +154,7 @@ class PaypalSDK
         }
 
         $this->action = 'POST';
-        $this->endpoint = 'v1/payments/authorization/'.$authorization_id.'/capture';
+        $this->endpoint = 'v1/payments/authorization/' . $authorization_id . '/capture';
         $response = $this->makeCall($this->getBody($body));
         return $response;
     }
@@ -166,7 +166,7 @@ class PaypalSDK
         }
 
         $this->action = 'POST';
-        $this->endpoint = 'v1/payments/authorization/'.$authorization_id.'/void';
+        $this->endpoint = 'v1/payments/authorization/' . $authorization_id . '/void';
         $response = $this->makeCall(null);
         return $response;
     }
@@ -178,7 +178,7 @@ class PaypalSDK
         }
 
         $this->action = 'GET';
-        $this->endpoint = 'v1/payments/capture/'.$capture_id;
+        $this->endpoint = 'v1/payments/capture/' . $capture_id;
         $response = $this->makeCall(null);
         return $response;
     }
@@ -190,7 +190,7 @@ class PaypalSDK
         }
 
         $this->action = 'POST';
-        $this->endpoint = 'v1/payments/capture/'.$capture_id.'/refund';
+        $this->endpoint = 'v1/payments/capture/' . $capture_id . '/refund';
         $response = $this->makeCall($this->getBody($body));
         return $response;
     }
@@ -218,11 +218,11 @@ class PaypalSDK
         $curl = curl_init();
         if ($this->action == "GET") {
             $body = (is_array($body)) ? http_build_query($body) : $body;
-            $this->endpoint = $this->endpoint.$body;
+            $this->endpoint = $this->endpoint . $body;
         }
 
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_URL, $this->urlAPI.$this->endpoint);
+        curl_setopt($curl, CURLOPT_URL, $this->urlAPI . $this->endpoint);
         if ($this->action == "PUT" || $this->action == "DELETE" || $this->action == "PATCH") {
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $this->action);
         }
@@ -243,12 +243,12 @@ class PaypalSDK
                 "Authorization: Basic ".base64_encode($this->clientId.':'.$this->secret)
             ));
             //*/
-            curl_setopt($curl, CURLOPT_USERPWD, $this->clientId.':'.$this->secret);
+            curl_setopt($curl, CURLOPT_USERPWD, $this->clientId . ':' . $this->secret);
         } else {
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                "Content-type: ".$cnt_type,
+                "Content-type: " . $cnt_type,
                 'Content-Length: ' . strlen($body),
-                "Authorization: Bearer ".$this->token,
+                "Authorization: Bearer " . $this->token,
                 "PayPal-Partner-Attribution-Id: PrestaShop_Cart_EC",
             ));
         }

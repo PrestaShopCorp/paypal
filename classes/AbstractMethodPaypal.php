@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2017 PrestaShop
  *
@@ -18,29 +19,35 @@
  * versions in the future. If you wish to customize PrestaShop for your
  * needs please refer to http://www.prestashop.com for more information.
  *
- *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2017 PrestaShop SA
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2007-2017 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-
 abstract class AbstractMethodPaypal
 {
     abstract public function init($params);
+
     abstract public function validation();
+
     abstract public function confirmCapture();
+
     abstract public function check();
+
     abstract public function refund();
+
     abstract public function setConfig($params);
+
     abstract public function void($params);
 
     public static function load($method)
     {
 
-        if(preg_match('/[a-zA-Z0-9_-]+/', $method) && file_exists(_PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php'))
-        {
-            include_once _PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php';
-            $method_class = 'Method'.$method;
+        if (preg_match('/[a-zA-Z0-9_-]+/',
+                $method) && file_exists(_PS_MODULE_DIR_ . 'paypal/classes/Method' . $method . '.php')
+        ) {
+            include_once _PS_MODULE_DIR_ . 'paypal/classes/Method' . $method . '.php';
+            $method_class = 'Method' . $method;
             return new $method_class();
         }
     }

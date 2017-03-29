@@ -12,6 +12,6 @@
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
-$(document).ready(function() {
+$(document).ready(function () {
     $('.page-order-confirmation #order-details ul').append($('#paypal_transaction_id'));
 });
