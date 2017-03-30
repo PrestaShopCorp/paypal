@@ -1,0 +1,5 @@
+img/logos/*
+!img/default*
+config_fr.xml
+api/Results.txt
+.idea/
