@@ -1,0 +1,124 @@
+.paypal-nav .nav {
+    margin-bottom: 20px;
+    margin-left: 8px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid lightgrey;
+}
+.paypal-nav .nav>li>a {
+    margin-right: 30px;
+}
+.paypal-nav .nav>li>a, .paypal-nav .nav>li>a:hover,  .paypal-nav .nav>li>a:focus,
+.paypal-nav .nav>li>a:hover>span, .paypal-nav .nav>li>a:focus>span{
+    color:#2095f2;
+    background-color: transparent;
+    font-size: 16px;
+    text-decoration: none;
+    padding-left: 0;
+    padding-bottom: 4px;
+}
+
+.paypal-nav .nav>li>a:active>span, .paypal-nav .nav>li.active>a:active>span, .paypal-nav .nav>li.active>a>span {
+    border-bottom: 3px solid #4277bb;
+    padding-bottom: 4px;
+}
+.paypal-nav .nav>li>a:active>span,
+.paypal-nav .nav>li.active>a:active>span,  .paypal-nav .nav>li.active>a:active,.paypal-nav .nav>li>a:active, .paypal-nav .nav>li.active>a>span,  .paypal-nav .nav>li.active>a:focus, .paypal-nav .nav>li.active>a:hover, .paypal-nav .nav>li.active>a:hover>span, .paypal-nav .nav>li.active>a, .paypal-nav .nav>li.active>a:focus>span{
+    color:#4277bb;
+    background-color: transparent;
+    font-size: 16px;
+    font-weight: bold;
+    padding-left: 0;
+}
+.active-products img.paypal-products {
+    width: 135px;
+}
+.active-products img.product-img {
+    height: 27px;
+    padding-right: 3px;
+}
+.active-products .panel span {
+    font-weight: bold;
+}
+.active-products .panel a {
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+.active-products .panel div.bottom {
+    margin-top: 25px;
+}
+.active-products .panel .btn.btn-default {
+    color: #87b1d6;
+    border-color: #87b1d6;
+    border: 2px solid;
+}
+.active-products .panel .btn.btn-default:hover{
+    color: white;
+    background-color: #87b1d6;
+    border-color: #87b1d6;
+    border: 2px solid;
+}
+.paypal-signup .btn.btn-info {
+    padding: 0px 15px 0 0;
+}
+#paypal_params .parametres {
+    float:none;
+}
+#paypal_params .help-right {
+    padding-left: 20px;
+    margin-top: 57px;
+}
+#paypal_params .help-left {
+    border-right: 1px solid #25b9d7;
+}
+
+.paypal-bold{font-weight:700}
+.box ul.tick li{background:url(../img/blue_tick.png) no-repeat left 3px;padding:4px 26px}
+#paypal_conf .right, .box ul.tick{float:right}
+#paypal_conf .left{width:60%}
+#paypal_conf .right{width:30%}
+#paypal_conf .box{margin:6px 1%;text-align:left}
+#paypal_conf .box ul{list-style:none;margin:0;padding:0}
+#paypal_conf .left {float:left}
+#paypal_conf .left img {margin-bottom: -5px; /*float:left;  */   width: 100px;}
+#paypal_conf .left .logo {
+    float: left;
+    width: 30%;
+    padding: 15px;
+    background: #fff;
+    margin: 0 auto;
+    text-align: center;
+}
+#paypal_conf .left .info {
+    float: right;
+    width: 65%;
+}
+.active-products > p {
+    padding-left: 15px;
+}
+#ConfirmLive .btn {
+    border: 1px solid #666;
+    padding: 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    margin: 10px;
+}
+#ConfirmLive .btn-info {
+    background-color: #25b9d7;
+    color: #ffffff;
+}
+
+
+.paypal_block_info{
+    border-color: #A1C4E6 !important;
+    background-color: #DDEAF6 !important;
+}
+
+#paypal_conf .active-products .col-sm-6 .panel{
+    min-height: 240px;
+}
+
+#credential-configuration ul li {
+    list-style-type: decimal;
+}
