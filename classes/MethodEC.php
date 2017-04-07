@@ -41,7 +41,7 @@ class MethodEC extends AbstractMethodPaypal
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
 
         $params = array(
-            'CANCELURL' => Tools::getShopDomain(true, true).'/index.php?controller=order&step=1',
+            'CANCELURL' => Context::getContext()->link->getPageLink('order', true).'&step=1',
             'LANDINGPAGE' => Tools::getValue('credit_card') ? 'Billing' : 'Login',
             'RETURNURL' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
         );
