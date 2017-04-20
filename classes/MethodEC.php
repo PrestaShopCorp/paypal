@@ -68,10 +68,12 @@ class MethodEC extends AbstractMethodPaypal
     public function _getPaymentInfo(&$params)
     {
         // Set cart products list
-        $cart = Context::getContext()->cart;
+        $context = Context::getContext();
+        $cart = $context->cart;
+        $customer = $context->customer;
         $products = $cart->getProducts();
-        $discounts = Context::getContext()->cart->getCartRules();
-        $wrapping = Context::getContext()->cart->gift ? $this->getGiftWrappingPrice() : 0;
+        $discounts = $context->cart->getCartRules();
+        $wrapping = $context->cart->gift ? $context->cart->getGiftWrappingPrice() : 0;
         $params['PAYMENT_LIST'] = array(
             'PRODUCTS' => $products,
             'DISCOUNTS' => $discounts,
@@ -79,10 +81,10 @@ class MethodEC extends AbstractMethodPaypal
         );
 
         // Payment values
-        $params['CURRENCY'] = Context::getContext()->currency->iso_code;
+        $params['CURRENCY'] = $context->currency->iso_code;
         $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Configuration::get('PAYPAL_API_INTENT');
 
-        $shipping_cost_wt = Context::getContext()->cart->getTotalShippingCost();
+        $shipping_cost_wt = $cart->getTotalShippingCost();
         $total = $cart->getOrderTotal(true, Cart::BOTH);
         $summary = $cart->getSummaryDetails();
         $subtotal = Tools::ps_round($summary['total_products'], 2);
@@ -91,13 +93,13 @@ class MethodEC extends AbstractMethodPaypal
             'SHIPPING_COST' => (float) $shipping_cost_wt,
             'TOTAL' => (float) $total,
             'SUBTOTAL' => (float) $subtotal,
-            'CARRIER' => new Carrier(Context::getContext()->cart->id_carrier),
+            'CARRIER' => new Carrier($cart->id_carrier),
         );
 
         // Set address information
-        $id_address = (int) Context::getContext()->cart->id_address_delivery;
-        if (($id_address == 0) && (Context::getContext()->customer)) {
-            $id_address = Address::getFirstCustomerAddressId(Context::getContext()->customer->id);
+        $id_address = (int) $cart->id_address_delivery;
+        if (($id_address == 0) && ($customer)) {
+            $id_address = Address::getFirstCustomerAddressId($customer->id);
         }
         $address = new Address($id_address);
         $state = '';
@@ -107,7 +109,7 @@ class MethodEC extends AbstractMethodPaypal
         $country = new Country((int) $address->id_country);
         $params['SHIPPING'] = array(
             'ADDRESS_OBJ' => $address,
-            'EMAIL' => Context::getContext()->customer->email,
+            'EMAIL' => $customer->email,
             'STATE' => $state ? $state->iso_code : '',
             'COUNTRY' => $country->iso_code,
         );

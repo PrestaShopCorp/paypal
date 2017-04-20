@@ -83,7 +83,7 @@ class PaypalSDK
 
         foreach ($params as &$field) {
             if (is_numeric($field)) {
-                $field = str_replace(',', '.', $field);
+                $field = number_format($field, 2, ".", ",");
             }
         }
 
@@ -102,8 +102,8 @@ class PaypalSDK
 
             $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($product['description_short']), 0, 50).'...';
 
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = round($product['price'], 2);
-            $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = round($product['price_wt'] - $product['price'], 2);
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($product['price'], 2);
+            $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = number_format($product['price_wt'] - $product['price'], 2);
             $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
 
             $total_products = $total_products + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
@@ -122,7 +122,7 @@ class PaypalSDK
                 }
 
                 /* It is a discount so we store a negative value */
-                $fields['L_PAYMENTREQUEST_0_AMT'.$index] = -1 * round($discount['value_real'], 2);
+                $fields['L_PAYMENTREQUEST_0_AMT'.$index] = -1 * number_format($discount['value_real'], 2);
                 $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
 
                 $total_products = round($total_products + $fields['L_PAYMENTREQUEST_0_AMT'.$index], 2);
@@ -134,7 +134,7 @@ class PaypalSDK
     {
         if ($wrapping > 0) {
             $fields['L_PAYMENTREQUEST_0_NAME'.++$index] = 'Gift wrapping';
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = round($wrapping, 2);
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($wrapping, 2);
             $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
             $total_products = round($total_products + $wrapping, 2);
         }
@@ -163,15 +163,15 @@ class PaypalSDK
         if ($total <= 1) {
             $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $costs['CARRIER']->id_reference;
             $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $costs['CARRIER']->name;
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = $shipping;
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($shipping, 2);
             $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
             $fields['PAYMENTREQUEST_0_ITEMAMT'] = $subtotal + $shipping;
             $fields['PAYMENTREQUEST_0_AMT'] = $total + $shipping;
         } else {
-            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = $shipping;
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $subtotal;
-            $fields['PAYMENTREQUEST_0_TAXAMT'] = $total_tax;
-            $fields['PAYMENTREQUEST_0_AMT'] = $total;
+            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = number_format($shipping, 2);
+            $fields['PAYMENTREQUEST_0_ITEMAMT'] = number_format($subtotal, 2);
+            $fields['PAYMENTREQUEST_0_TAXAMT'] = number_format($total_tax, 2);
+            $fields['PAYMENTREQUEST_0_AMT'] = number_format($total, 2);
         }
     }
 
