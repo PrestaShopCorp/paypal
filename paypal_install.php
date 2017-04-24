@@ -107,6 +107,7 @@ class PayPalInstall
 		Configuration::updateValue('PAYPAL_API_SIGNATURE', '');
 		Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 0);
 		Configuration::updateValue('PAYPAL_CAPTURE', 0);
+		Configuration::updateValue('PAYPAL_TRANSFER_CART_LINE_ITEMS', 1);
 		Configuration::updateValue('PAYPAL_PAYMENT_METHOD', WPS);
 		Configuration::updateValue('PAYPAL_NEW', 1);
 		Configuration::updateValue('PAYPAL_DEBUG_MODE', 0);
@@ -134,6 +135,7 @@ class PayPalInstall
 		Configuration::deleteByName('PAYPAL_PAYMENT_METHOD');
 		Configuration::deleteByName('PAYPAL_TEMPLATE');
 		Configuration::deleteByName('PAYPAL_CAPTURE');
+		Configuration::deleteByName('PAYPAL_TRANSFER_CART_LINE_ITEMS');
 		Configuration::deleteByName('PAYPAL_DEBUG_MODE');
 		Configuration::deleteByName('PAYPAL_COUNTRY_DEFAULT');
 		Configuration::deleteByName('PAYPAL_VERSION');

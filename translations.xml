@@ -111,6 +111,9 @@
 		<payment_type_direct>Direct sales (recommended)</payment_type_direct>
 		<payment_type_manual>Authorization/Manual capture (payment shipping)</payment_type_manual>
 
+		<transfer_cart_line_items>Transfer cart line items</transfer_cart_line_items>
+		<transfer_cart_line_items_tagline>Activate if you want to display the complete details of customer\'s order. Deactivate if you experience rounding problems.</transfer_cart_line_items_tagline>
+
 		<save_button>Save</save_button>
 
 		<error_message>You need to complete the PayPal identification Information in step 3 otherwise you won’t be able to accept payment.</error_message>

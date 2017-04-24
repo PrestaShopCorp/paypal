@@ -329,6 +329,13 @@
 
 				<br />
 
+				<p>{l s='Transfer cart line items' mod='paypal'}</p>
+				<p class="description">{l s='Activate if you want to display the complete details of customer\'s order. Deactivate if you experience rounding problems.' mod='paypal'}</p>
+				<input type="radio" name="transfer_cart_line_items" id="paypal_do_not_transfer_cart_line_items" value="0" {if $PayPal_transfer_cart_line_items == 0}checked="checked"{/if} /> <label for="paypal_do_not_transfer_cart_line_items">{l s='No' mod='paypal'}</label><br />
+				<input type="radio" name="transfer_cart_line_items" id="paypal_do_transfer_cart_line_items" value="1" {if $PayPal_transfer_cart_line_items == 1}checked="checked"{/if} /> <label for="paypal_do_transfer_cart_line_items">{l s='Yes' mod='paypal'}</label>
+
+				<br />
+
 				<p>{$PayPal_content.payment_type_title|escape:'htmlall':'UTF-8'}</p>
 				<p class="description">{$PayPal_content.payment_type_tagline|escape:'htmlall':'UTF-8'}</p>
 				<input type="radio" name="payment_capture" id="paypal_direct_sale" value="0" {if $PayPal_payment_capture == 0}checked="checked"{/if} /> <label for="paypal_direct_sale">{$PayPal_content.payment_type_direct|escape:'htmlall':'UTF-8'}</label><br />

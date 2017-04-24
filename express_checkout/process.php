@@ -298,10 +298,15 @@ class PaypalExpressCheckout extends Paypal
 
 			$fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
 
-			$fields['L_PAYMENTREQUEST_0_AMT'.$index] = Tools::ps_round($product['price_wt'], $this->decimals);
-			$fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
-
-			$total = $total + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
+			if ((bool) Configuration::get('PAYPAL_TRANSFER_CART_LINE_ITEMS')) {
+				$fields['L_PAYMENTREQUEST_0_AMT'.$index] = Tools::ps_round($product['price_wt'], $this->decimals);
+				$fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
+				$total = $total + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
+			} else {
+				$fields['L_PAYMENTREQUEST_0_AMT'.$index] = $product['total_wt'];
+				$fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
+				$total = $total + $fields['L_PAYMENTREQUEST_0_AMT'.$index];
+			}
 		}
 	}
 
@@ -408,9 +413,13 @@ class PaypalExpressCheckout extends Paypal
 
 		foreach ($this->product_list as $product)
 		{
-			$price = Tools::ps_round($product['price_wt'], $this->decimals);
-			$quantity = Tools::ps_round($product['quantity'], $this->decimals);
-			$total = Tools::ps_round($total + ($price * $quantity), $this->decimals);
+			if ((bool) Configuration::get('PAYPAL_TRANSFER_CART_LINE_ITEMS')) {
+				$price = Tools::ps_round($product['price_wt'], $this->decimals);
+				$quantity = Tools::ps_round($product['quantity'], $this->decimals);
+				$total = Tools::ps_round($total + ($price * $quantity), $this->decimals);
+			} else {
+				$total = $total + $product['total_wt'];
+			}
 		}
 
 		if ($this->context->cart->gift == 1)

@@ -333,6 +333,7 @@ class PayPal extends PaymentModule
 			'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID'),
 			'PayPal_sandbox_mode' => (int)Configuration::get('PAYPAL_SANDBOX'),
 			'PayPal_payment_capture' => (int)Configuration::get('PAYPAL_CAPTURE'),
+			'PayPal_transfer_cart_line_items' => (bool) Configuration::get('PAYPAL_TRANSFER_CART_LINE_ITEMS'),
 			'PayPal_country_default' => (int)$this->default_country,
 			'PayPal_change_country_url' => 'index.php?tab=AdminCountries&token='.Tools::getAdminTokenLite('AdminCountries').'#footer',
 			'Countries'	=> Country::getCountries($english_language_id),
@@ -1115,6 +1116,7 @@ class PayPal extends PaymentModule
 			$business = Tools::getValue('business') !== false ? (int)Tools::getValue('business') : false;
 			$payment_method = Tools::getValue('paypal_payment_method') !== false ? (int)Tools::getValue('paypal_payment_method') : false;
 			$payment_capture = Tools::getValue('payment_capture') !== false ? (int)Tools::getValue('payment_capture') : false;
+			$transfer_cart_line_items = Tools::getValue('transfer_cart_line_items') !== false ? (int) Tools::getValue('payment_capture') : false;
 			$sandbox_mode = Tools::getValue('sandbox_mode') !== false ? (int)Tools::getValue('sandbox_mode') : false;
 
 			if ($this->default_country === false || $sandbox_mode === false || $payment_capture === false || $business === false || $payment_method === false)
@@ -1146,6 +1148,7 @@ class PayPal extends PaymentModule
 				Configuration::updateValue('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID', Tools::getValue('in_context_checkout_merchant_id'));
 				Configuration::updateValue('PAYPAL_SANDBOX', (int)Tools::getValue('sandbox_mode'));
 				Configuration::updateValue('PAYPAL_CAPTURE', (int)Tools::getValue('payment_capture'));
+				Configuration::updateValue('PAYPAL_TRANSFER_CART_LINE_ITEMS', (int) Tools::getValue('transfer_cart_line_items'));
 				/* USE PAYPAL LOGIN */
 				Configuration::updateValue('PAYPAL_LOGIN', (int)Tools::getValue('paypal_login'));
 				Configuration::updateValue('PAYPAL_LOGIN_CLIENT_ID', Tools::getValue('paypal_login_client_id'));
