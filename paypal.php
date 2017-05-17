@@ -93,6 +93,7 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_API_ADVANTAGES', 1)
             || !Configuration::updateValue('PAYPAL_API_CARD', 0)
             || !Configuration::updateValue('PAYPAL_METHOD', '')
+            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
         ) {
             return false;
         }
@@ -156,6 +157,7 @@ class PayPal extends PaymentModule
             || !$this->registerHook('actionOrderStatusPostUpdate')
             || !$this->registerHook('actionValidateOrder')
             || !$this->registerHook('actionOrderStatusUpdate')
+            || !$this->registerHook('displayFooterProduct')
         ) {
             return false;
         }
@@ -230,12 +232,6 @@ class PayPal extends PaymentModule
 
     public function getContent()
     {
-
-      /*  $test = "{\"success\":true,\"data\":{\"url\":\"https:\/\/www.sandbox.paypal.com\/FR\/merchantsignup\/partner\/onboardingentry?token=NTBlNjdiYmEtMjU4Ny00ODcyLTg3NzMtYTkzNTc1NDE5NGJhNG5ET3lva1RVamhkRCtoZWlwRHFRaU5LalhVaUYyVGJxVEdJeHdXWmVXbz0=&context_token=6148968567513348096\"},\"error\":null}";
-//print_r(Tools::jsonDecode($test));
-        $response = $this->getPartnerInfo('EXPRESS_CHECKOUT');
-        print_r($response);die;*/
-
         $this->_postProcess();
         $return_url = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
         /*
@@ -342,6 +338,25 @@ class PayPal extends PaymentModule
                 ),
                 array(
                     'type' => 'switch',
+                    'label' => $this->l('Enabled shortcut'),
+                    'name' => 'paypal_express_checkout_shortcut',
+                    'is_bool' => true,
+                    'hint' => $this->l('qgsdfggh'),
+                    'values' => array(
+                        array(
+                            'id' => 'paypal_express_checkout_shortcut_on',
+                            'value' => 1,
+                            'label' => $this->l('Enabled'),
+                        ),
+                        array(
+                            'id' => 'paypal_express_checkout_shortcut_off',
+                            'value' => 0,
+                            'label' => $this->l('Disabled'),
+                        )
+                    ),
+                ),
+                array(
+                    'type' => 'switch',
                     'label' => $this->l('Show PayPal benefits to your customers'),
                     'name' => 'paypal_show_advantage',
                     'desc' => $this->l(''),
@@ -372,6 +387,7 @@ class PayPal extends PaymentModule
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
             'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
+            'paypal_express_checkout_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
         );
         $helper = new HelperForm();
         $helper->module = $this;
@@ -419,6 +435,7 @@ class PayPal extends PaymentModule
             Configuration::updateValue('PAYPAL_API_INTENT', Tools::getValue('paypal_intent'));
             Configuration::updateValue('PAYPAL_API_CARD', Tools::getValue('paypal_card'));
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', Tools::getValue('paypal_show_advantage'));
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', Tools::getValue('paypal_express_checkout_shortcut'));
         }
 
         if (Tools::getValue('api_username') && Tools::getValue('api_password') && Tools::getValue('api_signature')) {
@@ -449,15 +466,14 @@ class PayPal extends PaymentModule
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
             Configuration::updateValue('PAYPAL_METHOD', Tools::getValue('method'));
             $response = $this->getPartnerInfo(Tools::getValue('method'));
-            if ((!Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_LIVE_ACCESS'))
-                || (Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_SANDBOX_ACCESS'))
-                && Tools::getValue('modify')) {
+
+            if ((!Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_LIVE_ACCESS')) || (Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_SANDBOX_ACCESS')) && Tools::getValue('modify')) {
                 $response = $this->getPartnerInfo(Tools::getValue('method'));
-                $result = Tools::jsonDecode($response);
-                if (!$result->error && isset($result->data->url)) {
-                    $PartnerboardingURL = $result->data->url;
-                    Tools::redirectLink($PartnerboardingURL);
-                }
+
+            }
+            $result = Tools::jsonDecode($response);
+            if (!$result->error && isset($result->data->url)) {
+                Tools::redirectLink( $result->data->url);
             }
         }
     }
@@ -518,6 +534,12 @@ class PayPal extends PaymentModule
         ));
         $this->context->controller->registerJavascript($this->name.'-order_confirmation_js', $this->_path.'/views/js/order_confirmation.js');
         return $this->context->smarty->fetch('module:paypal/views/templates/hook/order_confirmation.tpl');
+    }
+
+    public function hookDisplayFooterProduct($params)
+    {
+        $method = AbstractMethodPaypal::load('EC');
+        return $method->renderExpressCheckout($this->context, 'EC');
     }
 
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
@@ -626,15 +648,9 @@ class PayPal extends PaymentModule
         return $paypal_msg.$this->display(__FILE__, 'views/templates/hook/paypal_order.tpl');
     }
 
-    public function hookActionOrderStatusPostUpdate($params)
-    {
-
-    }
-
 
     public function hookActionOrderStatusUpdate($params)
     {
-
 
         $paypal_order = PaypalOrder::loadByOrderId($params['id_order']);
         if (!Validate::isLoadedObject($paypal_order)) {

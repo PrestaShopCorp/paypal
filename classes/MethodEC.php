@@ -39,22 +39,28 @@ class MethodEC extends AbstractMethodPaypal
     public function init($data)
     {
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-
         $params = array(
-            'CANCELURL' => Context::getContext()->link->getPageLink('order', true).'&step=1',
-            'LANDINGPAGE' => Tools::getValue('credit_card') ? 'Billing' : 'Login',
+            'CANCELURL' => Tools::getShopDomain(true, true).'/index.php?controller=order&step=1',
+            'LANDINGPAGE' => $data['use_card'] ? 'Billing' : 'Login',
             'RETURNURL' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
         );
-
         $this->_getCredentialsInfo($params);
-
         $this->_getPaymentInfo($params);
+        $params = $this->_setPaymentDetails($params);
+
+
+        if(isset($data['short_cut']))
+        {
+            $params['LANDINGPAGE'] = 'Login';
+            $params['RETURNURL'] = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
+        }
+
+        if(isset($data['short_cut']))
+        {
+            $params['NOSHIPPING'] = 2;
+        }
 
         $payment = $sdk->setExpressCheckout($params);
-       /* echo '<pre>';
-        print_r($payment);
-        echo '<pre>';
-        die;*/
         $return = false;
         if (isset($payment['TOKEN'])) {
             $this->token = $payment['TOKEN'];
@@ -63,6 +69,147 @@ class MethodEC extends AbstractMethodPaypal
             $return = $payment;
         }
         return $return;
+    }
+
+    private function _setPaymentDetails($params)
+    {
+        // Products
+        $tax = $total_products = 0;
+        $index = -1;
+        $fields = array();
+        $fields['USER'] =  $params['USER'];
+        $fields['PWD'] = $params['PWD'];
+        $fields['SIGNATURE'] = $params['SIGNATURE'];
+        $fields['CANCELURL'] = $params['CANCELURL'];
+        $fields['LANDINGPAGE'] = $params['LANDINGPAGE'];
+        $fields['RETURNURL'] = $params['RETURNURL'];
+
+        // Set cart products list
+        $this->setProductsList($fields, $params['PAYMENT_LIST']['PRODUCTS'], $index, $total_products, $tax);
+        $this->setDiscountsList($fields, $params['PAYMENT_LIST']['DISCOUNTS'], $index, $total_products, $tax);
+        $this->setGiftWrapping($fields, $params['PAYMENT_LIST']['WRAPPING'], $index, $total_products, $tax);
+
+        // Payment values
+        $fields['PAYMENTREQUEST_0_PAYMENTACTION'] = $params['PAYMENTREQUEST_0_PAYMENTACTION'];
+        $fields['PAYMENTREQUEST_0_CURRENCYCODE'] = $params['CURRENCY'];
+        $this->setPaymentValues($fields, $params['COSTS'], $index, $total_products, $tax);
+
+
+        if(!isset($params['short_cut']))
+        {
+            // Set address information
+            $this->_setShippingAddress($fields, $params['SHIPPING']);
+        }
+
+        foreach ($params as &$field) {
+            if (is_numeric($field)) {
+                $field = number_format($field, 2, ".", ",");
+            }
+        }
+        $fields['METHOD'] = 'SetExpressCheckout';
+        $fields['SOLUTIONTYPE'] = 'Sole';
+        return $fields;
+    }
+
+    private function setProductsList(&$fields, $products, &$index, &$total_products, &$tax)
+    {
+        foreach ($products as $product) {
+            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = (int) $product['id_product'];
+
+            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $product['name'];
+
+            if (isset($product['attributes']) && (empty($product['attributes']) === false)) {
+                $fields['L_PAYMENTREQUEST_0_NAME'.$index] .= ' - '.$product['attributes'];
+            }
+
+            $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($product['description_short']), 0, 50).'...';
+
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($product['price'], 2);
+            $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = number_format($product['price_wt'] - $product['price'], 2);
+            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
+
+            $total_products = $total_products + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
+            $tax = $tax + ($fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] * $product['quantity']);
+        }
+    }
+
+    private function setDiscountsList(&$fields, $discounts, &$index, &$total_products)
+    {
+        if (count($discounts) > 0) {
+            foreach ($discounts as $discount) {
+                $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $discount['id_discount'];
+                $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $discount['name'];
+                if (isset($discount['description']) && !empty($discount['description'])) {
+                    $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($discount['description']), 0, 50).'...';
+                }
+
+                /* It is a discount so we store a negative value */
+                $fields['L_PAYMENTREQUEST_0_AMT'.$index] = -1 * number_format($discount['value_real'], 2);
+                $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
+
+                $total_products = round($total_products + $fields['L_PAYMENTREQUEST_0_AMT'.$index], 2);
+            }
+        }
+    }
+
+    private function setGiftWrapping(&$fields, $wrapping, &$index, &$total_products)
+    {
+        if ($wrapping > 0) {
+            $fields['L_PAYMENTREQUEST_0_NAME'.++$index] = 'Gift wrapping';
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($wrapping, 2);
+            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
+            $total_products = round($total_products + $wrapping, 2);
+        }
+    }
+
+    private function setPaymentValues(&$fields, $costs, &$index, &$total_products, &$tax)
+    {
+        $subtotal = $costs['SUBTOTAL'];
+        $total = $costs['TOTAL'];
+        $total_tax = round($tax, 2);
+
+        if ($subtotal != $total_products) {
+            $subtotal = $total_products;
+        }
+        $shipping = round($costs['SHIPPING_COST'], 2);
+        $total_cart = $total_products + $shipping + $tax;
+
+        if ($total != $total_cart) {
+            $total = $total_cart;
+        }
+
+        /**
+         * If the total amount is lower than 1 we put the shipping cost as an item
+         * so the payment could be valid.
+         */
+        if ($total <= 1) {
+            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $costs['CARRIER']->id_reference;
+            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $costs['CARRIER']->name;
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($shipping, 2);
+            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
+            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $subtotal + $shipping;
+            $fields['PAYMENTREQUEST_0_AMT'] = $total + $shipping;
+        } else {
+            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = number_format($shipping, 2);
+            $fields['PAYMENTREQUEST_0_ITEMAMT'] = number_format($subtotal, 2);
+            $fields['PAYMENTREQUEST_0_TAXAMT'] = number_format($total_tax, 2);
+            $fields['PAYMENTREQUEST_0_AMT'] = number_format($total, 2);
+        }
+    }
+
+    private function _setShippingAddress(&$fields, $params)
+    {
+        $fields['ADDROVERRIDE'] = '0';
+        $fields['NOSHIPPING'] = (isset($params['NOSHIPPING'])?$params['NOSHIPPING']:'1');
+        $fields['EMAIL'] = $params['EMAIL'];
+        $fields['PAYMENTREQUEST_0_SHIPTONAME'] = $params['ADDRESS_OBJ']->firstname.' '.$params['ADDRESS_OBJ']->lastname;
+        $fields['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = (empty($params['ADDRESS_OBJ']->phone)) ? $params['ADDRESS_OBJ']->phone_mobile : $params['ADDRESS_OBJ']->phone;
+        $fields['PAYMENTREQUEST_0_SHIPTOSTREET'] = $params['ADDRESS_OBJ']->address1;
+        $fields['PAYMENTREQUEST_0_SHIPTOSTREET2'] = $params['ADDRESS_OBJ']->address2;
+        $fields['PAYMENTREQUEST_0_SHIPTOCITY'] = $params['ADDRESS_OBJ']->city;
+        $fields['PAYMENTREQUEST_0_SHIPTOSTATE'] = $params['STATE'];
+        $fields['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $params['COUNTRY'];
+        $fields['PAYMENTREQUEST_0_SHIPTOZIP'] = $params['ADDRESS_OBJ']->postcode;
     }
 
     public function _getPaymentInfo(&$params)
@@ -260,7 +407,7 @@ class MethodEC extends AbstractMethodPaypal
  
         return $response;
     }
-    
+
     public function void($authorization)
     {
         $params = array();
@@ -268,5 +415,43 @@ class MethodEC extends AbstractMethodPaypal
         $this->_getCredentialsInfo($params);
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
         return $sdk->doVoid($params);
+    }
+
+    public function renderExpressCheckout(&$context,$type)
+    {
+        if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
+            return false;
+        }
+
+        $lang = Language::getLanguage($context->language->id);
+        $context->smarty->assign(array(
+            'PayPal_payment_type' => $type,
+            'PayPal_tracking_code' => 'PRESTASHOP_ECM',
+            'PayPal_lang_code' => str_replace('-','_' , $lang['locale']),
+            'action_url' => $context->link->getModuleLink('paypal','ecScPayment',array(),true)
+        ));
+        $context->controller->registerJavascript($this->name.'-order_confirmation_js', 'modules/paypal/views/js/ec_shortcut.js');
+
+        return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
+    }
+
+    public function getInfo($params)
+    {
+        switch (Configuration::get('PAYPAL_SANDBOX')) {
+            case 0:
+                $params['USER'] = Configuration::get('PAYPAL_USERNAME_LIVE');
+                $params['PWD'] = Configuration::get('PAYPAL_PSWD_LIVE');
+                $params['SIGNATURE'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
+                break;
+            case 1:
+                $params['USER'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
+                $params['PWD'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
+                $params['SIGNATURE'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
+                break;
+        }
+
+        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
+        return $sdk->getExpressCheckout($params);
+
     }
 }

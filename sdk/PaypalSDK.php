@@ -29,6 +29,7 @@ class PaypalSDK
     private $action;
     private $endpoint;
     private $urlAPI;
+    private $urlSI;
     private $version = '204';
 
     public function __construct($sandbox=0)
@@ -36,143 +37,21 @@ class PaypalSDK
         $this->action = 'POST';
         if ($sandbox) {
             $this->urlAPI = 'https://api-3t.sandbox.paypal.com/nvp';
+            $this->urlSI = 'http://137.74.166.211/';
         } else {
             $this->urlAPI = 'https://api-3t.paypal.com/nvp';
+            $this->urlSI = 'http://137.74.166.211/';
         }
     }
 
     public function setExpressCheckout($params)
     {
-        $fields = array();
 
         // Seller informations
-        $this->_setUserCredentials($fields, $params);
 
-        $fields['METHOD'] = 'SetExpressCheckout';
-        $fields['VERSION'] = $this->version;
-        $fields['CANCELURL'] = $params['CANCELURL'];
-        $fields['SOLUTIONTYPE'] = 'Sole';
-        $fields['LANDINGPAGE'] = $params['LANDINGPAGE'];
-        $fields['RETURNURL'] = $params['RETURNURL'];
+        $params['VERSION'] = $this->version;
+        return $this->makeCallPaypal($params);
 
-        // Set payment detail (reference)
-        $this->_setPaymentDetails($fields, $params);
-
-        return $this->makeCallPaypal($fields);
-
-    }
-
-    private function _setPaymentDetails(&$fields, $params)
-    {
-        // Products
-        $tax = $total_products = 0;
-        $index = -1;
-
-        // Set cart products list
-        $this->setProductsList($fields, $params['PAYMENT_LIST']['PRODUCTS'], $index, $total_products, $tax);
-        $this->setDiscountsList($fields, $params['PAYMENT_LIST']['DISCOUNTS'], $index, $total_products, $tax);
-        $this->setGiftWrapping($fields, $params['PAYMENT_LIST']['WRAPPING'], $index, $total_products, $tax);
-
-        // Payment values
-        $fields['PAYMENTREQUEST_0_PAYMENTACTION'] = $params['PAYMENTREQUEST_0_PAYMENTACTION'];
-        $fields['PAYMENTREQUEST_0_CURRENCYCODE'] = $params['CURRENCY'];
-        $this->setPaymentValues($fields, $params['COSTS'], $index, $total_products, $tax);
-
-        // Set address information
-        $this->_setShippingAddress($fields, $params['SHIPPING']);
-
-        foreach ($params as &$field) {
-            if (is_numeric($field)) {
-                $field = number_format($field, 2, ".", ",");
-            }
-        }
-
-    }
-
-    private function setProductsList(&$fields, $products, &$index, &$total_products, &$tax)
-    {
-        foreach ($products as $product) {
-            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = (int) $product['id_product'];
-
-            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $product['name'];
-
-            if (isset($product['attributes']) && (empty($product['attributes']) === false)) {
-                $fields['L_PAYMENTREQUEST_0_NAME'.$index] .= ' - '.$product['attributes'];
-            }
-
-            $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($product['description_short']), 0, 50).'...';
-
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($product['price'], 2);
-            $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = number_format($product['price_wt'] - $product['price'], 2);
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
-
-            $total_products = $total_products + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
-            $tax = $tax + ($fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] * $product['quantity']);
-        }
-    }
-
-    private function setDiscountsList(&$fields, $discounts, &$index, &$total_products)
-    {
-        if (count($discounts) > 0) {
-            foreach ($discounts as $discount) {
-                $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $discount['id_discount'];
-                $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $discount['name'];
-                if (isset($discount['description']) && !empty($discount['description'])) {
-                    $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($discount['description']), 0, 50).'...';
-                }
-
-                /* It is a discount so we store a negative value */
-                $fields['L_PAYMENTREQUEST_0_AMT'.$index] = -1 * number_format($discount['value_real'], 2);
-                $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-
-                $total_products = round($total_products + $fields['L_PAYMENTREQUEST_0_AMT'.$index], 2);
-            }
-        }
-    }
-
-    private function setGiftWrapping(&$fields, $wrapping, &$index, &$total_products)
-    {
-        if ($wrapping > 0) {
-            $fields['L_PAYMENTREQUEST_0_NAME'.++$index] = 'Gift wrapping';
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($wrapping, 2);
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-            $total_products = round($total_products + $wrapping, 2);
-        }
-    }
-
-    private function setPaymentValues(&$fields, $costs, &$index, &$total_products, &$tax)
-    {
-        $subtotal = $costs['SUBTOTAL'];
-        $total = $costs['TOTAL'];
-        $total_tax = round($tax, 2);
-
-        if ($subtotal != $total_products) {
-            $subtotal = $total_products;
-        }
-        $shipping = round($costs['SHIPPING_COST'], 2);
-        $total_cart = $total_products + $shipping + $tax;
-
-        if ($total != $total_cart) {
-            $total = $total_cart;
-        }
-
-        /**
-         * If the total amount is lower than 1 we put the shipping cost as an item
-         * so the payment could be valid.
-         */
-        if ($total <= 1) {
-            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $costs['CARRIER']->id_reference;
-            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $costs['CARRIER']->name;
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($shipping, 2);
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $subtotal + $shipping;
-            $fields['PAYMENTREQUEST_0_AMT'] = $total + $shipping;
-        } else {
-            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = number_format($shipping, 2);
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = number_format($subtotal, 2);
-            $fields['PAYMENTREQUEST_0_TAXAMT'] = number_format($total_tax, 2);
-            $fields['PAYMENTREQUEST_0_AMT'] = number_format($total, 2);
-        }
     }
 
     private function _setUserCredentials(&$fields, $params)
@@ -182,20 +61,6 @@ class PaypalSDK
         $fields['SIGNATURE'] = $params['SIGNATURE'];
     }
 
-    private function _setShippingAddress(&$fields, $params)
-    {
-        $fields['ADDROVERRIDE'] = '0';
-        $fields['NOSHIPPING'] = '1';
-        $fields['EMAIL'] = $params['EMAIL'];
-        $fields['PAYMENTREQUEST_0_SHIPTONAME'] = $params['ADDRESS_OBJ']->firstname.' '.$params['ADDRESS_OBJ']->lastname;
-        $fields['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = (empty($params['ADDRESS_OBJ']->phone)) ? $params['ADDRESS_OBJ']->phone_mobile : $params['ADDRESS_OBJ']->phone;
-        $fields['PAYMENTREQUEST_0_SHIPTOSTREET'] = $params['ADDRESS_OBJ']->address1;
-        $fields['PAYMENTREQUEST_0_SHIPTOSTREET2'] = $params['ADDRESS_OBJ']->address2;
-        $fields['PAYMENTREQUEST_0_SHIPTOCITY'] = $params['ADDRESS_OBJ']->city;
-        $fields['PAYMENTREQUEST_0_SHIPTOSTATE'] = $params['STATE'];
-        $fields['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $params['COUNTRY'];
-        $fields['PAYMENTREQUEST_0_SHIPTOZIP'] = $params['ADDRESS_OBJ']->postcode;
-    }
 
     public function getExpressCheckout($params)
     {
@@ -264,6 +129,7 @@ class PaypalSDK
 
     public function getUrlOnboarding($body)
     {
+        $this->endpoint = 'getUrl';
         $response = $this->makeCallSI(http_build_query($body, '', '&'));
         return $response;
     }
@@ -278,7 +144,7 @@ class PaypalSDK
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_URL, "https://paypal-sandbox.pp-ps-auth.com/getUrl?".$body);
+        curl_setopt($curl, CURLOPT_URL, $this->urlSI.$this->endpoint.'?'.$body );
         $response = curl_exec($curl);
         return $response;
     }
