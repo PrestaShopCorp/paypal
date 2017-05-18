@@ -172,6 +172,9 @@ class PaypalExpressCheckout extends Paypal
         $parsed_data = parse_url($url);
 
         $parsed_data['scheme'] .= '://';
+        if (isset($parsed_data['port'])) {
+            $parsed_data['port'] = ':' . $parsed_data['port'];
+        }
 
         if (isset($parsed_data['path'])) {
             $parsed_data['path'] .= '?paypal_ec_canceled=1&';
