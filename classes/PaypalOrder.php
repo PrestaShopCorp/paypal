@@ -46,6 +46,8 @@ class PaypalOrder extends ObjectModel
 
     public $total_prestashop;
 
+    public $method;
+
     public $date_add;
 
     public $date_upd;
@@ -68,6 +70,7 @@ class PaypalOrder extends ObjectModel
             'total_paid' => array('type' => self::TYPE_FLOAT),
             'payment_status' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'total_prestashop' => array('type' => self::TYPE_FLOAT),
+            'method' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
@@ -102,5 +105,15 @@ class PaypalOrder extends ObjectModel
         $sql->where('id_order = '.(int)$id_order);
         $id_paypal_order = Db::getInstance()->getValue($sql);
         return new self($id_paypal_order);
+    }
+
+    public static function getAllBtOrders()
+    {
+        $sql = new DbQuery();
+        $sql->select('*');
+        $sql->from('paypal_order');
+        $sql->where('method = "BT" AND payment_method = "sale"');
+        return Db::getInstance()->executeS($sql);
+
     }
 }

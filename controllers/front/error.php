@@ -34,7 +34,7 @@ class PaypalErrorModuleFrontController extends ModuleFrontController
         parent::initContent();
         $error_code = Tools::getValue('L_ERRORCODE0');
         $errors = $this->getErrorMsg();
-        $error_msg = $errors[$error_code]?$errors[$error_code]:$errors['00000'];
+        $error_msg = isset($errors[$error_code])?$errors[$error_code]:$errors['00000'];
         $this->context->smarty->assign(array(
             'error_paypal' => $error_msg,
         ));

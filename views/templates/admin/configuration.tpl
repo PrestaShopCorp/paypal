@@ -70,7 +70,7 @@
 
         <div class="active-products">
             <p><b>{l s='2 PayPal products selected for you' mod='paypal'}</b></p>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
@@ -88,7 +88,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">
+            {if !isset($braintree_dispo)}
+            <div class="col-sm-4">
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
@@ -109,6 +110,51 @@
                     </div>
                 </div>
             </div>
+            {/if}
+            {if isset($braintree_dispo)}
+            <div class="col-sm-4">
+                <div class="panel">
+                    <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                    <p>
+                        {l s='Accept' mod='paypal'} <b>{l s='Braintree' mod='paypal'}</b> {l s='payments' mod='paypal'}
+                    </p>
+                    <p>
+                        {l s='Your customers can pay with a selection of local and international ' mod='paypal'} <b>{l s='debit and credit cards.' mod='paypal'}</b> {l s='Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                    </p>
+                    <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                    <div class="bottom">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BRAINTREE">{if $bt_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="panel">
+                    <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                    <p>
+                        {l s='Accept' mod='paypal'} <b>{l s='Paypal by Braintree' mod='paypal'}</b> {l s='payments' mod='paypal'}
+                    </p>
+                    <p>
+                        {l s='Your customers can pay with a selection of local and international ' mod='paypal'} <b>{l s='debit and credit cards.' mod='paypal'}</b> {l s='Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                    </p>
+                    <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                    <div class="bottom">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BRAINTREE&with_paypal=1">{if $bt_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                    </div>
+                </div>
+            </div>
+            {/if}
         </div>
 
     </div>
@@ -168,6 +214,7 @@
 
 </div>
 
+<!--------------------------------------------------------------------------->
 <script type="text/javascript">
 
     function display_rounding()
@@ -197,8 +244,9 @@
             event.preventDefault();
             $('a[href=#paypal_conf]').click();
         });
-        
+        $('#configuration_form_1').insertAfter($('.parametres'));
         $('#configuration_form').insertAfter($('.parametres'));
+
         //var activate_link = "{*$PartnerboardingURL|escape:'html':'UTF-8'*}";
 
     });

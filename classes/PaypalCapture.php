@@ -76,4 +76,17 @@ class PaypalCapture extends ObjectModel
         $sql->where('po.id_order = '.(int)$id_order);
         return Db::getInstance()->getRow($sql);
     }
+
+    public static function updateCapture($transaction_id, $amount, $status, $id_paypal_order)
+    {
+        Db::getInstance()->update(
+            'paypal_capture',
+            array(
+                'id_capture' => pSQL($transaction_id),
+                'capture_amount' => (float)$amount,
+                'result' => pSQL($status),
+            ),
+            'id_paypal_order = '.(int)$id_paypal_order
+        );
+    }
 }

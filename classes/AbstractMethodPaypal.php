@@ -32,14 +32,17 @@ abstract class AbstractMethodPaypal
     abstract public function confirmCapture();
     abstract public function check();
     abstract public function refund();
-    abstract public function setConfig($params);
+    abstract public function setConfig();
     abstract public function void($params);
 
     public static function load($method)
     {
+
+
         if (file_exists(_PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php')) {
             include_once _PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php';
-            return new MethodEC();
+            $method_class = 'Method'.$method;
+            return new $method_class();
         }
     }
 }
