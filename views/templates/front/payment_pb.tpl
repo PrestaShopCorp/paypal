@@ -1,0 +1,102 @@
+{*
+* 2007-2017 PrestaShop
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to license@prestashop.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+* versions in the future. If you wish to customize PrestaShop for your
+* needs please refer to http://www.prestashop.com for more information.
+*
+*  @author    PrestaShop SA <contact@prestashop.com>
+*  @copyright 2007-2017 PrestaShop SA
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  International Registered Trademark & Property of PrestaShop SA
+*}
+<div class="row">
+    <div class="col-xs-12 col-md-10">
+        <div class="braintree-row-payment">
+            <div class="payment_module">
+<form><div id="paypal-button"></div></form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
+<script src="https://js.braintreegateway.com/web/3.16.0/js/client.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js"></script>
+<script>
+
+    var authorization = '{$braintreeToken}';
+    braintree.client.create({
+        authorization: authorization
+        }, function (clientErr, clientInstance) {
+
+        // Stop if there was a problem creating the client.
+        // This could happen if there is a network error or if the authorization
+        // is invalid.
+        if (clientErr) {
+            console.error('Error creating client:', clientErr);
+            return;
+        }
+
+        // Create a PayPal Checkout component.
+        braintree.paypalCheckout.create({
+        client: clientInstance
+        }, function (paypalCheckoutErr, paypalCheckoutInstance) {
+
+            // Stop if there was a problem creating PayPal Checkout.
+            // This could happen if there was a network error or if it's incorrectly
+            // configured.
+            if (paypalCheckoutErr) {
+            console.error('Error creating PayPal Checkout:', paypalCheckoutErr);
+            return;
+            }
+
+        // Set up PayPal with the checkout.js library
+        paypal.Button.render({
+        env: 'sandbox', // or 'sandbox'
+
+        payment: function () {
+            return paypalCheckoutInstance.createPayment({
+                flow: 'vault',
+                billingAgreementDescription: 'Your agreement description',
+                enableShippingAddress: true,
+                shippingAddressEditable: false,
+            });
+        },
+
+        onAuthorize: function (data, actions) {
+        return paypalCheckoutInstance.tokenizePayment(data)
+        .then(function (payload) {
+        // Submit `payload.nonce` to your server.
+        });
+        },
+
+        onCancel: function (data) {
+        console.log('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
+        },
+
+        onError: function (err) {
+        console.error('checkout.js error', err);
+        }
+        }, '#paypal-button').then(function () {
+        // The PayPal button will be rendered in an html element with the id
+        // `paypal-button`. This function will be called when the PayPal button
+        // is set up and ready to be used.
+        });
+
+        });
+
+    });
+</script>
