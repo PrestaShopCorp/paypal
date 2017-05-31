@@ -675,6 +675,7 @@ class PayPal extends PaymentModule
             $embeddedOption->setCallToActionText($this->l('Pay braintree'))
                 ->setForm($this->generateFormBt())
                 ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+
             $payments_options[] = $embeddedOption;
         }
 
@@ -684,9 +685,23 @@ class PayPal extends PaymentModule
     public function hookHeader()
     {
         if (Tools::getValue('controller') == "order") {
-            $this->context->controller->registerStylesheet($this->name.'-braintreecss', 'modules/'.$this->name.'/views/css/braintree.css');
-            //$this->context->controller->registerJavascript($this->name.'-braintreejs', 'modules/'.$this->name.'/views/js/payment_bt.js');
+            if (Configuration::get('PAYPAL_BRAINTREE_ENABLED') || Configuration::get('PAYPAL_BY_BRAINTREE')) {
+                $this->context->controller->registerJavascript($this->name . '-braintreegateway-client', 'https://js.braintreegateway.com/web/3.16.0/js/client.min.js', array('server' => 'remote'));
+            }
+            if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
+                $this->context->controller->registerJavascript($this->name . '-braintreegateway-hosted', 'https://js.braintreegateway.com/web/3.16.0/js/hosted-fields.min.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-braintreegateway-data', 'https://js.braintreegateway.com/web/3.16.0/js/data-collector.min.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-braintreegateway-3ds', 'https://js.braintreegateway.com/web/3.16.0/js/three-d-secure.min.js', array('server' => 'remote'));
+                $this->context->controller->registerStylesheet($this->name . '-braintreecss', 'modules/' . $this->name . '/views/css/braintree.css');
+                $this->context->controller->registerJavascript($this->name . '-braintreejs', 'modules/' . $this->name . '/views/js/payment_bt.js');
+            }
+            if (1 || Configuration::get('PAYPAL_BY_BRAINTREE')) {
+                $this->context->controller->registerJavascript($this->name . '-paypal-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-paypal-checkout-min', 'https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-paypal-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
+            }
         }
+
 
     }
 

@@ -28,7 +28,7 @@
 <div class="row">
     <div class="col-xs-12 col-md-10">
         <div class="braintree-row-payment">
-            <div class="payment_module">
+            <div class="payment_module braintree-card">
             {if $error_msg}<span class="braintree_error">{$error_msg|escape:'htmlall':'UTF-8'}</span>{/if}
                 <label class="paypal_title_pay_card">{l s='Pay with your card' mod='paypal'}</label><div class="paypal_clear"></div>
             <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/braintree_cards.png" alt="">
@@ -51,189 +51,37 @@
                 <input type="hidden" name="liabilityShiftPossible" id="liabilityShiftPossible"/>
                 <input type="hidden" name="payment_method_nonce" id="payment_method_nonce"/>
                 <input type="hidden" name="card_type" id="braintree_card_type"/>
+                <input type="hidden" name="payment_method_bt" value="card-braintree"/>
                 <div class="paypal_clear"></div>
-                <input type="submit" value="{l s='Pay' mod='paypal'}"  id="braintree_submit" disabled="disabled"/>
             </form>
             </div>
         </div>
         </div>
     </div>
 
-<script src="https://js.braintreegateway.com/web/3.9.0/js/client.min.js"></script>
-<script src="https://js.braintreegateway.com/web/3.9.0/js/hosted-fields.min.js"></script>
-<script src="https://js.braintreegateway.com/web/3.9.0/js/data-collector.min.js"></script>
-<script src="https://js.braintreegateway.com/web/3.9.0/js/three-d-secure.min.js"></script>
 
 <script>
+
     var authorization = '{$braintreeToken}';
-    var submit = document.querySelector('#braintree_submit');
-    var form = document.querySelector('#braintree-form');
+    var bt_amount = {$braintreeAmount};
+    var check3DS = {$check3Dsecure};
+    var bt_translations = {
+        client:"{l s='Error create Client' mod='paypal'}",
+        card_nmb:"{l s='Card number' mod='paypal'}",
+        cvc:"{l s='CVC' mod='paypal'}",
+        date:"{l s='MM/YY' mod='paypal'}",
+        hosted:"{l s='Error create Hosted fields' mod='paypal'}",
+        empty:"{l s='All fields are empty! Please fill out the form.' mod='paypal'}",
+        invalid:"{l s='Some fields are invalid :' mod='paypal'}",
+        token:"{l s='Tokenization failed server side. Is the card valid?' mod='paypal'}",
+        network:"{l s='Network error occurred when tokenizing.' mod='paypal'}",
+        tkn_failed:"{l s='Tokenize failed' mod='paypal'}",
+        https:"{l s='3D Secure requires HTTPS.' mod='paypal'}",
+        load_3d:"{l s='Load 3D Secure Failed' mod='paypal'}",
+        request_problem:"{l s='There was a problem with your request.' mod='paypal'}",
+        failed_3d:"{l s='3D Secure Failed' mod='paypal'}"
+    };
 
-    braintree.client.create({
-        authorization: authorization
-    }, function (clientErr, clientInstance) {
-        if (clientErr) {
-            $.fancybox.open([
-                {
-                    type: 'inline',
-                    autoScale: true,
-                    minHeight: 30,
-                    content: '{l s='Error create Client' mod='paypal'}'
-                }
-            ]);
-            return;
-        }
-
-        braintree.hostedFields.create({
-            client: clientInstance,
-            styles: {
-                'input': {
-                    'color': '#999999',
-                    'font-size': '14px',
-                    'font-family': 'PayPal Forward, sans-serif'
-                }
-            },
-            fields: {
-                number: {
-                    selector: "#card-number",
-                    placeholder: '{l s='Card number' mod='paypal'}'
-                },
-                cvv: {
-                    selector: "#cvv",
-                    placeholder: '{l s='CVC' mod='paypal'}'
-                },
-                expirationDate: {
-                    selector: "#expiration-date",
-                    placeholder: '{l s='MM/YY' mod='paypal'}'
-                }
-            }
-        },function (hostedFieldsErr, hostedFieldsInstance) {
-            if (hostedFieldsErr) {
-                $.fancybox.open([
-                    {
-                        type: 'inline',
-                        autoScale: true,
-                        minHeight: 30,
-                        content: '{l s='Error create Hosted fields' mod='paypal'}'
-                    }
-                ]);
-                return;
-            }
-
-            submit.removeAttribute('disabled');
-
-            form.addEventListener('submit', function (event) {
-                event.preventDefault();
-                hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
-                    if (tokenizeErr) {
-                        var popup_message = '';
-                        switch (tokenizeErr.code) {
-                            case 'HOSTED_FIELDS_FIELDS_EMPTY':
-                                popup_message = "{l s='All fields are empty! Please fill out the form.' mod='paypal'}";
-                                break;
-                            case 'HOSTED_FIELDS_FIELDS_INVALID':
-                                popup_message = "{l s='Some fields are invalid :' mod='paypal'} "+tokenizeErr.details.invalidFieldKeys;
-                                break;
-                            case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
-                                popup_message = "{l s='Tokenization failed server side. Is the card valid?' mod='paypal'}";
-                                break;
-                            case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
-                                popup_message = "{l s='Network error occurred when tokenizing.' mod='paypal'}";
-                                break;
-                            default:
-                                popup_message = "{l s='Tokenize failed' mod='paypal'}";
-                        }
-                        $.fancybox.open([
-                            {
-                                type: 'inline',
-                                autoScale: true,
-                                minHeight: 30,
-                                content: ''+popup_message+''
-                            }
-                        ]);
-                        return false;
-                    }
-                    {if $check3Dsecure}
-                    braintree.threeDSecure.create({
-                        client: clientInstance
-                    }, function (ThreeDSecureerror,threeDSecure) {
-
-                        if(ThreeDSecureerror)
-                        {
-                            switch (ThreeDSecureerror.code) {
-                                case 'THREEDS_HTTPS_REQUIRED':
-                                    popup_message = "{l s='3D Secure requires HTTPS.' mod='paypal'}";
-                                    break;
-                                default:
-                                    popup_message = "{l s='Load 3D Secure Failed' mod='paypal'}";
-                            }
-                            $.fancybox.open([
-                                {
-                                    type: 'inline',
-                                    autoScale: true,
-                                    minHeight: 30,
-                                    content: ''+popup_message+''
-                                }
-                            ]);
-                            return false;
-                        }
-                        threeDSecure.verifyCard({
-                            nonce: payload.nonce,
-                            amount: {$braintreeAmount},
-                            addFrame: function (err, iframe) {
-                                $.fancybox.open([
-                                    {
-                                        type: 'inline',
-                                        autoScale: true,
-                                        minHeight: 30,
-                                        content: '<p class="braintree-iframe">'+iframe.outerHTML+''
-                                    }
-                                ]);
-                            },
-                            removeFrame: function () {
-
-                            }
-                        }, function (err, three_d_secure_response) {
-                            if (err) {
-                                var popup_message = '';
-                                switch (err.code) {
-                                    case 'CLIENT_REQUEST_ERROR':
-                                        popup_message = "{l s='There was a problem with your request.' mod='paypal'}";
-                                        break;
-                                    default:
-                                        popup_message = "{l s='3D Secure Failed' mod='paypal'}";
-                                }
-                                $.fancybox.open([
-                                    {
-                                        type: 'inline',
-                                        autoScale: true,
-                                        minHeight: 30,
-                                        content: ''+popup_message+''
-                                    }
-                                ]);
-                                return false;
-                            }
-
-                            document.querySelector('input[name="payment_method_nonce"]').value = three_d_secure_response.nonce;
-                            document.querySelector('input[name="card_type"]').value = payload.details.cardType;
-                            form.submit()
-
-                        });
-                    });
-
-
-                    {else}
-
-                    document.querySelector('input[name="payment_method_nonce"]').value = payload.nonce;
-
-                    form.submit();
-
-                    {/if}
-
-                });
-            },true);
-        });
-    });
 </script>
 
 

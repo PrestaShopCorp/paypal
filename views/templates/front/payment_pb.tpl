@@ -24,79 +24,40 @@
 *}
 <div class="row">
     <div class="col-xs-12 col-md-10">
-        <div class="braintree-row-payment">
-            <div class="payment_module">
-<form><div id="paypal-button"></div></form>
+        <div class="paypal-braintree-row-payment">
+            <div class="payment_module paypal-braintree">
+            <form action="{$braintreeSubmitUrl}" id="paypal-braintree-form" method="post">
+                <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
+                <input type="hidden" name="payment_method_bt" value="paypal-braintree"/>
+                <div id="aaaaaa-button"></div>
+            </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
+<!--<script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
 <script src="https://js.braintreegateway.com/web/3.16.0/js/client.min.js"></script>
-<script src="https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js"></script>
+<script src="https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js"></script>-->
 <script>
 
     var authorization = '{$braintreeToken}';
-    braintree.client.create({
-        authorization: authorization
-        }, function (clientErr, clientInstance) {
-
-        // Stop if there was a problem creating the client.
-        // This could happen if there is a network error or if the authorization
-        // is invalid.
-        if (clientErr) {
-            console.error('Error creating client:', clientErr);
-            return;
-        }
-
-        // Create a PayPal Checkout component.
-        braintree.paypalCheckout.create({
-        client: clientInstance
-        }, function (paypalCheckoutErr, paypalCheckoutInstance) {
-
-            // Stop if there was a problem creating PayPal Checkout.
-            // This could happen if there was a network error or if it's incorrectly
-            // configured.
-            if (paypalCheckoutErr) {
-            console.error('Error creating PayPal Checkout:', paypalCheckoutErr);
-            return;
-            }
-
-        // Set up PayPal with the checkout.js library
-        paypal.Button.render({
-        env: 'sandbox', // or 'sandbox'
-
-        payment: function () {
-            return paypalCheckoutInstance.createPayment({
-                flow: 'vault',
-                billingAgreementDescription: 'Your agreement description',
-                enableShippingAddress: true,
-                shippingAddressEditable: false,
-            });
-        },
-
-        onAuthorize: function (data, actions) {
-        return paypalCheckoutInstance.tokenizePayment(data)
-        .then(function (payload) {
-        // Submit `payload.nonce` to your server.
-        });
-        },
-
-        onCancel: function (data) {
-        console.log('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
-        },
-
-        onError: function (err) {
-        console.error('checkout.js error', err);
-        }
-        }, '#paypal-button').then(function () {
-        // The PayPal button will be rendered in an html element with the id
-        // `paypal-button`. This function will be called when the PayPal button
-        // is set up and ready to be used.
-        });
-
-        });
-
-    });
+    var bt_amount = {$braintreeAmount};
+    var check3DS = {$check3Dsecure};
+    var bt_translations = {
+        client:"{l s='Error create Client' mod='paypal'}",
+        card_nmb:"{l s='Card number' mod='paypal'}",
+        cvc:"{l s='CVC' mod='paypal'}",
+        date:"{l s='MM/YY' mod='paypal'}",
+        hosted:"{l s='Error create Hosted fields' mod='paypal'}",
+        empty:"{l s='All fields are empty! Please fill out the form.' mod='paypal'}",
+        invalid:"{l s='Some fields are invalid :' mod='paypal'}",
+        token:"{l s='Tokenization failed server side. Is the card valid?' mod='paypal'}",
+        network:"{l s='Network error occurred when tokenizing.' mod='paypal'}",
+        tkn_failed:"{l s='Tokenize failed' mod='paypal'}",
+        https:"{l s='3D Secure requires HTTPS.' mod='paypal'}",
+        load_3d:"{l s='Load 3D Secure Failed' mod='paypal'}",
+        request_problem:"{l s='There was a problem with your request.' mod='paypal'}",
+        failed_3d:"{l s='3D Secure Failed' mod='paypal'}"
+    };
 </script>

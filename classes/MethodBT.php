@@ -146,7 +146,7 @@ class MethodBT extends AbstractMethodPaypal
         $paypal = new PayPal();
 
         $transaction = $this->sale(context::getContext()->cart, Tools::getValue('payment_method_nonce'), Tools::getValue('deviceData'));
-       // echo'<pre>';print_r($transaction);echo'<pre>';die;
+
         if (!$transaction) {
             Tools::redirect('index.php?controller=order&step=3&bt_error_msg='.urlencode($this->error));
         }
@@ -180,16 +180,14 @@ class MethodBT extends AbstractMethodPaypal
     {
 
         $this->initConfig();
-
-
+        $bt_method = Tools::getValue('payment_method_bt');
         $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$this->mode.'_BRAINTREE_ACCOUNT_ID'));
-
         $address_billing = new Address($cart->id_address_invoice);
         $country_billing = new Country($address_billing->id_country);
         $address_shipping = new Address($cart->id_address_delivery);
         $country_shipping = new Country($address_shipping->id_country);
         $current_currency = context::getContext()->currency->iso_code;
-
+//TODO:update for 2 methods : cards and paypal and Add Device data???
         try {
             $data = [
                 'amount'                => $cart->getOrderTotal(),
@@ -221,14 +219,14 @@ class MethodBT extends AbstractMethodPaypal
 
                 'options' => [
                     'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
-                    'three_d_secure' => [
+                    'threeDSecure' => [
                         'required' => Configuration::get('PAYPAL_USE_3D_SECURE')
                     ]
                 ]
             ];
 
             $result = $this->gateway->transaction()->sale($data);
-           // echo'<pre>';print_r($result);echo'<pre>';die;
+           // print_r("result");echo'<pre>';print_r($result);echo'<pre>';die;
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 return $result->transaction;
             } else {
