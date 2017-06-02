@@ -32,17 +32,16 @@ class PaypalErrorModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-        $error_code = Tools::getValue('L_ERRORCODE0');
-        $errors = $this->getErrorMsg();
-        $error_msg = isset($errors[$error_code])?$errors[$error_code]:$errors['00000'];
+        $error_code = Tools::getValue('error_code');
+        $error_message = $this->getErrorMsg($error_code);
         $this->context->smarty->assign(array(
-            'error_paypal' => $error_msg,
+            'error_paypal' => $error_message,
         ));
 
         $this->setTemplate('module:paypal/views/templates/front/payment_error.tpl');
     }
 
-    public function getErrorMsg()
+    public function getErrorMsg($error_code)
     {
         $module = Module::getInstanceByName('paypal');
         $errors = array(
@@ -54,6 +53,6 @@ class PaypalErrorModuleFrontController extends ModuleFrontController
             '10006' => $module->l('Version is not supported'),
             '10605' => $module->l('Currency is not supported'),
         );
-        return $errors;
+        return isset($errors[$error_code])?$errors[$error_code]:$errors['00000'];
     }
 }

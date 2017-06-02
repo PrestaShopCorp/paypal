@@ -214,7 +214,6 @@
 
 </div>
 
-<!--------------------------------------------------------------------------->
 <script type="text/javascript">
 
     function display_rounding()
