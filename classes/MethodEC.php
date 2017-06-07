@@ -32,11 +32,90 @@ class MethodEC extends AbstractMethodPaypal
 
     public $token;
 
-    public function getMethodContent()
+    public function getConfig(PayPal $module)
     {
-        Configuration::updateValue('PAYPAL_USERNAME_SANDBOX', 'claloum-facilitator_api1.202-ecommerce.com');
-        Configuration::updateValue('PAYPAL_PSWD_SANDBOX', '2NRPZ3FZQXN9LY2N');
-        Configuration::updateValue('PAYPAL_SIGNATURE_SANDBOX', 'AFcWxV21C7fd0v3bYYYRCpSSRl31Am6xsFqhy1VTTuSmPwEstqKmFDaX');
+        $params = array(
+            array(
+                'type' => 'select',
+                'label' => $module->l('Payment action'),
+                'name' => 'paypal_intent',
+                'desc' => $module->l(''),
+                'hint' => $module->l('Sale: the money moves instantly from the buyer\'s account to the seller\'s account at the time of payment. Authorization/capture: The authorized mode is a deferred mode of payment that requires the funds to be collected manually when you want to transfer the money. This mode is used if you want to ensure that you have the merchandise before depositing the money, for example. Be careful, you have 29 days to collect the funds.'),
+                'options' => array(
+                    'query' => array(
+                        array(
+                            'id' => 'sale',
+                            'name' => $module->l('Sale')
+                        ),
+                        array(
+                            'id' => 'authorization',
+                            'name' => $module->l('Authorize')
+                        )
+                    ),
+                    'id' => 'id',
+                    'name' => 'name'
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Accept credit and debit card payment'),
+                'name' => 'paypal_card',
+                'is_bool' => true,
+                'hint' => $module->l('Your customers can pay with debit and credit cards as well as local payment systems whether or not they use PayPal'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_card_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_card_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Show PayPal benefits to your customers'),
+                'name' => 'paypal_show_advantage',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'hint' => $module->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_advantage_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_advantage_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Enabled Shortcut'),
+                'name' => 'paypal_show_advantage',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'hint' => $module->l(''),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_advantage_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_advantage_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            )
+        );
 
         if (Configuration::get('PAYPAL_LIVE_ACCESS') || Configuration::get('PAYPAL_SANDBOX_ACCESS')) {
             $ec_card_active = Configuration::get('PAYPAL_API_CARD');
@@ -58,18 +137,21 @@ class MethodEC extends AbstractMethodPaypal
             'ec_card_active' => $ec_card_active,
             'ec_paypal_active' => $ec_paypal_active,
         ));
+
+        return $params;
     }
 
-    public function setConfig()
+    public function setConfig($params)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
 
-        if (Tools::getValue('api_username') && Tools::getValue('api_password') && Tools::getValue('api_signature')) {
-            Configuration::updateValue('PAYPAL_USERNAME_'.$mode, Tools::getValue('api_username'));
-            Configuration::updateValue('PAYPAL_PSWD_'.$mode, Tools::getValue('api_password'));
-            Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, Tools::getValue('api_signature'));
+        if (isset($params['api_username']) && isset($params['api_password']) && isset($params['api_signature'])) {
+            Configuration::updateValue('PAYPAL_USERNAME_'.$mode, $params['api_username']);
+            Configuration::updateValue('PAYPAL_PSWD_'.$mode, $params['api_password']);
+            Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
         }
+        Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
 
     }
 

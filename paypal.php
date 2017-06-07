@@ -431,6 +431,26 @@ class PayPal extends PaymentModule
                         )
                     ),
                 ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show PayPal benefits to your customers'),
+                    'name' => 'paypal_show_advantage',
+                    'desc' => $this->l(''),
+                    'is_bool' => true,
+                    'hint' => $this->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
+                    'values' => array(
+                        array(
+                            'id' => 'paypal_show_advantage_on',
+                            'value' => 1,
+                            'label' => $this->l('Enabled'),
+                        ),
+                        array(
+                            'id' => 'paypal_show_advantage_off',
+                            'value' => 0,
+                            'label' => $this->l('Disabled'),
+                        )
+                    ),
+                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
@@ -680,7 +700,7 @@ class PayPal extends PaymentModule
             $payments_options[] = $payment_options;
         }
 
-        if (1 || Configuration::get('PAYPAL_BY_BRAINTREE')) {
+        if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
             $embeddedOption = new PaymentOption();
             $embeddedOption->setCallToActionText($this->l('Pay with paypal by braintree'))
                 ->setForm($this->generateFormPaypalBt())
