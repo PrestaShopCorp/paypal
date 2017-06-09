@@ -46,7 +46,9 @@ function upgrade_module_1_4_2($module)
     }
 
     if (!Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 0)
-        || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))) {
+        || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))
+        || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
+        || !Configuration::updateValue('CART_BY_BRAINTREE', 0)) {
         return false;
     }
 

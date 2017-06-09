@@ -60,25 +60,6 @@ class MethodBT extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Accept credit and debit card payment'),
-                'name' => 'paypal_card',
-                'is_bool' => true,
-                'hint' => $module->l('Your customers can pay with debit and credit cards as well as local payment systems whether or not they use PayPal'),
-                'values' => array(
-                    array(
-                        'id' => 'paypal_card_on',
-                        'value' => 1,
-                        'label' => $module->l('Enabled'),
-                    ),
-                    array(
-                        'id' => 'paypal_card_off',
-                        'value' => 0,
-                        'label' => $module->l('Disabled'),
-                    )
-                ),
-            ),
-            array(
-                'type' => 'switch',
                 'label' => $module->l('Activate 3D Secure for Braintree'),
                 'name' => 'paypal_3DSecure',
                 'desc' => $module->l(''),
@@ -106,13 +87,12 @@ class MethodBT extends AbstractMethodPaypal
 
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
-            'paypal_card' => Configuration::get('PAYPAL_BY_BRAINTREE'),
             'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
             'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
         );
         $context = Context::getContext();
         $context->smarty->assign(array(
-            'bt_card_active' => !Configuration::get('PAYPAL_BY_BRAINTREE'),
+            'bt_card_active' => Configuration::get('CART_BY_BRAINTREE'),
             'bt_paypal_active' => Configuration::get('PAYPAL_BY_BRAINTREE'),
         ));
 
@@ -194,13 +174,18 @@ class MethodBT extends AbstractMethodPaypal
 
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
-            Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['paypal_card']);
             Configuration::updateValue('PAYPAL_USE_3D_SECURE', $params['paypal_3DSecure']);
             Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
         }
 
         if (isset($params['method'])) {
-            Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['with_paypal']);
+            if (isset($params['by_paypal'])) {
+                Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['by_paypal']);
+            }
+            if (isset($params['by_cart'])) {
+                Configuration::updateValue('CART_BY_BRAINTREE', $params['by_cart']);
+            }
+
             $response = $paypal->getBtConnectUrl();
             $result = Tools::jsonDecode($response);
             if ($result->error) {

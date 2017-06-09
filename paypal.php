@@ -103,6 +103,8 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_METHOD', '')
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
             || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))
+            || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
+            || !Configuration::updateValue('CART_BY_BRAINTREE', 0)
         ) {
             return false;
         }
@@ -266,6 +268,7 @@ class PayPal extends PaymentModule
             'PAYPAL_SANDBOX_BRAINTREE_REFRESH_TOKEN',
             'PAYPAL_SANDBOX_BRAINTREE_MERCHANT_ID',
             'PAYPAL_BY_BRAINTREE',
+            'CART_BY_BRAINTREE',
             'PAYPAL_CRON_TIME'
         );
 
@@ -517,7 +520,7 @@ class PayPal extends PaymentModule
                     $payments_options[] = $embeddedOption;
                 }
 
-                if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
+                if (Configuration::get('CART_BY_BRAINTREE')) {
                     $embeddedOption = new PaymentOption();
                     $embeddedOption->setCallToActionText($this->l('Pay braintree'))
                         ->setForm($this->generateFormBt())
@@ -535,10 +538,10 @@ class PayPal extends PaymentModule
     {
         if (Tools::getValue('controller') == "order") {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
-                if (Configuration::get('PAYPAL_BRAINTREE_ENABLED') || Configuration::get('PAYPAL_BY_BRAINTREE')) {
+                if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
                     $this->context->controller->registerJavascript($this->name . '-braintreegateway-client', 'https://js.braintreegateway.com/web/3.16.0/js/client.min.js', array('server' => 'remote'));
                 }
-                if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
+                if (Configuration::get('CART_BY_BRAINTREE')) {
                     $this->context->controller->registerJavascript($this->name . '-braintreegateway-hosted', 'https://js.braintreegateway.com/web/3.16.0/js/hosted-fields.min.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-braintreegateway-data', 'https://js.braintreegateway.com/web/3.16.0/js/data-collector.min.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-braintreegateway-3ds', 'https://js.braintreegateway.com/web/3.16.0/js/three-d-secure.min.js', array('server' => 'remote'));
@@ -558,14 +561,21 @@ class PayPal extends PaymentModule
     {
         $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
         if ($diff_cron_time->i > 4) {
-            // TODO: check state for BT orders
+            // TODO: check state for BT orders by paypal
             $bt_orders = PaypalOrder::getAllBtOrders();
+            //TODO: get all transaction info gateaway-> check all trans in one time with array of ids with status submitted for settlement
             foreach ($bt_orders as $key => $order) {
                 switch ($order['payment_status']){
                     case 'canceled':
                         // TODO: change state for ps order
                        /* $ps_order = new Order($order->id_order);
                         $ps_order->setCurrentState(_PS_OS_SMTH_);*/
+                        break;
+                    case 'settlement':
+                        // TODO: change state in paypal order for don't check anymore
+                        break;
+                    case 'submitted_for_settlement':
+                        // TODO: do nothing and check later one more time
                         break;
                 }
 

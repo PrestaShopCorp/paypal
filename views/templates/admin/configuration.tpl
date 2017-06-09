@@ -129,7 +129,7 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=0">{if isset($bt_card_active) && $bt_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&by_cart=1">{if isset($bt_card_active) && $bt_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -150,7 +150,7 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=1">{if isset($bt_paypal_active) && $bt_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&by_paypal=1">{if isset($bt_paypal_active) && $bt_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>

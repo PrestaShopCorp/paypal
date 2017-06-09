@@ -58,25 +58,6 @@ class MethodEC extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Accept credit and debit card payment'),
-                'name' => 'paypal_card',
-                'is_bool' => true,
-                'hint' => $module->l('Your customers can pay with debit and credit cards as well as local payment systems whether or not they use PayPal'),
-                'values' => array(
-                    array(
-                        'id' => 'paypal_card_on',
-                        'value' => 1,
-                        'label' => $module->l('Enabled'),
-                    ),
-                    array(
-                        'id' => 'paypal_card_off',
-                        'value' => 0,
-                        'label' => $module->l('Disabled'),
-                    )
-                ),
-            ),
-            array(
-                'type' => 'switch',
                 'label' => $module->l('Show PayPal benefits to your customers'),
                 'name' => 'paypal_show_advantage',
                 'desc' => $module->l(''),
@@ -119,10 +100,36 @@ class MethodEC extends AbstractMethodPaypal
 
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
-            'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
             'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
         );
+
+        $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+
+        if ($country_default != "FR" && $country_default != "UK") {
+            $params['inputs'][] = array(
+                'type' => 'switch',
+                'label' => $module->l('Accept credit and debit card payment'),
+                'name' => 'paypal_card',
+                'is_bool' => true,
+                'hint' => $module->l('Your customers can pay with debit and credit cards as well as local payment systems whether or not they use PayPal'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_card_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_card_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            );
+            $params['fields_value'][] = array(
+                'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
+            );
+        }
 
 
         $context = Context::getContext();
@@ -155,9 +162,16 @@ class MethodEC extends AbstractMethodPaypal
 
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
-            Configuration::updateValue('PAYPAL_API_CARD', $params['paypal_card']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+        }
+
+        $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
+
+        if ($country_default != "FR" && $country_default != "UK") {
+            if (Tools::isSubmit('paypal_config')) {
+                Configuration::updateValue('PAYPAL_API_CARD', $params['paypal_card']);
+            }
         }
 
         if (Tools::isSubmit('save_rounding_settings')) {
