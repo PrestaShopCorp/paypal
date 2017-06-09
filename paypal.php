@@ -36,6 +36,10 @@ include_once 'classes/PaypalCapture.php';
 include_once 'classes/PaypalOrder.php';
 
 
+// EC = express checkout
+// ECS = express checkout sortcut
+// BT = Braintree
+
 class PayPal extends PaymentModule
 {
     public static $dev = true;
@@ -575,7 +579,6 @@ class PayPal extends PaymentModule
 
     private function _postProcess()
     {
-
         $method_bt = AbstractMethodPaypal::load('BT');
         $method_bt->setConfig();
         $method_ec = AbstractMethodPaypal::load('EC');
