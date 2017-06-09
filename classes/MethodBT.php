@@ -34,19 +34,143 @@ class MethodBT extends AbstractMethodPaypal
 
     public $mode;
 
-    public function getMethodContent()
+    public function getConfig(PayPal $module)
     {
-        Context::getContext()->smarty->assign(array(
-            'braintree_dispo' => true,
-            'bt_active' => Configuration::get('PAYPAL_BRAINTREE_ENABLED'),
-            'need_rounding' => Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM ? 0 : 1,
+        $params['inputs'] = array(
+            array(
+                'type' => 'select',
+                'label' => $module->l('Payment action'),
+                'name' => 'paypal_intent',
+                'desc' => $module->l(''),
+                'hint' => $module->l('Sale: the money moves instantly from the buyer\'s account to the seller\'s account at the time of payment. Authorization/capture: The authorized mode is a deferred mode of payment that requires the funds to be collected manually when you want to transfer the money. This mode is used if you want to ensure that you have the merchandise before depositing the money, for example. Be careful, you have 29 days to collect the funds.'),
+                'options' => array(
+                    'query' => array(
+                        array(
+                            'id' => 'sale',
+                            'name' => $module->l('Sale')
+                        ),
+                        array(
+                            'id' => 'authorization',
+                            'name' => $module->l('Authorize')
+                        )
+                    ),
+                    'id' => 'id',
+                    'name' => 'name'
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Accept credit and debit card payment'),
+                'name' => 'paypal_card',
+                'is_bool' => true,
+                'hint' => $module->l('Your customers can pay with debit and credit cards as well as local payment systems whether or not they use PayPal'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_card_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_card_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Activate 3D Secure for Braintree'),
+                'name' => 'paypal_3DSecure',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'values' => array(
+                    array(
+                        'id' => 'paypal_3DSecure_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_3DSecure_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'text',
+                'label' => $module->l('Amount for 3DS in ').Currency::getCurrency(Configuration::get('PS_CURRENCY_DEFAULT'))['iso_code'],
+                'name' => 'paypal_3DSecure_amount',
+                'hint' => $module->l('Activate 3D Secure only for orders which total is bigger that this amount in your context currency'),
+            ),
+        );
+
+        $params['fields_value'] = array(
+            'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
+            'paypal_card' => Configuration::get('PAYPAL_BY_BRAINTREE'),
+            'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
+            'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
+        );
+        $context = Context::getContext();
+        $context->smarty->assign(array(
+            'bt_card_active' => !Configuration::get('PAYPAL_BY_BRAINTREE'),
+            'bt_paypal_active' => Configuration::get('PAYPAL_BY_BRAINTREE'),
         ));
+
+        $params['form'] = $this->getMerchantCurrenciesForm($module);
+
+        return $params;
     }
 
-    public function setConfig()
+    public function getMerchantCurrenciesForm($module)
+    {
+        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_SANDBOX_BRAINTREE_ACCOUNT_ID'));
+        $ps_currencies = Currency::getCurrencies();
+        $fields_form2 = array();
+        $fields_form2[0]['form'] = array(
+            'legend' => array(
+                'title' => $module->l('Braintree merchant accounts'),
+                'icon' => 'icon-cogs',
+            ),
+        );
+        foreach ($ps_currencies as $curr)
+        {
+            $fields_form2[0]['form']['input'][] =
+                array(
+                    'type' => 'text',
+                    'label' => $module->l('Merchant account Id for ').$curr['iso_code'],
+                    'name' => 'braintree_curr_'.$curr['iso_code'],
+                    'value' => isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : ''
+                );
+            $fields_value['braintree_curr_'.$curr['iso_code']] =  isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : '';
+        }
+        $fields_form2[0]['form']['submit'] = array(
+            'title' => $module->l('Save'),
+            'class' => 'btn btn-default pull-right button',
+        );
+
+        $helper = new HelperForm();
+        $helper->module = $module;
+        $helper->name_controller = $module->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
+        $helper->title = $module->displayName;
+        $helper->show_toolbar = false;
+        $helper->submit_action = 'paypal_braintree_curr';
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = $default_lang;
+        $helper->allow_employee_form_lang = $default_lang;
+        $helper->tpl_vars = array(
+            'fields_value' => $fields_value,
+            'id_language' => Context::getContext()->language->id,
+            'back_url' => $module->module_link.'#paypal_params'
+        );
+        return $helper->generateForm($fields_form2);
+    }
+
+    public function setConfig($params)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
-
+        $paypal = Module::getInstanceByName($this->name);
         if (Tools::isSubmit('paypal_braintree_curr')) {
             $ps_currencies = Currency::getCurrencies();
             foreach ($ps_currencies as $curr) {
@@ -58,15 +182,39 @@ class MethodBT extends AbstractMethodPaypal
         if (Tools::getValue('accessToken') && Tools::getValue('expiresAt') && Tools::getValue('refreshToken') && Tools::getValue('merchantId')) {
             Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 1);
             $method_bt = AbstractMethodPaypal::load('BT');
-            $merchant_accounts = $method_bt->createForCurrency();
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCESS_TOKEN', Tools::getValue('accessToken'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_EXPIRES_AT', Tools::getValue('expiresAt'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_REFRESH_TOKEN', Tools::getValue('refreshToken'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_MERCHANT_ID', Tools::getValue('merchantId'));
+            $merchant_accounts = $method_bt->createForCurrency();
             if ($merchant_accounts) {
                 Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', $merchant_accounts);
             }
         }
+
+        if (Tools::isSubmit('paypal_config')) {
+            Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
+            Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['paypal_card']);
+            Configuration::updateValue('PAYPAL_USE_3D_SECURE', $params['paypal_3DSecure']);
+            Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
+        }
+
+        if (isset($params['method'])) {
+            Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['with_paypal']);
+            $response = $paypal->getBtConnectUrl();
+            $result = Tools::jsonDecode($response);
+            if ($result->error) {
+                $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Braintree : ').$result->error);
+            } elseif (isset($result->data->url_connect)) {
+                Tools::redirectLink($result->data->url_connect);
+            }
+        }
+
+        if (!Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCESS_TOKEN') || !Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_EXPIRES_AT')
+            || !Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_MERCHANT_ID')) {
+            $paypal->errors .= $paypal->displayError($paypal->l('An error occurred. Please, check your credentials Braintree.'));
+        }
+
     }
 
     private function initConfig()
@@ -181,13 +329,25 @@ class MethodBT extends AbstractMethodPaypal
 
         $this->initConfig();
         $bt_method = Tools::getValue('payment_method_bt');
+        if ($bt_method == "paypal-braintree") {
+            $options = array(
+                'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
+                'threeDSecure' => array(
+                    'required' => Configuration::get('PAYPAL_USE_3D_SECURE')
+                )
+            );
+        } else {
+            $options = array(
+                'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
+            );
+        }
         $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$this->mode.'_BRAINTREE_ACCOUNT_ID'));
         $address_billing = new Address($cart->id_address_invoice);
         $country_billing = new Country($address_billing->id_country);
         $address_shipping = new Address($cart->id_address_delivery);
         $country_shipping = new Country($address_shipping->id_country);
         $current_currency = context::getContext()->currency->iso_code;
-//TODO:update for 2 methods : cards and paypal and Add Device data???
+         //TODO: Add Device data???
         try {
             $data = [
                 'amount'                => $cart->getOrderTotal(),
@@ -216,13 +376,7 @@ class MethodBT extends AbstractMethodPaypal
                     'countryCodeAlpha2' => $country_shipping->iso_code,
                 ],
                 "deviceData"            => $device_data,
-
-                'options' => [
-                    'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
-                    'threeDSecure' => [
-                        'required' => Configuration::get('PAYPAL_USE_3D_SECURE')
-                    ]
-                ]
+                'options' => $options,
             ];
 
             $result = $this->gateway->transaction()->sale($data);

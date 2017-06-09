@@ -34,7 +34,7 @@ class MethodEC extends AbstractMethodPaypal
 
     public function getConfig(PayPal $module)
     {
-        $params = array(
+        $params['inputs'] = array(
             array(
                 'type' => 'select',
                 'label' => $module->l('Payment action'),
@@ -98,18 +98,18 @@ class MethodEC extends AbstractMethodPaypal
             array(
                 'type' => 'switch',
                 'label' => $module->l('Enabled Shortcut'),
-                'name' => 'paypal_show_advantage',
+                'name' => 'paypal_show_shortcut',
                 'desc' => $module->l(''),
                 'is_bool' => true,
                 'hint' => $module->l(''),
                 'values' => array(
                     array(
-                        'id' => 'paypal_show_advantage_on',
+                        'id' => 'paypal_show_shortcut_on',
                         'value' => 1,
                         'label' => $module->l('Enabled'),
                     ),
                     array(
-                        'id' => 'paypal_show_advantage_off',
+                        'id' => 'paypal_show_shortcut_off',
                         'value' => 0,
                         'label' => $module->l('Disabled'),
                     )
@@ -117,26 +117,27 @@ class MethodEC extends AbstractMethodPaypal
             )
         );
 
-        if (Configuration::get('PAYPAL_LIVE_ACCESS') || Configuration::get('PAYPAL_SANDBOX_ACCESS')) {
-            $ec_card_active = Configuration::get('PAYPAL_API_CARD');
-            $ec_paypal_active = !Configuration::get('PAYPAL_API_CARD');
-        } else {
-            $ec_card_active = false;
-            $ec_paypal_active = false;
-        }
+        $params['fields_value'] = array(
+            'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
+            'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
+            'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
+            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
+        );
+
+
         $context = Context::getContext();
 
         $context->smarty->assign(array(
-            //'path_ajax_sandbox' => $context->link->getAdminLink('AdminModules',true,array(),array('configure'=>'paypal')),
-            'country' => Country::getNameById($context->language->id, $context->country->id),
-            'localization' => $context->link->getAdminLink('AdminLocalization', true),
-            'preference' => $context->link->getAdminLink('AdminPreferences', true),
             'access_token_sandbox' => Configuration::get('PAYPAL_SANDBOX_ACCESS'),
             'access_token_live' => Configuration::get('PAYPAL_LIVE_ACCESS'),
-            'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
-            'ec_card_active' => $ec_card_active,
-            'ec_paypal_active' => $ec_paypal_active,
+            'ec_card_active' => Configuration::get('PAYPAL_API_CARD'),
+            'ec_paypal_active' => !Configuration::get('PAYPAL_API_CARD'),
+            'need_rounding' => Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM ? 0 : 1,
         ));
+
+        if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) {
+            $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
+        }
 
         return $params;
     }
@@ -144,14 +145,47 @@ class MethodEC extends AbstractMethodPaypal
     public function setConfig($params)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
-
+        $paypal = Module::getInstanceByName($this->name);
         if (isset($params['api_username']) && isset($params['api_password']) && isset($params['api_signature'])) {
             Configuration::updateValue('PAYPAL_USERNAME_'.$mode, $params['api_username']);
             Configuration::updateValue('PAYPAL_PSWD_'.$mode, $params['api_password']);
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
         }
-        Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
+
+        if (Tools::isSubmit('paypal_config')) {
+            Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
+            Configuration::updateValue('PAYPAL_API_CARD', $params['paypal_card']);
+            Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+        }
+
+        if (Tools::isSubmit('save_rounding_settings')) {
+            Configuration::updateValue('PAYPAL_SANDBOX', 0);
+            Configuration::updateValue('PS_ROUND_TYPE', Order::ROUND_ITEM);
+            Tools::redirect($this->module_link);
+        }
+
+        if (isset($params['method'])) {
+            Configuration::updateValue('PAYPAL_API_CARD', $params['with_card']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
+            if ((!Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_LIVE_ACCESS'))
+                || (Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_SANDBOX_ACCESS'))) {
+                $response = $paypal->getPartnerInfo($params['method']);
+                $result = Tools::jsonDecode($response);
+                if (!$result->error && isset($result->data->url)) {
+                    $PartnerboardingURL = $result->data->url;
+                    Tools::redirectLink($PartnerboardingURL);
+                } else {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
+                }
+            }
+        }
+
+        if (!Configuration::get('PAYPAL_USERNAME_'.$mode) || !Configuration::get('PAYPAL_PSWD_'.$mode)
+            || !Configuration::get('PAYPAL_SIGNATURE_'.$mode)) {
+            $paypal->errors .= $paypal->displayError($paypal->l('An error occurred. Please, check your credentials Paypal.'));
+        }
 
     }
 
@@ -539,23 +573,27 @@ class MethodEC extends AbstractMethodPaypal
         $params['REFUNDTYPE'] = 'Full';
         $response = $sdk->refundTransaction($params);
 
-        if (Validate::isLoadedObject($capture) && $capture->capture_id) {
-            if (isset($response['REFUNDTRANSACTIONID']) && $response['ACK'] == 'Success') {
-                Db::getInstance()->update(
-                    'paypal_capture',
-                    array(
-                        'result' => 'Refunded',
-                    ),
-                    'id_paypal_order = '.(int)$id_paypal_order
-                );
+        if ($response['ACK'] == "Success") {
+            $result =  array(
+                'success' => true,
+                'refund_id' => $response['REFUNDTRANSACTIONID'],
+                'status' => $response['ACK'],
+                'total_amount' => $response['TOTALREFUNDEDAMOUNT'],
+                'net_amount' => $response['NETREFUNDAMT'],
+                'currency' => $response['CURRENCYCODE'],
+            );
+        } else {
+            $result = array(
+                'status' => $response['ACK'],
+                'error_code' => $response['L_ERRORCODE0'],
+                'error_message' => $response['L_LONGMESSAGE0'],
+            );
+            if ($response['L_ERRORCODE0'] == "10009") {
+                $result['already_refunded'] = true;
             }
         }
-        if (isset($response['REFUNDTRANSACTIONID']) && $response['ACK'] == 'Success') {
-            $paypal_order->payment_status = 'Refunded';
-            $paypal_order->update();
-        }
  
-        return $response;
+        return $result;
     }
     
     public function void($authorization)
@@ -564,7 +602,20 @@ class MethodEC extends AbstractMethodPaypal
         $params['AUTHORIZATIONID'] = $authorization['authorization_id'];
         $this->_getCredentialsInfo($params);
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-        return $sdk->doVoid($params);
+        $result = $sdk->doVoid($params);
+        if ($result['ACK'] == "Success") {
+            $response =  array(
+                'authorization_id' => $result['AUTHORIZATIONID'],
+                'status' => $result['ACK'],
+                'success' => true,
+            );
+        } else {
+            $response =  array(
+                'error_code' => $result['L_ERRORCODE0'],
+                'error_message' => $result['L_LONGMESSAGE0'],
+            );
+        }
+        return $response;
     }
 
     public function renderExpressCheckout(&$context,$type)

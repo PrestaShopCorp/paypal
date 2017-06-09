@@ -22,4 +22,11 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<li id="paypal_transaction_id">{l s='Paypal transaction id :'} {$transaction_id}</li>
+<li id="paypal_transaction_id">
+    {if $method == 'BT'}
+        {l s='Braintree transaction id :'}
+    {else}
+        {l s='Paypal transaction id :'}
+    {/if}
+    {$transaction_id}
+</li>

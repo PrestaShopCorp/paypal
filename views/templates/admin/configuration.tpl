@@ -37,11 +37,11 @@
 </div>
 <div class="container-fluid paypal-nav">
 <ul class="nav nav-pills navbar-separator">
-    <li {if !$ec_paypal_active && !$ec_card_active}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>
-    <li {if $ec_paypal_active || $ec_card_active}class="active"{/if}><a data-toggle="pill" href="#paypal_params"><span>{l s='Settings' mod='paypal'}</span></a></li>
+    <li {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_card_active) && !isset($bt_card_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>
+    <li {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_card_active) || isset($bt_card_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_params"><span>{l s='Settings' mod='paypal'}</span></a></li>
 </ul>
     <div class="tab-content">
-    <div id="paypal_conf"  class="tab-pane fade {if !$ec_paypal_active && !$ec_card_active}in active{/if}">
+    <div id="paypal_conf"  class="tab-pane fade {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_card_active) && !isset($bt_card_active)}in active{/if}">
         <div class="box half left">
             <div class="logo">
                  <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" alt=""  />
@@ -69,7 +69,7 @@
         <div style="clear:both;"></div>
 
         <div class="active-products">
-            <p><b>{l s='2 PayPal products selected for you' mod='paypal'}</b></p>
+            <p><b>{l s='3 PayPal products selected for you' mod='paypal'}</b></p>
             <div class="col-sm-4">
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
@@ -84,11 +84,11 @@
                     </p>
                     <div class="bottom">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EXPRESS_CHECKOUT&with_card=0{if $ec_paypal_active}modify=1{/if}" >{if $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=0" >{if isset($ec_paypal_active) &&  $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
-            {if !isset($braintree_dispo)}
+            {if !isset($braintree_available)}
             <div class="col-sm-4">
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
@@ -106,12 +106,12 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EXPRESS_CHECKOUT&with_card=1&{if $ec_card_active}modify=1{/if}">{if $ec_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=1">{if  isset($ec_card_active) && $ec_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
             {/if}
-            {if isset($braintree_dispo)}
+            {if isset($braintree_available)}
             <div class="col-sm-4">
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
@@ -129,7 +129,7 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BRAINTREE">{if $bt_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=0">{if isset($bt_card_active) && $bt_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -150,7 +150,7 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BRAINTREE&with_paypal=1">{if $bt_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=1">{if isset($bt_paypal_active) && $bt_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -158,7 +158,7 @@
         </div>
 
     </div>
-    <div id="paypal_params" class="tab-pane fade col-sm-12 {if $ec_paypal_active || $ec_card_active}in active{/if}">
+    <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_card_active) || isset($bt_card_active)}in active{/if}">
         <div class="panel parametres">
             <div class="panel-body">
                 <div class="col-sm-8 help-left">
@@ -194,59 +194,17 @@
 
 </div>
 </div>
-
-
-<div style="display: none;">
-    <div id="content-rounding-settings">
-        <form action="{$return_url|escape:'javascript':'UTF-8'}" method="post" id="credential-configuration" class="bootstrap">
-
-            <h4>{l s='Warning' mod='paypal'}</h4>
-
-            <p>{l s='Your product rounding settings are not compliant with PayPal module.' mod='paypal'}</p>
-            <p style='margin-bottom: 30px;'>{l s='Without modification of your PrastaShop configuration, PayPal will round items from cart to your customers.' mod='paypal'}</p>
-
-            <p>
-                <button class="btn btn-default"  onclick="$.fancybox.close();return false;">{l s='I understand' mod='paypal'}</button>
-                <button class="btn btn-info" name="save_rounding_settings">{l s='Change rounding settings' mod='paypal'}</button>
-            </p>
-        </form>
-    </div>
-
-</div>
-
 <script type="text/javascript">
 
-    function display_rounding()
-    {
-        $.fancybox.open([
-            {
-                type: 'inline',
-                autoScale: true,
-                minHeight: 30,
-                content: $('#content-rounding-settings').html(),
-            }
-        ]);
-    }
 
     $(document).ready(function(){
-
-        var need_rounding = {$need_rounding|escape:'html':'UTF-8'};
-
-        $('#configuration_form input[name=paypal_sandbox]').change(function(event) {
-            sandbox = $('#configuration_form input[name=paypal_sandbox]:checked').val();
-            if (need_rounding && sandbox == 0) {
-                display_rounding();
-            }
-        });
 
         $('#change_product').click(function(event) {
             event.preventDefault();
             $('a[href=#paypal_conf]').click();
         });
-        $('#configuration_form_1').insertAfter($('.parametres'));
         $('#configuration_form').insertAfter($('.parametres'));
-
-        //var activate_link = "{*$PartnerboardingURL|escape:'html':'UTF-8'*}";
+        $('#configuration_form_1').insertAfter($('.parametres'));
 
     });
 

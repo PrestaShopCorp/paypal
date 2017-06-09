@@ -32,3 +32,50 @@
         </div>
     </div>
 </div>
+
+<div style="display: none;">
+    <div id="content-rounding-settings">
+        <form action="{$return_url|escape:'javascript':'UTF-8'}" method="post" id="credential-configuration" class="bootstrap">
+
+            <h4>{l s='Warning' mod='paypal'}</h4>
+
+            <p>{l s='Your product rounding settings are not compliant with PayPal module.' mod='paypal'}</p>
+            <p style='margin-bottom: 30px;'>{l s='Without modification of your PrastaShop configuration, PayPal will round items from cart to your customers.' mod='paypal'}</p>
+
+            <p>
+                <button class="btn btn-default"  onclick="$.fancybox.close();return false;">{l s='I understand' mod='paypal'}</button>
+                <button class="btn btn-info" name="save_rounding_settings">{l s='Change rounding settings' mod='paypal'}</button>
+            </p>
+        </form>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    function display_rounding()
+    {
+        $.fancybox.open([
+            {
+                type: 'inline',
+                autoScale: true,
+                minHeight: 30,
+                content: $('#content-rounding-settings').html(),
+            }
+        ]);
+    }
+
+    $(document).ready(function(){
+
+        var need_rounding = {$need_rounding|escape:'html':'UTF-8'};
+
+        $('#configuration_form input[name=paypal_sandbox]').change(function(event) {
+            sandbox = $('#configuration_form input[name=paypal_sandbox]:checked').val();
+            if (need_rounding && sandbox == 0) {
+                display_rounding();
+            }
+        });
+
+    });
+
+</script>

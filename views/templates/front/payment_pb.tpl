@@ -43,7 +43,6 @@
 
     var authorization = '{$braintreeToken}';
     var bt_amount = {$braintreeAmount};
-    var check3DS = {$check3Dsecure};
     var bt_translations = {
         client:"{l s='Error create Client' mod='paypal'}",
         card_nmb:"{l s='Card number' mod='paypal'}",
