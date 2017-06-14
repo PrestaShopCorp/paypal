@@ -24,24 +24,12 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-abstract class AbstractMethodPaypal
-{
-    // Force les classes filles à définir cette méthode
-    abstract public function init($params);
-    abstract public function validation();
-    abstract public function confirmCapture();
-    abstract public function check();
-    abstract public function refund();
-    abstract public function setConfig($params);
-    abstract public function getConfig(Paypal $module);
-    abstract public function void($params);
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
 
-    public static function load($method)
-    {
-        if (file_exists(_PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php')) {
-            include_once _PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php';
-            $method_class = 'Method'.$method;
-            return new $method_class();
-        }
-    }
-}
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+header("Location: ../");
+exit;

@@ -24,24 +24,33 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-abstract class AbstractMethodPaypal
-{
-    // Force les classes filles à définir cette méthode
-    abstract public function init($params);
-    abstract public function validation();
-    abstract public function confirmCapture();
-    abstract public function check();
-    abstract public function refund();
-    abstract public function setConfig($params);
-    abstract public function getConfig(Paypal $module);
-    abstract public function void($params);
 
-    public static function load($method)
-    {
-        if (file_exists(_PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php')) {
-            include_once _PS_MODULE_DIR_.'paypal/classes/Method'.$method.'.php';
-            $method_class = 'Method'.$method;
-            return new $method_class();
-        }
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+function upgrade_module_1_4_2($module)
+{
+    $sql = 'ALTER TABLE '._DB_PREFIX_.'paypal_order ADD method VARCHAR(255)';
+    if (!Db::getInstance()->execute($sql)) {
+        return false;
     }
+
+    if (!$module->installOrderState()) {
+        return false;
+    }
+
+    if (!$module->registerHook('header')
+        || !$module->registerHook('actionObjectCurrencyAddAfter')) {
+        return false;
+    }
+
+    if (!Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 0)
+        || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))
+        || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
+        || !Configuration::updateValue('CART_BY_BRAINTREE', 0)) {
+        return false;
+    }
+
+    return true;
 }

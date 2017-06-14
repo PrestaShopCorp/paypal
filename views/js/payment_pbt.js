@@ -7,6 +7,7 @@ $(document).ready(function(){
 
 function initPaypalBraintree() {
     var paypal_bt_form = document.querySelector('#paypal-braintree-form');
+
     braintree.client.create({
         authorization: authorization
     }, function (clientErr, clientInstance) {
@@ -32,49 +33,55 @@ function initPaypalBraintree() {
                 return;
             }
 
+            paypal.Button.render({
+                env: 'sandbox', // or 'sandbox'
+
+                payment: function () {
+                    return paypalCheckoutInstance.createPayment({
+                        flow: 'vault',
+                        billingAgreementDescription: 'Your agreement description',
+                        enableShippingAddress: true,
+                        shippingAddressEditable: false,
+                    });
+                },
+
+                onAuthorize: function (data, actions) {
+                    return paypalCheckoutInstance.tokenizePayment(data)
+                        .then(function (payload) {
+                            // Submit `payload.nonce` to your server.
+                            document.querySelector('input#paypal_payment_method_nonce').value = payload.nonce;
+
+                            paypal_bt_form.submit();
+                        });
+                },
+
+                onCancel: function (data) {
+                    console.log('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
+                },
+
+                onError: function (err) {
+                    console.error('checkout.js error', err);
+                }
+            }, '#aaaaaa-button').then(function (e) {
+              /*  console.log('this', this);
+                console.log('event', e);
+                var test = $(document).find('#paypal-button');
+                console.log('test', test);
+                var paypal_bt_form2 = document.querySelector('#paypal-button');
+                paypal_bt_form2.click();
+                //   $('.paypal-button-container').click();
+                // The PayPal button will be rendered in an html element with the id
+                // `paypal-button`. This function will be called when the PayPal button
+                // is set up and ready to be used.
+                // paypal_bt_form.submit();*/
+            });
+
             // Set up PayPal with the checkout.js library
             $('#payment-confirmation button').click(function(){
 
                 event.preventDefault();
                 event.stopPropagation();
-
-                paypal.Button.render({
-                    env: 'sandbox', // or 'sandbox'
-
-                    payment: function () {
-                        return paypalCheckoutInstance.createPayment({
-                            flow: 'vault',
-                            billingAgreementDescription: 'Your agreement description',
-                            enableShippingAddress: true,
-                            shippingAddressEditable: false,
-                        });
-                    },
-
-                    onAuthorize: function (data, actions) {
-                        return paypalCheckoutInstance.tokenizePayment(data)
-                            .then(function (payload) {
-                                // Submit `payload.nonce` to your server.
-                                document.querySelector('input#paypal_payment_method_nonce').value = payload.nonce;
-
-                                paypal_bt_form.submit();
-                            });
-                    },
-
-                    onCancel: function (data) {
-                        console.log('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
-                    },
-
-                    onError: function (err) {
-                        console.error('checkout.js error', err);
-                    }
-                }, '#aaaaaa-button').then(function () {
-                    $('#paypal-button-container').click();
-                 //   $('.paypal-button-container').click();
-                    // The PayPal button will be rendered in an html element with the id
-                    // `paypal-button`. This function will be called when the PayPal button
-                    // is set up and ready to be used.
-                    // paypal_bt_form.submit();
-                });
+                $('#paypal-button').click();
             });
 
 

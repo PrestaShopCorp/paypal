@@ -99,7 +99,7 @@ class PaypalSDK
         $this->_setUserCredentials($fields, $params);
         $fields['METHOD'] = 'DoVoid';
         $fields['VERSION'] = $this->version;
-        $fields['AUTHORIZATIONID'] = $params['authorization_id'];
+        $fields['AUTHORIZATIONID'] = $params['AUTHORIZATIONID'];
         return $this->makeCallPaypal($fields);
     }
 
