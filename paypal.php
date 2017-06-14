@@ -106,7 +106,7 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_API_CARD', 0)
             || !Configuration::updateValue('PAYPAL_METHOD', '')
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
-            || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))
+ //           || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))
             || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
             || !Configuration::updateValue('CART_BY_BRAINTREE', 0)
         ) {
@@ -560,7 +560,7 @@ class PayPal extends PaymentModule
             }
         }
     }
-
+/*
     public function hookBackOfficeHeader()
     {
         $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
@@ -572,8 +572,8 @@ class PayPal extends PaymentModule
                 switch ($order['payment_status']){
                     case 'canceled':
                         // TODO: change state for ps order
-                       /* $ps_order = new Order($order->id_order);
-                        $ps_order->setCurrentState(_PS_OS_SMTH_);*/
+                        //$ps_order = new Order($order->id_order);
+                        //$ps_order->setCurrentState(_PS_OS_SMTH_);
                         break;
                     case 'settlement':
                         // TODO: change state in paypal order for don't check anymore
@@ -587,7 +587,7 @@ class PayPal extends PaymentModule
 
         }
     }
-
+*/
     public function hookActionObjectCurrencyAddAfter($params)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';

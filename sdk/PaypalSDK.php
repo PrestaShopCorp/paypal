@@ -37,10 +37,10 @@ class PaypalSDK
         $this->action = 'POST';
         if ($sandbox) {
             $this->urlAPI = 'https://api-3t.sandbox.paypal.com/nvp';
-            $this->urlSI = 'http://137.74.166.211/';
+            $this->urlSI = 'https://paypal-sandbox.pp-ps-auth.com/';
         } else {
             $this->urlAPI = 'https://api-3t.paypal.com/nvp';
-            $this->urlSI = 'http://137.74.166.211/';
+            $this->urlSI = 'https://paypal-live.pp-ps-auth.com/';
         }
     }
 
@@ -99,7 +99,7 @@ class PaypalSDK
         $this->_setUserCredentials($fields, $params);
         $fields['METHOD'] = 'DoVoid';
         $fields['VERSION'] = $this->version;
-        $fields['AUTHORIZATIONID'] = $params['AUTHORIZATIONID'];
+        $fields['AUTHORIZATIONID'] = $params['authorization_id'];
         return $this->makeCallPaypal($fields);
     }
 
