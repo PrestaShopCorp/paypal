@@ -52,6 +52,14 @@ class PaypalErrorModuleFrontController extends ModuleFrontController
             '10400' => $module->l('Order total is missing'),
             '10006' => $module->l('Version is not supported'),
             '10605' => $module->l('Currency is not supported'),
+            '2069' => $module->l('PayPal Blocking Duplicate Order IDs'),
+            '93102' => $module->l('The nonce that was received is not a valid nonce.'),
+            '93103' => $module->l('A nonce was not provided.'),
+            '93107' => $module->l('A payment method nonce may only be consumed once.'),
+            '93108' => $module->l('Unknown or expired payment_method_nonce.'),
+            '81503' => $module->l('Amount is an invalid format.'),
+            '81501' => $module->l('Amount cannot be negative.'),
+            '81509' => $module->l('Credit card type is not accepted by this merchant account.'),
         );
         return isset($errors[$error_code])?$errors[$error_code]:$errors['00000'];
     }

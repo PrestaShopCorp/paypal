@@ -29,9 +29,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_2($module)
+function upgrade_module_4_2_0($module)
 {
-    $sql = 'ALTER TABLE '._DB_PREFIX_.'paypal_order ADD method VARCHAR(255)';
+    $sql = 'ALTER TABLE '._DB_PREFIX_.'paypal_order ADD method VARCHAR(255), ADD payment_tool VARCHAR(255)';
     if (!Db::getInstance()->execute($sql)) {
         return false;
     }
@@ -41,15 +41,15 @@ function upgrade_module_4_2($module)
     }
 
     if (!$module->registerHook('header')
-        || !$module->registerHook('actionObjectCurrencyAddAfter')
-        || !$module->registerHook('displayFooterProduct')) {
+        || !$module->registerHook('displayBackOfficeHeader')
+        || !$module->registerHook('displayFooterProduct')
+        || !$module->registerHook('actionObjectCurrencyAddAfter')) {
         return false;
     }
 
     if (!Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 0)
-       // || !Configuration::updateValue('PAYPAL_CRON_TIME', date_create('now'))
-        || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
-        || !Configuration::updateValue('CART_BY_BRAINTREE', 0)) {
+        || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
+        || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)) {
         return false;
     }
 

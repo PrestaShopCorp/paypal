@@ -48,6 +48,8 @@ class PaypalOrder extends ObjectModel
 
     public $method;
 
+    public $payment_tool;
+
     public $date_add;
 
     public $date_upd;
@@ -71,6 +73,7 @@ class PaypalOrder extends ObjectModel
             'payment_status' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'total_prestashop' => array('type' => self::TYPE_FLOAT),
             'method' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'payment_tool' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
@@ -107,13 +110,18 @@ class PaypalOrder extends ObjectModel
         return new self($id_paypal_order);
     }
 
-    public static function getAllBtOrders()
+    public static function getPaypalBtOrdersIds()
     {
+        //TODO: change payment_status settling by subbmitted for settlement ??
         $sql = new DbQuery();
-        $sql->select('*');
+        $sql->select('id_transaction');
         $sql->from('paypal_order');
-        $sql->where('method = "BT" AND payment_method = "sale"');
-        return Db::getInstance()->executeS($sql);
+        $sql->where('method = "BT" AND payment_method = "sale" AND payment_tool = "paypal_account" AND payment_status = "settling"');
+        $results = Db::getInstance()->executeS($sql);
+        foreach ($results as $result) {
+            $ids[] =  $result['id_transaction'];
+        }
+        return $ids;
 
     }
 }

@@ -92,9 +92,10 @@ class MethodBT extends AbstractMethodPaypal
         );
         $context = Context::getContext();
         $context->smarty->assign(array(
-            'bt_card_active' => Configuration::get('CART_BY_BRAINTREE'),
             'bt_paypal_active' => Configuration::get('PAYPAL_BY_BRAINTREE'),
+            'bt_active' => Configuration::get('PAYPAL_BRAINTREE_ENABLED'),
         ));
+
 
         $params['form'] = $this->getMerchantCurrenciesForm($module);
 
@@ -151,8 +152,8 @@ class MethodBT extends AbstractMethodPaypal
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
         $paypal = Module::getInstanceByName($this->name);
+        $ps_currencies = Currency::getCurrencies();
         if (Tools::isSubmit('paypal_braintree_curr')) {
-            $ps_currencies = Currency::getCurrencies();
             foreach ($ps_currencies as $curr) {
                 $new_accounts[$curr['iso_code']] = Tools::getValue('braintree_curr_'.$curr['iso_code']);
             }
@@ -166,9 +167,11 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_EXPIRES_AT', Tools::getValue('expiresAt'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_REFRESH_TOKEN', Tools::getValue('refreshToken'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_MERCHANT_ID', Tools::getValue('merchantId'));
-            $merchant_accounts = $method_bt->createForCurrency();
-            if ($merchant_accounts) {
-                Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', $merchant_accounts);
+            $existing_merchant_accounts = $method_bt->getAllCurrency();
+            $new_merchant_accounts = $method_bt->createForCurrency();
+            $all_merchant_accounts = array_merge((array)$existing_merchant_accounts, (array)$new_merchant_accounts);
+            if ($all_merchant_accounts) {
+                Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($all_merchant_accounts));
             }
         }
 
@@ -179,11 +182,8 @@ class MethodBT extends AbstractMethodPaypal
         }
 
         if (isset($params['method'])) {
-            if (isset($params['by_paypal'])) {
-                Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['by_paypal']);
-            }
-            if (isset($params['by_cart'])) {
-                Configuration::updateValue('CART_BY_BRAINTREE', $params['by_cart']);
+            if (isset($params['with_paypal'])) {
+                Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['with_paypal']);
             }
 
             $response = $paypal->getBtConnectUrl();
@@ -218,9 +218,23 @@ class MethodBT extends AbstractMethodPaypal
             $clientToken = $this->gateway->clientToken()->generate();
             return $clientToken;
         } catch (Exception $e) {
-            PrestaShopLogger::addLog($e->getCode().'=>'.$e->getMessage());
             return false;
         }
+    }
+
+    public function getAllCurrency()
+    {
+        $this->initConfig();
+        $result = '';
+        try {
+            $response = $this->gateway->merchantAccount()->all();
+            foreach ($response as $account) {
+                $result[$account->currencyIsoCode] = $account->id;
+            }
+        }
+        catch  (Exception $e) {
+        }
+        return $result;
     }
 
     public function createForCurrency($currency = null)
@@ -263,13 +277,10 @@ class MethodBT extends AbstractMethodPaypal
     public function getTransactionStatus($transactionId)
     {
         $this->initConfig();
-
         try {
             $result = $this->gateway->transaction()->find($transactionId);
-
             return $result->status;
         } catch (Exception $e) {
-            PrestaShopLogger::addLog($e->getCode().'=>'.$e->getMessage());
             return false;
         }
     }
@@ -277,22 +288,21 @@ class MethodBT extends AbstractMethodPaypal
     public function validation()
     {
         $paypal = new PayPal();
-
         $transaction = $this->sale(context::getContext()->cart, Tools::getValue('payment_method_nonce'), Tools::getValue('deviceData'));
 
         if (!$transaction) {
             Tools::redirect('index.php?controller=order&step=3&bt_error_msg='.urlencode($this->error));
         }
         $transactionDetail = $this->getDetailsTransaction($transaction);
-        if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
+        if (Configuration::get('PAYPAL_API_INTENT') == "sale" && $transaction->paymentInstrumentType == "paypal_account" && $transaction->status == "settling") { // or submitted for settlement?
+            $order_state = Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION');
+        } else if ((Configuration::get('PAYPAL_API_INTENT') == "sale" && $transaction->paymentInstrumentType == "paypal_account" && $transaction->status == "settled")
+        || (Configuration::get('PAYPAL_API_INTENT') == "sale" && $transaction->paymentInstrumentType == "credit_card")) {
             $order_state = Configuration::get('PS_OS_PAYMENT');
         } else {
             $order_state = Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING');
         }
         $paypal->validateOrder(context::getContext()->cart->id, $order_state, $transaction->amount, 'Braintree', $paypal->l('Payment accepted.'), $transactionDetail, context::getContext()->cart->id_currency, false, context::getContext()->customer->secure_key);
-        $order_id = Order::getOrderByCartId(context::getContext()->cart->id);
-
-       // echo'<pre>';print_r($braintree_presta);echo'<pre>';die;
     }
 
     public function getDetailsTransaction($transaction)
@@ -306,6 +316,7 @@ class MethodBT extends AbstractMethodPaypal
             'id_payment' => Tools::getValue('payment_method_nonce'),
             'client_token' => Tools::getValue('client_token'),
             'capture' => $transaction->status == "authorized" ? true : false,
+            'payment_tool' => $transaction->paymentInstrumentType,
         );
     }
 
@@ -338,7 +349,7 @@ class MethodBT extends AbstractMethodPaypal
                 'amount'                => $cart->getOrderTotal(),
                 'paymentMethodNonce'    => $token_payment,//'fake-processor-declined-visa-nonce',//
                 'merchantAccountId'     => $merchant_accounts->$current_currency,
-                'orderId'               => $cart->id,
+                'orderId'               => $cart->id, // Paypal block duplicate order Id
                 'channel'               => 'PrestaShop_Cart_Braintree',
                 'billing' => [
                     'firstName'         => $address_billing->firstname,
@@ -369,7 +380,13 @@ class MethodBT extends AbstractMethodPaypal
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 return $result->transaction;
             } else {
-                $this->error = $result->transaction->status;
+                $errors = $result->errors->deepAll();
+                if ($errors) {
+                    $error_code = $errors[0]->code;
+                } else {
+                    $error_code = $result->transaction->processorResponseCode;
+                }
+                Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $error_code)));
             }
 
         } catch (Exception $e) {
@@ -382,7 +399,7 @@ class MethodBT extends AbstractMethodPaypal
 
     public function isValidStatus($status)
     {
-        return in_array($status, array('submitted_for_settlement','authorized','settled'));
+        return in_array($status, array('submitted_for_settlement','authorized','settled', 'settling'));
     }
 
 
@@ -423,8 +440,10 @@ class MethodBT extends AbstractMethodPaypal
             }
             return $response;
         } catch (Exception $e) {
-            PrestaShopLogger::addLog($e->getCode().'=>'.$e->getMessage());
-            return false;
+            $response =  array(
+                'error_message' => $e->getCode().'=>'.$e->getMessage(),
+            );
+            return $response;
         }
     }
 
@@ -470,8 +489,10 @@ class MethodBT extends AbstractMethodPaypal
             }
             return $response;
         } catch (Exception $e) {
-            PrestaShopLogger::addLog($e->getCode().'=>'.$e->getMessage());
-            return false;
+            $response =  array(
+                'error_message' => $e->getCode().'=>'.$e->getMessage(),
+            );
+            return $response;
         }
     }
 
@@ -496,8 +517,21 @@ class MethodBT extends AbstractMethodPaypal
             }
             return $response;
         } catch (Exception $e) {
-            PrestaShopLogger::addLog($e->getCode().'=>'.$e->getMessage());
-            return false;
+            $response =  array(
+                'error_message' => $e->getCode().'=>'.$e->getMessage(),
+            );
+            return $response;
         }
+    }
+
+    public function searchTransactions($ids) {
+        $this->initConfig();
+        $collection = $this->gateway->transaction()->search(
+            array(
+                Braintree_TransactionSearch::ids()->is($ids)
+            )
+        );
+        return $collection;
+
     }
 }
