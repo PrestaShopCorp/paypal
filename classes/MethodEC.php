@@ -183,17 +183,15 @@ class MethodEC extends AbstractMethodPaypal
         if (isset($params['method'])) {
             Configuration::updateValue('PAYPAL_API_CARD', $params['with_card']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
-            if ((!Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_LIVE_ACCESS'))
-                || (Configuration::get('PAYPAL_SANDBOX') && !Configuration::get('PAYPAL_SANDBOX_ACCESS'))) {
-                $response = $paypal->getPartnerInfo($params['method']);
-                $result = Tools::jsonDecode($response);
-                if (!$result->error && isset($result->data->url)) {
-                    $PartnerboardingURL = $result->data->url;
-                    Tools::redirectLink($PartnerboardingURL);
-                } else {
-                    $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
-                }
+            $response = $paypal->getPartnerInfo($params['method']);
+            $result = Tools::jsonDecode($response);
+            if (!$result->error && isset($result->data->url)) {
+                $PartnerboardingURL = $result->data->url;
+                Tools::redirectLink($PartnerboardingURL);
+            } else {
+                $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
             }
+
         }
 
         if (!Configuration::get('PAYPAL_USERNAME_'.$mode) || !Configuration::get('PAYPAL_PSWD_'.$mode)
@@ -481,9 +479,10 @@ class MethodEC extends AbstractMethodPaypal
     public function validation()
     {
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
+        $context = Context::getContext();
         $params = array(
-            'TOKEN' => Tools::getValue('token'),
-            'PAYERID' => Tools::getValue('PayerID'),
+            'TOKEN' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token'),
+            'PAYERID' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID'),
         );
         $this->_getCredentialsInfo($params);
         $this->_getPaymentInfo($params);
@@ -491,15 +490,15 @@ class MethodEC extends AbstractMethodPaypal
 
         $exec_payment = $sdk->doExpressCheckout($params);
         if (isset($exec_payment['L_ERRORCODE0'])) {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment['L_ERRORCODE0'])));
+            Tools::redirect($context->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment['L_ERRORCODE0'])));
         }
 
-        $cart = Context::getContext()->cart;
+        $cart = $context->cart;
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
         }
-        $currency = Context::getContext()->currency;
+        $currency = $context->currency;
         $total = (float)$exec_payment['PAYMENTINFO_0_AMT'];
         $paypal = Module::getInstanceByName('paypal');
         if (Configuration::get('PAYPAL_API_INTENT') == "sale") {

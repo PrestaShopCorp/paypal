@@ -113,6 +113,7 @@ class PaypalOrder extends ObjectModel
     public static function getPaypalBtOrdersIds()
     {
         //TODO: change payment_status settling by subbmitted for settlement ??
+        $ids = array();
         $sql = new DbQuery();
         $sql->select('id_transaction');
         $sql->from('paypal_order');

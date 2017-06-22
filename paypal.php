@@ -510,44 +510,56 @@ class PayPal extends PaymentModule
 
         switch ($method_active) {
             case 'EC':
-                $payment_options = new PaymentOption();
-                $action_text = $this->l('Pay with Paypal');
-                $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/paypal_sm.png'));
-                if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
-                    $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
-                }
-                $this->context->smarty->assign(array(
-                    'path' => $this->_path,
-                ));
-                $payment_options->setCallToActionText($action_text);
-                $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0'), true));
-                if (!$not_refunded) {
-                    $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos.tpl'));
-                }
-                $payments_options = [
-                    $payment_options,
-                ];
-
-                if (Configuration::get('PAYPAL_API_CARD')) {
+                if ((Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_SANDBOX_ACCESS'))
+                || (Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_SANDBOX_ACCESS'))) {
                     $payment_options = new PaymentOption();
-                    $action_text = $this->l('Pay with debit or credit card');
-                    $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                    $action_text = $this->l('Pay with Paypal');
+                    $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/paypal_sm.png'));
+                    if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
+                        $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
+                    }
+                    $this->context->smarty->assign(array(
+                        'path' => $this->_path,
+                    ));
                     $payment_options->setCallToActionText($action_text);
-                    $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'1'), true));
-                    $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos_card.tpl'));
-                    $payments_options[] = $payment_options;
+                    $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0'), true));
+                    if (!$not_refunded) {
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos.tpl'));
+                    }
+                    $payments_options = [
+                        $payment_options,
+                    ];
+
+                    if (Configuration::get('PAYPAL_API_CARD')) {
+                        $payment_options = new PaymentOption();
+                        $action_text = $this->l('Pay with debit or credit card');
+                        $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                        $payment_options->setCallToActionText($action_text);
+                        $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'1'), true));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos_card.tpl'));
+                        $payments_options[] = $payment_options;
+                    }
+                    if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
+                        $payment_options = new PaymentOption();
+                        $action_text = $this->l('Pay with paypal express checkout');
+                        $payment_options->setCallToActionText($action_text);
+                        $payment_options->setModuleName('express_checkout');
+                        $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/express_checkout.tpl'));
+                        $payments_options[] = $payment_options;
+                    }
                 }
                 break;
             case 'BT':
-                if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
-                    $embeddedOption = new PaymentOption();
-                    $embeddedOption->setCallToActionText($this->l('Pay with paypal by braintree'))
-                        ->setForm($this->generateFormPaypalBt())
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
-                    $payments_options[] = $embeddedOption;
-                }
-
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
+                    if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
+                        $embeddedOption = new PaymentOption();
+                        $embeddedOption->setCallToActionText($this->l('Pay with paypal by braintree'))
+                            ->setForm($this->generateFormPaypalBt())
+                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                        $payments_options[] = $embeddedOption;
+                    }
+
                     $embeddedOption = new PaymentOption();
                     $embeddedOption->setCallToActionText($this->l('Pay braintree'))
                         ->setForm($this->generateFormBt())
@@ -579,6 +591,9 @@ class PayPal extends PaymentModule
                     $this->context->controller->registerJavascript($this->name . '-paypal-checkout-min', 'https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-paypal-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
                 }
+            }
+            if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
+                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
             }
         }
     }
@@ -692,6 +707,9 @@ class PayPal extends PaymentModule
 
     public function hookDisplayFooterProduct($params)
     {
+        if (Configuration::get('PAYPAL_METHOD') != 'EC') {
+            return false;
+        }
         $method = AbstractMethodPaypal::load('EC');
         return $method->renderExpressCheckout($this->context, 'EC');
     }
@@ -936,6 +954,7 @@ class PayPal extends PaymentModule
         $partner_info = array(
             'email' => Configuration::get('PS_SHOP_EMAIL'),
             'shop_url' => Tools::getShopDomainSsl(true),
+            'shop_name' => Configuration::get('PS_SHOP_NAME',null, null, null, ''),
             'address1' => Configuration::get('PS_SHOP_ADDR1',null, null, null, ''),
             'address2' => Configuration::get('PS_SHOP_ADDR2',null, null, null, ''),
             'city' => Configuration::get('PS_SHOP_CITY',null, null, null, ''),

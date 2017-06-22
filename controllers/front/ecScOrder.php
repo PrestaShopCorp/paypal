@@ -66,37 +66,58 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         CartRule::autoAddToCart($this->context);
         // END Login
         $addresses = $customer->getAddresses($this->context->language->id);
-        $orderAddress = new Address();
+        $address_exist = false;
+        $count = 1;
+
         foreach ($addresses as $address)
         {
-            if($address['alias'] == 'Paypal_Address')
-            {
-                $orderAddress = new Address($address['id_address']);
-                break;
+            if($address['firstname'].' '.$address['lastname'] == $info['SHIPTONAME']
+                && $address['address1'] == $info['PAYMENTREQUEST_0_SHIPTOSTREET']
+                && (isset($info['PAYMENTREQUEST_0_SHIPTOSTREET2'])?$address['address2'] == $info['PAYMENTREQUEST_0_SHIPTOSTREET2']:true)
+                && $address['id_country'] == Country::getByIso($info['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'])
+                && $address['city'] == $info['PAYMENTREQUEST_0_SHIPTOCITY']
+                && (isset($info['PAYMENTREQUEST_0_SHIPTOSTATE'])?$address['id_state'] == $info['PAYMENTREQUEST_0_SHIPTOSTATE']:true)
+                && $address['postcode'] == $info['PAYMENTREQUEST_0_SHIPTOZIP']
+                && (isset($info['PAYMENTREQUEST_0_SHIPTOPHONENUM'])?$address['phone'] == $info['PAYMENTREQUEST_0_SHIPTOPHONENUM']:true)
+            ) {
+                $address_exist = true;
+            } else {
+                if ((strrpos($address['alias'], 'Paypal_Address')) !== false) {
+                    $count = (int)(substr($address['alias'], -1)) + 1;
+                }
             }
         }
-        $orderAddress->firstname = $info['FIRSTNAME'];
-        $orderAddress->lastname = $info['LASTNAME'];
-        $orderAddress->address1 = $info['PAYMENTREQUEST_0_SHIPTOSTREET'];
-        if (isset($info['PAYMENTREQUEST_0_SHIPTOSTREET2'])) {
-            $orderAddress->address2 = $info['PAYMENTREQUEST_0_SHIPTOSTREET2'];
-        }
-        $orderAddress->id_country = Country::getByIso($info['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']);
-        $orderAddress->city = $info['PAYMENTREQUEST_0_SHIPTOCITY'];
-        if (Country::containsStates($orderAddress->id_country)) {
-            $orderAddress->id_state = (int) State::getIdByIso($info['PAYMENTREQUEST_0_SHIPTOSTATE'], $address->id_country);
+        //echo '<pre>';print_r($addresses);echo '<pre>';;print_r($info);die;
+       // echo '<pre>';print_r($count+1);echo '<pre>';die;
+        if (!$address_exist) {
+            $orderAddress = new Address();
+            $separated_name = explode(" ", $info['SHIPTONAME']);
+            $orderAddress->firstname = $separated_name[0];
+            $orderAddress->lastname = $separated_name[1];
+            $orderAddress->address1 = $info['PAYMENTREQUEST_0_SHIPTOSTREET'];
+            if (isset($info['PAYMENTREQUEST_0_SHIPTOSTREET2'])) {
+                $orderAddress->address2 = $info['PAYMENTREQUEST_0_SHIPTOSTREET2'];
+            }
+            $orderAddress->id_country = Country::getByIso($info['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']);
+            $orderAddress->city = $info['PAYMENTREQUEST_0_SHIPTOCITY'];
+            if (Country::containsStates($orderAddress->id_country)) {
+                $orderAddress->id_state = (int) State::getIdByIso($info['PAYMENTREQUEST_0_SHIPTOSTATE'], $address->id_country);
+            }
+
+            $orderAddress->postcode = $info['PAYMENTREQUEST_0_SHIPTOZIP'];
+            if (isset($info['PAYMENTREQUEST_0_SHIPTOPHONENUM'])) {
+                $orderAddress->phone = $info['PAYMENTREQUEST_0_SHIPTOPHONENUM'];
+            }
+
+            $orderAddress->id_customer = $customer->id;
+            $orderAddress->alias = 'Paypal_Address '.($count);
+
+            $orderAddress->save();
         }
 
-        $orderAddress->postcode = $info['PAYMENTREQUEST_0_SHIPTOZIP'];
-        if (isset($info['PAYMENTREQUEST_0_SHIPTOPHONENUM'])) {
-            $orderAddress->phone = $info['PAYMENTREQUEST_0_SHIPTOPHONENUM'];
-        }
 
-        $orderAddress->id_customer = $customer->id;
-        $orderAddress->alias = 'Paypal_Address';
-
-        $orderAddress->save();
-        $this->context->cookie->paypal_ecs = true;
+        $this->context->cookie->__set('paypal_ecs' , $info['TOKEN']);
+        $this->context->cookie->__set('paypal_ecs_payerid' , $info['PAYERID']);
         Tools::redirect($this->context->link->getPageLink('order',NULL,NULL,array('step'=>2)));
     }
 }
