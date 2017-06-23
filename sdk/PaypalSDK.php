@@ -83,9 +83,6 @@ class PaypalSDK
         $fields['TOKEN'] = $params['TOKEN'];
         $fields['PAYERID'] = $params['PAYERID'];
 
-        // Set payment details
-        $this->_setPaymentDetails($fields, $params);
-
         /* echo '<pre>';
         print_r($this->makeCallPaypal($fields));
         echo '<pre>';

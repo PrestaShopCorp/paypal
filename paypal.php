@@ -259,6 +259,7 @@ class PayPal extends PaymentModule
             || !$this->registerHook('actionObjectCurrencyAddAfter')
             || !$this->registerHook('displayBackOfficeHeader')
             || !$this->registerHook('displayFooterProduct')
+            || !$this->registerHook('actionBeforeCartUpdateQty')
         ) {
             return false;
         }
@@ -498,10 +499,8 @@ class PayPal extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
-        if(!Configuration::get('PAYPAL_SANDBOX') && !(Configuration::get('PAYPAL_USERNAME_LIVE') && Configuration::get('PAYPAL_PSWD_LIVE') && Configuration::get('PAYPAL_PSWD_LIVE'))
-            || Configuration::get('PAYPAL_SANDBOX') && !(Configuration::get('PAYPAL_USERNAME_SANDBOX') && Configuration::get('PAYPAL_PSWD_SANDBOX') && Configuration::get('PAYPAL_SIGNATURE_SANDBOX'))){
-            return false;
-        }
+
+
 
         $not_refunded = 0;
         foreach ($params['cart']->getProducts() as $key => $product) {
@@ -515,8 +514,8 @@ class PayPal extends PaymentModule
 
         switch ($method_active) {
             case 'EC':
-                if ((Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_SANDBOX_ACCESS'))
-                || (Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_SANDBOX_ACCESS'))) {
+                if (!Configuration::get('PAYPAL_SANDBOX') && (Configuration::get('PAYPAL_USERNAME_LIVE') && Configuration::get('PAYPAL_PSWD_LIVE') && Configuration::get('PAYPAL_PSWD_LIVE'))
+                    || (Configuration::get('PAYPAL_SANDBOX') && (Configuration::get('PAYPAL_USERNAME_SANDBOX') && Configuration::get('PAYPAL_PSWD_SANDBOX') && Configuration::get('PAYPAL_SIGNATURE_SANDBOX')))) {
                     $payment_options = new PaymentOption();
                     $action_text = $this->l('Pay with Paypal');
                     $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/paypal_sm.png'));
@@ -828,6 +827,15 @@ class PayPal extends PaymentModule
         }
 
         return $paypal_msg.$this->display(__FILE__, 'views/templates/hook/paypal_order.tpl');
+    }
+
+    public function hookActionBeforeCartUpdateQty($params)
+    {
+        if (isset($this->context->cookie->paypal_ecs) || isset($this->context->cookie->paypal_ecs_payerid)) {
+            //unset cookie of payment init if it's no more same cart
+            Context::getContext()->cookie->__unset('paypal_ecs');
+            Context::getContext()->cookie->__unset('paypal_ecs_payerid');
+        }
     }
 
 
