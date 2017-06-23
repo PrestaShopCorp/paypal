@@ -231,10 +231,6 @@ class MethodEC extends AbstractMethodPaypal
         }
 
         $payment = $sdk->setExpressCheckout($params);
-       /* echo '<pre>';
-        print_r($payment);
-        echo '<pre>';
-        die;*/
         $return = false;
         if (isset($payment['TOKEN'])) {
             $this->token = $payment['TOKEN'];
