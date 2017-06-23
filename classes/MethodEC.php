@@ -290,7 +290,7 @@ class MethodEC extends AbstractMethodPaypal
                 $fields['L_PAYMENTREQUEST_0_NAME'.$index] .= ' - '.$product['attributes'];
             }
 
-            $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($product['description_short']), 0, 50).'...';
+            $fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
 
             $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($product['price'], 2);
             $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = number_format($product['price_wt'] - $product['price'], 2);
@@ -308,7 +308,7 @@ class MethodEC extends AbstractMethodPaypal
                 $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $discount['id_discount'];
                 $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $discount['name'];
                 if (isset($discount['description']) && !empty($discount['description'])) {
-                    $fields['L_PAYMENTREQUEST_0_DESC'.$index] = substr(strip_tags($discount['description']), 0, 50).'...';
+                    $fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
                 }
 
                 /* It is a discount so we store a negative value */
@@ -482,8 +482,10 @@ class MethodEC extends AbstractMethodPaypal
         );
         $this->_getCredentialsInfo($params);
         $this->_getPaymentInfo($params);
-
-
+        $params = $this->_setPaymentDetails($params);
+        $params['TOKEN'] = Tools::getValue('token');
+        $params['PAYERID'] = Tools::getValue('PayerID');
+        
         $exec_payment = $sdk->doExpressCheckout($params);
         if (isset($exec_payment['L_ERRORCODE0'])) {
             Tools::redirect($context->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment['L_ERRORCODE0'])));

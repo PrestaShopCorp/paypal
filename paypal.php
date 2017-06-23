@@ -498,6 +498,11 @@ class PayPal extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
+        if(!Configuration::get('PAYPAL_SANDBOX') && !(Configuration::get('PAYPAL_USERNAME_LIVE') && Configuration::get('PAYPAL_PSWD_LIVE') && Configuration::get('PAYPAL_PSWD_LIVE'))
+            || Configuration::get('PAYPAL_SANDBOX') && !(Configuration::get('PAYPAL_USERNAME_SANDBOX') && Configuration::get('PAYPAL_PSWD_SANDBOX') && Configuration::get('PAYPAL_SIGNATURE_SANDBOX'))){
+            return false;
+        }
+
         $not_refunded = 0;
         foreach ($params['cart']->getProducts() as $key => $product) {
             if ($product['is_virtual']) {
