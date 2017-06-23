@@ -29,12 +29,12 @@
     <div class="col-xs-12 col-md-10">
         <div class="braintree-row-payment">
             <div class="payment_module braintree-card">
-            {if $error_msg}<span class="braintree_error">{$error_msg|escape:'htmlall':'UTF-8'}</span>{/if}
                 <label class="paypal_title_pay_card">{l s='Pay with your card' mod='paypal'}</label><div class="paypal_clear"></div>
             <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/braintree_cards.png" alt="">
             <form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
                 <div id="block-card-number" class="block_field">
-                    <div id="card-number" class="hosted_field"></div>
+                    <div id="card-number" class="hosted_field"><div id="card-image"></div></div>
+
                 </div>
 
                 <div id="block-expiration-date" class="block_field half_block_field">

@@ -61,6 +61,17 @@
                     return;
                 }
 
+                hostedFieldsInstance.on('empty', function (event) {
+                    $('.braintree-card #card-image').removeClass();
+                });
+
+                hostedFieldsInstance.on('cardTypeChange', function (event) {
+                    // Change card bg depending on card type
+                    if (event.cards.length === 1) {
+                        $('.braintree-card #card-image').removeClass().addClass(event.cards[0].type);
+                    }
+                });
+
 
                 bt_button.addEventListener('click', function (event) {
                     payment_selected = $('input[name=payment-option]:checked').attr('id');
@@ -166,7 +177,7 @@
                                 });
                             });
                         } else {
-                            document.querySelector('input[name="payment_method_nonce"]').value = payload.nonce;
+                            document.querySelector('#braintree-form #payment_method_nonce').value = payload.nonce;
 
                             bt_form.submit();
                         }

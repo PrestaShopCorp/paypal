@@ -122,3 +122,27 @@
 #credential-configuration ul li {
     list-style-type: decimal;
 }
+
+@media only screen and (max-width: 900px) {
+    #paypal_conf .left .logo {
+        float: none;
+        width: 50%;
+        margin: 0px;
+    }
+    #paypal_conf .left .info {
+        float: none;
+        margin-top: 15px;
+        width: 90%;
+    }
+    #paypal_conf .left {
+        width: 50%;
+    }
+    #paypal_conf .right {
+        width: 40%;
+    }
+}
+@media only screen and (max-width: 570px) {
+    #paypal_conf .left .logo {
+        width: 85%;
+    }
+}
