@@ -43,6 +43,7 @@ function upgrade_module_4_2_0($module)
     if (!$module->registerHook('header')
         || !$module->registerHook('displayBackOfficeHeader')
         || !$module->registerHook('displayFooterProduct')
+        || !$module->registerHook('actionBeforeCartUpdateQty')
         || !$module->registerHook('actionObjectCurrencyAddAfter')) {
         return false;
     }
