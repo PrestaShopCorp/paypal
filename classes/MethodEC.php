@@ -207,7 +207,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $params = array(
             'CANCELURL' => Context::getContext()->link->getPageLink('order', true).'&step=1',
-            'LANDINGPAGE' => Tools::getValue('credit_card') ? 'Billing' : 'Login',
+            'LANDINGPAGE' => $data['use_card'] ? 'Billing' : 'Login',
             'RETURNURL' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
         );
 
@@ -248,9 +248,19 @@ class MethodEC extends AbstractMethodPaypal
         $fields['USER'] =  $params['USER'];
         $fields['PWD'] = $params['PWD'];
         $fields['SIGNATURE'] = $params['SIGNATURE'];
-        $fields['CANCELURL'] = $params['CANCELURL'];
-        $fields['LANDINGPAGE'] = $params['LANDINGPAGE'];
-        $fields['RETURNURL'] = $params['RETURNURL'];
+        if(isset($params['CANCELURL']))
+        {
+            $fields['CANCELURL'] = $params['CANCELURL'];
+        }
+        if(isset($params['LANDINGPAGE']))
+        {
+            $fields['LANDINGPAGE'] = $params['LANDINGPAGE'];
+        }
+        if(isset($params['RETURNURL']))
+        {
+            $fields['RETURNURL'] = $params['RETURNURL'];
+        }
+
 
         // Set cart products list
         $this->setProductsList($fields, $params['PAYMENT_LIST']['PRODUCTS'], $index, $total_products, $tax);
@@ -529,7 +539,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
         $id_paypal_order = $paypal_order->id;
-
+        $params = array();
         $params['AMT'] = $paypal_order->total_paid;
         $params['AUTHORIZATIONID'] = $paypal_order->id_transaction;
         $params['CURRENCYCODE'] = $paypal_order->currency;

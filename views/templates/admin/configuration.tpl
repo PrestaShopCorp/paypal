@@ -74,10 +74,10 @@
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
-                        {l s='Accept' mod='paypal'} <b>{l s='PayPal' mod='paypal'}</b> {l s='payments, you can optimize your conversion rate.' mod='paypal'}
+                            {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'}
                     </p>
                     <p>
-                        {l s='Fast checkout and fast payment. Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                            {l s='Fast checkout and fast payment. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                     </p>
                     <p>
                         <a target="_blank" href="https://www.paypal.com/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
@@ -93,10 +93,10 @@
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
-                        {l s='Accept' mod='paypal'} <b>{l s='credit cards' mod='paypal'}</b>, <b>{l s='debit cards' mod='paypal'}</b> {l s='and' mod='paypal'} <b>{l s='PayPal' mod='paypal'}</b> {l s='payments' mod='paypal'}
+                            {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'}
                     </p>
                     <p>
-                        {l s='Your customers can pay with a selection of local and international ' mod='paypal'} <b>{l s='debit and credit cards.' mod='paypal'}</b> {l s='Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                            {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                     </p>
                     <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
@@ -116,10 +116,10 @@
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
-                        {l s='Accept' mod='paypal'} <b>{l s='Braintree' mod='paypal'}</b> {l s='payments' mod='paypal'}
+                        {l s='Accept Braintree payments' mod='paypal'}
                     </p>
                     <p>
-                        {l s='Your customers can pay with a selection of local and international ' mod='paypal'} <b>{l s='debit and credit cards.' mod='paypal'}</b> {l s='Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                        {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                     </p>
                     <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
@@ -137,12 +137,12 @@
                 <div class="panel">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
-                        {l s='Accept' mod='paypal'} <b>{l s='cards' mod='paypal'}</b> {l s='and' mod='paypal'} <b>{l s='PayPal' mod='paypal'}</b>
-                        {l s='with our full-stack payments platform' mod='paypal'} <b>{l s='Braintree' mod='paypal'}.</b>
+                        {l s='Accept cards and PayPal' mod='paypal'}
+                        {l s='with our full-stack payments platform Braintree' mod='paypal'}.
                     </p>
                     <p>
-                        {l s='You can improve your customers experience and your conversion with hosted fields for' mod='paypal'} <b>{l s='card' mod='paypal'}</b>
-                        {l s='payments and' mod='paypal'} <b>{l s='PayPal' mod='paypal'}</b> {l s='payment including One Touch' mod='paypal'}&trade;
+                        {l s='You can improve your customers experience and your conversion with hosted fields for card' mod='paypal'}
+                        {l s='payments and PayPal payment including One Touch' mod='paypal'}&trade;
                     </p>
                     <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
@@ -167,10 +167,10 @@
                     {if !$paypal_card}
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                         <p>
-                            {l s='Accept' mod='paypal'} <b>{l s='PayPal' mod='paypal'}</b> {l s='payments, you can optimize your conversion rate.' mod='paypal'} : <b>{$active_products|escape:'html':'UTF-8'}</b>
+                                {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
                         <p>
-                            {l s='Fast checkout and fast payment. Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                                {l s='Fast checkout and fast payment. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                         </p>
                         <p>
                             <a target="_blank" href="https://www.paypal.com/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
@@ -178,17 +178,25 @@
                     {else}
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                         <p>
-                            {l s='Accept' mod='paypal'} <b>{l s='credit cards' mod='paypal'}</b>, <b>{l s='debit cards' mod='paypal'}</b> {l s='and' mod='paypal'} <b>{l s='PayPal' mod='paypal'}</b> {l s='payments' mod='paypal'}  : <b>{$active_products|escape:'html':'UTF-8'}</b>
+                                {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
                         <p>
-                            {l s='Your customers can pay with a selection of local and international ' mod='paypal'} <b>{l s='debit and credit cards.' mod='paypal'}</b> {l s='Make online payments simple.' mod='paypal'} <b>{l s='PayPal customers' mod='paypal'}</b> {l s='can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                                {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                         </p>
                         <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     {/if}
                 </div>
                 <div class="col-sm-3 help-right">
+                        <p>
                     {l s='More Information' mod='paypal'} ?
                     <a target="_blank" href="https://www.paypal.com/webapps/mpp/contact-us">{l s='Contact us' mod='paypal'}</a>
+                        </p>
+                        <p>
+                            {l s='API user name SandBox' mod='paypal'} : {if $api_user_name_sandbox == ''}{l s='not specified'}{else}{$api_user_name_sandbox}{/if}
+                        </p>
+                        <p>
+                            {l s='API user name Live' mod='paypal'} : {if $api_user_name_live == ''}{l s='not specified'}{else}{$api_user_name_live}{/if}
+                        </p>
                 </div>
             </div>
         </div>

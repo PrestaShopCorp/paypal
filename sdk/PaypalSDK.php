@@ -74,23 +74,10 @@ class PaypalSDK
 
     public function doExpressCheckout($params)
     {
-        $fields = array();
-        // Seller informations
-        $this->_setUserCredentials($fields, $params);
-
-        $fields['METHOD'] = 'DoExpressCheckoutPayment';
-        $fields['VERSION'] = $this->version;
-        $fields['TOKEN'] = $params['TOKEN'];
-        $fields['PAYERID'] = $params['PAYERID'];
-
-        // Set payment details
-        $this->_setPaymentDetails($fields, $params);
-
-        /* echo '<pre>';
-        print_r($this->makeCallPaypal($fields));
-        echo '<pre>';
-        die;*/
-        return $this->makeCallPaypal($fields);
+        $params['METHOD'] = 'DoExpressCheckoutPayment';
+        $params['VERSION'] = $this->version;
+        $return = $this->makeCallPaypal($params);
+        return $return;
     }
 
     public function doVoid($params)
@@ -180,7 +167,7 @@ class PaypalSDK
         }
 
         if (curl_errno($curl)) {
-            die('error occured during curl exec. Additioanl info: ' . curl_errno($curl).':'. curl_error($curl));
+            die('error occured during curl exec. Additional info: ' . curl_errno($curl).':'. curl_error($curl));
         }
         return $return;
     }

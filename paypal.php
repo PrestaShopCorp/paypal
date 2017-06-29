@@ -957,18 +957,19 @@ class PayPal extends PaymentModule
         }
 
         $partner_info = array(
-            'email' => Configuration::get('PS_SHOP_EMAIL'),
-            'shop_url' => Tools::getShopDomainSsl(true),
-            'shop_name' => Configuration::get('PS_SHOP_NAME',null, null, null, ''),
-            'address1' => Configuration::get('PS_SHOP_ADDR1',null, null, null, ''),
-            'address2' => Configuration::get('PS_SHOP_ADDR2',null, null, null, ''),
-            'city' => Configuration::get('PS_SHOP_CITY',null, null, null, ''),
-            'country_code' => Tools::strtoupper($this->context->country->iso_code),
-            'postal_code' => Configuration::get('PS_SHOP_CODE',null, null, null, ''),
-            'state' => Configuration::get('PS_SHOP_STATE_ID',null, null, null, ''),
-            'return_url' => $return_url,
-            'first_name' => $this->context->employee->firstname,
-            'last_name' => $this->context->employee->lastname,
+            'email'         => $this->context->employee->email,
+            'shop_url'      => Tools::getShopDomainSsl(true),
+            'address1'      => Configuration::get('PS_SHOP_ADDR1',null, null, null, ''),
+            'address2'      => Configuration::get('PS_SHOP_ADDR2',null, null, null, ''),
+            'city'          => Configuration::get('PS_SHOP_CITY',null, null, null, ''),
+            'country_code'  => Tools::strtoupper($this->context->country->iso_code),
+            'postal_code'   => Configuration::get('PS_SHOP_CODE',null, null, null, ''),
+            'state'         => Configuration::get('PS_SHOP_STATE_ID',null, null, null, ''),
+            'return_url'    => $return_url,
+            'first_name'    => $this->context->employee->firstname,
+            'last_name'     => $this->context->employee->lastname,
+            'shop_name'     => Configuration::get('PS_SHOP_NAME',null, null, null, ''),
+            'ref_merchant'  => 'prestashop_'._PS_VERSION_.'_'.$this->version,
         );
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
