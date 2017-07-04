@@ -50,38 +50,32 @@ function initPaypalBraintree() {
                         .then(function (payload) {
                             // Submit `payload.nonce` to your server.
                             document.querySelector('input#paypal_payment_method_nonce').value = payload.nonce;
+                            $('#paypal-button').hide();
+                            $('#paypal-vault-info').show().append(payload.details.firstName+' '+payload.details.lastName+' '+payload.details.email);
 
-                            paypal_bt_form.submit();
                         });
                 },
 
                 onCancel: function (data) {
-                    console.log('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
+                    alert('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
                 },
 
                 onError: function (err) {
-                    console.error('checkout.js error', err);
+                    alert('checkout.js error', err);
                 }
-            }, '#aaaaaa-button').then(function (e) {
-              /*  console.log('this', this);
-                console.log('event', e);
-                var test = $(document).find('#paypal-button');
-                console.log('test', test);
-                var paypal_bt_form2 = document.querySelector('#paypal-button');
-                paypal_bt_form2.click();
-                //   $('.paypal-button-container').click();
-                // The PayPal button will be rendered in an html element with the id
-                // `paypal-button`. This function will be called when the PayPal button
-                // is set up and ready to be used.
-                // paypal_bt_form.submit();*/
+            }, '#paypal-button').then(function (e) {
+
             });
-
-            // Set up PayPal with the checkout.js library
             $('#payment-confirmation button').click(function(){
-
-                event.preventDefault();
-                event.stopPropagation();
-                $('#paypal-button').click();
+                payment_selected = $('input[name=payment-option]:checked').attr('id');
+                if (!$('#pay-with-'+payment_selected+'-form .payment_module').hasClass('paypal-braintree')) {
+                    return true;
+                }
+                if (!document.querySelector('input#paypal_payment_method_nonce').value) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert(pbt_translations.empty_nonce);
+                }
             });
 
 

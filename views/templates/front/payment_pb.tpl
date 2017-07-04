@@ -29,34 +29,20 @@
             <form action="{$braintreeSubmitUrl}" id="paypal-braintree-form" method="post">
                 <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
                 <input type="hidden" name="payment_method_bt" value="paypal-braintree"/>
-                <div id="aaaaaa-button"></div>
+                <div id="paypal-button"></div>
+                <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
             </form>
             </div>
         </div>
     </div>
 </div>
 
-<!--<script src="https://www.paypalobjects.com/api/checkout.js" data-version-4 log-level="warn"></script>
-<script src="https://js.braintreegateway.com/web/3.16.0/js/client.min.js"></script>
-<script src="https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js"></script>-->
+
 <script>
 
     var authorization = '{$braintreeToken}';
     var bt_amount = {$braintreeAmount};
-    var bt_translations = {
-        client:"{l s='Error create Client' mod='paypal'}",
-        card_nmb:"{l s='Card number' mod='paypal'}",
-        cvc:"{l s='CVC' mod='paypal'}",
-        date:"{l s='MM/YY' mod='paypal'}",
-        hosted:"{l s='Error create Hosted fields' mod='paypal'}",
-        empty:"{l s='All fields are empty! Please fill out the form.' mod='paypal'}",
-        invalid:"{l s='Some fields are invalid :' mod='paypal'}",
-        token:"{l s='Tokenization failed server side. Is the card valid?' mod='paypal'}",
-        network:"{l s='Network error occurred when tokenizing.' mod='paypal'}",
-        tkn_failed:"{l s='Tokenize failed' mod='paypal'}",
-        https:"{l s='3D Secure requires HTTPS.' mod='paypal'}",
-        load_3d:"{l s='Load 3D Secure Failed' mod='paypal'}",
-        request_problem:"{l s='There was a problem with your request.' mod='paypal'}",
-        failed_3d:"{l s='3D Secure Failed' mod='paypal'}"
+    var pbt_translations = {
+        empty_nonce:"{l s='Cklick paypal button first' mod='paypal'}"
     };
 </script>

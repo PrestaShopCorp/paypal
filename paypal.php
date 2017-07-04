@@ -560,8 +560,7 @@ class PayPal extends PaymentModule
                         $embeddedOption = new PaymentOption();
                         $embeddedOption->setCallToActionText($this->l('Pay with paypal by braintree'))
                             ->setForm($this->generateFormPaypalBt())
-                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'))
-                            ->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/express_checkout.tpl'));
+                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
                         $payments_options[] = $embeddedOption;
                     }
 
@@ -627,7 +626,7 @@ class PayPal extends PaymentModule
                         $paypal_order->payment_status = $transaction->status;
                         $ps_order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
                         break;
-                    case 'submitted_for_settlement':
+                    default:
                         // do nothing and check later one more time
                         break;
                 }
