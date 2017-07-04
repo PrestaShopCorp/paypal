@@ -146,7 +146,47 @@ class MethodEC extends AbstractMethodPaypal
             $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
         }
 
+        $params['form'] = $this->getApiUserName($module);
+
         return $params;
+    }
+
+    public function getApiUserName($module)
+    {
+        $fields_form = array();
+        $fields_form[0]['form'] = array(
+            'legend' => array(
+                'title' => $module->l('Api user name'),
+                'icon' => 'icon-cogs',
+            ),
+        );
+        $apiUserName = (Configuration::get('PAYPAL_SANDBOX_ACCESS')?Configuration::get('PAYPAL_USERNAME_SANDBOX'):Configuration::get('PAYPAL_USERNAME_LIVE'));
+
+        $fields_form[0]['form']['input'] = array(
+            array(
+                'type' => 'text',
+                'label' => $module->l('API user name'),
+                'name'=>'api_user_name',
+                'disabled'=>'disabled'
+            )
+        );
+
+        $helper = new HelperForm();
+        $helper->module = $module;
+        $helper->name_controller = $module->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
+        $helper->title = $module->displayName;
+        $helper->show_toolbar = false;
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = $default_lang;
+        $helper->allow_employee_form_lang = $default_lang;
+        $helper->tpl_vars = array(
+            'fields_value' => array('api_user_name'=>$apiUserName),
+            'id_language' => Context::getContext()->language->id,
+            'back_url' => $module->module_link.'#paypal_params'
+        );
+        return $helper->generateForm($fields_form);
     }
 
     public function setConfig($params)

@@ -190,13 +190,6 @@
                         <p>
                     {l s='More Information' mod='paypal'} ?
                     <a target="_blank" href="https://www.paypal.com/webapps/mpp/contact-us">{l s='Contact us' mod='paypal'}</a>
-                        </p>
-                        <p>
-                            {l s='API user name SandBox' mod='paypal'} : {if $api_user_name_sandbox == ''}{l s='not specified'}{else}{$api_user_name_sandbox}{/if}
-                        </p>
-                        <p>
-                            {l s='API user name Live' mod='paypal'} : {if $api_user_name_live == ''}{l s='not specified'}{else}{$api_user_name_live}{/if}
-                        </p>
                 </div>
             </div>
         </div>

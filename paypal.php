@@ -560,7 +560,8 @@ class PayPal extends PaymentModule
                         $embeddedOption = new PaymentOption();
                         $embeddedOption->setCallToActionText($this->l('Pay with paypal by braintree'))
                             ->setForm($this->generateFormPaypalBt())
-                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'))
+                            ->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/express_checkout.tpl'));
                         $payments_options[] = $embeddedOption;
                     }
 
