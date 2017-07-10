@@ -34,7 +34,7 @@ class MethodEC extends AbstractMethodPaypal
 
     public function getConfig(PayPal $module)
     {
-        $params['inputs'] = array(
+        $params = array('inputs' => array(
             array(
                 'type' => 'select',
                 'label' => $module->l('Payment action'),
@@ -96,7 +96,7 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             )
-        );
+        ));
 
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
@@ -230,14 +230,12 @@ class MethodEC extends AbstractMethodPaypal
             } else {
                 $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
             }
-
         }
 
         if (!Configuration::get('PAYPAL_USERNAME_'.$mode) || !Configuration::get('PAYPAL_PSWD_'.$mode)
             || !Configuration::get('PAYPAL_SIGNATURE_'.$mode)) {
             $paypal->errors .= $paypal->displayError($paypal->l('An error occurred. Please, check your credentials Paypal.'));
         }
-
     }
 
     public function init($data)
@@ -251,8 +249,7 @@ class MethodEC extends AbstractMethodPaypal
             'solution_type' => 'Sole',
             'addr_override' => '0',
         );
-        if(isset($data['short_cut']))
-        {
+        if (isset($data['short_cut'])) {
             $params['landing_page'] = 'Login';
             $params['return_url'] = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
             $params['no_shipping'] = 2;
@@ -267,7 +264,7 @@ class MethodEC extends AbstractMethodPaypal
         if (isset($payment['TOKEN'])) {
             $this->token = $payment['TOKEN'];
             $return = $this->redirectToAPI($payment['TOKEN'], 'setExpressCheckout');
-        } elseif(isset($payment['L_ERRORCODE0'])) {
+        } elseif (isset($payment['L_ERRORCODE0'])) {
             $return = $payment;
         }
         return $return;
@@ -284,8 +281,7 @@ class MethodEC extends AbstractMethodPaypal
         $this->_getDiscountsList($params, $total_products);
         $this->_getGiftWrapping($params, $total_products);
         $this->_getPaymentValues($params, $total_products, $tax);
-        if(!isset($params['short_cut']))
-        {
+        if (!isset($params['short_cut'])) {
             $this->_getShippingAddress($params);
         }
 
@@ -584,7 +580,7 @@ class MethodEC extends AbstractMethodPaypal
         return $response;
     }
 
-    public function renderExpressCheckout(&$context,$type)
+    public function renderExpressCheckout(&$context, $type)
     {
         if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
             return false;
@@ -594,8 +590,8 @@ class MethodEC extends AbstractMethodPaypal
         $context->smarty->assign(array(
             'PayPal_payment_type' => $type,
             'PayPal_tracking_code' => 'PRESTASHOP_ECM',
-            'PayPal_lang_code' => str_replace('-','_' , $lang['locale']),
-            'action_url' => $context->link->getModuleLink('paypal','ecScInit',array(),true)
+            'PayPal_lang_code' => str_replace('-', '_', $lang['locale']),
+            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true)
         ));
         $context->controller->registerJavascript($this->name.'-order_confirmation_js', 'modules/paypal/views/js/ec_shortcut.js');
 
@@ -619,6 +615,5 @@ class MethodEC extends AbstractMethodPaypal
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
         return $sdk->getExpressCheckout($params);
-
     }
 }

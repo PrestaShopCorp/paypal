@@ -34,9 +34,8 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
     {
         $method = AbstractMethodPaypal::load('EC');
         $info = $method->getInfo(array('TOKEN'=>Tools::getValue('token')));
-        if($info['ACK'] != 'Success')
-        {
-            Tools::redirect($this->context->link->getModuleLink('paypal','error',array('error_code'=>$info['L_ERRORCODE0'])));
+        if ($info['ACK'] != 'Success') {
+            Tools::redirect($this->context->link->getModuleLink('paypal', 'error', array('error_code'=>$info['L_ERRORCODE0'])));
         }
         if ($this->context->cookie->logged) {
             $customer = $this->context->customer;
@@ -69,8 +68,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         $address_exist = false;
         $count = 1;
 
-        foreach ($addresses as $address)
-        {
+        foreach ($addresses as $address) {
             if($address['firstname'].' '.$address['lastname'] == $info['SHIPTONAME']
                 && $address['address1'] == $info['PAYMENTREQUEST_0_SHIPTOSTREET']
                 && (isset($info['PAYMENTREQUEST_0_SHIPTOSTREET2'])?$address['address2'] == $info['PAYMENTREQUEST_0_SHIPTOSTREET2']:true)
@@ -83,7 +81,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
                 $address_exist = true;
             } else {
                 if ((strrpos($address['alias'], 'Paypal_Address')) !== false) {
-                    $count = (int)(substr($address['alias'], -1)) + 1;
+                    $count = (int)(Tools::substr($address['alias'], -1)) + 1;
                 }
             }
         }
@@ -116,8 +114,8 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         }
 
 
-        $this->context->cookie->__set('paypal_ecs' , $info['TOKEN']);
-        $this->context->cookie->__set('paypal_ecs_payerid' , $info['PAYERID']);
-        Tools::redirect($this->context->link->getPageLink('order',NULL,NULL,array('step'=>2)));
+        $this->context->cookie->__set('paypal_ecs', $info['TOKEN']);
+        $this->context->cookie->__set('paypal_ecs_payerid', $info['PAYERID']);
+        Tools::redirect($this->context->link->getPageLink('order', null, null, array('step'=>2)));
     }
 }

@@ -24,9 +24,9 @@
 *}
 <li id="paypal_transaction_id">
     {if $method == 'BT'}
-        {l s='Braintree transaction id :'}
+        {l s='Braintree transaction id :' mod='paypal'}
     {else}
-        {l s='Paypal transaction id :'}
+        {l s='Paypal transaction id :' mod='paypal'}
     {/if}
     {$transaction_id}
 </li>
