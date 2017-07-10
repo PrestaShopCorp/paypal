@@ -629,6 +629,7 @@ class PayPal extends PaymentModule
                         // do nothing and check later one more time
                         break;
                 }
+                $paypal_order->update();
             }
         }
     }

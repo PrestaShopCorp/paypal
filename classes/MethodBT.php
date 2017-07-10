@@ -519,14 +519,12 @@ class MethodBT extends AbstractMethodPaypal
         }
     }
 
-    public function searchTransactions($ids)
-    {
+    public function searchTransactions($ids) {
         $this->initConfig();
-        $collection = $this->gateway->transaction()->search(
-            array(
-                Braintree_TransactionSearch::ids()->is($ids)
-            )
-        );
+        $ids_transaction =  Braintree_TransactionSearch::ids()->in($ids);
+        $collection = $this->gateway->transaction()->search([
+            $ids_transaction
+        ]);
         return $collection;
     }
 }
