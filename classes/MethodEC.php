@@ -199,7 +199,6 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
         }
-
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
@@ -244,31 +243,26 @@ class MethodEC extends AbstractMethodPaypal
     public function init($data)
     {
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-
         $params = array(
-            'CANCELURL' => Context::getContext()->link->getPageLink('order', true).'&step=1',
-            'LANDINGPAGE' => $data['use_card'] ? 'Billing' : 'Login',
-            'RETURNURL' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
+            'cancel_url' => Context::getContext()->link->getPageLink('order', true).'&step=1',
+            'landing_page' => $data['use_card'] ? 'Billing' : 'Login',
+            'return_url' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
+            'no_shipping' => 1,
+            'solution_type' => 'Sole',
+            'addr_override' => '0',
         );
+        if(isset($data['short_cut']))
+        {
+            $params['landing_page'] = 'Login';
+            $params['return_url'] = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
+            $params['no_shipping'] = 2;
+        }
 
         $this->_getCredentialsInfo($params);
-
-        $this->_getPaymentInfo($params);
-        $params = $this->_setPaymentDetails($params);
-
-
-        if(isset($data['short_cut']))
-        {
-            $params['LANDINGPAGE'] = 'Login';
-            $params['RETURNURL'] = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
-        }
-
-        if(isset($data['short_cut']))
-        {
-            $params['NOSHIPPING'] = 2;
-        }
+        $params = $this->_getPaymentDetails($params);
 
         $payment = $sdk->setExpressCheckout($params);
+
         $return = false;
         if (isset($payment['TOKEN'])) {
             $this->token = $payment['TOKEN'];
@@ -279,189 +273,108 @@ class MethodEC extends AbstractMethodPaypal
         return $return;
     }
 
-    private function _setPaymentDetails($params)
+    private function _getPaymentDetails($params)
     {
-        // Products
         $tax = $total_products = 0;
-        $index = -1;
-        $fields = array();
-        $fields['USER'] =  $params['USER'];
-        $fields['PWD'] = $params['PWD'];
-        $fields['SIGNATURE'] = $params['SIGNATURE'];
-        if(isset($params['CANCELURL']))
-        {
-            $fields['CANCELURL'] = $params['CANCELURL'];
-        }
-        if(isset($params['LANDINGPAGE']))
-        {
-            $fields['LANDINGPAGE'] = $params['LANDINGPAGE'];
-        }
-        if(isset($params['RETURNURL']))
-        {
-            $fields['RETURNURL'] = $params['RETURNURL'];
-        }
 
+        $params['currency'] = Context::getContext()->currency->iso_code;
+        $params['payment_action'] = Configuration::get('PAYPAL_API_INTENT');
 
-        // Set cart products list
-        $this->setProductsList($fields, $params['PAYMENT_LIST']['PRODUCTS'], $index, $total_products, $tax);
-        $this->setDiscountsList($fields, $params['PAYMENT_LIST']['DISCOUNTS'], $index, $total_products, $tax);
-        $this->setGiftWrapping($fields, $params['PAYMENT_LIST']['WRAPPING'], $index, $total_products, $tax);
-
-        // Payment values
-        $fields['PAYMENTREQUEST_0_PAYMENTACTION'] = $params['PAYMENTREQUEST_0_PAYMENTACTION'];
-        $fields['PAYMENTREQUEST_0_CURRENCYCODE'] = $params['CURRENCY'];
-        $this->setPaymentValues($fields, $params['COSTS'], $index, $total_products, $tax);
-
-
+        $this->getProductsList($params, $total_products, $tax);
+        $this->getDiscountsList($params, $total_products);
+        $this->getGiftWrapping($params, $total_products);
+        $this->getPaymentValues($params, $total_products, $tax);
         if(!isset($params['short_cut']))
         {
-            // Set address information
-            $this->_setShippingAddress($fields, $params['SHIPPING']);
+            $this->getShippingAddress($params);
         }
 
-        foreach ($params as &$field) {
-            if (is_numeric($field)) {
-                $field = number_format($field, 2, ".", ",");
+        foreach ($params as &$param) {
+            if (is_numeric($param) && !is_string($param)) {
+                $param = number_format($param, 2, ".", ",");
             }
         }
-        $fields['METHOD'] = 'SetExpressCheckout';
-        $fields['SOLUTIONTYPE'] = 'Sole';
-        return $fields;
+        return $params;
     }
 
-    private function setProductsList(&$fields, $products, &$index, &$total_products, &$tax)
+    private function getProductsList(&$params, &$total_products, &$tax)
     {
+        $products = Context::getContext()->cart->getProducts();
         foreach ($products as $product) {
-            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = (int) $product['id_product'];
-
-            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $product['name'];
-
             if (isset($product['attributes']) && (empty($product['attributes']) === false)) {
-                $fields['L_PAYMENTREQUEST_0_NAME'.$index] .= ' - '.$product['attributes'];
+                $product['name'] .= ' - '.$product['attributes'];
             }
-
-            $fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
-
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($product['price'], 2);
-            $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = number_format($product['price_wt'] - $product['price'], 2);
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
-
-            $total_products = $total_products + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
-            $tax = $tax + ($fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] * $product['quantity']);
+            $product['description_short'] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
+            $product['price'] = number_format($product['price'], 2);
+            $product['product_tax'] = number_format($product['price_wt'] - $product['price'], 2);
+            $total_products = $total_products + (number_format($product['price'], 2) * $product['quantity']);
+            $tax = $tax + (number_format($product['price_wt'] - $product['price'], 2) * $product['quantity']);
+            $params['products_list']['products'][] = $product;
         }
     }
 
-    private function setDiscountsList(&$fields, $discounts, &$index, &$total_products)
+    private function getDiscountsList(&$params, &$total_products)
     {
+        $discounts = Context::getContext()->cart->getCartRules();
+        $params['products_list']['discounts'] = array();
         if (count($discounts) > 0) {
             foreach ($discounts as $discount) {
-                $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $discount['id_discount'];
-                $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $discount['name'];
                 if (isset($discount['description']) && !empty($discount['description'])) {
-                    $fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
+                    $discount['description'] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
                 }
-
                 /* It is a discount so we store a negative value */
-                $fields['L_PAYMENTREQUEST_0_AMT'.$index] = -1 * number_format($discount['value_real'], 2);
-                $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-
-                $total_products = round($total_products + $fields['L_PAYMENTREQUEST_0_AMT'.$index], 2);
+                $discount['value_real'] = -1 * number_format($discount['value_real'], 2);
+                $discount['quantity'] = 1;
+                $total_products = round($total_products + $discount['value_real'], 2);
+                $params['products_list']['discounts'][] = $discount;
             }
         }
     }
 
-    private function setGiftWrapping(&$fields, $wrapping, &$index, &$total_products)
+    private function getGiftWrapping(&$params, &$total_products)
     {
-        if ($wrapping > 0) {
-            $fields['L_PAYMENTREQUEST_0_NAME'.++$index] = 'Gift wrapping';
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($wrapping, 2);
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-            $total_products = round($total_products + $wrapping, 2);
+        $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
+        $wrapping = array();
+        if ($wrapping_price > 0) {
+            $wrapping['name'] = 'Gift wrapping';
+            $wrapping['amount'] = number_format($wrapping_price, 2);
+            $wrapping['quantity'] = 1;
+            $total_products = round($total_products + $wrapping_price, 2);
         }
+        $params['products_list']['wrapping'] = $wrapping;
     }
 
-    private function setPaymentValues(&$fields, $costs, &$index, &$total_products, &$tax)
+    private function getPaymentValues(&$params, &$total_products, &$tax)
     {
-        $subtotal = $costs['SUBTOTAL'];
-        $total = $costs['TOTAL'];
-        $total_tax = round($tax, 2);
-
-        if ($subtotal != $total_products) {
-            $subtotal = $total_products;
-        }
-        $shipping = round($costs['SHIPPING_COST'], 2);
-        $total_cart = $total_products + $shipping + $tax;
-
-        if ($total != $total_cart) {
-            $total = $total_cart;
-        }
-
-        /**
-         * If the total amount is lower than 1 we put the shipping cost as an item
-         * so the payment could be valid.
-         */
-        if ($total <= 1) {
-            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $costs['CARRIER']->id_reference;
-            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $costs['CARRIER']->name;
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = number_format($shipping, 2);
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $subtotal + $shipping;
-            $fields['PAYMENTREQUEST_0_AMT'] = $total + $shipping;
-        } else {
-            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = number_format($shipping, 2);
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = number_format($subtotal, 2);
-            $fields['PAYMENTREQUEST_0_TAXAMT'] = number_format($total_tax, 2);
-            $fields['PAYMENTREQUEST_0_AMT'] = number_format($total, 2);
-        }
-    }
-
-    private function _setShippingAddress(&$fields, $params)
-    {
-        $fields['ADDROVERRIDE'] = '0';
-        $fields['NOSHIPPING'] = (isset($params['NOSHIPPING'])?$params['NOSHIPPING']:'1');
-        $fields['EMAIL'] = $params['EMAIL'];
-        $fields['PAYMENTREQUEST_0_SHIPTONAME'] = $params['ADDRESS_OBJ']->firstname.' '.$params['ADDRESS_OBJ']->lastname;
-        $fields['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = (empty($params['ADDRESS_OBJ']->phone)) ? $params['ADDRESS_OBJ']->phone_mobile : $params['ADDRESS_OBJ']->phone;
-        $fields['PAYMENTREQUEST_0_SHIPTOSTREET'] = $params['ADDRESS_OBJ']->address1;
-        $fields['PAYMENTREQUEST_0_SHIPTOSTREET2'] = $params['ADDRESS_OBJ']->address2;
-        $fields['PAYMENTREQUEST_0_SHIPTOCITY'] = $params['ADDRESS_OBJ']->city;
-        $fields['PAYMENTREQUEST_0_SHIPTOSTATE'] = $params['STATE'];
-        $fields['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $params['COUNTRY'];
-        $fields['PAYMENTREQUEST_0_SHIPTOZIP'] = $params['ADDRESS_OBJ']->postcode;
-    }
-
-    public function _getPaymentInfo(&$params)
-    {
-        // Set cart products list
         $context = Context::getContext();
         $cart = $context->cart;
-        $customer = $context->customer;
-        $products = $cart->getProducts();
-        $discounts = $context->cart->getCartRules();
-        $wrapping = $context->cart->gift ? $context->cart->getGiftWrappingPrice() : 0;
-        $params['PAYMENT_LIST'] = array(
-            'PRODUCTS' => $products,
-            'DISCOUNTS' => $discounts,
-            'WRAPPING' => $wrapping,
-        );
-
-        // Payment values
-        $params['CURRENCY'] = $context->currency->iso_code;
-        $params['PAYMENTREQUEST_0_PAYMENTACTION'] = Configuration::get('PAYPAL_API_INTENT');
-
         $shipping_cost_wt = $cart->getTotalShippingCost();
+        $shipping = round($shipping_cost_wt, 2);
         $total = $cart->getOrderTotal(true, Cart::BOTH);
         $summary = $cart->getSummaryDetails();
         $subtotal = Tools::ps_round($summary['total_products'], 2);
-
-        $params['COSTS'] = array(
-            'SHIPPING_COST' => (float) $shipping_cost_wt,
-            'TOTAL' => (float) $total,
-            'SUBTOTAL' => (float) $subtotal,
-            'CARRIER' => new Carrier($cart->id_carrier),
+        $total_tax = round($tax, 2);
+        if ($subtotal != $total_products) {
+            $subtotal = $total_products;
+        }
+        $total_cart = $total_products + $shipping + $tax;
+        if ($total != $total_cart) {
+            $total = $total_cart;
+        }
+        $params['costs'] = array(
+            'shipping_cost' => number_format($shipping, 2),
+            'total' => number_format($total, 2),
+            'subtotal' => number_format($subtotal, 2),
+            'carrier' => new Carrier($cart->id_carrier),
+            'total_tax' => $total_tax,
         );
+    }
 
-        // Set address information
+    private function getShippingAddress(&$params)
+    {
+        $context = Context::getContext();
+        $cart = $context->cart;
+        $customer = $context->customer;
         $id_address = (int) $cart->id_address_delivery;
         if (($id_address == 0) && ($customer)) {
             $id_address = Address::getFirstCustomerAddressId($customer->id);
@@ -472,13 +385,14 @@ class MethodEC extends AbstractMethodPaypal
             $state = new State((int) $address->id_state);
         }
         $country = new Country((int) $address->id_country);
-        $params['SHIPPING'] = array(
-            'ADDRESS_OBJ' => $address,
-            'EMAIL' => $customer->email,
-            'STATE' => $state ? $state->iso_code : '',
-            'COUNTRY' => $country->iso_code,
+        $params['shipping'] = array(
+            'address' => $address,
+            'ship_name' => $address->firstname.' '.$address->lastname,
+            'phone' => (empty($address->phone)) ? $address->phone_mobile : $address->phone,
+            'email' => $customer->email,
+            'state' => $state ? $state->iso_code : '',
+            'country' => $country->iso_code,
         );
-
     }
 
     public function redirectToAPI($token, $method)
@@ -510,14 +424,14 @@ class MethodEC extends AbstractMethodPaypal
     {
         switch (Configuration::get('PAYPAL_SANDBOX')) {
             case 0:
-                $params['USER'] = Configuration::get('PAYPAL_USERNAME_LIVE');
-                $params['PWD'] = Configuration::get('PAYPAL_PSWD_LIVE');
-                $params['SIGNATURE'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
+                $params['user'] = Configuration::get('PAYPAL_USERNAME_LIVE');
+                $params['pwd'] = Configuration::get('PAYPAL_PSWD_LIVE');
+                $params['signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
                 break;
             case 1:
-                $params['USER'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
-                $params['PWD'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
-                $params['SIGNATURE'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
+                $params['user'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
+                $params['pwd'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
+                $params['signature'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
                 break;
         }
     }
@@ -527,12 +441,13 @@ class MethodEC extends AbstractMethodPaypal
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
         $context = Context::getContext();
         $params = array(
-            'TOKEN' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token'),
-            'PAYERID' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID'),
+            'token' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token'),
+            'payer_id' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID'),
         );
         $this->_getCredentialsInfo($params);
-        $this->_getPaymentInfo($params);
+        $params = $this->_getPaymentDetails($params);
         $exec_payment = $sdk->doExpressCheckout($params);
+
         if (isset($exec_payment['L_ERRORCODE0'])) {
             Tools::redirect($context->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment['L_ERRORCODE0'])));
         }
@@ -576,10 +491,10 @@ class MethodEC extends AbstractMethodPaypal
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
         $id_paypal_order = $paypal_order->id;
         $params = array();
-        $params['AMT'] = $paypal_order->total_paid;
-        $params['AUTHORIZATIONID'] = $paypal_order->id_transaction;
-        $params['CURRENCYCODE'] = $paypal_order->currency;
-        $params['COMPLETETYPE'] = 'complete';
+        $params['amount'] = number_format($paypal_order->total_paid, 2, ".", ",");
+        $params['authorization_id'] = $paypal_order->id_transaction;
+        $params['currency_code'] = $paypal_order->currency;
+        $params['complete_type'] = 'complete';
         $this->_getCredentialsInfo($params);
 
         $response = $sdk->doCapture($params);
@@ -607,7 +522,7 @@ class MethodEC extends AbstractMethodPaypal
                 $result['already_captured'] = true;
             }
         }
-        
+
         return $result;
     }
 
@@ -626,8 +541,8 @@ class MethodEC extends AbstractMethodPaypal
 
         $params = array();
         $this->_getCredentialsInfo($params);
-        $params['TRANSACTIONID'] = $id_transaction;
-        $params['REFUNDTYPE'] = 'Full';
+        $params['transaction_id'] = $id_transaction;
+        $params['refund_type'] = 'Full';
         $response = $sdk->refundTransaction($params);
 
         if ($response['ACK'] == "Success") {
@@ -649,17 +564,15 @@ class MethodEC extends AbstractMethodPaypal
                 $result['already_refunded'] = true;
             }
         }
- 
+
         return $result;
     }
-    
+
     public function void($authorization)
     {
-        $params = array();
-        $params['AUTHORIZATIONID'] = $authorization['authorization_id'];
-        $this->_getCredentialsInfo($params);
+        $this->_getCredentialsInfo($authorization);
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-        $result = $sdk->doVoid($params);
+        $result = $sdk->doVoid($authorization);
         if ($result['ACK'] == "Success") {
             $response =  array(
                 'authorization_id' => $result['AUTHORIZATIONID'],

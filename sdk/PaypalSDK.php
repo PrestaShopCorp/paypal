@@ -46,26 +46,112 @@ class PaypalSDK
 
     public function setExpressCheckout($params)
     {
-
+        $fields = array();
         // Seller informations
+        $this->_setUserCredentials($fields, $params);
+        $fields['METHOD'] = 'SetExpressCheckout';
+        $fields['VERSION'] = $this->version;
+        $fields['CANCELURL'] = $params['cancel_url'];
+        $fields['SOLUTIONTYPE'] = $params['solution_type'];
+        $fields['LANDINGPAGE'] = $params['landing_page'];
+        $fields['RETURNURL'] = $params['return_url'];
+        $fields['ADDROVERRIDE'] = $params['addr_override'];
+        $fields['NOSHIPPING'] = $params['no_shipping'];
+        // Set payment detail (reference)
+        $this->_setPaymentDetails($fields, $params);
 
-        $params['VERSION'] = $this->version;
-        return $this->makeCallPaypal($params);
+        return $this->makeCallPaypal($fields);
+    }
+
+    private function _setPaymentDetails(&$fields, $params)
+    {
+        // Set cart products list
+        $index = -1;
+        $this->setProductsList($fields, $params['products_list']['products'], $index);
+        $this->setDiscountsList($fields, $params['products_list']['discounts'], $index);
+        $this->setGiftWrapping($fields, $params['products_list']['wrapping'], $index);
+        // Payment values
+        $fields['PAYMENTREQUEST_0_PAYMENTACTION'] = $params['payment_action'];
+        $fields['PAYMENTREQUEST_0_CURRENCYCODE'] = $params['currency'];
+        $this->setPaymentValues($fields, $params['costs'], $index);
+        // Set address information
+        $this->_setShippingAddress($fields, $params['shipping']);
 
     }
 
+    private function setProductsList(&$fields, $products, &$index)
+    {
+        foreach ($products as $product) {
+            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = (int) $product['id_product'];
+            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $product['name'];
+            $fields['L_PAYMENTREQUEST_0_DESC'.$index] = $product['description_short'];
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = $product['price'];
+            $fields['L_PAYMENTREQUEST_0_TAXAMT'.$index] = $product['product_tax'];
+            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
+        }
+    }
+    private function setDiscountsList(&$fields, $discounts, &$index)
+    {
+        if (count($discounts) > 0) {
+            foreach ($discounts as $discount) {
+                $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $discount['id_discount'];
+                $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $discount['name'];
+                $fields['L_PAYMENTREQUEST_0_DESC'.$index] = $discount['description'];
+                $fields['L_PAYMENTREQUEST_0_AMT'.$index] = $discount['value_real'];
+                $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $discount['quantity'];
+            }
+        }
+    }
+    private function setGiftWrapping(&$fields, $wrapping, &$index)
+    {
+        if ($wrapping) {
+            $fields['L_PAYMENTREQUEST_0_NAME'.++$index] = $wrapping['name'];
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = $wrapping['amount'];
+            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $wrapping['quantity'];
+        }
+    }
+    private function setPaymentValues(&$fields, $costs, &$index)
+    {
+        /**
+         * If the total amount is lower than 1 we put the shipping cost as an item
+         * so the payment could be valid.
+         */
+        if ($costs['total'] <= 1) {
+            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $costs['carrier']->id_reference;
+            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $costs['carrier']->name;
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = $costs['shipping_cost'];
+            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
+            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $costs['subtotal'] + $costs['shipping_cost'];
+            $fields['PAYMENTREQUEST_0_AMT'] = $costs['total'] + $costs['shipping_cost'];
+        } else {
+            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = $costs['shipping_cost'];
+            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $costs['subtotal'];
+            $fields['PAYMENTREQUEST_0_TAXAMT'] = $costs['total_tax'];
+            $fields['PAYMENTREQUEST_0_AMT'] = $costs['total'];
+        }
+    }
     private function _setUserCredentials(&$fields, $params)
     {
-        $fields['USER'] =  $params['USER'];
-        $fields['PWD'] = $params['PWD'];
-        $fields['SIGNATURE'] = $params['SIGNATURE'];
+        $fields['USER'] =  $params['user'];
+        $fields['PWD'] = $params['pwd'];
+        $fields['SIGNATURE'] = $params['signature'];
     }
-
+    private function _setShippingAddress(&$fields, $params)
+    {
+        $fields['EMAIL'] = $params['email'];
+        $fields['PAYMENTREQUEST_0_SHIPTONAME'] = $params['ship_name'];
+        $fields['PAYMENTREQUEST_0_SHIPTOPHONENUM'] = $params['phone'];
+        $fields['PAYMENTREQUEST_0_SHIPTOSTREET'] = $params['address']->address1;
+        $fields['PAYMENTREQUEST_0_SHIPTOSTREET2'] = $params['address']->address2;
+        $fields['PAYMENTREQUEST_0_SHIPTOCITY'] = $params['address']->city;
+        $fields['PAYMENTREQUEST_0_SHIPTOSTATE'] = $params['state'];
+        $fields['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $params['country'];
+        $fields['PAYMENTREQUEST_0_SHIPTOZIP'] = $params['address']->postcode;
+    }
 
     public function getExpressCheckout($params)
     {
         $fields = array();
-        $this->_setUserCredentials($fields, $params);
         $fields['METHOD'] = 'GetExpressCheckoutDetails';
         $fields['VERSION'] = $this->version;
         $fields['TOKEN'] = $params['TOKEN'];
@@ -74,9 +160,16 @@ class PaypalSDK
 
     public function doExpressCheckout($params)
     {
-        $params['METHOD'] = 'DoExpressCheckoutPayment';
-        $params['VERSION'] = $this->version;
-        $return = $this->makeCallPaypal($params);
+        $fields = array();
+        $fields['METHOD'] = 'DoExpressCheckoutPayment';
+        $fields['VERSION'] = $this->version;
+        $fields['TOKEN'] = $params['token'];
+        $fields['PAYERID'] = $params['payer_id'];
+        // Seller informations
+        $this->_setUserCredentials($fields, $params);
+        // Set payment detail (reference)
+        $this->_setPaymentDetails($fields, $params);
+        $return = $this->makeCallPaypal($fields);
         return $return;
     }
 
@@ -96,10 +189,10 @@ class PaypalSDK
         $this->_setUserCredentials($fields, $params);
         $fields['METHOD'] = 'DoCapture';
         $fields['VERSION'] = $this->version;
-        $fields['AMT'] = number_format($params['AMT'], 2);
-        $fields['AUTHORIZATIONID'] = $params['AUTHORIZATIONID'];
-        $fields['CURRENCYCODE'] = $params['CURRENCYCODE'];
-        $fields['COMPLETETYPE'] = $params['COMPLETETYPE'];
+        $fields['AMT'] = $params['amount'];
+        $fields['AUTHORIZATIONID'] = $params['authorization_id'];
+        $fields['CURRENCYCODE'] = $params['currency_code'];
+        $fields['COMPLETETYPE'] = $params['complete_type'];
         return $this->makeCallPaypal($fields);
     }
 
@@ -109,8 +202,8 @@ class PaypalSDK
         $this->_setUserCredentials($fields, $params);
         $fields['METHOD'] = 'RefundTransaction';
         $fields['VERSION'] = $this->version;
-        $fields['TRANSACTIONID'] = $params['TRANSACTIONID'];
-        $fields['REFUNDTYPE'] = $params['REFUNDTYPE'];
+        $fields['TRANSACTIONID'] = $params['transaction_id'];
+        $fields['REFUNDTYPE'] = $params['refund_type'];
         return $this->makeCallPaypal($fields);
     }
 
