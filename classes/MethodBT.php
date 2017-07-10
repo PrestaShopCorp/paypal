@@ -343,13 +343,13 @@ class MethodBT extends AbstractMethodPaypal
         $address_shipping = new Address($cart->id_address_delivery);
         $country_shipping = new Country($address_shipping->id_country);
         $current_currency = context::getContext()->currency->iso_code;
-         //TODO: Add Device data???
+
         try {
             $data = [
                 'amount'                => $cart->getOrderTotal(),
-                'paymentMethodNonce'    => $token_payment,//'fake-processor-declined-visa-nonce',//
+                'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts->$current_currency,
-                'orderId'               => $cart->id, // Paypal block duplicate order Id
+                'orderId'               => $cart->id, 
                 'channel'               => 'PrestaShop_Cart_Braintree',
                 'billing' => [
                     'firstName'         => $address_billing->firstname,

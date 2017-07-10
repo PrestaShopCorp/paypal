@@ -280,24 +280,20 @@ class MethodEC extends AbstractMethodPaypal
         $params['currency'] = Context::getContext()->currency->iso_code;
         $params['payment_action'] = Configuration::get('PAYPAL_API_INTENT');
 
-        $this->getProductsList($params, $total_products, $tax);
-        $this->getDiscountsList($params, $total_products);
-        $this->getGiftWrapping($params, $total_products);
-        $this->getPaymentValues($params, $total_products, $tax);
+        $this->_getProductsList($params, $total_products, $tax);
+        $this->_getDiscountsList($params, $total_products);
+        $this->_getGiftWrapping($params, $total_products);
+        $this->_getPaymentValues($params, $total_products, $tax);
         if(!isset($params['short_cut']))
         {
-            $this->getShippingAddress($params);
+            $this->_getShippingAddress($params);
         }
 
-        foreach ($params as &$param) {
-            if (is_numeric($param) && !is_string($param)) {
-                $param = number_format($param, 2, ".", ",");
-            }
-        }
+
         return $params;
     }
 
-    private function getProductsList(&$params, &$total_products, &$tax)
+    private function _getProductsList(&$params, &$total_products, &$tax)
     {
         $products = Context::getContext()->cart->getProducts();
         foreach ($products as $product) {
@@ -305,15 +301,15 @@ class MethodEC extends AbstractMethodPaypal
                 $product['name'] .= ' - '.$product['attributes'];
             }
             $product['description_short'] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
-            $product['price'] = number_format($product['price'], 2);
-            $product['product_tax'] = number_format($product['price_wt'] - $product['price'], 2);
-            $total_products = $total_products + (number_format($product['price'], 2) * $product['quantity']);
-            $tax = $tax + (number_format($product['price_wt'] - $product['price'], 2) * $product['quantity']);
+            $product['price'] = number_format($product['price'], 2, ".", ",");
+            $product['product_tax'] = number_format(($product['price_wt'] - $product['price']), 2, ".", ",");
+            $total_products += (number_format($product['price'], 2, ".", ",") * $product['quantity']);
+            $tax += (number_format($product['price_wt'] - $product['price'], 2, ".", ",") * $product['quantity']);
             $params['products_list']['products'][] = $product;
         }
     }
 
-    private function getDiscountsList(&$params, &$total_products)
+    private function _getDiscountsList(&$params, &$total_products)
     {
         $discounts = Context::getContext()->cart->getCartRules();
         $params['products_list']['discounts'] = array();
@@ -323,7 +319,7 @@ class MethodEC extends AbstractMethodPaypal
                     $discount['description'] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
                 }
                 /* It is a discount so we store a negative value */
-                $discount['value_real'] = -1 * number_format($discount['value_real'], 2);
+                $discount['value_real'] = -1 * number_format($discount['value_real'], 2, ".", ",");
                 $discount['quantity'] = 1;
                 $total_products = round($total_products + $discount['value_real'], 2);
                 $params['products_list']['discounts'][] = $discount;
@@ -331,20 +327,20 @@ class MethodEC extends AbstractMethodPaypal
         }
     }
 
-    private function getGiftWrapping(&$params, &$total_products)
+    private function _getGiftWrapping(&$params, &$total_products)
     {
         $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
         $wrapping = array();
         if ($wrapping_price > 0) {
             $wrapping['name'] = 'Gift wrapping';
-            $wrapping['amount'] = number_format($wrapping_price, 2);
+            $wrapping['amount'] = number_format($wrapping_price, 2, ".", ",");
             $wrapping['quantity'] = 1;
             $total_products = round($total_products + $wrapping_price, 2);
         }
         $params['products_list']['wrapping'] = $wrapping;
     }
 
-    private function getPaymentValues(&$params, &$total_products, &$tax)
+    private function _getPaymentValues(&$params, &$total_products, &$tax)
     {
         $context = Context::getContext();
         $cart = $context->cart;
@@ -362,15 +358,15 @@ class MethodEC extends AbstractMethodPaypal
             $total = $total_cart;
         }
         $params['costs'] = array(
-            'shipping_cost' => number_format($shipping, 2),
-            'total' => number_format($total, 2),
-            'subtotal' => number_format($subtotal, 2),
+            'shipping_cost' => number_format($shipping, 2, ".", ","),
+            'total' => number_format($total, 2, ".", ","),
+            'subtotal' => number_format($subtotal, 2, ".", ","),
             'carrier' => new Carrier($cart->id_carrier),
             'total_tax' => $total_tax,
         );
     }
 
-    private function getShippingAddress(&$params)
+    private function _getShippingAddress(&$params)
     {
         $context = Context::getContext();
         $cart = $context->cart;

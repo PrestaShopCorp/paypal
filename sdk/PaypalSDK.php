@@ -67,19 +67,19 @@ class PaypalSDK
     {
         // Set cart products list
         $index = -1;
-        $this->setProductsList($fields, $params['products_list']['products'], $index);
-        $this->setDiscountsList($fields, $params['products_list']['discounts'], $index);
-        $this->setGiftWrapping($fields, $params['products_list']['wrapping'], $index);
+        $this->_setProductsList($fields, $params['products_list']['products'], $index);
+        $this->_setDiscountsList($fields, $params['products_list']['discounts'], $index);
+        $this->_setGiftWrapping($fields, $params['products_list']['wrapping'], $index);
         // Payment values
         $fields['PAYMENTREQUEST_0_PAYMENTACTION'] = $params['payment_action'];
         $fields['PAYMENTREQUEST_0_CURRENCYCODE'] = $params['currency'];
-        $this->setPaymentValues($fields, $params['costs'], $index);
+        $this->_setPaymentValues($fields, $params['costs'], $index);
         // Set address information
         $this->_setShippingAddress($fields, $params['shipping']);
 
     }
 
-    private function setProductsList(&$fields, $products, &$index)
+    private function _setProductsList(&$fields, $products, &$index)
     {
         foreach ($products as $product) {
             $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = (int) $product['id_product'];
@@ -90,7 +90,7 @@ class PaypalSDK
             $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
         }
     }
-    private function setDiscountsList(&$fields, $discounts, &$index)
+    private function _setDiscountsList(&$fields, $discounts, &$index)
     {
         if (count($discounts) > 0) {
             foreach ($discounts as $discount) {
@@ -102,7 +102,7 @@ class PaypalSDK
             }
         }
     }
-    private function setGiftWrapping(&$fields, $wrapping, &$index)
+    private function _setGiftWrapping(&$fields, $wrapping, &$index)
     {
         if ($wrapping) {
             $fields['L_PAYMENTREQUEST_0_NAME'.++$index] = $wrapping['name'];
@@ -110,7 +110,7 @@ class PaypalSDK
             $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $wrapping['quantity'];
         }
     }
-    private function setPaymentValues(&$fields, $costs, &$index)
+    private function _setPaymentValues(&$fields, $costs, &$index)
     {
         /**
          * If the total amount is lower than 1 we put the shipping cost as an item
