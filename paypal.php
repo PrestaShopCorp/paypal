@@ -208,11 +208,7 @@ class PayPal extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
-            if ($order_state->add()) {
-                $source = _PS_MODULE_DIR_.'paypal/views/img/os_paypal.png';
-                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
-                copy($source, $destination);
-            }
+            $order_state->add();
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING', (int) $order_state->id);
         }
         if (!Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION')
@@ -232,11 +228,7 @@ class PayPal extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
-            if ($order_state->add()) {
-                $source = _PS_MODULE_DIR_.'paypal/views/img/os_paypal.png';
-                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
-                copy($source, $destination);
-            }
+            $order_state->add();
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION', (int) $order_state->id);
         }
         return true;
