@@ -33,7 +33,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $method = AbstractMethodPaypal::load('EC');
-        $info = $method->getInfo(array('TOKEN'=>Tools::getValue('token')));
+        $info = $method->getInfo(array('token'=>Tools::getValue('token')));
         if ($info['ACK'] != 'Success') {
             Tools::redirect($this->context->link->getModuleLink('paypal', 'error', array('error_code'=>$info['L_ERRORCODE0'])));
         }

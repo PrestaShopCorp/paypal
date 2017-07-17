@@ -598,18 +598,7 @@ class MethodEC extends AbstractMethodPaypal
 
     public function getInfo($params)
     {
-        switch (Configuration::get('PAYPAL_SANDBOX')) {
-            case 0:
-                $params['USER'] = Configuration::get('PAYPAL_USERNAME_LIVE');
-                $params['PWD'] = Configuration::get('PAYPAL_PSWD_LIVE');
-                $params['SIGNATURE'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
-                break;
-            case 1:
-                $params['USER'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
-                $params['PWD'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
-                $params['SIGNATURE'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
-                break;
-        }
+        $this->_getCredentialsInfo($params);
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
         return $sdk->getExpressCheckout($params);

@@ -43,7 +43,14 @@ function initPaypalBraintree() {
             // This could happen if there was a network error or if it's incorrectly
             // configured.
             if (paypalCheckoutErr) {
-                console.error('Error creating PayPal Checkout:', paypalCheckoutErr);
+                $.fancybox.open([
+                    {
+                        type: 'inline',
+                        autoScale: true,
+                        minHeight: 30,
+                        content: ''+paypalCheckoutErr+''
+                    }
+                ]);
                 return;
             }
 
@@ -71,11 +78,25 @@ function initPaypalBraintree() {
                 },
 
                 onCancel: function (data) {
-                    alert('checkout.js payment cancelled', JSON.stringify(data, 0, 2));
+                    $.fancybox.open([
+                        {
+                            type: 'inline',
+                            autoScale: true,
+                            minHeight: 30,
+                            content: 'checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+''
+                        }
+                    ]);
                 },
 
                 onError: function (err) {
-                    alert('checkout.js error', err);
+                    $.fancybox.open([
+                        {
+                            type: 'inline',
+                            autoScale: true,
+                            minHeight: 30,
+                            content: ''+err+''
+                        }
+                    ]);
                 }
             }, '#paypal-button').then(function (e) {
 
@@ -88,7 +109,14 @@ function initPaypalBraintree() {
                 if (!document.querySelector('input#paypal_payment_method_nonce').value) {
                     event.preventDefault();
                     event.stopPropagation();
-                    alert(pbt_translations.empty_nonce);
+                    $.fancybox.open([
+                        {
+                            type: 'inline',
+                            autoScale: true,
+                            minHeight: 30,
+                            content: ''+pbt_translations.empty_nonce+''
+                        }
+                    ]);
                 }
             });
 
