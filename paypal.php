@@ -502,6 +502,7 @@ class PayPal extends PaymentModule
         }
 
         $method_active = Configuration::get('PAYPAL_METHOD');
+        $payments_options = array();
 
         switch ($method_active) {
             case 'EC':
@@ -546,6 +547,12 @@ class PayPal extends PaymentModule
                 }
                 break;
             case 'BT':
+                $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
+                $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
+                $curr = context::getContext()->currency->iso_code;
+                if (!isset($merchant_accounts->$curr)) {
+                    return $payments_options;
+                }
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
                     if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
                         $embeddedOption = new PaymentOption();

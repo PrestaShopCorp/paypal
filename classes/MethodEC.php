@@ -126,9 +126,7 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             );
-            $params['fields_value'][] = array(
-                'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
-            );
+            $params['fields_value']['paypal_card'] = Configuration::get('PAYPAL_API_CARD');
         }
 
 

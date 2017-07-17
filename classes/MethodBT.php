@@ -104,7 +104,9 @@ class MethodBT extends AbstractMethodPaypal
 
     public function getMerchantCurrenciesForm($module)
     {
-        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_SANDBOX_BRAINTREE_ACCOUNT_ID'));
+        $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
+        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
+
         $ps_currencies = Currency::getCurrencies();
         $fields_form2 = array();
         $fields_form2[0]['form'] = array(
@@ -121,7 +123,7 @@ class MethodBT extends AbstractMethodPaypal
                     'name' => 'braintree_curr_'.$curr['iso_code'],
                     'value' => isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : ''
                 );
-            $fields_value =  array('braintree_curr_'.$curr['iso_code'] => isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : '');
+            $fields_value['braintree_curr_'.$curr['iso_code']] =  isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : '';
         }
         $fields_form2[0]['form']['submit'] = array(
             'title' => $module->l('Save'),
@@ -154,7 +156,7 @@ class MethodBT extends AbstractMethodPaypal
         $ps_currencies = Currency::getCurrencies();
         if (Tools::isSubmit('paypal_braintree_curr')) {
             foreach ($ps_currencies as $curr) {
-                $new_accounts = array($curr['iso_code'] => Tools::getValue('braintree_curr_'.$curr['iso_code']));
+                $new_accounts[$curr['iso_code']] = Tools::getValue('braintree_curr_'.$curr['iso_code']);
             }
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($new_accounts));
         }
@@ -167,8 +169,11 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_REFRESH_TOKEN', Tools::getValue('refreshToken'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_MERCHANT_ID', Tools::getValue('merchantId'));
             $existing_merchant_accounts = $method_bt->getAllCurrency();
+
             $new_merchant_accounts = $method_bt->createForCurrency();
+
             $all_merchant_accounts = array_merge((array)$existing_merchant_accounts, (array)$new_merchant_accounts);
+            unset($all_merchant_accounts[0]);
             if ($all_merchant_accounts) {
                 Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($all_merchant_accounts));
             }
