@@ -154,7 +154,8 @@ class PaypalSDK
         $fields = array();
         $fields['METHOD'] = 'GetExpressCheckoutDetails';
         $fields['VERSION'] = $this->version;
-        $fields['TOKEN'] = $params['TOKEN'];
+        $fields['TOKEN'] = $params['token'];
+        $this->_setUserCredentials($fields, $params);
         return $this->makeCallPaypal($fields);
     }
 

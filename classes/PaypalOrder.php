@@ -122,6 +122,5 @@ class PaypalOrder extends ObjectModel
             $ids[] =  $result['id_transaction'];
         }
         return $ids;
-
     }
 }

@@ -36,7 +36,7 @@ class MethodBT extends AbstractMethodPaypal
 
     public function getConfig(PayPal $module)
     {
-        $params['inputs'] = array(
+        $params = array('inputs' => array(
             array(
                 'type' => 'select',
                 'label' => $module->l('Payment action'),
@@ -83,7 +83,7 @@ class MethodBT extends AbstractMethodPaypal
                 'name' => 'paypal_3DSecure_amount',
                 'hint' => $module->l('Activate 3D Secure only for orders which total is bigger that this amount in your context currency'),
             ),
-        );
+        ));
 
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
@@ -104,7 +104,9 @@ class MethodBT extends AbstractMethodPaypal
 
     public function getMerchantCurrenciesForm($module)
     {
-        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_SANDBOX_BRAINTREE_ACCOUNT_ID'));
+        $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
+        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
+
         $ps_currencies = Currency::getCurrencies();
         $fields_form2 = array();
         $fields_form2[0]['form'] = array(
@@ -113,8 +115,7 @@ class MethodBT extends AbstractMethodPaypal
                 'icon' => 'icon-cogs',
             ),
         );
-        foreach ($ps_currencies as $curr)
-        {
+        foreach ($ps_currencies as $curr) {
             $fields_form2[0]['form']['input'][] =
                 array(
                     'type' => 'text',
@@ -168,8 +169,11 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_REFRESH_TOKEN', Tools::getValue('refreshToken'));
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_MERCHANT_ID', Tools::getValue('merchantId'));
             $existing_merchant_accounts = $method_bt->getAllCurrency();
+
             $new_merchant_accounts = $method_bt->createForCurrency();
+
             $all_merchant_accounts = array_merge((array)$existing_merchant_accounts, (array)$new_merchant_accounts);
+            unset($all_merchant_accounts[0]);
             if ($all_merchant_accounts) {
                 Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($all_merchant_accounts));
             }
@@ -199,7 +203,6 @@ class MethodBT extends AbstractMethodPaypal
             || !Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_MERCHANT_ID')) {
             $paypal->errors .= $paypal->displayError($paypal->l('An error occurred. Please, check your credentials Braintree.'));
         }
-
     }
 
     private function initConfig()
@@ -270,7 +273,6 @@ class MethodBT extends AbstractMethodPaypal
         }
 
         return $result;
-
     }
 
 
@@ -349,7 +351,7 @@ class MethodBT extends AbstractMethodPaypal
                 'amount'                => $cart->getOrderTotal(),
                 'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts->$current_currency,
-                'orderId'               => $cart->id, 
+                'orderId'               => $cart->id,
                 'channel'               => 'PrestaShop_Cart_Braintree',
                 'billing' => [
                     'firstName'         => $address_billing->firstname,
@@ -388,7 +390,6 @@ class MethodBT extends AbstractMethodPaypal
                 }
                 Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $error_code)));
             }
-
         } catch (Exception $e) {
             $this->error = $e->getCode().' : '.$e->getMessage();
             return false;
@@ -472,7 +473,6 @@ class MethodBT extends AbstractMethodPaypal
                     'payment_type' => $result->transaction->payment_type,
                     'merchantAccountId' => $result->transaction->merchantAccountId,
                 );
-
             } else {
                 $errors = $result->errors->deepAll();
                 foreach ($errors as $error) {
@@ -526,12 +526,10 @@ class MethodBT extends AbstractMethodPaypal
 
     public function searchTransactions($ids) {
         $this->initConfig();
-        $collection = $this->gateway->transaction()->search(
-            array(
-                Braintree_TransactionSearch::ids()->is($ids)
-            )
-        );
+        $ids_transaction =  Braintree_TransactionSearch::ids()->in($ids);
+        $collection = $this->gateway->transaction()->search([
+            $ids_transaction
+        ]);
         return $collection;
-
     }
 }

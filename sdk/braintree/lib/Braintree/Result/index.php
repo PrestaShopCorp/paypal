@@ -23,35 +23,13 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-function upgrade_module_4_2_0($module)
-{
-    $sql = 'ALTER TABLE '._DB_PREFIX_.'paypal_order ADD method VARCHAR(255), ADD payment_tool VARCHAR(255)';
-    if (!Db::getInstance()->execute($sql)) {
-        return false;
-    }
-
-    if (!$module->installOrderState()) {
-        return false;
-    }
-
-    if (!$module->registerHook('header')
-        || !$module->registerHook('displayBackOfficeHeader')
-        || !$module->registerHook('displayFooterProduct')
-        || !$module->registerHook('actionBeforeCartUpdateQty')
-        || !$module->registerHook('actionObjectCurrencyAddAfter')) {
-        return false;
-    }
-
-    if (!Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 0)
-        || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
-        || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)) {
-        return false;
-    }
-
-    return true;
-}
+                        
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
+                        
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+                        
+header("Location: ../");
+exit;
