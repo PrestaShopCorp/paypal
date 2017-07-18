@@ -60,6 +60,26 @@ class MethodBT extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
+                'label' => $module->l('Show PayPal benefits to your customers'),
+                'name' => 'paypal_show_advantage',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'hint' => $module->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_advantage_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_advantage_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
                 'label' => $module->l('Activate 3D Secure for Braintree'),
                 'name' => 'paypal_3DSecure',
                 'desc' => $module->l(''),
@@ -87,6 +107,7 @@ class MethodBT extends AbstractMethodPaypal
 
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
+            'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
             'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
             'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
         );
@@ -183,6 +204,7 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
             Configuration::updateValue('PAYPAL_USE_3D_SECURE', $params['paypal_3DSecure']);
             Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
+            Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
         }
 
         if (isset($params['method'])) {

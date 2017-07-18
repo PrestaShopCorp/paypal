@@ -26,12 +26,14 @@
     <div class="col-xs-12 col-md-10">
         <div class="paypal-braintree-row-payment">
             <div class="payment_module paypal-braintree">
-            <form action="{$braintreeSubmitUrl}" id="paypal-braintree-form" method="post">
+                <form action="{$braintreeSubmitUrl}" id="paypal-braintree-form" method="post">
+                {include file="module:paypal/views/templates/front/payment_infos.tpl"}
                 <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
                 <input type="hidden" name="payment_method_bt" value="paypal-braintree"/>
                 <div id="paypal-button"></div>
                 <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
             </form>
+                <div id="bt-paypal-error-msg"></div>
             </div>
         </div>
     </div>

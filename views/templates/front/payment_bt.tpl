@@ -53,6 +53,7 @@
                 <input type="hidden" name="card_type" id="braintree_card_type"/>
                 <input type="hidden" name="payment_method_bt" value="card-braintree"/>
                 <div class="paypal_clear"></div>
+                <div id="bt-card-error-msg"></div>
             </form>
             </div>
         </div>
