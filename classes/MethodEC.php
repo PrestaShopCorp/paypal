@@ -34,7 +34,7 @@ class MethodEC extends AbstractMethodPaypal
 
     public function getConfig(PayPal $module)
     {
-        $params['inputs'] = array(
+        $params = array('input'=>array(
             array(
                 'type' => 'select',
                 'label' => $module->l('Payment action'),
@@ -96,7 +96,7 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             )
-        );
+        ));
 
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
