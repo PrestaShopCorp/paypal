@@ -136,6 +136,7 @@ class MethodBT extends AbstractMethodPaypal
                 'icon' => 'icon-cogs',
             ),
         );
+        $fields_value = array();
         foreach ($ps_currencies as $curr) {
             $fields_form2[0]['form']['input'][] =
                 array(
@@ -175,6 +176,7 @@ class MethodBT extends AbstractMethodPaypal
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
         $paypal = Module::getInstanceByName($this->name);
         $ps_currencies = Currency::getCurrencies();
+        $new_accounts = array();
         if (Tools::isSubmit('paypal_braintree_curr')) {
             foreach ($ps_currencies as $curr) {
                 $new_accounts[$curr['iso_code']] = Tools::getValue('braintree_curr_'.$curr['iso_code']);
