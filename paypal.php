@@ -556,7 +556,11 @@ class PayPal extends PaymentModule
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
                     if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
                         $embeddedOption = new PaymentOption();
-                        $embeddedOption->setCallToActionText($this->l('Pay with paypal by braintree'))
+                        $action_text = $this->l('Pay with paypal by braintree');
+                        if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
+                            $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
+                        }
+                        $embeddedOption->setCallToActionText($action_text)
                             ->setForm($this->generateFormPaypalBt())
                             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
                         $payments_options[] = $embeddedOption;
@@ -658,6 +662,7 @@ class PayPal extends PaymentModule
             'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
             'braintreeAmount'=> $amount,
             'baseDir' => $context->link->getBaseLink($context->shop->id, true),
+            'path' => $this->_path,
         ));
 
 

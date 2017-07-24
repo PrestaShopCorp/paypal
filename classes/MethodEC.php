@@ -158,7 +158,7 @@ class MethodEC extends AbstractMethodPaypal
                 'icon' => 'icon-cogs',
             ),
         );
-        $apiUserName = (Configuration::get('PAYPAL_SANDBOX_ACCESS')?Configuration::get('PAYPAL_USERNAME_SANDBOX'):Configuration::get('PAYPAL_USERNAME_LIVE'));
+        $apiUserName = (Configuration::get('PAYPAL_SANDBOX')?Configuration::get('PAYPAL_USERNAME_SANDBOX'):Configuration::get('PAYPAL_USERNAME_LIVE'));
 
         $fields_form[0]['form']['input'] = array(
             array(

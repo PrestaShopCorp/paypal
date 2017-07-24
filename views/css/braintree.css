@@ -1,6 +1,5 @@
 .braintree-row-payment {
     padding:5px 5px 5px 10px;
-    border:solid 1px #d6d4d4;
     border-radius: 4px;
     margin:0 0 10px 0;
 }
@@ -24,7 +23,7 @@
     margin: 9px 20px 0 0;
     display:block;
     width: 200px;
-    /*text-align:right;*/
+    text-align: left !important;
 }
 
 .braintree-row-payment .half_block_field .hosted_field {
@@ -151,6 +150,18 @@
  }
 .braintree-row-payment #card-number {
     position: relative;
+}
+#paypal-vault-info {
+    display:none;
+    margin-bottom: 20px;
+}
+#bt-card-error-msg, #bt-paypal-error-msg {
+    display:none;
+    color:red;
+    margin-top: 10px;
+}
+#bt-paypal-error-msg {
+    margin-bottom: 10px;
 }
 @media only screen and (max-width: 500px) {
     .braintree-row-payment .block_field {

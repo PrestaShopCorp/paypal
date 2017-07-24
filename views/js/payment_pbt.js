@@ -43,14 +43,7 @@ function initPaypalBraintree() {
             // This could happen if there was a network error or if it's incorrectly
             // configured.
             if (paypalCheckoutErr) {
-                $.fancybox.open([
-                    {
-                        type: 'inline',
-                        autoScale: true,
-                        minHeight: 30,
-                        content: ''+paypalCheckoutErr+''
-                    }
-                ]);
+                $('#bt-paypal-error-msg').show().append(paypalCheckoutErr);
                 return;
             }
 
@@ -78,25 +71,11 @@ function initPaypalBraintree() {
                 },
 
                 onCancel: function (data) {
-                    $.fancybox.open([
-                        {
-                            type: 'inline',
-                            autoScale: true,
-                            minHeight: 30,
-                            content: 'checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+''
-                        }
-                    ]);
+                    $('#bt-paypal-error-msg').show().append('checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+'');
                 },
 
                 onError: function (err) {
-                    $.fancybox.open([
-                        {
-                            type: 'inline',
-                            autoScale: true,
-                            minHeight: 30,
-                            content: ''+err+''
-                        }
-                    ]);
+                    $('#bt-paypal-error-msg').show().append(err);
                 }
             }, '#paypal-button').then(function (e) {
 
@@ -109,14 +88,7 @@ function initPaypalBraintree() {
                 if (!document.querySelector('input#paypal_payment_method_nonce').value) {
                     event.preventDefault();
                     event.stopPropagation();
-                    $.fancybox.open([
-                        {
-                            type: 'inline',
-                            autoScale: true,
-                            minHeight: 30,
-                            content: ''+pbt_translations.empty_nonce+''
-                        }
-                    ]);
+                    $('#bt-paypal-error-msg').show().append(pbt_translations.empty_nonce);
                 }
             });
 
