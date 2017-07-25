@@ -34,7 +34,7 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
 
         $response = $method_ec->init(array('use_card'=>Tools::getValue('credit_card')));
         if (!isset($response['L_ERRORCODE0'])) {
-            Tools::redirect($response);
+            Tools::redirect($response.'&useraction=commit');
         } else {
             Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $response['L_ERRORCODE0'])));
         }

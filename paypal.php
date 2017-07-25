@@ -252,6 +252,7 @@ class PayPal extends PaymentModule
             || !$this->registerHook('displayBackOfficeHeader')
             || !$this->registerHook('displayFooterProduct')
             || !$this->registerHook('actionBeforeCartUpdateQty')
+            || !$this->registerHook('displayReassurance')
         ) {
             return false;
         }
@@ -289,7 +290,8 @@ class PayPal extends PaymentModule
             'PAYPAL_SANDBOX_BRAINTREE_REFRESH_TOKEN',
             'PAYPAL_SANDBOX_BRAINTREE_MERCHANT_ID',
             'PAYPAL_BY_BRAINTREE',
-            'PAYPAL_CRON_TIME'
+            'PAYPAL_CRON_TIME',
+            'PAYPAL_EXPRESS_CHECKOUT'
         );
 
         foreach ($config as $var) {
@@ -401,10 +403,12 @@ class PayPal extends PaymentModule
         $method_name = Configuration::get('PAYPAL_METHOD');
         $config = '';
         if ($method_name) {
-            $method = AbstractMethodPaypal::load($method_name);
-            $config = $method->getConfig($this);
-            $inputs = array_merge($inputs, $config['inputs']);
-            $fields_value = array_merge($fields_value, $config['fields_value']);
+            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT')) {
+                $method = AbstractMethodPaypal::load($method_name);
+                $config = $method->getConfig($this);
+                $inputs = array_merge($inputs, $config['inputs']);
+                $fields_value = array_merge($fields_value, $config['fields_value']);
+            }
         }
 
         $fields_form[0]['form'] = array(
@@ -466,7 +470,11 @@ class PayPal extends PaymentModule
         }
 
         if (Tools::getValue('method')) {
-            Configuration::updateValue('PAYPAL_METHOD', Tools::getValue('method'));
+            $method_name = Tools::getValue('method');
+        } elseif (Tools::getValue('active_method')) {
+            $method_name = Tools::getValue('active_method');
+        } else {
+            $method_name = Configuration::get('PAYPAL_METHOD');
         }
 
         $method_name = Configuration::get('PAYPAL_METHOD');
@@ -482,7 +490,7 @@ class PayPal extends PaymentModule
             'user_country' => $this->context->country->iso_code,
             'user_email' => Configuration::get('PS_SHOP_EMAIL'),
             'business_name' => Configuration::get('PS_SHOP_NAME'),
-            'redirect_url' => $this->module_link,
+            'redirect_url' => $this->module_link.'&active_method='.Tools::getValue('method'),
         );
         $sdk = new BraintreeSDK(Configuration::get('PAYPAL_SANDBOX'));
         return $sdk->getUrlConnect($connect_params);
@@ -713,9 +721,18 @@ class PayPal extends PaymentModule
         return $this->context->smarty->fetch('module:paypal/views/templates/hook/order_confirmation.tpl');
     }
 
-    public function hookDisplayFooterProduct($params)
+    /* public function hookDisplayFooterProduct($params)
     {
         if (Configuration::get('PAYPAL_METHOD') != 'EC') {
+            return false;
+        }
+        $method = AbstractMethodPaypal::load('EC');
+        return $method->renderExpressCheckout($this->context, 'EC');
+    }*/
+
+    public function hookDisplayReassurance()
+    {
+        if ('product' !== $this->context->controller->php_self || Configuration::get('PAYPAL_METHOD') != 'EC') {
             return false;
         }
         $method = AbstractMethodPaypal::load('EC');
@@ -957,7 +974,7 @@ class PayPal extends PaymentModule
 
     public function getPartnerInfo($method)
     {
-        $return_url = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        $return_url = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'&active_method='.Tools::getValue('method');
         if (Configuration::get('PS_SSL_ENABLED')) {
             $shop_url = Tools::getShopDomainSsl(true);
         } else {

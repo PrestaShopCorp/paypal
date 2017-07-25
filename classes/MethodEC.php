@@ -138,6 +138,7 @@ class MethodEC extends AbstractMethodPaypal
             'ec_card_active' => Configuration::get('PAYPAL_API_CARD'),
             'ec_paypal_active' => !Configuration::get('PAYPAL_API_CARD'),
             'need_rounding' => Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM ? 0 : 1,
+            'ec_active' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT'),
         ));
 
         if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) {
@@ -192,6 +193,8 @@ class MethodEC extends AbstractMethodPaypal
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
         $paypal = Module::getInstanceByName($this->name);
         if (isset($params['api_username']) && isset($params['api_password']) && isset($params['api_signature'])) {
+            Configuration::updateValue('PAYPAL_METHOD', 'EC');
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
             Configuration::updateValue('PAYPAL_USERNAME_'.$mode, $params['api_username']);
             Configuration::updateValue('PAYPAL_PSWD_'.$mode, $params['api_password']);
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
@@ -219,14 +222,15 @@ class MethodEC extends AbstractMethodPaypal
 
         if (isset($params['method'])) {
             Configuration::updateValue('PAYPAL_API_CARD', $params['with_card']);
-            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT', 1);
-            $response = $paypal->getPartnerInfo($params['method']);
-            $result = Tools::jsonDecode($response);
-            if (!$result->error && isset($result->data->url)) {
-                $PartnerboardingURL = $result->data->url;
-                Tools::redirectLink($PartnerboardingURL);
-            } else {
-                $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
+            if ((isset($params['modify']) && $params['modify']) || (Configuration::get('PAYPAL_METHOD') != $params['method'])) {
+                $response = $paypal->getPartnerInfo($params['method']);
+                $result = Tools::jsonDecode($response);
+                if (!$result->error && isset($result->data->url)) {
+                    $PartnerboardingURL = $result->data->url;
+                    Tools::redirectLink($PartnerboardingURL);
+                } else {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
+                }
             }
         }
 

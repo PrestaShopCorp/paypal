@@ -185,6 +185,7 @@ class MethodBT extends AbstractMethodPaypal
         }
 
         if (Tools::getValue('accessToken') && Tools::getValue('expiresAt') && Tools::getValue('refreshToken') && Tools::getValue('merchantId')) {
+            Configuration::updateValue('PAYPAL_METHOD', 'BT');
             Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 1);
             $method_bt = AbstractMethodPaypal::load('BT');
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCESS_TOKEN', Tools::getValue('accessToken'));
@@ -213,13 +214,14 @@ class MethodBT extends AbstractMethodPaypal
             if (isset($params['with_paypal'])) {
                 Configuration::updateValue('PAYPAL_BY_BRAINTREE', $params['with_paypal']);
             }
-
-            $response = $paypal->getBtConnectUrl();
-            $result = Tools::jsonDecode($response);
-            if ($result->error) {
-                $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Braintree : ').$result->error);
-            } elseif (isset($result->data->url_connect)) {
-                Tools::redirectLink($result->data->url_connect);
+            if ((isset($params['modify']) && $params['modify']) || (Configuration::get('PAYPAL_METHOD') != $params['method'])) {
+                $response = $paypal->getBtConnectUrl();
+                $result = Tools::jsonDecode($response);
+                if ($result->error) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Braintree : ') . $result->error);
+                } elseif (isset($result->data->url_connect)) {
+                    Tools::redirectLink($result->data->url_connect);
+                }
             }
         }
 

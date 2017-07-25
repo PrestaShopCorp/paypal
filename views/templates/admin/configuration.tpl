@@ -37,8 +37,8 @@
 </div>
 <div class="container-fluid paypal-nav">
 <ul class="nav nav-pills navbar-separator">
-    <li {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active) && !isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>
-    <li {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_params"><span>{l s='Settings' mod='paypal'}</span></a></li>
+    <li {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>
+    <li {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_params"><span>{l s='Settings' mod='paypal'}</span></a></li>
 </ul>
     <div class="tab-content">
     <div id="paypal_conf"  class="tab-pane fade {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active) && !isset($bt_active)}in active{/if}">
@@ -84,7 +84,7 @@
                     </p>
                     <div class="bottom">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=0" >{if isset($ec_paypal_active) &&  $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=0{if isset($ec_paypal_active) &&  $ec_paypal_active}&modify=1{/if}" >{if isset($ec_paypal_active) &&  $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=1">{if  isset($ec_card_active) && $ec_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=1{if isset($ec_active) && $ec_active && isset($ec_card_active) && $ec_card_active}&modify=1{/if}">{if  isset($ec_active) && $ec_active && isset($ec_card_active) && $ec_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -123,13 +123,12 @@
                     </p>
                     <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=0">{if isset($bt_active) && $bt_active && $bt_paypal_active == 0}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=0{if isset($bt_active) && $bt_active && $bt_paypal_active == 0}&modify=1{/if}">{if isset($bt_active) && $bt_active && $bt_paypal_active == 0}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -152,7 +151,7 @@
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=1">{if isset($bt_paypal_active) && $bt_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=1{if isset($bt_paypal_active) && $bt_paypal_active}&modify=1{/if}">{if isset($bt_paypal_active) && $bt_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
@@ -160,11 +159,12 @@
         </div>
 
     </div>
-    <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($bt_active)}in active{/if}">
+    <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}in active{/if}">
+        {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}
         <div class="panel parametres">
             <div class="panel-body">
                 <div class="col-sm-8 help-left">
-                    {if !$paypal_card}
+                    {if isset($ec_paypal_active) && $ec_paypal_active}
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                         <p>
                                 {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
@@ -175,13 +175,33 @@
                         <p>
                             <a target="_blank" href="https://www.paypal.com/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
                         </p>
-                    {else}
+                    {elseif isset($ec_card_active) && $ec_card_active}
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                         <p>
                                 {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
                         <p>
                                 {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
+                        </p>
+                        <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                    {elseif isset($bt_paypal_active) && $bt_paypal_active}
+                        <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                        <p>
+                            {l s='Accept cards and PayPal' mod='paypal'}
+                            {l s='with our full-stack payments platform Braintree' mod='paypal'}.
+                        </p>
+                        <p>
+                            {l s='You can improve your customers experience and your conversion with hosted fields for card' mod='paypal'}
+                            {l s='payments and PayPal payment including One Touch' mod='paypal'}&trade;
+                        </p>
+                        <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                    {elseif isset($bt_active) && !$bt_paypal_active && $bt_active}
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                        <p>
+                            {l s='Accept Braintree payments' mod='paypal'}
+                        </p>
+                        <p>
+                            {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                         </p>
                         <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     {/if}
@@ -193,6 +213,8 @@
                 </div>
             </div>
         </div>
+        {/if}
+        <div class="configuration-block"></div>
     </div>
 
 </div>
@@ -206,8 +228,8 @@
             event.preventDefault();
             $('a[href=#paypal_conf]').click();
         });
-        $('#configuration_form').insertAfter($('.parametres'));
-        $('#configuration_form_1').insertAfter($('.parametres'));
+        $('#configuration_form').insertAfter($('.configuration-block'));
+        $('#configuration_form_1').insertAfter($('.configuration-block'));
 
     });
 
