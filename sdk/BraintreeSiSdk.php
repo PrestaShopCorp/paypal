@@ -34,9 +34,9 @@ class BraintreeSDK
     {
         $this->action = 'POST';
         if ($sandbox) {
-            $this->urlAPI = 'https://sandbox.pp-ps-auth.com/';
+            $this->urlAPI = 'http://braintree-sandbox.pp-ps-auth.com/';
         } else {
-            $this->urlAPI = 'https://pp-ps-auth.com/';
+            $this->urlAPI = 'http://braintree-live.pp-ps-auth.com/';
         }
     }
 
