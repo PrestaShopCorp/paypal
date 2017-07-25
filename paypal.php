@@ -477,7 +477,7 @@ class PayPal extends PaymentModule
             $method_name = Configuration::get('PAYPAL_METHOD');
         }
 
-        $method_name = Configuration::get('PAYPAL_METHOD');
+
         if ($method_name) {
             $method = AbstractMethodPaypal::load($method_name);
             $method->setConfig(Tools::getAllValues());
