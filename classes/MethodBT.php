@@ -378,7 +378,7 @@ class MethodBT extends AbstractMethodPaypal
                 'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts->$current_currency,
                 'orderId'               => $cart->id,
-                'channel'               => 'PrestaShop_Cart_Braintree',
+                'channel'               => (defined(HOSTMODE)?'Presto_Cart_Braintree':'PrestaShop_Cart_Braintree'),
                 'billing' => [
                     'firstName'         => $address_billing->firstname,
                     'lastName'          => $address_billing->lastname,
