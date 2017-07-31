@@ -588,11 +588,17 @@ class MethodEC extends AbstractMethodPaypal
             return false;
         }
 
-        $lang = Language::getLanguage($context->language->id);
+        $lang = $context->country->iso_code;
+
+        $img_esc = "/modules/paypal/views/img/ECShortcut/".strtolower($lang)."/buy/buy.png";
+
+        if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
+            $img_esc = "/modules/paypal/views/img/ECShortcut/us/buy/buy.png";
+        }
         $context->smarty->assign(array(
             'PayPal_payment_type' => $type,
             'PayPal_tracking_code' => 'PRESTASHOP_ECM',
-            'PayPal_lang_code' => str_replace('-', '_', $lang['locale']),
+            'PayPal_img_esc' => $img_esc,
             'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true)
         ));
         $context->controller->registerJavascript($this->name.'-order_confirmation_js', 'modules/paypal/views/js/ec_shortcut.js');
