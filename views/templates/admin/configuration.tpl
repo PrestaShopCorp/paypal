@@ -114,7 +114,7 @@
             {if isset($braintree_available)}
             <div class="col-sm-4">
                 <div class="panel">
-                    <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                    <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                     <p>
                         {l s='Accept Braintree payments' mod='paypal'}
                     </p>
@@ -134,7 +134,7 @@
             </div>
             <div class="col-sm-4">
                 <div class="panel">
-                    <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                    <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                     <p>
                         {l s='Accept cards and PayPal' mod='paypal'}
                         {l s='with our full-stack payments platform Braintree' mod='paypal'}.
