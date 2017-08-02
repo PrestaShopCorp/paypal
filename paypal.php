@@ -519,6 +519,7 @@ class PayPal extends PaymentModule
                     $payment_options = new PaymentOption();
                     $action_text = $this->l('Pay with Paypal');
                     $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/paypal_sm.png'));
+                    $payment_options->setModuleName($this->name);
                     if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
                         $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
                     }
@@ -539,6 +540,7 @@ class PayPal extends PaymentModule
                         $action_text = $this->l('Pay with debit or credit card');
                         $payment_options->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
                         $payment_options->setCallToActionText($action_text);
+                        $payment_options->setModuleName($this->name);
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'1'), true));
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos_card.tpl'));
                         $payments_options[] = $payment_options;
@@ -547,7 +549,7 @@ class PayPal extends PaymentModule
                         $payment_options = new PaymentOption();
                         $action_text = $this->l('Pay with paypal express checkout');
                         $payment_options->setCallToActionText($action_text);
-                        $payment_options->setModuleName('express_checkout');
+                        $payment_options->setModuleName($this->name);
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/express_checkout.tpl'));
                         $payments_options[] = $payment_options;
@@ -571,6 +573,7 @@ class PayPal extends PaymentModule
                         $embeddedOption->setCallToActionText($action_text)
                             ->setForm($this->generateFormPaypalBt())
                             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                        $embeddedOption->setModuleName('braintree');
                         $payments_options[] = $embeddedOption;
                     }
 
@@ -578,6 +581,7 @@ class PayPal extends PaymentModule
                     $embeddedOption->setCallToActionText($this->l('Pay braintree'))
                         ->setForm($this->generateFormBt())
                         ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                    $embeddedOption->setModuleName('braintree');
 
                     $payments_options[] = $embeddedOption;
                 }
