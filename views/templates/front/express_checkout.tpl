@@ -25,6 +25,3 @@
 <p id="paypal-es-checked">
     {l s='You have already payed with PayPal express checkout.' mod='paypal'}
 </p>
-<script>
-
-</script>

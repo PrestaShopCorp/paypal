@@ -45,6 +45,6 @@
     var authorization = '{$braintreeToken}';
     var bt_amount = {$braintreeAmount};
     var pbt_translations = {
-        empty_nonce:"{l s='Cklick paypal button first' mod='paypal'}"
+        empty_nonce:"{l s='Click paypal button first' mod='paypal'}"
     };
 </script>

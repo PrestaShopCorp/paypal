@@ -499,9 +499,6 @@ class PayPal extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
-
-
-
         $not_refunded = 0;
         foreach ($params['cart']->getProducts() as $key => $product) {
             if ($product['is_virtual']) {
@@ -550,7 +547,7 @@ class PayPal extends PaymentModule
                         $payment_options = new PaymentOption();
                         $action_text = $this->l('Pay with paypal express checkout');
                         $payment_options->setCallToActionText($action_text);
-                        $payment_options->setModuleName($this->name);
+                        $payment_options->setModuleName('express_checkout_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/express_checkout.tpl'));
                         $payments_options[] = $payment_options;
