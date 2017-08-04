@@ -22,7 +22,6 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-
 <div dir="ltr" style="text-align: left;" trbidi="on">
     <script type="text/javascript">
          (function(d, s, id){
@@ -35,6 +34,7 @@
          }(document, "script", "paypal-js"));
     </script>
 </div>
+
 <div class="container-fluid paypal-nav">
 <ul class="nav nav-pills navbar-separator">
     <li {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>

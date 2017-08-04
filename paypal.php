@@ -55,6 +55,8 @@ class PayPal extends PaymentModule
         $this->tab = 'payments_gateways';
         $this->version = '4.2.0';
         $this->author = 'PrestaShop';
+        $this->display = 'view';
+        $this->module_key = '336225a5988ad434b782f2d868d7bfcd';
         $this->is_eu_compatible = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->controllers = array('payment', 'validation');
@@ -403,12 +405,11 @@ class PayPal extends PaymentModule
         $method_name = Configuration::get('PAYPAL_METHOD');
         $config = '';
         if ($method_name) {
-            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT')) {
-                $method = AbstractMethodPaypal::load($method_name);
-                $config = $method->getConfig($this);
-                $inputs = array_merge($inputs, $config['inputs']);
-                $fields_value = array_merge($fields_value, $config['fields_value']);
-            }
+            $method = AbstractMethodPaypal::load($method_name);
+
+            $config = $method->getConfig($this);
+            $inputs = array_merge($inputs, $config['inputs']);
+            $fields_value = array_merge($fields_value, $config['fields_value']);
         }
 
         $fields_form[0]['form'] = array(
