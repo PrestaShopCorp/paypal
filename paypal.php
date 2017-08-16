@@ -673,6 +673,7 @@ class PayPal extends PaymentModule
             'braintreeAmount'=> $amount,
             'baseDir' => $context->link->getBaseLink($context->shop->id, true),
             'path' => $this->_path,
+            'mode' => $braintree->mode == 'SANDBOX' ? strtolower($braintree->mode) : 'production',
         ));
 
 
@@ -892,7 +893,9 @@ class PayPal extends PaymentModule
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
-            $orderMessage->save();
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
         }
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_REFUND')) {
@@ -939,7 +942,9 @@ class PayPal extends PaymentModule
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
-            $orderMessage->save();
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
 
             if (!isset($refund_response['already_refunded']) && !isset($refund_response['success'])) {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_refund=1');
@@ -966,7 +971,9 @@ class PayPal extends PaymentModule
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
-            $orderMessage->save();
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
 
             if (!isset($capture_response['already_captured']) && !isset($capture_response['success'])) {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_capture=1');

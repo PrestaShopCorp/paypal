@@ -48,7 +48,7 @@ function initPaypalBraintree() {
             }
 
             paypal.Button.render({
-                env: 'sandbox', // or 'sandbox'
+                env: mode, // 'production' or 'sandbox'
 
                 payment: function () {
                     return paypalCheckoutInstance.createPayment({
@@ -71,7 +71,7 @@ function initPaypalBraintree() {
                 },
 
                 onCancel: function (data) {
-                    $('#bt-paypal-error-msg').show().append('checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+'');
+                    //$('#bt-paypal-error-msg').show().append('checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+'');
                 },
 
                 onError: function (err) {
