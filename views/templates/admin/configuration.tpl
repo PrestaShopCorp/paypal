@@ -70,8 +70,8 @@
 
         <div class="active-products">
             <p><b>{l s='3 PayPal products selected for you' mod='paypal'}</b></p>
-            <div class="col-sm-4">
-                <div class="panel">
+            <div class="col-sm-6">
+                <div class="panel {if isset($ec_paypal_active) && $ec_paypal_active}active-panel{/if}">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
                             {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'}
@@ -84,13 +84,13 @@
                     </p>
                     <div class="bottom">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
-                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=0{if isset($ec_paypal_active) &&  $ec_paypal_active}&modify=1{/if}" >{if isset($ec_paypal_active) &&  $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
+                        <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=0{if isset($ec_paypal_active) &&  $ec_paypal_active}&modify=1{/if}" >{if isset($ec_paypal_active) && $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
             {if !isset($braintree_available)}
-            <div class="col-sm-4">
-                <div class="panel">
+            <div class="col-sm-6">
+                <div class="panel {if isset($ec_active) && $ec_active && isset($ec_card_active) && $ec_card_active}actvie-panel{/if}">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                     <p>
                             {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'}
@@ -112,8 +112,8 @@
             </div>
             {/if}
             {if isset($braintree_available)}
-            <div class="col-sm-4">
-                <div class="panel">
+            <div class="col-sm-4 hide">
+                <div class="panel {if isset($bt_active) && $bt_active && $bt_paypal_active == 0}active-panel{/if}">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                     <p>
                         {l s='Accept Braintree payments' mod='paypal'}
@@ -132,8 +132,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div class="panel">
+            <div class="col-sm-6">
+                <div class="panel {if isset($bt_paypal_active) && $bt_paypal_active}active-panel{/if}">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                     <p>
                         {l s='Accept cards and PayPal' mod='paypal'}
