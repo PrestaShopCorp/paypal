@@ -58,6 +58,9 @@
     border-color: #87b1d6;
     border: 2px solid;
 }
+.active-products .panel.active-panel {
+    background-color: #F0F8FF !important; 
+}
 .paypal-signup .btn.btn-info {
     padding: 0px 15px 0 0;
 }

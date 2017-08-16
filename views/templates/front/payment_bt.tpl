@@ -80,7 +80,8 @@
         https:"{l s='3D Secure requires HTTPS.' mod='paypal'}",
         load_3d:"{l s='Load 3D Secure Failed' mod='paypal'}",
         request_problem:"{l s='There was a problem with your request.' mod='paypal'}",
-        failed_3d:"{l s='3D Secure Failed' mod='paypal'}"
+        failed_3d:"{l s='3D Secure Failed' mod='paypal'}",
+        empty_field:"{l s='is empty.' mod='paypal'}"
     };
 
 </script>

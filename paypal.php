@@ -444,10 +444,18 @@ class PayPal extends PaymentModule
 
         if (count($this->errors)) {
             $this->message .= $this->errors;
-        } elseif (Configuration::get('PAYPAL_SANDBOX') == 1) {
-            $this->message .= $this->displayWarning($this->l('Your PayPal account is currently configured to accept payments on the Sandbox (test environment). Any transaction will be fictitious. Disable the option, to accept actual payments (production environment) and log in with your PayPal credentials'));
-        } elseif (Configuration::get('PAYPAL_SANDBOX') == 0) {
-            $this->message .= $this->displayConfirmation($this->l('Your PayPal account is properly connected, you can now receive payments'));
+        } elseif (Configuration::get('PAYPAL_METHOD') && Configuration::get('PAYPAL_SANDBOX') == 1) {
+            if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+                $this->message .= $this->displayWarning($this->l('Your Braintree account is currently configured to accept payments on the Sandbox (test environment). Any transaction will be fictitious. Disable the option, to accept actual payments (production environment) and log in with your Braintree credentials'));
+            } else {
+                $this->message .= $this->displayWarning($this->l('Your PayPal account is currently configured to accept payments on the Sandbox (test environment). Any transaction will be fictitious. Disable the option, to accept actual payments (production environment) and log in with your PayPal credentials'));
+            }
+        } elseif (Configuration::get('PAYPAL_METHOD') && Configuration::get('PAYPAL_SANDBOX') == 0) {
+            if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+                $this->message .= $this->displayConfirmation($this->l('Your Braintree account is properly connected, you can now receive payments'));
+            } else {
+                $this->message .= $this->displayConfirmation($this->l('Your PayPal account is properly connected, you can now receive payments'));
+            }
         }
 
         $context->controller->addCSS($this->_path.'views/css/paypal-bo.css', 'all');
@@ -569,8 +577,7 @@ class PayPal extends PaymentModule
                             $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
                         }
                         $embeddedOption->setCallToActionText($action_text)
-                            ->setForm($this->generateFormPaypalBt())
-                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                            ->setForm($this->generateFormPaypalBt());
                         $embeddedOption->setModuleName('braintree');
                         $payments_options[] = $embeddedOption;
                     }

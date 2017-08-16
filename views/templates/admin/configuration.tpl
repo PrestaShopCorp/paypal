@@ -69,7 +69,7 @@
         <div style="clear:both;"></div>
 
         <div class="active-products">
-            <p><b>{l s='3 PayPal products selected for you' mod='paypal'}</b></p>
+            <p><b>{l s='2 PayPal products selected for you' mod='paypal'}</b></p>
             <div class="col-sm-6">
                 <div class="panel {if isset($ec_paypal_active) && $ec_paypal_active}active-panel{/if}">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
