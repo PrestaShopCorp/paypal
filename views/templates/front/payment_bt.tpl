@@ -30,7 +30,7 @@
         <div class="braintree-row-payment">
             <div class="payment_module braintree-card">
                 <label class="paypal_title_pay_card">{l s='Pay with your card' mod='paypal'}</label><div class="paypal_clear"></div>
-            <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/braintree_cards.png" alt="">
+            <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/card-maxi.png" alt="">
             <form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
                 <div id="block-card-number" class="block_field">
                     <div id="card-number" class="hosted_field"><div id="card-image"></div></div>

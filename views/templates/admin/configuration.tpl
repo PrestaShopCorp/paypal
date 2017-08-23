@@ -185,7 +185,7 @@
                         </p>
                         <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     {elseif isset($bt_paypal_active) && $bt_paypal_active}
-                        <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                        <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                         <p>
                             {l s='Accept cards and PayPal' mod='paypal'}
                             {l s='with our full-stack payments platform Braintree' mod='paypal'}.
@@ -196,7 +196,7 @@
                         </p>
                         <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     {elseif isset($bt_active) && !$bt_paypal_active && $bt_active}
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
+                        <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                         <p>
                             {l s='Accept Braintree payments' mod='paypal'}
                         </p>

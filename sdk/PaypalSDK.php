@@ -153,6 +153,7 @@ class PaypalSDK
         $fields['VERSION'] = $this->version;
         $fields['TOKEN'] = $params['token'];
         $fields['PAYERID'] = $params['payer_id'];
+        $fields['BUTTONSOURCE'] = $params['button_source'];
         // Seller informations
         $this->_setUserCredentials($fields, $params);
         // Set payment detail (reference)

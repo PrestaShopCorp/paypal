@@ -583,9 +583,9 @@ class PayPal extends PaymentModule
                     }
 
                     $embeddedOption = new PaymentOption();
-                    $embeddedOption->setCallToActionText($this->l('Pay braintree'))
+                    $embeddedOption->setCallToActionText($this->l('Pay with card'))
                         ->setForm($this->generateFormBt())
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/card-mini.png'));
                     $embeddedOption->setModuleName('braintree');
 
                     $payments_options[] = $embeddedOption;

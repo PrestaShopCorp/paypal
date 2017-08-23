@@ -29,7 +29,7 @@
     font-weight: bold;
     padding-left: 0;
 }
-.active-products img.paypal-products {
+.active-products img.paypal-products, .parametres .paypal-products {
     width: 135px;
 }
 .active-products img.product-img {
