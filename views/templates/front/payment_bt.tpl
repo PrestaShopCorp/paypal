@@ -30,7 +30,7 @@
         <div class="braintree-row-payment">
             <div class="payment_module braintree-card">
                 <label class="paypal_title_pay_card">{l s='Pay with your card' mod='paypal'}</label><div class="paypal_clear"></div>
-            <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/braintree_cards.png" alt="">
+            <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/card-maxi.png" alt="">
             <form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
                 <div id="block-card-number" class="block_field">
                     <div id="card-number" class="hosted_field"><div id="card-image"></div></div>
@@ -80,7 +80,8 @@
         https:"{l s='3D Secure requires HTTPS.' mod='paypal'}",
         load_3d:"{l s='Load 3D Secure Failed' mod='paypal'}",
         request_problem:"{l s='There was a problem with your request.' mod='paypal'}",
-        failed_3d:"{l s='3D Secure Failed' mod='paypal'}"
+        failed_3d:"{l s='3D Secure Failed' mod='paypal'}",
+        empty_field:"{l s='is empty.' mod='paypal'}"
     };
 
 </script>

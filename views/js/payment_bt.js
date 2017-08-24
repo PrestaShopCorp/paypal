@@ -28,7 +28,7 @@
             authorization: authorization
         }, function (clientErr, clientInstance) {
             if (clientErr) {
-                $('#bt-card-error-msg').show().append(bt_translations.client);
+                $('#bt-card-error-msg').show().text(bt_translations.client);
                 return;
             }
 
@@ -57,7 +57,7 @@
                 }
             },function (hostedFieldsErr, hostedFieldsInstance) {
                 if (hostedFieldsErr) {
-                    $('#bt-card-error-msg').show().append(bt_translations.hosted);
+                    $('#bt-card-error-msg').show().text(bt_translations.hosted);
                     return;
                 }
 
@@ -70,6 +70,17 @@
                     if (event.cards.length === 1) {
                         $('.braintree-card #card-image').removeClass().addClass(event.cards[0].type);
                     }
+                });
+
+                hostedFieldsInstance.on('blur', function (event) {
+                    var popup_message = '';
+                    var blur_field_info = event.fields[event.emittedBy];
+                    if (blur_field_info.isEmpty) {
+                        popup_message = event.emittedBy+' '+bt_translations.empty_field;
+                    } else if (!blur_field_info.isValid) {
+                        popup_message = bt_translations.invalid+' '+event.emittedBy;
+                    }
+                    $('#bt-card-error-msg').show().text(popup_message);
                 });
 
 
@@ -99,7 +110,7 @@
                                 default:
                                     popup_message = bt_translations.tkn_failed;
                             }
-                            $('#bt-card-error-msg').show().append(popup_message);
+                            $('#bt-card-error-msg').show().text(popup_message);
                             return false;
                         }
                         if (check3DS) {
@@ -116,7 +127,7 @@
                                         default:
                                             popup_message = bt_translations.load_3d;
                                     }
-                                    $('#bt-card-error-msg').show().append(popup_message);
+                                    $('#bt-card-error-msg').show().text(popup_message);
                                     return false;
                                 }
                                 threeDSecure.verifyCard({
@@ -145,7 +156,7 @@
                                             default:
                                                 popup_message = bt_translations.failed_3d;
                                         }
-                                        $('#bt-card-error-msg').show().append(popup_message);
+                                        $('#bt-card-error-msg').show().text(popup_message);
                                         return false;
                                     }
 

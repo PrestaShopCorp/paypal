@@ -43,12 +43,12 @@ function initPaypalBraintree() {
             // This could happen if there was a network error or if it's incorrectly
             // configured.
             if (paypalCheckoutErr) {
-                $('#bt-paypal-error-msg').show().append(paypalCheckoutErr);
+                $('#bt-paypal-error-msg').show().text(paypalCheckoutErr);
                 return;
             }
 
             paypal.Button.render({
-                env: 'sandbox', // or 'sandbox'
+                env: mode, // 'production' or 'sandbox'
 
                 payment: function () {
                     return paypalCheckoutInstance.createPayment({
@@ -65,17 +65,18 @@ function initPaypalBraintree() {
                             // Submit `payload.nonce` to your server.
                             document.querySelector('input#paypal_payment_method_nonce').value = payload.nonce;
                             $('#paypal-button').hide();
+                            $('#bt-paypal-error-msg').hide();
                             $('#paypal-vault-info').show().append(payload.details.firstName+' '+payload.details.lastName+' '+payload.details.email);
 
                         });
                 },
 
                 onCancel: function (data) {
-                    $('#bt-paypal-error-msg').show().append('checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+'');
+                   // $('#bt-paypal-error-msg').show().text('checkout.js payment cancelled'+JSON.stringify(data, 0, 2)+'');
                 },
 
                 onError: function (err) {
-                    $('#bt-paypal-error-msg').show().append(err);
+                    $('#bt-paypal-error-msg').show().text(err);
                 }
             }, '#paypal-button').then(function (e) {
 
@@ -88,7 +89,7 @@ function initPaypalBraintree() {
                 if (!document.querySelector('input#paypal_payment_method_nonce').value) {
                     event.preventDefault();
                     event.stopPropagation();
-                    $('#bt-paypal-error-msg').show().append(pbt_translations.empty_nonce);
+                    $('#bt-paypal-error-msg').show().text(pbt_translations.empty_nonce);
                 }
             });
 

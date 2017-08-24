@@ -54,5 +54,16 @@ function upgrade_module_4_2_0($module)
         return false;
     }
 
+    if (Configuration::get('PAYPAL_METHOD') == "EXPRESS_CHECKOUT") {
+        if (Configuration::get('PAYPAL_LIVE_ACCESS') || Configuration::get('PAYPAL_SANDBOX_ACCESS')) {
+            Configuration::updateValue('PAYPAL_METHOD', 'EC');
+            if (Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')) == "FR" || Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')) == "UK") {
+                Configuration::updateValue('PAYPAL_API_CARD', 0);
+            }
+        } else {
+            Configuration::updateValue('PAYPAL_METHOD', '');
+        }
+    }
+
     return true;
 }

@@ -437,6 +437,7 @@ class MethodEC extends AbstractMethodPaypal
         $params = array(
             'token' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token'),
             'payer_id' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID'),
+            'button_source' => (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Presto':'PrestaShop_Cart_EC',
         );
         $this->_getCredentialsInfo($params);
         $params = $this->_getPaymentDetails($params);
@@ -460,7 +461,7 @@ class MethodEC extends AbstractMethodPaypal
             $order_state = Configuration::get('PAYPAL_OS_WAITING');
         }
         $transactionDetail = $this->getDetailsTransaction($exec_payment);
-        $paypal->validateOrder($cart->id, $order_state, $total, 'paypal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
+        $paypal->validateOrder($cart->id, $order_state, $total, 'PayPal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
     }
 
     public function getDetailsTransaction($transaction)

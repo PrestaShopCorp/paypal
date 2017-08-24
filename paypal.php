@@ -444,10 +444,18 @@ class PayPal extends PaymentModule
 
         if (count($this->errors)) {
             $this->message .= $this->errors;
-        } elseif (Configuration::get('PAYPAL_SANDBOX') == 1) {
-            $this->message .= $this->displayWarning($this->l('Your PayPal account is currently configured to accept payments on the Sandbox (test environment). Any transaction will be fictitious. Disable the option, to accept actual payments (production environment) and log in with your PayPal credentials'));
-        } elseif (Configuration::get('PAYPAL_SANDBOX') == 0) {
-            $this->message .= $this->displayConfirmation($this->l('Your PayPal account is properly connected, you can now receive payments'));
+        } elseif (Configuration::get('PAYPAL_METHOD') && Configuration::get('PAYPAL_SANDBOX') == 1) {
+            if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+                $this->message .= $this->displayWarning($this->l('Your Braintree account is currently configured to accept payments on the Sandbox (test environment). Any transaction will be fictitious. Disable the option, to accept actual payments (production environment) and log in with your Braintree credentials'));
+            } else {
+                $this->message .= $this->displayWarning($this->l('Your PayPal account is currently configured to accept payments on the Sandbox (test environment). Any transaction will be fictitious. Disable the option, to accept actual payments (production environment) and log in with your PayPal credentials'));
+            }
+        } elseif (Configuration::get('PAYPAL_METHOD') && Configuration::get('PAYPAL_SANDBOX') == 0) {
+            if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+                $this->message .= $this->displayConfirmation($this->l('Your Braintree account is properly connected, you can now receive payments'));
+            } else {
+                $this->message .= $this->displayConfirmation($this->l('Your PayPal account is properly connected, you can now receive payments'));
+            }
         }
 
         $context->controller->addCSS($this->_path.'views/css/paypal-bo.css', 'all');
@@ -569,16 +577,15 @@ class PayPal extends PaymentModule
                             $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
                         }
                         $embeddedOption->setCallToActionText($action_text)
-                            ->setForm($this->generateFormPaypalBt())
-                            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                            ->setForm($this->generateFormPaypalBt());
                         $embeddedOption->setModuleName('braintree');
                         $payments_options[] = $embeddedOption;
                     }
 
                     $embeddedOption = new PaymentOption();
-                    $embeddedOption->setCallToActionText($this->l('Pay braintree'))
+                    $embeddedOption->setCallToActionText($this->l('Pay with card'))
                         ->setForm($this->generateFormBt())
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/logo_card.png'));
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/card-mini.png'));
                     $embeddedOption->setModuleName('braintree');
 
                     $payments_options[] = $embeddedOption;
@@ -673,6 +680,7 @@ class PayPal extends PaymentModule
             'braintreeAmount'=> $amount,
             'baseDir' => $context->link->getBaseLink($context->shop->id, true),
             'path' => $this->_path,
+            'mode' => $braintree->mode == 'SANDBOX' ? strtolower($braintree->mode) : 'production',
         ));
 
 
@@ -892,7 +900,9 @@ class PayPal extends PaymentModule
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
-            $orderMessage->save();
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
         }
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_REFUND')) {
@@ -939,7 +949,9 @@ class PayPal extends PaymentModule
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
-            $orderMessage->save();
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
 
             if (!isset($refund_response['already_refunded']) && !isset($refund_response['success'])) {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_refund=1');
@@ -966,7 +978,9 @@ class PayPal extends PaymentModule
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
-            $orderMessage->save();
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
 
             if (!isset($capture_response['already_captured']) && !isset($capture_response['success'])) {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_capture=1');
@@ -996,7 +1010,7 @@ class PayPal extends PaymentModule
             'first_name'    => $this->context->employee->firstname,
             'last_name'     => $this->context->employee->lastname,
             'shop_name'     => Configuration::get('PS_SHOP_NAME', null, null, null, ''),
-            'ref_merchant'  => ((defined(PLATEFORM) && PLATEFORM == 'PSREAD')?'presto':'prestashop_')._PS_VERSION_.'_'.$this->version,
+            'ref_merchant'  => ((defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'presto':'prestashop_')._PS_VERSION_.'_'.$this->version,
         );
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));

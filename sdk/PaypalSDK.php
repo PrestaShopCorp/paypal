@@ -112,23 +112,10 @@ class PaypalSDK
     }
     private function _setPaymentValues(&$fields, $costs, &$index)
     {
-        /**
-         * If the total amount is lower than 1 we put the shipping cost as an item
-         * so the payment could be valid.
-         */
-        if ($costs['total'] <= 1) {
-            $fields['L_PAYMENTREQUEST_0_NUMBER'.++$index] = $costs['carrier']->id_reference;
-            $fields['L_PAYMENTREQUEST_0_NAME'.$index] = $costs['carrier']->name;
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = $costs['shipping_cost'];
-            $fields['L_PAYMENTREQUEST_0_QTY'.$index] = 1;
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $costs['subtotal'] + $costs['shipping_cost'];
-            $fields['PAYMENTREQUEST_0_AMT'] = $costs['total'] + $costs['shipping_cost'];
-        } else {
-            $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = $costs['shipping_cost'];
-            $fields['PAYMENTREQUEST_0_ITEMAMT'] = $costs['subtotal'];
-            $fields['PAYMENTREQUEST_0_TAXAMT'] = $costs['total_tax'];
-            $fields['PAYMENTREQUEST_0_AMT'] = $costs['total'];
-        }
+        $fields['PAYMENTREQUEST_0_SHIPPINGAMT'] = $costs['shipping_cost'];
+        $fields['PAYMENTREQUEST_0_ITEMAMT'] = $costs['subtotal'];
+        $fields['PAYMENTREQUEST_0_TAXAMT'] = $costs['total_tax'];
+        $fields['PAYMENTREQUEST_0_AMT'] = $costs['total'];
     }
     private function _setUserCredentials(&$fields, $params)
     {
@@ -166,6 +153,7 @@ class PaypalSDK
         $fields['VERSION'] = $this->version;
         $fields['TOKEN'] = $params['token'];
         $fields['PAYERID'] = $params['payer_id'];
+        $fields['BUTTONSOURCE'] = $params['button_source'];
         // Seller informations
         $this->_setUserCredentials($fields, $params);
         // Set payment detail (reference)
