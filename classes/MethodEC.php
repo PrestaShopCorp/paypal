@@ -299,10 +299,10 @@ class MethodEC extends AbstractMethodPaypal
                 $product['name'] .= ' - '.$product['attributes'];
             }
             $product['description_short'] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
-            $product['price'] = number_format($product['price'], 2, ".", ",");
-            $product['product_tax'] = number_format(($product['price_wt'] - $product['price']), 2, ".", ",");
-            $total_products += (number_format($product['price'], 2, ".", ",") * $product['quantity']);
-            $tax += (number_format($product['price_wt'] - $product['price'], 2, ".", ",") * $product['quantity']);
+            $product['price'] = number_format($product['price'], 2, ".", '');
+            $product['product_tax'] = number_format(($product['price_wt'] - $product['price']), 2, ".", '');
+            $total_products += (number_format($product['price'], 2, ".", '') * $product['quantity']);
+            $tax += (number_format($product['price_wt'] - $product['price'], 2, ".", '') * $product['quantity']);
             $params['products_list']['products'][] = $product;
         }
     }
@@ -317,7 +317,7 @@ class MethodEC extends AbstractMethodPaypal
                     $discount['description'] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
                 }
                 /* It is a discount so we store a negative value */
-                $discount['value_real'] = -1 * number_format($discount['value_real'], 2, ".", ",");
+                $discount['value_real'] = -1 * number_format($discount['value_real'], 2, ".", '');
                 $discount['quantity'] = 1;
                 $total_products = round($total_products + $discount['value_real'], 2);
                 $params['products_list']['discounts'][] = $discount;
@@ -331,7 +331,7 @@ class MethodEC extends AbstractMethodPaypal
         $wrapping = array();
         if ($wrapping_price > 0) {
             $wrapping['name'] = 'Gift wrapping';
-            $wrapping['amount'] = number_format($wrapping_price, 2, ".", ",");
+            $wrapping['amount'] = number_format($wrapping_price, 2, ".", '');
             $wrapping['quantity'] = 1;
             $total_products = round($total_products + $wrapping_price, 2);
         }
@@ -356,9 +356,9 @@ class MethodEC extends AbstractMethodPaypal
             $total = $total_cart;
         }
         $params['costs'] = array(
-            'shipping_cost' => number_format($shipping, 2, ".", ","),
-            'total' => number_format($total, 2, ".", ","),
-            'subtotal' => number_format($subtotal, 2, ".", ","),
+            'shipping_cost' => number_format($shipping, 2, ".", ''),
+            'total' => number_format($total, 2, ".", ''),
+            'subtotal' => number_format($subtotal, 2, ".", ''),
             'carrier' => new Carrier($cart->id_carrier),
             'total_tax' => $total_tax,
         );
@@ -485,7 +485,7 @@ class MethodEC extends AbstractMethodPaypal
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
         $id_paypal_order = $paypal_order->id;
         $params = array();
-        $params['amount'] = number_format($paypal_order->total_paid, 2, ".", ",");
+        $params['amount'] = number_format($paypal_order->total_paid, 2, ".", '');
         $params['authorization_id'] = $paypal_order->id_transaction;
         $params['currency_code'] = $paypal_order->currency;
         $params['complete_type'] = 'complete';

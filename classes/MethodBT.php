@@ -437,7 +437,7 @@ class MethodBT extends AbstractMethodPaypal
         $this->initConfig();
         try {
             $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
-            $result = $this->gateway->transaction()->submitForSettlement($paypal_order->id_transaction, number_format($paypal_order->total_paid, 2, ".", ","));
+            $result = $this->gateway->transaction()->submitForSettlement($paypal_order->id_transaction, number_format($paypal_order->total_paid, 2, ".", ''));
            // echo '<pre>';print_r($result);die;
             if ($result instanceof Braintree_Result_Successful && $result->success) {
                 PaypalCapture::updateCapture($result->transaction->id, $result->transaction->amount, $result->transaction->status, $paypal_order->id);
@@ -486,7 +486,7 @@ class MethodBT extends AbstractMethodPaypal
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
          //  echo '<pre>';print_r($this->gateway->transaction()->find($id_transaction));die;
-            $result = $this->gateway->transaction()->refund($id_transaction, number_format($paypal_order->total_paid, 2, ".", ","));
+            $result = $this->gateway->transaction()->refund($id_transaction, number_format($paypal_order->total_paid, 2, ".", ''));
 
             if ($result->success) {
                 $response =  array(
