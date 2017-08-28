@@ -868,9 +868,8 @@ class PayPal extends PaymentModule
     }
 
 
-    public function hookActionOrderStatusUpdate($params)
+    public function hookActionOrderStatusUpdate(&$params)
     {
-
 
         $paypal_order = PaypalOrder::loadByOrderId($params['id_order']);
         if (!Validate::isLoadedObject($paypal_order)) {
@@ -893,6 +892,7 @@ class PayPal extends PaymentModule
                 $orderPayPal->save();
             }
 
+
             foreach ($response_void as $key => $msg) {
                 $orderMessage->message .= $key." : ".$msg.";\r";
             }
@@ -902,6 +902,13 @@ class PayPal extends PaymentModule
             $orderMessage->private = 1;
             if ($orderMessage->message) {
                 $orderMessage->save();
+            }
+
+            if(!$response_void['success']) {
+                $order = new order($params['id_order']);
+                $orderstate = new Orderstate($order->getCurrentstate());
+                $params['newOrderStatus'] = $orderstate;
+                return false;
             }
         }
 
