@@ -831,6 +831,11 @@ class PayPal extends PaymentModule
                 '<p class="paypal-warning">'.$this->l('We have unexpected problem during refund operation. See massages for more details').'</p>'
             );
         }
+        if (Tools::getValue('cancel_failed')) {
+            $paypal_msg .= $this->displayWarning(
+                '<p class="paypal-warning">'.$this->l('We have unexpected problem during cancel operation. See massages for more details').'</p>'
+            );
+        }
         if ($order->current_state == Configuration::get('PS_OS_REFUND') &&  $paypal_order->payment_status == 'Refunded') {
             $paypal_msg .= $this->displayWarning(
                 '<p class="paypal-warning">'.$this->l('Your order is fully refunded by PayPal.').'</p>'
@@ -882,6 +887,10 @@ class PayPal extends PaymentModule
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
             $orderPayPal = PaypalOrder::loadByOrderId($params['id_order']);
             $paypalCapture = PaypalCapture::loadByOrderPayPalId($orderPayPal->id);
+            if(!$paypalCapture->id_cature)
+            {
+                return true;
+            }
 
             $response_void = $method->void(array('authorization_id'=>$orderPayPal->id_transaction));
 
@@ -890,6 +899,20 @@ class PayPal extends PaymentModule
                 $paypalCapture->save();
                 $orderPayPal->payment_status = 'voided';
                 $orderPayPal->save();
+            }
+            else
+            {
+                foreach ($response_void as $key => $msg) {
+                    $orderMessage->message .= $key." : ".$msg.";\r";
+                }
+
+                $orderMessage->id_order = $params['id_order'];
+                $orderMessage->id_customer = $this->context->customer->id;
+                $orderMessage->private = 1;
+                if ($orderMessage->message) {
+                    $orderMessage->save();
+                }
+                Tools::redirect($_SERVER['HTTP_REFERER'].'&cancel_failed=1');
             }
 
 
@@ -904,12 +927,7 @@ class PayPal extends PaymentModule
                 $orderMessage->save();
             }
 
-            if(!$response_void['success']) {
-                $order = new order($params['id_order']);
-                $orderstate = new Orderstate($order->getCurrentstate());
-                $params['newOrderStatus'] = $orderstate;
-                return false;
-            }
+
         }
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_REFUND')) {
