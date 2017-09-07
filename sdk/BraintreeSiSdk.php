@@ -53,7 +53,8 @@ class BraintreeSDK
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($curl, CURLOPT_CAINFO, _PS_CACHE_CA_CERT_FILE_);
         curl_setopt($curl, CURLOPT_URL, $this->urlAPI.$this->endpoint.$body);
         $response = curl_exec($curl);
         return $response;
