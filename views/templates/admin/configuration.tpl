@@ -45,26 +45,25 @@
         <div class="box half left">
             <div class="logo">
                  <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" alt=""  />
+                <div>{l s='The smart chice for business' mod='paypal'}</div>
             </div>
-            <div class="info">
-                <p class="paypal-bold">{l s='Merchant Country' mod='paypal'} {$country|escape:'html':'UTF-8'}</p>
-                <p><i>
-                    {l s='If not specified, Default Country from configuration is used. To modify : ' mod='paypal'}
-                    <a target="_blank" href="{$localization|escape:'html':'UTF-8'}">{l s='International > Localization' mod='paypal'}</a>
-                </i></p>
-                <p class="paypal-bold">
-                    {l s='Benefit from PayPal’s complete payments platform and grow your business online, on mobile and internationally' mod='paypal'}
-                </p>
-            </div>
+            <ul class="tick">
+                <li><span class="paypal-bold">{l s='Target more customers' mod='paypal'}</span><br />{l s='More than 200 million PayPal active users worldwide' mod='paypal'}.</li>
+                <li><span class="paypal-bold">{l s='Truly global' mod='paypal'}</span><br />{l s='Access a whole world of customers. PayPal is available in more than 200 markets and in 25 currencies' mod='paypal'}.</li>
+                <li><span class="paypal-bold">{l s='Accept all types of payment' mod='paypal'}</span><br />{l s='Use PayPal with simple buy button or also payment by cart due to Braintree (un service PayPal)' mod='paypal'}.</li>
+                <li><span class="paypal-bold">{l s='Safety' mod='paypal'}</span><br />{l s='Protect your profit from the risks of fraud thanks to our program of' mod='paypal'} <a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/ua/useragreement-full#011">{l s='Seller Protection' mod='paypal'}</a>.</li>
+            </ul>
+
         </div>
 
         <div class="box half right">
-            <ul class="tick">
-                <li><span class="paypal-bold">{l s='Target more customers' mod='paypal'}</span><br />{l s='More than 190 million PayPal active users worldwide' mod='paypal'}</li>
-                <li><span class="paypal-bold">{l s='Truly global' mod='paypal'}</span><br />{l s='Access a whole world of customers. PayPal is available in more than 200 markets and in 25 currencies' mod='paypal'}</li>
-                <li><span class="paypal-bold">{l s='Safer' mod='paypal'}</span><br />{l s='We can protect your business with our Seller Protection and advanced encryption and fraud prevention tools' mod='paypal'}</li>
-                <li><span class="paypal-bold">{l s='Accept local and international payments' mod='paypal'}</span></li>
-            </ul>
+            <div class="info">
+                <p class="paypal-bold">{l s='Merchant Country' mod='paypal'} {$country|escape:'html':'UTF-8'}</p>
+                <p><i>
+                        {l s='To modify country : ' mod='paypal'}
+                        <a target="_blank" href="{$localization|escape:'html':'UTF-8'}">{l s='International > Localization' mod='paypal'}</a>
+                    </i></p>
+            </div>
         </div>
         <div style="clear:both;"></div>
 
@@ -76,14 +75,19 @@
                     <p>
                             {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'}
                     </p>
+                    <p><ul>
+                        <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                        <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
+                            {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
+                        <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
+                        <li>{l s='Benefit of in-context checkout so your buyers never leave your site' mod='paypal'}</li>
+                        <li>{l s='With our Seller Protection Program and advanced fraud screening, xe can protect your business' mod='paypal'}</li>
+                    </ul></p>
                     <p>
-                            {l s='Fast checkout and fast payment. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
-                    </p>
-                    <p>
-                        <a target="_blank" href="https://www.paypal.com/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
+                        <a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
                     </p>
                     <div class="bottom">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
+                        <img src="{$img_checkout|escape:'html':'UTF-8'}" class="product-img">
                         <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=0{if isset($ec_paypal_active) &&  $ec_paypal_active}&modify=1{/if}" >{if isset($ec_paypal_active) && $ec_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
@@ -95,17 +99,25 @@
                     <p>
                             {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'}
                     </p>
-                    <p>
-                            {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
-                    </p>
-                    <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                    <p><ul>
+                        <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                        <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
+                            {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
+                        <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
+                        <li>{l s='Benefit of in-context checkout so your buyers never leave your site' mod='paypal'}</li>
+                        <li>{l s='With our Seller Protection Program and advanced fraud screening, xe can protect your business' mod='paypal'}</li>
+                    </ul></p>
+                    <p><a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/jcb.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/amex.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/diners.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/unionpay.svg" class="product-img">
                         <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=EC&with_card=1{if isset($ec_active) && $ec_active && isset($ec_card_active) && $ec_card_active}&modify=1{/if}">{if  isset($ec_active) && $ec_active && isset($ec_card_active) && $ec_card_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
@@ -123,11 +135,15 @@
                     </p>
                     <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/jcb.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/amex.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/diners.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/unionpay.svg" class="product-img">
                         <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=0{if isset($bt_active) && $bt_active && $bt_paypal_active == 0}&modify=1{/if}">{if isset($bt_active) && $bt_active && $bt_paypal_active == 0}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
@@ -136,26 +152,72 @@
                 <div class="panel {if isset($bt_paypal_active) && $bt_paypal_active}active-panel{/if}">
                     <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                     <p>
-                        {l s='Accept cards and PayPal' mod='paypal'}
-                        {l s='with our full-stack payments platform Braintree' mod='paypal'}.
+                        {l s='Accept PayPal, debit and credit card payments via Braintree (a PayPal service)' mod='paypal'}.
                     </p>
-                    <p>
-                        {l s='You can improve your customers experience and your conversion with hosted fields for card' mod='paypal'}
-                        {l s='payments and PayPal payment including One Touch' mod='paypal'}&trade;
-                    </p>
-                    <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                    <p><ul>
+                        <li>{l s='Get the best of PayPal & Braintree in a single solution' mod='paypal'}</li>
+                        <li>{l s='Benefit of PayPal\'s OneTouch' mod='paypal'}&trade; {l s='conversion rate improvements, in-context payments & Seller Protection Program' mod='paypal'}</li>
+                        <li>{l s='Offer debit and credit card payments with all major global card networks' mod='paypal'}</li>
+                        <li>{l s='No monthly or setup fee - check PayPal\'s & Braintree\'s pricing' mod='paypal'}</li>
+                        <li>{l s='Protect your payments with 3D Secure & PCI DSS v3.0 SAQ-A compliance' mod='paypal'}</li>
+                    </ul></p>
+                    <p><a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/hosted">{l s='More Information' mod='paypal'}</a></p>
                     <div class="bottom">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/american_express.png" class="product-img">
-                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.png" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" class="product-img"> <b>+</b>
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/visa.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/mastercard.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/maestro.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/jcb.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/discover.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/amex.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/diners.svg" class="product-img">
+                        <img src="{$path|escape:'html':'UTF-8'}/views/img/unionpay.svg" class="product-img">
                         <a class="btn btn-default pull-right" href="{$return_url|escape:'html':'UTF-8'}&method=BT&with_paypal=1{if isset($bt_paypal_active) && $bt_paypal_active}&modify=1{/if}">{if isset($bt_paypal_active) && $bt_paypal_active}{l s='Modify' mod='paypal'}{else}{l s='Activate' mod='paypal'}{/if}</a>
                     </div>
                 </div>
             </div>
             {/if}
+        </div>
+
+        <div style="clear:both;"></div>
+        <div class="blue">
+            <div class="row-fluid" id="rtb1">
+                <header class="containerCentered center-text">
+                    <h2 class="pulloutHeadline ">{l s='Find out why 7 million businesses worldwide choose PayPal.' mod='paypal'}</h2>
+                </header>
+                <div class="containerCentered">
+                    <div class="span4">
+                        <h2 class="contentHead large h3">{l s='Safer and more protected' mod='paypal'}</h2>
+                        <p class="contentPara">{l s='With our Seller Protection and advanced fraud screening, we can protect your business.' mod='paypal'}</p>
+                    </div>
+                    <div class="span4">
+                        <h2 class="contentHead large h3">{l s='Easy and convenient' mod='paypal'}</h2>
+                        <p class="contentPara">{l s='Customers need just an email address and password or mobile number and PIN to pay quickly and more securely.' mod='paypal'}</p>
+                    </div>
+                    <div class="span4">
+                        <h2 class="contentHead large h3">{l s='Preferred by customers' mod='paypal'}</h2>
+                        <p class="contentPara">{l s='We’re the smart choice: Great Britain’s No.1 preferred online and mobile payment method' mod='paypal'}<sup>4</sup>.
+                            {l s='For invaluable insights into what makes British shoppers tick' mod='paypal'},
+                            <a data-pa-click="link|shopping-habits" href="https://www.paypal.com/uk-shopping-habits">{l s='click here' mod='paypal'}</a>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row-fluid" id="rtb2">
+                <div class="containerCentered">
+                    <div class="span4">
+                        <h2 class="contentHead large h3">{l s='Truly global' mod='paypal'}</h2>
+                        <p class="contentPara">{l s='Access a whole world of customers. PayPal is available in 202 countries and markets, and in 25 currencies.' mod='paypal'}</p>
+                    </div>
+                    <div class="span4">
+                        <h2 class="contentHead large h3">{l s='Simple to integrate' mod='paypal'}</h2>
+                        <p class="contentPara">{l s='Works with all major shopping carts and ecommerce platforms.' mod='paypal'}</p>
+                    </div>
+                    <div class="span4">
+                        <h2 class="contentHead large h3">{l s='24/7 customer support' mod='paypal'}</h2>
+                        <p class="contentPara">{l s='Whatever your query, we\'ve got it covered. Online or on the phone, we\'re here to help.' mod='paypal'}</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -169,32 +231,44 @@
                         <p>
                                 {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
+                        <p><ul>
+                            <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                            <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
+                                {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
+                            <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
+                            <li>{l s='Benefit of in-context checkout so your buyers never leave your site' mod='paypal'}</li>
+                            <li>{l s='With our Seller Protection Program and advanced fraud screening, xe can protect your business' mod='paypal'}</li>
+                        </ul></p>
                         <p>
-                                {l s='Fast checkout and fast payment. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
-                        </p>
-                        <p>
-                            <a target="_blank" href="https://www.paypal.com/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
+                            <a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
                         </p>
                     {elseif isset($ec_card_active) && $ec_card_active}
                         <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal.png">
                         <p>
                                 {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
-                        <p>
-                                {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
-                        </p>
-                        <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                        <p><ul>
+                            <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                            <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
+                                {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
+                            <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
+                            <li>{l s='Benefit of in-context checkout so your buyers never leave your site' mod='paypal'}</li>
+                            <li>{l s='With our Seller Protection Program and advanced fraud screening, xe can protect your business' mod='paypal'}</li>
+                        </ul></p>
+                        <p><a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a></p>
                     {elseif isset($bt_paypal_active) && $bt_paypal_active}
                         <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                         <p>
-                            {l s='Accept cards and PayPal' mod='paypal'}
-                            {l s='with our full-stack payments platform Braintree' mod='paypal'}.
+                            {l s='Accept PayPal, debit and credit card payments via Braintree (a PayPal service)' mod='paypal'}.
                         </p>
-                        <p>
-                            {l s='You can improve your customers experience and your conversion with hosted fields for card' mod='paypal'}
-                            {l s='payments and PayPal payment including One Touch' mod='paypal'}&trade;
-                        </p>
-                        <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                        <p><ul>
+                            <li>{l s='Get the best of PayPal & Braintree in a single solution' mod='paypal'}</li>
+                            <li>{l s='Benefit of PayPal\'s OneTouch' mod='paypal'}&trade; {l s='conversion rate improvements, in-context payments & Seller Protection Program' mod='paypal'}</li>
+                            <li>{l s='Offer debit and credit card payments with all major global card networks' mod='paypal'}</li>
+                            <li>{l s='No monthly or setup fee - check PayPal\'s & Braintree\'s pricing' mod='paypal'}</li>
+                            <li>{l s='Protect your payments with 3D Secure & PCI DSS v3.0 SAQ-A compliance' mod='paypal'}</li>
+                        </ul></p>
+                        <p><a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/hosted">{l s='More Information' mod='paypal'}</a></p>
                     {elseif isset($bt_active) && !$bt_paypal_active && $bt_active}
                         <img class="paypal-products" src="{$path|escape:'html':'UTF-8'}/views/img/braintree-paypal.png">
                         <p>
@@ -203,13 +277,13 @@
                         <p>
                             {l s='Your customers can pay with a selection of local and international debit and credit cards. Make online payments simple. PayPal customers can buy from you quickly if they use One Touch' mod='paypal'}&trade;
                         </p>
-                        <p><a target="_blank" href="https://www.paypal.com/webapps/mpp/standard">{l s='More Information' mod='paypal'}</a></p>
+                        <p><a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a></p>
                     {/if}
                 </div>
                 <div class="col-sm-3 help-right">
                         <p>
                     {l s='More Information' mod='paypal'} ?
-                    <a target="_blank" href="https://www.paypal.com/webapps/mpp/contact-us">{l s='Contact us' mod='paypal'}</a>
+                    <a target="_blank" href="{l s='https://www.paypal.com/fr/webapps/mpp/contact-us' mod='paypal'}">{l s='Contact us' mod='paypal'}</a>
                 </div>
             </div>
         </div>

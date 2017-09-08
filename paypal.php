@@ -358,6 +358,11 @@ class PayPal extends PaymentModule
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
         $context = $this->context;
+        $lang = $context->country->iso_code;
+        $img_esc = $this->_path."/views/img/ECShortcut/".strtolower($lang)."/checkout.png";
+        if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
+            $img_esc = "/modules/paypal/views/img/ECShortcut/us/checkout.png";
+        }
 
         $context->smarty->assign(array(
             'path' => $this->_path,
@@ -367,9 +372,11 @@ class PayPal extends PaymentModule
             'localization' => $context->link->getAdminLink('AdminLocalization', true),
             'preference' => $context->link->getAdminLink('AdminPreferences', true),
             'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
+            'iso_code' => $lang,
+            'img_checkout' => $img_esc,
         ));
 
-        if ($country_default == "FR" || $country_default == "UK") {
+        if ($country_default == "FR" || $country_default == "UK" || $country_default == "IT" || $country_default == "ES") {
             $context->smarty->assign(array(
                 'braintree_available' => true,
             ));
@@ -585,7 +592,7 @@ class PayPal extends PaymentModule
                     $embeddedOption = new PaymentOption();
                     $embeddedOption->setCallToActionText($this->l('Pay with card'))
                         ->setForm($this->generateFormBt())
-                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/card-mini.png'));
+                        ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/mini-cards.png'));
                     $embeddedOption->setModuleName('braintree');
 
                     $payments_options[] = $embeddedOption;

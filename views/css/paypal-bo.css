@@ -78,15 +78,15 @@
 .paypal-bold{font-weight:700}
 .box ul.tick li{background:url(../img/blue_tick.png) no-repeat left 3px;padding:4px 26px}
 #paypal_conf .right, .box ul.tick{float:right}
-#paypal_conf .left{width:60%}
-#paypal_conf .right{width:30%}
+#paypal_conf .left{width:77%}
+#paypal_conf .right{width:18%}
 #paypal_conf .box{margin:6px 1%;text-align:left}
 #paypal_conf .box ul{list-style:none;margin:0;padding:0}
 #paypal_conf .left {float:left}
 #paypal_conf .left img {margin-bottom: -5px; /*float:left;  */   width: 100px;}
 #paypal_conf .left .logo {
     float: left;
-    width: 30%;
+    width: fit-content;
     padding: 15px;
     background: #fff;
     margin: 0 auto;
@@ -126,6 +126,96 @@
     list-style-type: decimal;
 }
 
+#paypal_conf .left .logo > div {
+    margin-top: 11px;
+    font-size: 16px;
+}
+/*section marketing*/
+.blue {
+    color: #fff;
+    background-color: #009cde;
+    background-image: radial-gradient(circle farthest-side at center bottom,#009cde,#003087 125%);
+}
+.containerCentered {
+    margin-right: auto;
+    margin-left: auto;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    max-width: 1150px;
+    padding-left: 3%;
+    padding-right: 3%;
+}
+.row-fluid {
+    background: #fff;
+    position: relative;
+    z-index: 2;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate(0,0);
+    padding: 15px 0;
+    width: 100%;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#rtb1.row-fluid, #rtb2.row-fluid {
+    background: none;
+}
+.center-text {
+    text-align: center;
+}
+.containerCentered:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.row-fluid [class*=span]:not(.btn) {
+    padding-right: 2%;
+}
+html[data-device-type="dedicated"] .sticky-nav-panel .btn, html[data-device-type="portable"] .sticky-nav-panel .btn, html[data-device-type="dedicated"] .row-fluid .span4, html[data-device-type="portable"] .row-fluid .span4 {
+    min-width: 205px;
+}
+.row-fluid [class*=span]:first-child {
+    margin-left: 0;
+}
+.row-fluid .span4 {
+    width: 32%;
+}
+.row-fluid [class*=span] {
+    float: left;
+    margin-left: 2%;
+    min-height: 1px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+p.contentPara {
+    font-size: 14px;
+}
+.large, h3, html[data-device-type=mobile] .x-large, html[data-device-type=mobile] h2 {
+    font-size: 28px;
+    font-size: 2rem;
+    line-height: 1.25em;
+}
+.large, .medium, .small, h3, h4, h5, h6 {
+    letter-spacing: .01em;
+}
+.blue h1, .blue h2, .blue h3, .blue h4, .blue h5, .blue h6 {
+    font-family: pp-sans-big-light,Helvetica Neue,Arial,sans-serif !important;
+    font-weight: 400 !important;
+    font-variant: normal !important;
+    line-height: 1.25 !important;
+}
+.blue p {
+    color: #fff;
+}
+.blue a, .dark a {
+    font-family: pp-sans-small-bold,Helvetica Neue,Arial,sans-serif;
+    font-weight: bold;
+    font-variant: normal;
+    color: #fff;
+    text-decoration: underline;
+}
+.blue a:hover, .dark a:hover {
+    color: #fff;
+}
 @media only screen and (max-width: 900px) {
     #paypal_conf .left .logo {
         float: none;

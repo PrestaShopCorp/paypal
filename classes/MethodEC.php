@@ -106,7 +106,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        if ($country_default != "FR" && $country_default != "UK") {
+        if ($country_default != "FR" && $country_default != "UK" && $country_default != "IT" && $country_default != "ES") {
             $params['inputs'][] = array(
                 'type' => 'switch',
                 'label' => $module->l('Accept credit and debit card payment'),
@@ -208,7 +208,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        if ($country_default != "FR" && $country_default != "UK") {
+        if ($country_default != "FR" && $country_default != "UK" && $country_default != "IT" && $country_default != "ES") {
             if (Tools::isSubmit('paypal_config')) {
                 Configuration::updateValue('PAYPAL_API_CARD', $params['paypal_card']);
             }
