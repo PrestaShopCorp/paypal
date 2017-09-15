@@ -579,7 +579,7 @@ class PayPal extends PaymentModule
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
                     if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
                         $embeddedOption = new PaymentOption();
-                        $action_text = $this->l('Pay with paypal by braintree');
+                        $action_text = $this->l('Pay with paypal');
                         if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
                             $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
                         }
