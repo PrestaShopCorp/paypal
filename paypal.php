@@ -359,7 +359,7 @@ class PayPal extends PaymentModule
 
         $context = $this->context;
         $lang = $context->country->iso_code;
-        $img_esc = $this->_path."/views/img/ECShortcut/".strtolower($lang)."/checkout.png";
+        $img_esc = $this->_path."/views/img/ECShortcut/".Tools::strtolower($lang)."/checkout.png";
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
             $img_esc = "/modules/paypal/views/img/ECShortcut/us/checkout.png";
         }
@@ -687,7 +687,7 @@ class PayPal extends PaymentModule
             'braintreeAmount'=> $amount,
             'baseDir' => $context->link->getBaseLink($context->shop->id, true),
             'path' => $this->_path,
-            'mode' => $braintree->mode == 'SANDBOX' ? strtolower($braintree->mode) : 'production',
+            'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
         ));
 
 

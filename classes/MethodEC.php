@@ -591,7 +591,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $lang = $context->country->iso_code;
 
-        $img_esc = "/modules/paypal/views/img/ECShortcut/".strtolower($lang)."/buy/buy.png";
+        $img_esc = "/modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
 
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
             $img_esc = "/modules/paypal/views/img/ECShortcut/us/buy/buy.png";
