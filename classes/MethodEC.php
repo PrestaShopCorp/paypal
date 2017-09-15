@@ -82,7 +82,7 @@ class MethodEC extends AbstractMethodPaypal
                 'name' => 'paypal_show_shortcut',
                 'desc' => $module->l(''),
                 'is_bool' => true,
-                'hint' => $module->l(''),
+                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product and shopping cart pages. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_show_shortcut_on',

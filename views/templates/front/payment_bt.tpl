@@ -29,36 +29,35 @@
     <div class="col-xs-12 col-md-10">
         <div class="braintree-row-payment">
             <div class="payment_module braintree-card">
-                <label class="paypal_title_pay_card">{l s='Pay with your card' mod='paypal'}</label><div class="paypal_clear"></div>
-            <img src="{$baseDir|escape:'htmlall':'UTF-8'}modules/paypal/views/img/maxi-cards.png" alt="">
-            <form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
-                <div id="block-card-number" class="block_field">
-                    <div id="card-number" class="hosted_field"><div id="card-image"></div></div>
+                <form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
+                    <div id="block-card-number" class="block_field">
+                        <div id="card-number" class="hosted_field"><div id="card-image"></div></div>
 
-                </div>
+                    </div>
 
-                <div id="block-expiration-date" class="block_field half_block_field">
-                    <div id="expiration-date" class="hosted_field"></div>
-                </div>
+                    <div id="block-expiration-date" class="block_field half_block_field">
+                        <div id="expiration-date" class="hosted_field"></div>
+                    </div>
 
-                <div id="block-cvv" class="block_field half_block_field">
-                    <div id="cvv" class="hosted_field"></div>
-                </div>
+                    <div id="block-cvv" class="block_field half_block_field">
+                        <div id="cvv" class="hosted_field"></div>
+                    </div>
 
-                <input type="hidden" name="deviceData" id="deviceData"/>
-                <input type="hidden" name="client_token" value="{$braintreeToken}">
-                <input type="hidden" name="liabilityShifted" id="liabilityShifted"/>
-                <input type="hidden" name="liabilityShiftPossible" id="liabilityShiftPossible"/>
-                <input type="hidden" name="payment_method_nonce" id="payment_method_nonce"/>
-                <input type="hidden" name="card_type" id="braintree_card_type"/>
-                <input type="hidden" name="payment_method_bt" value="card-braintree"/>
-                <div class="paypal_clear"></div>
-                <div id="bt-card-error-msg"></div>
-            </form>
+                    <input type="hidden" name="deviceData" id="deviceData"/>
+                    <input type="hidden" name="client_token" value="{$braintreeToken}">
+                    <input type="hidden" name="liabilityShifted" id="liabilityShifted"/>
+                    <input type="hidden" name="liabilityShiftPossible" id="liabilityShiftPossible"/>
+                    <input type="hidden" name="payment_method_nonce" id="payment_method_nonce"/>
+                    <input type="hidden" name="card_type" id="braintree_card_type"/>
+                    <input type="hidden" name="payment_method_bt" value="card-braintree"/>
+                    <div class="paypal_clear"></div>
+                    <div id="bt-card-error-msg"></div>
+                    <div id="logo_braintree_by_paypal"><img src="https://s3-us-west-1.amazonaws.com/bt-partner-assets/paypal-braintree.png" height="20px"></div>
+                </form>
             </div>
         </div>
-        </div>
     </div>
+</div>
 
 
 <script>
@@ -81,7 +80,10 @@
         load_3d:"{l s='Load 3D Secure Failed' mod='paypal'}",
         request_problem:"{l s='There was a problem with your request.' mod='paypal'}",
         failed_3d:"{l s='3D Secure Failed' mod='paypal'}",
-        empty_field:"{l s='is empty.' mod='paypal'}"
+        empty_field:"{l s='is empty.' mod='paypal'}",
+        expirationDate:"{l s='Expiration Date' mod='paypal'}",
+        number:"{l s='card number' mod='paypal'}",
+        cvv:"{l s='CVV' mod='paypal'}",
     };
 
 </script>

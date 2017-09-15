@@ -73,12 +73,13 @@
                 });
 
                 hostedFieldsInstance.on('blur', function (event) {
+
                     var popup_message = '';
                     var blur_field_info = event.fields[event.emittedBy];
                     if (blur_field_info.isEmpty) {
-                        popup_message = event.emittedBy+' '+bt_translations.empty_field;
+                        popup_message = bt_translations[event.emittedBy]+' '+bt_translations.empty_field;
                     } else if (!blur_field_info.isValid) {
-                        popup_message = bt_translations.invalid+' '+event.emittedBy;
+                        popup_message = bt_translations.invalid+' '+bt_translations[event.emittedBy];
                     }
                     $('#bt-card-error-msg').show().text(popup_message);
                 });
@@ -139,7 +140,7 @@
                                                 type: 'inline',
                                                 autoScale: true,
                                                 minHeight: 30,
-                                                content: '<p class="braintree-iframe">'+iframe.outerHTML+''
+                                                content: '<p class="braintree-iframe">'+iframe.outerHTML+'</p>'
                                             }
                                         ]);
                                     },

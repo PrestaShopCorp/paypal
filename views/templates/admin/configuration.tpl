@@ -45,12 +45,12 @@
         <div class="box half left">
             <div class="logo">
                  <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" alt=""  />
-                <div>{l s='The smart chice for business' mod='paypal'}</div>
+                <div>{l s='The smart choice for business' mod='paypal'}</div>
             </div>
             <ul class="tick">
                 <li><span class="paypal-bold">{l s='Target more customers' mod='paypal'}</span><br />{l s='More than 200 million PayPal active users worldwide' mod='paypal'}.</li>
                 <li><span class="paypal-bold">{l s='Truly global' mod='paypal'}</span><br />{l s='Access a whole world of customers. PayPal is available in more than 200 markets and in 25 currencies' mod='paypal'}.</li>
-                <li><span class="paypal-bold">{l s='Accept all types of payment' mod='paypal'}</span><br />{l s='Use PayPal with simple buy button or also payment by cart due to Braintree (un service PayPal)' mod='paypal'}.</li>
+                <li><span class="paypal-bold">{l s='Accept all types of payments' mod='paypal'}</span><br />{l s='Use PayPal with simple buy button or also payment by card due to Braintree (un service PayPal)' mod='paypal'}.</li>
                 <li><span class="paypal-bold">{l s='Safety' mod='paypal'}</span><br />{l s='Protect your profit from the risks of fraud thanks to our program of' mod='paypal'} <a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/ua/useragreement-full#011">{l s='Seller Protection' mod='paypal'}</a>.</li>
             </ul>
 
@@ -76,7 +76,7 @@
                             {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'}
                     </p>
                     <p><ul>
-                        <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                        <li>{l s='Fast, simple & secure, used by over 200 million active users' mod='paypal'}</li>
                         <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
                             {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
                         <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
@@ -100,7 +100,7 @@
                             {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'}
                     </p>
                     <p><ul>
-                        <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                        <li>{l s='Fast, simple & secure, used by over 200 million active users' mod='paypal'}</li>
                         <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
                             {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
                         <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
@@ -232,12 +232,12 @@
                                 {l s='Accept PayPal payments, you can optimize your conversion rate.' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
                         <p><ul>
-                            <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                            <li>{l s='Fast, simple & secure, used by over 200 million active users' mod='paypal'}</li>
                             <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
-                                {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
+                                {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trimestre 2015 in United States' mod='paypal'}</li>
                             <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
                             <li>{l s='Benefit of in-context checkout so your buyers never leave your site' mod='paypal'}</li>
-                            <li>{l s='With our Seller Protection Program and advanced fraud screening, xe can protect your business' mod='paypal'}</li>
+                            <li>{l s='With our Seller Protection Program and advanced fraud screening, we can protect your business' mod='paypal'}</li>
                         </ul></p>
                         <p>
                             <a target="_blank" href="https://www.paypal.com/{$iso_code|escape:'html':'UTF-8'}/webapps/mpp/express-checkout">{l s='More Information' mod='paypal'}</a>
@@ -248,7 +248,7 @@
                                 {l s='Accept credit cards, debit cards and PayPal payments' mod='paypal'} : {$active_products|escape:'html':'UTF-8'}
                         </p>
                         <p><ul>
-                            <li>{l s='Fats, simple & secure, used by over 200 million active users' mod='paypal'}</li>
+                            <li>{l s='Fast, simple & secure, used by over 200 million active users' mod='paypal'}</li>
                             <li>{l s='OneTouch' mod='paypal'}&trade; {l s='optimizes your conversion rate up to 87.5%.' mod='paypal'}
                                 {l s='Rate with OneTouch' mod='paypal'}&trade; {l s='in theme of comScore, 4th trilestre 2015 in United States' mod='paypal'}</li>
                             <li>{l s='Fully optimized for mobile payments' mod='paypal'}</li>
