@@ -376,7 +376,7 @@ class PayPal extends PaymentModule
             'img_checkout' => $img_esc,
         ));
 
-        if ($country_default == "FR" || $country_default == "UK" || $country_default == "IT" || $country_default == "ES") {
+        if ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES") {
             $context->smarty->assign(array(
                 'braintree_available' => true,
             ));
