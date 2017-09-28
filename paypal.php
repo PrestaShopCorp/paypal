@@ -890,17 +890,11 @@ class PayPal extends PaymentModule
         $method = AbstractMethodPaypal::load($paypal_order->method);
         $orderMessage = new Message();
         $orderMessage->message = "";
-
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
             $orderPayPal = PaypalOrder::loadByOrderId($params['id_order']);
             $paypalCapture = PaypalCapture::loadByOrderPayPalId($orderPayPal->id);
-            if(!$paypalCapture->id_cature)
-            {
-                return true;
-            }
 
             $response_void = $method->void(array('authorization_id'=>$orderPayPal->id_transaction));
-
             if ($response_void['success']) {
                 $paypalCapture->result = 'voided';
                 $paypalCapture->save();
