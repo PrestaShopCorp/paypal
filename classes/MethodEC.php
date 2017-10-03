@@ -23,8 +23,20 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
+//require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
 
-include_once(_PS_MODULE_DIR_.'paypal/sdk/PaypalSDK.php');
+//require_once _PS_MODULE_DIR_.'paypal/sdk/paypal/lib/PayPal/test.php';
+
+use PayPal\EBLBaseComponents\AddressType;
+use PayPal\EBLBaseComponents\BillingAgreementDetailsType;
+use PayPal\EBLBaseComponents\PaymentDetailsItemType;
+use PayPal\EBLBaseComponents\PaymentDetailsType;
+use PayPal\EBLBaseComponents\SetExpressCheckoutRequestDetailsType;
+use PayPal\PayPalAPI\SetExpressCheckoutReq;
+use PayPal\PayPalAPI\SetExpressCheckoutRequestType;
+use PayPal\Service\PayPalAPIInterfaceServiceService;
+
+
 
 class MethodEC extends AbstractMethodPaypal
 {
@@ -242,25 +254,138 @@ class MethodEC extends AbstractMethodPaypal
 
     public function init($data)
     {
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-        $params = array(
-            'cancel_url' => Context::getContext()->link->getPageLink('order', true).'&step=1',
-            'landing_page' => $data['use_card'] ? 'Billing' : 'Login',
-            'return_url' => Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true),
-            'no_shipping' => 1,
-            'solution_type' => 'Sole',
-            'addr_override' => '0',
-        );
-        if (isset($data['short_cut'])) {
-            $params['landing_page'] = 'Login';
-            $params['return_url'] = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
-            $params['no_shipping'] = 2;
+
+      //  $shippingTotal = new Teaz();
+
+       // $params = $this->_getPaymentDetails($params);
+
+        /*
+        * The SetExpressCheckout API operation initiates an Express Checkout transaction
+        */
+
+        $currencyCode = Context::getContext()->currency->iso_code;
+        // total shipping amount
+        $shippingTotal = new PayPal\CoreComponentTypes\BasicAmountType($currencyCode, $_REQUEST['shippingTotal']);
+        //total handling amount if any
+        $handlingTotal = new PayPal\CoreComponentTypes\BasicAmountType($currencyCode, 0);
+        //total insurance amount if any
+        $insuranceTotal = new PayPal\CoreComponentTypes\BasicAmountType($currencyCode, 0);
+        // shipping address
+        $address = $this->_getShippingAddress();
+        // details about payment
+        $paymentDetails = new PaymentDetailsType();
+        $itemTotalValue = 0;
+        $taxTotalValue = 0;
+        /*
+         * iterate trhough each item and add to atem detaisl
+         */
+        for($i=0; $i<count($_REQUEST['itemAmount']); $i++) {
+            $itemAmount = new BasicAmountType($currencyCode, $_REQUEST['itemAmount'][$i]);
+            $itemTotalValue += $_REQUEST['itemAmount'][$i] * $_REQUEST['itemQuantity'][$i];
+            $taxTotalValue += $_REQUEST['itemSalesTax'][$i] * $_REQUEST['itemQuantity'][$i];
+            $itemDetails = new PaymentDetailsItemType();
+            $itemDetails->Name = $_REQUEST['itemName'][$i];
+            $itemDetails->Amount = $itemAmount;
+            $itemDetails->Quantity = $_REQUEST['itemQuantity'][$i];
+            /*
+             * Indicates whether an item is digital or physical. For digital goods, this field is required and must be set to Digital. It is one of the following values:
+            Digital
+            Physical
+             */
+            $itemDetails->ItemCategory = $_REQUEST['itemCategory'][$i];
+            $itemDetails->Tax = new BasicAmountType($currencyCode, $_REQUEST['itemSalesTax'][$i]);
+
+            $paymentDetails->PaymentDetailsItem[$i] = $itemDetails;
         }
+        /*
+         * The total cost of the transaction to the buyer. If shipping cost and tax charges are known, include them in this value. If not, this value should be the current subtotal of the order. If the transaction includes one or more one-time purchases, this field must be equal to the sum of the purchases. If the transaction does not include a one-time purchase such as when you set up a billing agreement for a recurring payment, set this field to 0.
+         */
+        $orderTotalValue = $shippingTotal->value + $handlingTotal->value +
+            $insuranceTotal->value +
+            $itemTotalValue + $taxTotalValue;
+        //Payment details
+        $paymentDetails->ShipToAddress = $address;
+        $paymentDetails->ItemTotal = new BasicAmountType($currencyCode, $itemTotalValue);
+        $paymentDetails->TaxTotal = new BasicAmountType($currencyCode, $taxTotalValue);
+        $paymentDetails->OrderTotal = new BasicAmountType($currencyCode, $orderTotalValue);
+        /*
+         * How you want to obtain payment. When implementing parallel payments, this field is required and must be set to Order. When implementing digital goods, this field is required and must be set to Sale. If the transaction does not include a one-time purchase, this field is ignored. It is one of the following values:
+            Sale – This is a final sale for which you are requesting payment (default).
+            Authorization – This payment is a basic authorization subject to settlement with PayPal Authorization and Capture.
+            Order – This payment is an order authorization subject to settlement with PayPal Authorization and Capture.
+         */
+        $paymentDetails->PaymentAction = $_REQUEST['paymentType'];
+        $paymentDetails->HandlingTotal = $handlingTotal;
+        $paymentDetails->InsuranceTotal = $insuranceTotal;
+        $paymentDetails->ShippingTotal = $shippingTotal;
 
-        $this->_getCredentialsInfo($params);
-        $params = $this->_getPaymentDetails($params);
+        $setECReqDetails = new SetExpressCheckoutRequestDetailsType();
+        $setECReqDetails->PaymentDetails[0] = $paymentDetails;
 
-        $payment = $sdk->setExpressCheckout($params);
+        /*
+         * (Required) URL to which the buyer is returned if the buyer does not approve the use of PayPal to pay you. For digital goods, you must add JavaScript to this page to close the in-context experience.
+         */
+        $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true).'&step=1';
+        /*
+         * (Required) URL to which the buyer's browser is returned after choosing to pay with PayPal. For digital goods, you must add JavaScript to this page to close the in-context experience.
+         */
+        $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);;
+        /*
+         * Determines where or not PayPal displays shipping address fields on the PayPal pages. For digital goods, this field is required, and you must set it to 1. It is one of the following values:
+            0 – PayPal displays the shipping address on the PayPal pages.
+            1 – PayPal does not display shipping address fields whatsoever.
+            2 – If you do not pass the shipping address, PayPal obtains it from the buyer's account profile.
+         */
+        $setECReqDetails->NoShipping = 1;
+        /*
+         *  (Optional) Determines whether or not the PayPal pages should display the shipping address set by you in this SetExpressCheckout request, not the shipping address on file with PayPal for this buyer. Displaying the PayPal street address on file does not allow the buyer to edit that address. It is one of the following values:
+            0 – The PayPal pages should not display the shipping address.
+            1 – The PayPal pages should display the shipping address.
+         */
+        $setECReqDetails->AddressOverride = 0;
+        /*
+         * Indicates whether or not you require the buyer's shipping address on file with PayPal be a confirmed address. For digital goods, this field is required, and you must set it to 0. It is one of the following values:
+            0 – You do not require the buyer's shipping address be a confirmed address.
+            1 – You require the buyer's shipping address be a confirmed address.
+         */
+        $setECReqDetails->ReqConfirmShipping = 0;
+        if (isset($data['short_cut'])) {
+            $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
+            $setECReqDetails->NoShipping = 2;
+        }
+        // Billing agreement details
+        $billingAgreementDetails = new BillingAgreementDetailsType($_REQUEST['billingType']);
+        $billingAgreementDetails->BillingAgreementDescription = $_REQUEST['billingAgreementText'];
+        $setECReqDetails->BillingAgreementDetails = array($billingAgreementDetails);
+        // Display options
+        // TODO: if xe have to add some style ?
+        /* $setECReqDetails->cppheaderimage = $_REQUEST['cppheaderimage'];
+        $setECReqDetails->cppheaderbordercolor = $_REQUEST['cppheaderbordercolor'];
+        $setECReqDetails->cppheaderbackcolor = $_REQUEST['cppheaderbackcolor'];
+        $setECReqDetails->cpppayflowcolor = $_REQUEST['cpppayflowcolor'];
+        $setECReqDetails->cppcartbordercolor = $_REQUEST['cppcartbordercolor'];
+        $setECReqDetails->cpplogoimage = $_REQUEST['cpplogoimage'];
+        $setECReqDetails->PageStyle = $_REQUEST['pageStyle'];
+        $setECReqDetails->BrandName = $_REQUEST['brandName'];*/
+        // Advanced options
+        $setECReqDetails->AllowNote = $_REQUEST['allowNote'];
+        $setECReqType = new SetExpressCheckoutRequestType();
+        $setECReqType->SetExpressCheckoutRequestDetails = $setECReqDetails;
+        $setECReq = new SetExpressCheckoutReq();
+        $setECReq->SetExpressCheckoutRequest = $setECReqType;
+        /*
+         * 	 ## Creating service wrapper object
+        Creating service wrapper object to make API call and loading
+        Configuration::getAcctAndConfig() returns array that contains credential and config parameters
+        */
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        try {
+            /* wrap API method calls on the service object with a try catch */
+            $setECResponse = $paypalService->SetExpressCheckout($setECReq);
+        } catch (Exception $ex) {
+            include_once("../Error.php");
+            exit;
+        }
 
         $return = false;
         if (isset($payment['TOKEN'])) {
@@ -364,7 +489,7 @@ class MethodEC extends AbstractMethodPaypal
         );
     }
 
-    private function _getShippingAddress(&$params)
+    private function _getShippingAddress()
     {
         $context = Context::getContext();
         $cart = $context->cart;
@@ -379,14 +504,15 @@ class MethodEC extends AbstractMethodPaypal
             $state = new State((int) $address->id_state);
         }
         $country = new Country((int) $address->id_country);
-        $params['shipping'] = array(
-            'address' => $address,
-            'ship_name' => $address->firstname.' '.$address->lastname,
-            'phone' => (empty($address->phone)) ? $address->phone_mobile : $address->phone,
-            'email' => $customer->email,
-            'state' => $state ? $state->iso_code : '',
-            'country' => $country->iso_code,
-        );
+        $address_pp = new AddressType();
+        $address_pp->CityName = $address->city;
+        $address_pp->Name = $address->firstname.' '.$address->lastname;
+        $address_pp->Street1 = $address->address1;
+        $address_pp->StateOrProvince = $state ? $state->iso_code : '';
+        $address_pp->PostalCode = $address->postcode;
+        $address_pp->Country = $country->iso_code;
+        $address_pp->Phone = (empty($address->phone)) ? $address->phone_mobile : $address->phone;
+        return $address_pp;
     }
 
     public function redirectToAPI($token, $method)
@@ -414,7 +540,7 @@ class MethodEC extends AbstractMethodPaypal
         return false;
     }
 
-    public function _getCredentialsInfo(&$params)
+    public function _getCredentialsInfo()
     {
         switch (Configuration::get('PAYPAL_SANDBOX')) {
             case 0:
@@ -423,11 +549,14 @@ class MethodEC extends AbstractMethodPaypal
                 $params['signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
                 break;
             case 1:
-                $params['user'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
-                $params['pwd'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
-                $params['signature'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
+                $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
+                $params['acct1.Password'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
+                $params['acct1.Signature'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
+                $params['mode'] = Configuration::get('PAYPAL_SANDBOX');
+                $params['log.LogEnabled'] = false;
                 break;
         }
+        return $params;
     }
 
     public function validation()
