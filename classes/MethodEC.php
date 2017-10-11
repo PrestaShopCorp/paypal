@@ -23,9 +23,9 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-//require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
+require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
 
-//require_once _PS_MODULE_DIR_.'paypal/sdk/paypal/lib/PayPal/test.php';
+require_once _PS_MODULE_DIR_.'paypal/sdk/paypal/lib/PayPal/CoreComponentTypes/BasicAmountType.php';
 
 use PayPal\EBLBaseComponents\AddressType;
 use PayPal\EBLBaseComponents\BillingAgreementDetailsType;
@@ -310,9 +310,9 @@ class MethodEC extends AbstractMethodPaypal
         $paymentDetails->OrderTotal = new BasicAmountType($currencyCode, $orderTotalValue);
         /*
          * How you want to obtain payment. When implementing parallel payments, this field is required and must be set to Order. When implementing digital goods, this field is required and must be set to Sale. If the transaction does not include a one-time purchase, this field is ignored. It is one of the following values:
-            Sale – This is a final sale for which you are requesting payment (default).
-            Authorization – This payment is a basic authorization subject to settlement with PayPal Authorization and Capture.
-            Order – This payment is an order authorization subject to settlement with PayPal Authorization and Capture.
+            Sale ï¿½ This is a final sale for which you are requesting payment (default).
+            Authorization ï¿½ This payment is a basic authorization subject to settlement with PayPal Authorization and Capture.
+            Order ï¿½ This payment is an order authorization subject to settlement with PayPal Authorization and Capture.
          */
         $paymentDetails->PaymentAction = $_REQUEST['paymentType'];
         $paymentDetails->HandlingTotal = $handlingTotal;
@@ -332,21 +332,21 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);;
         /*
          * Determines where or not PayPal displays shipping address fields on the PayPal pages. For digital goods, this field is required, and you must set it to 1. It is one of the following values:
-            0 – PayPal displays the shipping address on the PayPal pages.
-            1 – PayPal does not display shipping address fields whatsoever.
-            2 – If you do not pass the shipping address, PayPal obtains it from the buyer's account profile.
+            0 ï¿½ PayPal displays the shipping address on the PayPal pages.
+            1 ï¿½ PayPal does not display shipping address fields whatsoever.
+            2 ï¿½ If you do not pass the shipping address, PayPal obtains it from the buyer's account profile.
          */
         $setECReqDetails->NoShipping = 1;
         /*
          *  (Optional) Determines whether or not the PayPal pages should display the shipping address set by you in this SetExpressCheckout request, not the shipping address on file with PayPal for this buyer. Displaying the PayPal street address on file does not allow the buyer to edit that address. It is one of the following values:
-            0 – The PayPal pages should not display the shipping address.
-            1 – The PayPal pages should display the shipping address.
+            0 ï¿½ The PayPal pages should not display the shipping address.
+            1 ï¿½ The PayPal pages should display the shipping address.
          */
         $setECReqDetails->AddressOverride = 0;
         /*
          * Indicates whether or not you require the buyer's shipping address on file with PayPal be a confirmed address. For digital goods, this field is required, and you must set it to 0. It is one of the following values:
-            0 – You do not require the buyer's shipping address be a confirmed address.
-            1 – You require the buyer's shipping address be a confirmed address.
+            0 ï¿½ You do not require the buyer's shipping address be a confirmed address.
+            1 ï¿½ You require the buyer's shipping address be a confirmed address.
          */
         $setECReqDetails->ReqConfirmShipping = 0;
         if (isset($data['short_cut'])) {
