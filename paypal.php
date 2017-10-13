@@ -605,6 +605,7 @@ class PayPal extends PaymentModule
 
     public function hookHeader()
     {
+        //echo '<pre>';print_r($this->context->cart);die;
         if (Tools::getValue('controller') == "order") {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
@@ -992,7 +993,7 @@ class PayPal extends PaymentModule
 
             $capture_response = $method->confirmCapture();
 
-            if ($capture_response['success']) {
+            if (isset($capture_response['success'])) {
                 $paypal_order->payment_status = $capture_response['status'];
                 $paypal_order->save();
             }

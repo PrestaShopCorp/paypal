@@ -468,7 +468,7 @@ class MethodBT extends AbstractMethodPaypal
                     'status' => $result->transaction->status,
                     'amount' => $result->transaction->amount,
                     'currency' => $result->transaction->currencyIsoCode,
-                    'payment_type' => $result->transaction->payment_type,
+                    'payment_type' => isset($result->transaction->payment_type) ? $result->transaction->payment_type : '',
                     'merchantAccountId' => $result->transaction->merchantAccountId,
                 );
             } else {

@@ -23,10 +23,10 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
-//require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
 
-//require_once _PS_MODULE_DIR_.'paypal/sdk/paypal/lib/PayPal/test.php';
 
+use PayPal\CoreComponentTypes\BasicAmountType;
+use PayPal\EBLBaseComponents\DoExpressCheckoutPaymentRequestDetailsType;
 use PayPal\EBLBaseComponents\AddressType;
 use PayPal\EBLBaseComponents\BillingAgreementDetailsType;
 use PayPal\EBLBaseComponents\PaymentDetailsItemType;
@@ -34,7 +34,16 @@ use PayPal\EBLBaseComponents\PaymentDetailsType;
 use PayPal\EBLBaseComponents\SetExpressCheckoutRequestDetailsType;
 use PayPal\PayPalAPI\SetExpressCheckoutReq;
 use PayPal\PayPalAPI\SetExpressCheckoutRequestType;
+use PayPal\PayPalAPI\DoExpressCheckoutPaymentReq;
+use PayPal\PayPalAPI\DoExpressCheckoutPaymentRequestType;
+use PayPal\PayPalAPI\RefundTransactionReq;
+use PayPal\PayPalAPI\RefundTransactionRequestType;
+use PayPal\PayPalAPI\DoCaptureReq;
+use PayPal\PayPalAPI\DoCaptureRequestType;
+use PayPal\PayPalAPI\DoVoidReq;
+use PayPal\PayPalAPI\DoVoidResponseType;
 use PayPal\Service\PayPalAPIInterfaceServiceService;
+require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
 
 
 
@@ -252,123 +261,45 @@ class MethodEC extends AbstractMethodPaypal
         }
     }
 
+    /*
+    * The SetExpressCheckout API operation initiates an Express Checkout transaction
+    */
     public function init($data)
     {
-
-      //  $shippingTotal = new Teaz();
-
-       // $params = $this->_getPaymentDetails($params);
-
-        /*
-        * The SetExpressCheckout API operation initiates an Express Checkout transaction
-        */
-
-        $currencyCode = Context::getContext()->currency->iso_code;
-        // total shipping amount
-        $shippingTotal = new PayPal\CoreComponentTypes\BasicAmountType($currencyCode, $_REQUEST['shippingTotal']);
-        //total handling amount if any
-        $handlingTotal = new PayPal\CoreComponentTypes\BasicAmountType($currencyCode, 0);
-        //total insurance amount if any
-        $insuranceTotal = new PayPal\CoreComponentTypes\BasicAmountType($currencyCode, 0);
-        // shipping address
-        $address = $this->_getShippingAddress();
         // details about payment
         $paymentDetails = new PaymentDetailsType();
         $itemTotalValue = 0;
         $taxTotalValue = 0;
-        /*
-         * iterate trhough each item and add to atem detaisl
-         */
-        for($i=0; $i<count($_REQUEST['itemAmount']); $i++) {
-            $itemAmount = new BasicAmountType($currencyCode, $_REQUEST['itemAmount'][$i]);
-            $itemTotalValue += $_REQUEST['itemAmount'][$i] * $_REQUEST['itemQuantity'][$i];
-            $taxTotalValue += $_REQUEST['itemSalesTax'][$i] * $_REQUEST['itemQuantity'][$i];
-            $itemDetails = new PaymentDetailsItemType();
-            $itemDetails->Name = $_REQUEST['itemName'][$i];
-            $itemDetails->Amount = $itemAmount;
-            $itemDetails->Quantity = $_REQUEST['itemQuantity'][$i];
-            /*
-             * Indicates whether an item is digital or physical. For digital goods, this field is required and must be set to Digital. It is one of the following values:
-            Digital
-            Physical
-             */
-            $itemDetails->ItemCategory = $_REQUEST['itemCategory'][$i];
-            $itemDetails->Tax = new BasicAmountType($currencyCode, $_REQUEST['itemSalesTax'][$i]);
 
-            $paymentDetails->PaymentDetailsItem[$i] = $itemDetails;
+        // shipping address
+        if (!isset($params['short_cut'])) {
+            $address = $this->_getShippingAddress();
+            $paymentDetails->ShipToAddress = $address;
         }
-        /*
-         * The total cost of the transaction to the buyer. If shipping cost and tax charges are known, include them in this value. If not, this value should be the current subtotal of the order. If the transaction includes one or more one-time purchases, this field must be equal to the sum of the purchases. If the transaction does not include a one-time purchase such as when you set up a billing agreement for a recurring payment, set this field to 0.
-         */
-        $orderTotalValue = $shippingTotal->value + $handlingTotal->value +
-            $insuranceTotal->value +
-            $itemTotalValue + $taxTotalValue;
-        //Payment details
-        $paymentDetails->ShipToAddress = $address;
-        $paymentDetails->ItemTotal = new BasicAmountType($currencyCode, $itemTotalValue);
-        $paymentDetails->TaxTotal = new BasicAmountType($currencyCode, $taxTotalValue);
-        $paymentDetails->OrderTotal = new BasicAmountType($currencyCode, $orderTotalValue);
-        /*
-         * How you want to obtain payment. When implementing parallel payments, this field is required and must be set to Order. When implementing digital goods, this field is required and must be set to Sale. If the transaction does not include a one-time purchase, this field is ignored. It is one of the following values:
-            Sale – This is a final sale for which you are requesting payment (default).
-            Authorization – This payment is a basic authorization subject to settlement with PayPal Authorization and Capture.
-            Order – This payment is an order authorization subject to settlement with PayPal Authorization and Capture.
-         */
-        $paymentDetails->PaymentAction = $_REQUEST['paymentType'];
-        $paymentDetails->HandlingTotal = $handlingTotal;
-        $paymentDetails->InsuranceTotal = $insuranceTotal;
-        $paymentDetails->ShippingTotal = $shippingTotal;
 
+        /** The total cost of the transaction to the buyer. If shipping cost and tax charges are known, include them in this value. If not, this value should be the current subtotal of the order. If the transaction includes one or more one-time purchases, this field must be equal to the sum of the purchases. If the transaction does not include a one-time purchase such as when you set up a billing agreement for a recurring payment, set this field to 0.*/
+        $this->_getPaymentDetails($paymentDetails, $itemTotalValue, $taxTotalValue);
+
+        $paymentDetails->PaymentAction = ucfirst(Configuration::get('PAYPAL_API_INTENT'));
         $setECReqDetails = new SetExpressCheckoutRequestDetailsType();
         $setECReqDetails->PaymentDetails[0] = $paymentDetails;
-
-        /*
-         * (Required) URL to which the buyer is returned if the buyer does not approve the use of PayPal to pay you. For digital goods, you must add JavaScript to this page to close the in-context experience.
-         */
         $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true).'&step=1';
-        /*
-         * (Required) URL to which the buyer's browser is returned after choosing to pay with PayPal. For digital goods, you must add JavaScript to this page to close the in-context experience.
-         */
         $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);;
-        /*
-         * Determines where or not PayPal displays shipping address fields on the PayPal pages. For digital goods, this field is required, and you must set it to 1. It is one of the following values:
-            0 – PayPal displays the shipping address on the PayPal pages.
-            1 – PayPal does not display shipping address fields whatsoever.
-            2 – If you do not pass the shipping address, PayPal obtains it from the buyer's account profile.
-         */
         $setECReqDetails->NoShipping = 1;
-        /*
-         *  (Optional) Determines whether or not the PayPal pages should display the shipping address set by you in this SetExpressCheckout request, not the shipping address on file with PayPal for this buyer. Displaying the PayPal street address on file does not allow the buyer to edit that address. It is one of the following values:
-            0 – The PayPal pages should not display the shipping address.
-            1 – The PayPal pages should display the shipping address.
-         */
         $setECReqDetails->AddressOverride = 0;
-        /*
-         * Indicates whether or not you require the buyer's shipping address on file with PayPal be a confirmed address. For digital goods, this field is required, and you must set it to 0. It is one of the following values:
-            0 – You do not require the buyer's shipping address be a confirmed address.
-            1 – You require the buyer's shipping address be a confirmed address.
-         */
         $setECReqDetails->ReqConfirmShipping = 0;
+
         if (isset($data['short_cut'])) {
             $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
             $setECReqDetails->NoShipping = 2;
         }
         // Billing agreement details
-        $billingAgreementDetails = new BillingAgreementDetailsType($_REQUEST['billingType']);
-        $billingAgreementDetails->BillingAgreementDescription = $_REQUEST['billingAgreementText'];
+        $billingAgreementDetails = new BillingAgreementDetailsType(1);
+        $billingAgreementDetails->BillingAgreementDescription = 1;
         $setECReqDetails->BillingAgreementDetails = array($billingAgreementDetails);
-        // Display options
-        // TODO: if xe have to add some style ?
-        /* $setECReqDetails->cppheaderimage = $_REQUEST['cppheaderimage'];
-        $setECReqDetails->cppheaderbordercolor = $_REQUEST['cppheaderbordercolor'];
-        $setECReqDetails->cppheaderbackcolor = $_REQUEST['cppheaderbackcolor'];
-        $setECReqDetails->cpppayflowcolor = $_REQUEST['cpppayflowcolor'];
-        $setECReqDetails->cppcartbordercolor = $_REQUEST['cppcartbordercolor'];
-        $setECReqDetails->cpplogoimage = $_REQUEST['cpplogoimage'];
-        $setECReqDetails->PageStyle = $_REQUEST['pageStyle'];
-        $setECReqDetails->BrandName = $_REQUEST['brandName'];*/
+
         // Advanced options
-        $setECReqDetails->AllowNote = $_REQUEST['allowNote'];
+        $setECReqDetails->AllowNote = 0;
         $setECReqType = new SetExpressCheckoutRequestType();
         $setECReqType->SetExpressCheckoutRequestDetails = $setECReqDetails;
         $setECReq = new SetExpressCheckoutReq();
@@ -381,90 +312,91 @@ class MethodEC extends AbstractMethodPaypal
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
         try {
             /* wrap API method calls on the service object with a try catch */
-            $setECResponse = $paypalService->SetExpressCheckout($setECReq);
+            $payment = $paypalService->SetExpressCheckout($setECReq);
+            $this->token = $payment->Token;
+            $return = $this->redirectToAPI($payment->Token, 'setExpressCheckout');
         } catch (Exception $ex) {
-            include_once("../Error.php");
-            exit;
+            $return = $ex;
         }
 
-        $return = false;
-        if (isset($payment['TOKEN'])) {
-            $this->token = $payment['TOKEN'];
-            $return = $this->redirectToAPI($payment['TOKEN'], 'setExpressCheckout');
-        } elseif (isset($payment['L_ERRORCODE0'])) {
-            $return = $payment;
-        }
         return $return;
     }
 
-    private function _getPaymentDetails($params)
+    private function _getPaymentDetails(&$paymentDetails, &$total_products, &$tax)
     {
         $tax = $total_products = 0;
+        $this->_getProductsList($paymentDetails, $total_products, $tax);
+        $this->_getDiscountsList($paymentDetails, $total_products);
+        $this->_getGiftWrapping($paymentDetails, $total_products);
+        $this->_getPaymentValues($paymentDetails, $total_products, $tax);
 
-        $params['currency'] = Context::getContext()->currency->iso_code;
-        $params['payment_action'] = Configuration::get('PAYPAL_API_INTENT');
-
-        $this->_getProductsList($params, $total_products, $tax);
-        $this->_getDiscountsList($params, $total_products);
-        $this->_getGiftWrapping($params, $total_products);
-        $this->_getPaymentValues($params, $total_products, $tax);
-        if (!isset($params['short_cut'])) {
-            $this->_getShippingAddress($params);
-        }
-
-
-        return $params;
     }
 
-    private function _getProductsList(&$params, &$total_products, &$tax)
+    private function _getProductsList(&$paymentDetails, &$itemTotalValue, &$taxTotalValue)
     {
         $products = Context::getContext()->cart->getProducts();
+        $currency = Context::getContext()->currency->iso_code;
         foreach ($products as $product) {
+            $itemDetails = new PaymentDetailsItemType();
+            $product['product_tax'] = $product['price_wt'] - $product['price'];
+            $itemAmount = new BasicAmountType($currency, number_format($product['price'], 2, ".", ''));
             if (isset($product['attributes']) && (empty($product['attributes']) === false)) {
                 $product['name'] .= ' - '.$product['attributes'];
             }
-            $product['description_short'] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
-            $product['price'] = number_format($product['price'], 2, ".", '');
-            $product['product_tax'] = number_format(($product['price_wt'] - $product['price']), 2, ".", '');
-            $total_products += (number_format($product['price'], 2, ".", '') * $product['quantity']);
-            $tax += (number_format($product['price_wt'] - $product['price'], 2, ".", '') * $product['quantity']);
-            $params['products_list']['products'][] = $product;
+            $itemDetails->Name = $product['name'];
+            $itemDetails->Amount = $itemAmount;
+            $itemDetails->Quantity = $product['quantity'];
+            /** Indicates whether an item is digital or physical. For digital goods, this field is required and must be set to Digital. It is one of the following values:*/
+            $itemDetails->ItemCategory = 'Physical';
+            $itemDetails->Tax = new BasicAmountType($currency, number_format($product['product_tax'], 2, ".", ''));
+            $paymentDetails->PaymentDetailsItem[] = $itemDetails;
+
+            $itemTotalValue += $product['price'] * $product['quantity'];
+            $taxTotalValue += $product['product_tax'] * $product['quantity'];
         }
     }
 
-    private function _getDiscountsList(&$params, &$total_products)
+    private function _getDiscountsList(&$paymentDetails, &$itemTotalValue)
     {
         $discounts = Context::getContext()->cart->getCartRules();
+        $currency = Context::getContext()->currency->iso_code;
         $params['products_list']['discounts'] = array();
         if (count($discounts) > 0) {
             foreach ($discounts as $discount) {
                 if (isset($discount['description']) && !empty($discount['description'])) {
                     $discount['description'] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
                 }
-                /* It is a discount so we store a negative value */
                 $discount['value_real'] = -1 * number_format($discount['value_real'], 2, ".", '');
-                $discount['quantity'] = 1;
-                $total_products = round($total_products + $discount['value_real'], 2);
-                $params['products_list']['discounts'][] = $discount;
+                $itemDetails = new PaymentDetailsItemType();
+                $itemDetails->Name = $discount['name'];
+                $itemDetails->Amount = new BasicAmountType($currency, $discount['value_real']);;
+                $itemDetails->Quantity = 1;
+                $paymentDetails->PaymentDetailsItem[] = $itemDetails;
+                $itemTotalValue += $discount['value_real'];
             }
         }
     }
 
-    private function _getGiftWrapping(&$params, &$total_products)
+    private function _getGiftWrapping(&$paymentDetails, &$itemTotalValue)
     {
         $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
         $wrapping = array();
+        $currency = Context::getContext()->currency->iso_code;
         if ($wrapping_price > 0) {
-            $wrapping['name'] = 'Gift wrapping';
-            $wrapping['amount'] = number_format($wrapping_price, 2, ".", '');
-            $wrapping['quantity'] = 1;
-            $total_products = round($total_products + $wrapping_price, 2);
+            $wrapping_price = number_format($wrapping_price, 2, ".", '');
+            $itemDetails = new PaymentDetailsItemType();
+            $itemDetails->Name = 'Gift wrapping';
+            $itemDetails->Amount = new BasicAmountType($currency, $wrapping_price);;
+            $itemDetails->Quantity = 1;
+            $paymentDetails->PaymentDetailsItem[] = $itemDetails;
+            $itemTotalValue += $wrapping_price;
         }
         $params['products_list']['wrapping'] = $wrapping;
     }
 
-    private function _getPaymentValues(&$params, &$total_products, &$tax)
+    private function _getPaymentValues(&$paymentDetails, &$itemTotalValue, &$taxTotalValue)
     {
+        $currency = Context::getContext()->currency->iso_code;
         $context = Context::getContext();
         $cart = $context->cart;
         $shipping_cost_wt = $cart->getTotalShippingCost();
@@ -472,21 +404,34 @@ class MethodEC extends AbstractMethodPaypal
         $total = $cart->getOrderTotal(true, Cart::BOTH);
         $summary = $cart->getSummaryDetails();
         $subtotal = Tools::ps_round($summary['total_products'], 2);
-        $total_tax = round($tax, 2);
-        if ($subtotal != $total_products) {
-            $subtotal = $total_products;
+        $total_tax = round($taxTotalValue, 2);
+
+        // total shipping amount
+        $shippingTotal = new BasicAmountType($currency, number_format($shipping, 2, ".", ''));
+        //total handling amount if any
+        $handlingTotal = new BasicAmountType($currency, number_format(0, 2, ".", ''));
+        //total insurance amount if any
+        $insuranceTotal = new BasicAmountType($currency, number_format(0, 2, ".", ''));
+
+        if ($subtotal != $itemTotalValue) {
+            $subtotal = $itemTotalValue;
         }
-        $total_cart = $total_products + $shipping + $tax;
+        //total
+        $total_cart = $shippingTotal->value + $handlingTotal->value +
+            $insuranceTotal->value +
+            $itemTotalValue + $taxTotalValue;
+
         if ($total != $total_cart) {
             $total = $total_cart;
         }
-        $params['costs'] = array(
-            'shipping_cost' => number_format($shipping, 2, ".", ''),
-            'total' => number_format($total, 2, ".", ''),
-            'subtotal' => number_format($subtotal, 2, ".", ''),
-            'carrier' => new Carrier($cart->id_carrier),
-            'total_tax' => $total_tax,
-        );
+
+        $paymentDetails->ItemTotal = new BasicAmountType($currency, number_format($subtotal, 2, ".", ''));
+        $paymentDetails->TaxTotal = new BasicAmountType($currency, number_format($total_tax, 2, ".", ''));
+        $paymentDetails->OrderTotal = new BasicAmountType($currency, number_format($total, 2, ".", ''));
+
+        $paymentDetails->HandlingTotal = $handlingTotal;
+        $paymentDetails->InsuranceTotal = $insuranceTotal;
+        $paymentDetails->ShippingTotal = $shippingTotal;
     }
 
     private function _getShippingAddress()
@@ -552,7 +497,7 @@ class MethodEC extends AbstractMethodPaypal
                 $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');
                 $params['acct1.Password'] = Configuration::get('PAYPAL_PSWD_SANDBOX');
                 $params['acct1.Signature'] = Configuration::get('PAYPAL_SIGNATURE_SANDBOX');
-                $params['mode'] = Configuration::get('PAYPAL_SANDBOX');
+                $params['mode'] = Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live';
                 $params['log.LogEnabled'] = false;
                 break;
         }
@@ -561,89 +506,126 @@ class MethodEC extends AbstractMethodPaypal
 
     public function validation()
     {
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
         $context = Context::getContext();
-        $params = array(
-            'token' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token'),
-            'payer_id' => Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID'),
-            'button_source' => (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Presto':'PrestaShop_Cart_EC',
-        );
-        $this->_getCredentialsInfo($params);
-        $params = $this->_getPaymentDetails($params);
-        $exec_payment = $sdk->doExpressCheckout($params);
 
-        if (isset($exec_payment['L_ERRORCODE0'])) {
-            Tools::redirect($context->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment['L_ERRORCODE0'])));
+        $paymentDetails= new PaymentDetailsType();
+        $itemTotalValue = 0;
+        $taxTotalValue = 0;
+
+        $this->_getPaymentDetails($paymentDetails, $itemTotalValue, $taxTotalValue);
+
+        $DoECRequestDetails = new DoExpressCheckoutPaymentRequestDetailsType();
+        $DoECRequestDetails->PayerID = Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID');
+        $DoECRequestDetails->Token = Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token');
+        $DoECRequestDetails->PaymentAction = ucfirst(Configuration::get('PAYPAL_API_INTENT'));;
+        $DoECRequestDetails->PaymentDetails[0] = $paymentDetails;
+
+        $DoECRequest = new DoExpressCheckoutPaymentRequestType();
+        $DoECRequest->DoExpressCheckoutPaymentRequestDetails = $DoECRequestDetails;
+        $DoECReq = new DoExpressCheckoutPaymentReq();
+        $DoECReq->DoExpressCheckoutPaymentRequest = $DoECRequest;
+
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+
+        try {
+            /* wrap API method calls on the service object with a try catch */
+            $exec_payment = $paypalService->DoExpressCheckoutPayment($DoECReq);
+        } catch (Exception $ex) {
+            $exec_payment = $ex;
         }
 
-        $cart = $context->cart;
-        $customer = new Customer($cart->id_customer);
-        if (!Validate::isLoadedObject($customer)) {
-            Tools::redirect('index.php?controller=order&step=1');
-        }
-        $currency = $context->currency;
-        $total = (float)$exec_payment['PAYMENTINFO_0_AMT'];
-        $paypal = Module::getInstanceByName('paypal');
-        if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
-            $order_state = Configuration::get('PS_OS_PAYMENT');
+      // echo '<pre>';print_r($exec_payment);die;
+
+
+        if ($exec_payment instanceof PayPal\PayPalAPI\DoExpressCheckoutPaymentResponseType) {
+            if (isset($exec_payment->Errors)) {
+                Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment->Errors[0]->ErrorCode)));
+            }
+            $cart = $context->cart;
+            $customer = new Customer($cart->id_customer);
+            if (!Validate::isLoadedObject($customer)) {
+                Tools::redirect('index.php?controller=order&step=1');
+            }
+            $currency = $context->currency;
+            if(isset($exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo)) {
+                $payment_info = $exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo[0];
+                $total = (float)$payment_info->GrossAmount->value;
+                $paypal = Module::getInstanceByName('paypal');
+                if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
+                    $order_state = Configuration::get('PS_OS_PAYMENT');
+                } else {
+                    $order_state = Configuration::get('PAYPAL_OS_WAITING');
+                }
+                $transactionDetail = $this->getDetailsTransaction($exec_payment->DoExpressCheckoutPaymentResponseDetails);
+                $paypal->validateOrder($cart->id, $order_state, $total, 'PayPal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
+                return true;
+            }
         } else {
-            $order_state = Configuration::get('PAYPAL_OS_WAITING');
+            return $exec_payment;
         }
-        $transactionDetail = $this->getDetailsTransaction($exec_payment);
-        $paypal->validateOrder($cart->id, $order_state, $total, 'PayPal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
     }
 
     public function getDetailsTransaction($transaction)
     {
+        $payment_info = $transaction->PaymentInfo[0];
         return array(
             'method' => 'EC',
-            'currency' => $transaction['PAYMENTINFO_0_CURRENCYCODE'],
-            'transaction_id' => pSQL($transaction['PAYMENTINFO_0_TRANSACTIONID']),
-            'payment_status' => $transaction['PAYMENTINFO_0_PAYMENTSTATUS'],
-            'payment_method' => $transaction['PAYMENTINFO_0_PAYMENTTYPE'],
-            'id_payment' => $transaction['TOKEN'],
+            'currency' => $payment_info->GrossAmount->currencyID,
+            'transaction_id' => pSQL($payment_info->TransactionID),
+            'payment_status' => $payment_info->PaymentStatus,
+            'payment_method' => $payment_info->PaymentType,
+            'id_payment' => pSQL($transaction->Token),
             'client_token' => "",
-            'capture' => $transaction['PAYMENTINFO_0_PAYMENTSTATUS'] == "Pending" && $transaction['PAYMENTINFO_0_PENDINGREASON'] == "authorization" ? true : false,
+            'capture' =>$payment_info->PaymentStatus == "Pending" && $payment_info->PendingReason == "authorization" ? true : false,
         );
     }
 
 
     public function confirmCapture()
     {
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
         $id_paypal_order = $paypal_order->id;
-        $params = array();
-        $params['amount'] = number_format($paypal_order->total_paid, 2, ".", '');
-        $params['authorization_id'] = $paypal_order->id_transaction;
-        $params['currency_code'] = $paypal_order->currency;
-        $params['complete_type'] = 'complete';
-        $this->_getCredentialsInfo($params);
+        $currency = $paypal_order->currency;
+        $amount = $paypal_order->total_paid;
+        $doCaptureRequestType = new DoCaptureRequestType();
+        $doCaptureRequestType->AuthorizationID = $paypal_order->id_transaction;
+        $doCaptureRequestType->Amount = new BasicAmountType($currency, number_format($amount, 2, ".", ''));
+        $doCaptureRequestType->CompleteType = 'Complete';
+        $doCaptureReq = new DoCaptureReq();
+        $doCaptureReq->DoCaptureRequest = $doCaptureRequestType;
 
-        $response = $sdk->doCapture($params);
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        try {
+            $response = $paypalService->DoCapture($doCaptureReq);
+        } catch (Exception $ex) {
+            $response = $ex;
+        }
 
-        if ($response['ACK'] == "Success") {
-            PaypalCapture::updateCapture($response['TRANSACTIONID'], $response['AMT'], $response['PAYMENTSTATUS'], $id_paypal_order);
-            $result =  array(
-                'success' => true,
-                'authorization_id' => $response['AUTHORIZATIONID'],
-                'status' => $response['PAYMENTSTATUS'],
-                'amount' => $response['AMT'],
-                'transaction_id' => $response['TRANSACTIONID'],
-                'currency' => $response['CURRENCYCODE'],
-                'parent_payment' => $response['PARENTTRANSACTIONID'],
-                'pending_reason' => $response['PENDINGREASON'],
-            );
-        } else {
-            $result = array(
-                'authorization_id' => $response['AUTHORIZATIONID'],
-                'status' => $response['ACK'],
-                'error_code' => $response['L_ERRORCODE0'],
-                'error_message' => $response['L_LONGMESSAGE0'],
-            );
-            if ($response['L_ERRORCODE0'] == "10602") {
-                $result['already_captured'] = true;
+        if ($response instanceof PayPal\PayPalAPI\DoCaptureResponseType) {
+            $authorization_id = $response->DoCaptureResponseDetails->AuthorizationID;
+            if (isset($response->Errors)) {
+                $result = array(
+                    'authorization_id' => $authorization_id,
+                    'status' => $response->Ack,
+                    'error_code' => $response->Errors[0]->ErrorCode,
+                    'error_message' => $response->Errors[0]->LongMessage,
+                );
+                if ($response->Errors[0]->ErrorCode == "10602") {
+                    $result['already_captured'] = true;
+                }
+            } else {
+                $payment_info = $response->DoCaptureResponseDetails->PaymentInfo;
+                PaypalCapture::updateCapture($authorization_id, $payment_info->GrossAmount->value, $payment_info->PaymentStatus, $id_paypal_order);
+                $result =  array(
+                    'success' => true,
+                    'authorization_id' => $authorization_id,
+                    'status' => $payment_info->PaymentStatus,
+                    'amount' => $payment_info->GrossAmount->value,
+                    'transaction_id' => $payment_info->TransactionID,
+                    'currency' => $payment_info->GrossAmount->currencyID,
+                    'parent_payment' => $payment_info->ParentTransactionID,
+                    'pending_reason' => $payment_info->PendingReason,
+                );
             }
         }
 
@@ -656,36 +638,46 @@ class MethodEC extends AbstractMethodPaypal
 
     public function refund()
     {
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
+
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
         $id_paypal_order = $paypal_order->id;
         $capture = PaypalCapture::loadByOrderPayPalId($id_paypal_order);
 
         $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
 
-        $params = array();
-        $this->_getCredentialsInfo($params);
-        $params['transaction_id'] = $id_transaction;
-        $params['refund_type'] = 'Full';
-        $response = $sdk->refundTransaction($params);
+        $refundTransactionReqType = new RefundTransactionRequestType();
+        $refundTransactionReqType->TransactionID = $id_transaction;
+        $refundTransactionReqType->RefundType = 'Full';
+        $refundTransactionReq = new RefundTransactionReq();
+        $refundTransactionReq->RefundTransactionRequest = $refundTransactionReqType;
 
-        if ($response['ACK'] == "Success") {
-            $result =  array(
-                'success' => true,
-                'refund_id' => $response['REFUNDTRANSACTIONID'],
-                'status' => $response['ACK'],
-                'total_amount' => $response['TOTALREFUNDEDAMOUNT'],
-                'net_amount' => $response['NETREFUNDAMT'],
-                'currency' => $response['CURRENCYCODE'],
-            );
-        } else {
-            $result = array(
-                'status' => $response['ACK'],
-                'error_code' => $response['L_ERRORCODE0'],
-                'error_message' => $response['L_LONGMESSAGE0'],
-            );
-            if ($response['L_ERRORCODE0'] == "10009") {
-                $result['already_refunded'] = true;
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        try {
+            $response = $paypalService->RefundTransaction($refundTransactionReq);
+        } catch (Exception $ex) {
+            $response = $ex;
+        }
+
+
+        if ($response instanceof PayPal\PayPalAPI\RefundTransactionResponseType) {
+            if (isset($response->Errors)) {
+                $result = array(
+                    'status' => $response->Ack,
+                    'error_code' => $response->Errors[0]->ErrorCode,
+                    'error_message' => $response->Errors[0]->LongMessage,
+                );
+                if ($response->Errors[0]->ErrorCode == "10009") {
+                    $result['already_refunded'] = true;
+                }
+            } else {
+                $result =  array(
+                    'success' => true,
+                    'refund_id' => $response->RefundTransactionID,
+                    'status' => $response->Ack,
+                    'total_amount' => $response->TotalRefundedAmount->value,
+                    'net_amount' => $response->NetRefundAmount->value,
+                    'currency' => $response->TotalRefundedAmount->currencyID,
+                );
             }
         }
 
