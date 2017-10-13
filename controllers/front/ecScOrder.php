@@ -34,18 +34,36 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
     {
         $method = AbstractMethodPaypal::load('EC');
         $info = $method->getInfo(array('token'=>Tools::getValue('token')));
-        if ($info['ACK'] != 'Success') {
-            Tools::redirect($this->context->link->getModuleLink('paypal', 'error', array('error_code'=>$info['L_ERRORCODE0'])));
+        $ex_detailed_message = '';
+        $paypal = Module::getInstanceByName('paypal');
+        if($info instanceof PayPal\Exception\PPConnectionException) {
+            $ex_detailed_message = $paypal->l('Error connecting to ') . $info->getUrl();
+        } else if($info instanceof PayPal\Exception\PPMissingCredentialException || $info instanceof PayPal\Exception\PPInvalidCredentialException) {
+            $ex_detailed_message = $info->errorMessage();
+        } else if($info instanceof PayPal\Exception\PPConfigurationException) {
+            $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
+        } else if($info instanceof PayPal\PayPalAPI\GetExpressCheckoutDetailsResponseType) {
+            if (isset($info->Errors)) {
+                Tools::redirect($this->context->link->getModuleLink('paypal', 'error', array('error_code'=>$info->Errors[0]->ErrorCode)));
+            }
         }
+        if ($ex_detailed_message) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg_ec' => $ex_detailed_message)));
+        }
+
+
+        $payer_info = $info->GetExpressCheckoutDetailsResponseDetails->PayerInfo;
+        $ship_addr = $info->GetExpressCheckoutDetailsResponseDetails->PaymentDetails[0]->ShipToAddress;
+
         if ($this->context->cookie->logged) {
             $customer = $this->context->customer;
-        } elseif ($id_customer = Customer::customerExists($info['EMAIL'], true)) {
+        } elseif ($id_customer = Customer::customerExists($payer_info->Payer, true)) {
             $customer = new Customer($id_customer);
         } else {
             $customer = new Customer();
-            $customer->email = $info['EMAIL'];
-            $customer->firstname = $info['FIRSTNAME'];
-            $customer->lastname = $info['LASTNAME'];
+            $customer->email = $payer_info->Payer;
+            $customer->firstname = $payer_info->PayerName->FirstName;
+            $customer->lastname = $payer_info->PayerName->LastName;
             $customer->passwd = Tools::encrypt(Tools::passwdGen());
 
             $customer->add();
@@ -69,14 +87,14 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         $count = 1;
 
         foreach ($addresses as $address) {
-            if($address['firstname'].' '.$address['lastname'] == $info['SHIPTONAME']
-                && $address['address1'] == $info['PAYMENTREQUEST_0_SHIPTOSTREET']
-                && (isset($info['PAYMENTREQUEST_0_SHIPTOSTREET2'])?$address['address2'] == $info['PAYMENTREQUEST_0_SHIPTOSTREET2']:true)
-                && $address['id_country'] == Country::getByIso($info['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'])
-                && $address['city'] == $info['PAYMENTREQUEST_0_SHIPTOCITY']
-                && (isset($info['PAYMENTREQUEST_0_SHIPTOSTATE'])?$address['id_state'] == $info['PAYMENTREQUEST_0_SHIPTOSTATE']:true)
-                && $address['postcode'] == $info['PAYMENTREQUEST_0_SHIPTOZIP']
-                && (isset($info['PAYMENTREQUEST_0_SHIPTOPHONENUM'])?$address['phone'] == $info['PAYMENTREQUEST_0_SHIPTOPHONENUM']:true)
+            if($address['firstname'].' '.$address['lastname'] == $ship_addr->Name
+                && $address['address1'] == $ship_addr->Street1
+                && (isset($ship_addr->Street2)?$address['address2'] == $ship_addr->Street2:true)
+                && $address['id_country'] == Country::getByIso($ship_addr->Country)
+                && $address['city'] == $ship_addr->CityName
+                && (isset($ship_addr->StateOrProvince)?$address['id_state'] == $ship_addr->StateOrProvince:true)
+                && $address['postcode'] == $ship_addr->PostalCode
+                && (isset($ship_addr->Phone)?$address['phone'] == $ship_addr->Phone:true)
             ) {
                 $address_exist = true;
             } else {
@@ -89,22 +107,22 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
        // echo '<pre>';print_r($count+1);echo '<pre>';die;
         if (!$address_exist) {
             $orderAddress = new Address();
-            $separated_name = explode(" ", $info['SHIPTONAME']);
+            $separated_name = explode(" ", $ship_addr->Name);
             $orderAddress->firstname = $separated_name[0];
             $orderAddress->lastname = $separated_name[1];
-            $orderAddress->address1 = $info['PAYMENTREQUEST_0_SHIPTOSTREET'];
-            if (isset($info['PAYMENTREQUEST_0_SHIPTOSTREET2'])) {
-                $orderAddress->address2 = $info['PAYMENTREQUEST_0_SHIPTOSTREET2'];
+            $orderAddress->address1 = $ship_addr->Street1;
+            if (isset($ship_addr->Street2)) {
+                $orderAddress->address2 = $ship_addr->Street2;
             }
-            $orderAddress->id_country = Country::getByIso($info['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']);
-            $orderAddress->city = $info['PAYMENTREQUEST_0_SHIPTOCITY'];
+            $orderAddress->id_country = Country::getByIso($ship_addr->Country);
+            $orderAddress->city = $ship_addr->CityName;
             if (Country::containsStates($orderAddress->id_country)) {
-                $orderAddress->id_state = (int) State::getIdByIso($info['PAYMENTREQUEST_0_SHIPTOSTATE'], $address->id_country);
+                $orderAddress->id_state = (int) State::getIdByIso($ship_addr->StateOrProvince, $orderAddress->id_country);
             }
 
-            $orderAddress->postcode = $info['PAYMENTREQUEST_0_SHIPTOZIP'];
-            if (isset($info['PAYMENTREQUEST_0_SHIPTOPHONENUM'])) {
-                $orderAddress->phone = $info['PAYMENTREQUEST_0_SHIPTOPHONENUM'];
+            $orderAddress->postcode = $ship_addr->PostalCode;
+            if (isset($ship_addr->Phone)) {
+                $orderAddress->phone = $ship_addr->Phone;
             }
 
             $orderAddress->id_customer = $customer->id;
@@ -114,8 +132,8 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         }
 
 
-        $this->context->cookie->__set('paypal_ecs', $info['TOKEN']);
-        $this->context->cookie->__set('paypal_ecs_payerid', $info['PAYERID']);
+        $this->context->cookie->__set('paypal_ecs', $info->GetExpressCheckoutDetailsResponseDetails->Token);
+        $this->context->cookie->__set('paypal_ecs_payerid', $info->GetExpressCheckoutDetailsResponseDetails->PayerInfo->PayerID);
         Tools::redirect($this->context->link->getPageLink('order', null, null, array('step'=>2)));
     }
 }

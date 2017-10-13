@@ -880,6 +880,21 @@ class PayPal extends PaymentModule
         }
     }
 
+    public function createOrderThread($id_order)
+    {
+        $orderThread = new CustomerThread();
+        $orderThread->id_shop = $this->context->shop->id;
+        $orderThread->id_lang = $this->context->language->id;
+        $orderThread->id_contact = 0;
+        $orderThread->id_order = $id_order;
+        $orderThread->id_customer = $this->context->customer->id;
+        $orderThread->status = 'open';
+        $orderThread->email = $this->context->customer->email;
+        $orderThread->token = Tools::passwdGen(12);
+        $orderThread->add();
+        return (int)$orderThread->id;
+    }
+
 
     public function hookActionOrderStatusUpdate(&$params)
     {
@@ -889,7 +904,7 @@ class PayPal extends PaymentModule
             return false;
         }
         $method = AbstractMethodPaypal::load($paypal_order->method);
-        $orderMessage = new Message();
+        $orderMessage = new CustomerMessage();
         $orderMessage->message = "";
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
             $orderPayPal = PaypalOrder::loadByOrderId($params['id_order']);
@@ -907,7 +922,7 @@ class PayPal extends PaymentModule
                 foreach ($response_void as $key => $msg) {
                     $orderMessage->message .= $key." : ".$msg.";\r";
                 }
-
+                $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
                 $orderMessage->id_order = $params['id_order'];
                 $orderMessage->id_customer = $this->context->customer->id;
                 $orderMessage->private = 1;
@@ -921,7 +936,7 @@ class PayPal extends PaymentModule
             foreach ($response_void as $key => $msg) {
                 $orderMessage->message .= $key." : ".$msg.";\r";
             }
-
+            $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
@@ -937,6 +952,7 @@ class PayPal extends PaymentModule
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             if (Validate::isLoadedObject($capture) && !$capture->id_capture) {
                 $orderMessage = new Message();
+                $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
                 $orderMessage->message = $this->l('You couldn\'t refund order, it\'s not payed yet.');
                 $orderMessage->id_order = $params['id_order'];
                 $orderMessage->id_customer = $this->context->customer->id;
@@ -972,7 +988,7 @@ class PayPal extends PaymentModule
             foreach ($refund_response as $key => $msg) {
                 $orderMessage->message .= $key." : ".$msg.";\r";
             }
-
+            $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;
@@ -1001,7 +1017,7 @@ class PayPal extends PaymentModule
             foreach ($capture_response as $key => $msg) {
                 $orderMessage->message .= $key." : ".$msg.";\r";
             }
-
+            $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;
             $orderMessage->private = 1;

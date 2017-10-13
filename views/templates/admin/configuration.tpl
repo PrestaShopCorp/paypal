@@ -183,7 +183,7 @@
         <div class="blue">
             <div class="row-fluid" id="rtb1">
                 <header class="containerCentered center-text">
-                    <h2 class="pulloutHeadline ">{l s='Find out why 7 million businesses worldwide choose PayPal.' mod='paypal'}</h2>
+                    <h2 class="pulloutHeadline ">{l s='Find out why 17 million businesses worldwide choose PayPal.' mod='paypal'}</h2>
                 </header>
                 <div class="containerCentered">
                     <div class="span4">

@@ -33,13 +33,14 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
         $method_ec = AbstractMethodPaypal::load('EC');
 
         $response = $method_ec->init(array('use_card'=>Tools::getValue('credit_card')));
+        $paypal = Module::getInstanceByName('paypal');
 
         if($response instanceof PayPal\Exception\PPConnectionException) {
-            $ex_detailed_message = "Error connecting to " . $response->getUrl();
+            $ex_detailed_message = $paypal->l('Error connecting to ') . $response->getUrl();
         } else if($response instanceof PayPal\Exception\PPMissingCredentialException || $response instanceof PayPal\Exception\PPInvalidCredentialException) {
             $ex_detailed_message = $response->errorMessage();
         } else if($response instanceof PayPal\Exception\PPConfigurationException) {
-            $ex_detailed_message = "Invalid configuration. Please check your configuration file";
+            $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
         } else {
             Tools::redirect($response.'&useraction=commit');
         }
