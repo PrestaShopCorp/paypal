@@ -471,6 +471,9 @@ class MethodBT extends AbstractMethodPaypal
                     'payment_type' => isset($result->transaction->payment_type) ? $result->transaction->payment_type : '',
                     'merchantAccountId' => $result->transaction->merchantAccountId,
                 );
+            } else if ($result->transaction->status == Braintree_Transaction::SETTLEMENT_DECLINED) {
+                $order = new Order(Tools::getValue('id_order'));
+                $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
             } else {
                 $errors = $result->errors->deepAll();
 
@@ -520,6 +523,13 @@ class MethodBT extends AbstractMethodPaypal
                     'payment_type' => $result->transaction->payment_type,
                     'merchantAccountId' => $result->transaction->merchantAccountId,
                 );
+            } elseif ($result->transaction->status == Braintree_Transaction::SETTLEMENT_DECLINED) {
+                $order = new Order(Tools::getValue('id_order'));
+                $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+                $response =  array(
+                    'transaction_id' => $result->params['id'],
+                    'error_message' => $result->message,
+                );
             } else {
                 $errors = $result->errors->deepAll();
                 foreach ($errors as $error) {
@@ -555,6 +565,13 @@ class MethodBT extends AbstractMethodPaypal
                     'status' => $result->transaction->status,
                     'amount' => $result->transaction->amount,
                     'currency' => $result->transaction->currencyIsoCode,
+                );
+            } elseif ($result->transaction->status == Braintree_Transaction::SETTLEMENT_DECLINED) {
+                $order = new Order(Tools::getValue('id_order'));
+                $order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+                $response =  array(
+                    'transaction_id' => $result->params['id'],
+                    'error_message' => $result->message,
                 );
             } else {
                 $response =  array(

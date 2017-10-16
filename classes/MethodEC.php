@@ -41,7 +41,9 @@ use PayPal\PayPalAPI\RefundTransactionRequestType;
 use PayPal\PayPalAPI\DoCaptureReq;
 use PayPal\PayPalAPI\DoCaptureRequestType;
 use PayPal\PayPalAPI\DoVoidReq;
-use PayPal\PayPalAPI\DoVoidResponseType;
+use PayPal\PayPalAPI\DoVoidRequestType;
+use PayPal\PayPalAPI\GetExpressCheckoutDetailsRequestType;
+use PayPal\PayPalAPI\GetExpressCheckoutDetailsReq;
 use PayPal\Service\PayPalAPIInterfaceServiceService;
 require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
 
@@ -313,6 +315,9 @@ class MethodEC extends AbstractMethodPaypal
         try {
             /* wrap API method calls on the service object with a try catch */
             $payment = $paypalService->SetExpressCheckout($setECReq);
+            if (isset($payment->Errors)) {
+                Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $payment->Errors[0]->ErrorCode)));
+            }
             $this->token = $payment->Token;
             $return = $this->redirectToAPI($payment->Token, 'setExpressCheckout');
         } catch (Exception $ex) {
@@ -351,8 +356,8 @@ class MethodEC extends AbstractMethodPaypal
             $itemDetails->Tax = new BasicAmountType($currency, number_format($product['product_tax'], 2, ".", ''));
             $paymentDetails->PaymentDetailsItem[] = $itemDetails;
 
-            $itemTotalValue += $product['price'] * $product['quantity'];
-            $taxTotalValue += $product['product_tax'] * $product['quantity'];
+            $itemTotalValue += number_format($product['price'], 2, ".", '') * $product['quantity'];
+            $taxTotalValue += number_format($product['product_tax'], 2, ".", '') * $product['quantity'];
         }
     }
 
@@ -372,7 +377,7 @@ class MethodEC extends AbstractMethodPaypal
                 $itemDetails->Amount = new BasicAmountType($currency, $discount['value_real']);;
                 $itemDetails->Quantity = 1;
                 $paymentDetails->PaymentDetailsItem[] = $itemDetails;
-                $itemTotalValue += $discount['value_real'];
+                $itemTotalValue += number_format($discount['value_real'], 2, ".", '');
             }
         }
     }
@@ -389,7 +394,7 @@ class MethodEC extends AbstractMethodPaypal
             $itemDetails->Amount = new BasicAmountType($currency, $wrapping_price);;
             $itemDetails->Quantity = 1;
             $paymentDetails->PaymentDetailsItem[] = $itemDetails;
-            $itemTotalValue += $wrapping_price;
+            $itemTotalValue += number_format($wrapping_price, 2, ".", '');
         }
         $params['products_list']['wrapping'] = $wrapping;
     }
@@ -405,7 +410,6 @@ class MethodEC extends AbstractMethodPaypal
         $summary = $cart->getSummaryDetails();
         $subtotal = Tools::ps_round($summary['total_products'], 2);
         $total_tax = round($taxTotalValue, 2);
-
         // total shipping amount
         $shippingTotal = new BasicAmountType($currency, number_format($shipping, 2, ".", ''));
         //total handling amount if any
@@ -612,13 +616,12 @@ class MethodEC extends AbstractMethodPaypal
                 }
             } else {
                 $payment_info = $response->DoCaptureResponseDetails->PaymentInfo;
-                PaypalCapture::updateCapture($authorization_id, $payment_info->GrossAmount->value, $payment_info->PaymentStatus, $id_paypal_order);
+                PaypalCapture::updateCapture($payment_info->TransactionID, $payment_info->GrossAmount->value, $payment_info->PaymentStatus, $id_paypal_order);
                 $result =  array(
                     'success' => true,
-                    'authorization_id' => $authorization_id,
+                    'authorization_id' => $payment_info->TransactionID,
                     'status' => $payment_info->PaymentStatus,
                     'amount' => $payment_info->GrossAmount->value,
-                    'transaction_id' => $payment_info->TransactionID,
                     'currency' => $payment_info->GrossAmount->currencyID,
                     'parent_payment' => $payment_info->ParentTransactionID,
                     'pending_reason' => $payment_info->PendingReason,
@@ -635,7 +638,6 @@ class MethodEC extends AbstractMethodPaypal
 
     public function refund()
     {
-
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
         $id_paypal_order = $paypal_order->id;
         $capture = PaypalCapture::loadByOrderPayPalId($id_paypal_order);
@@ -654,7 +656,6 @@ class MethodEC extends AbstractMethodPaypal
         } catch (Exception $ex) {
             $response = $ex;
         }
-
 
         if ($response instanceof PayPal\PayPalAPI\RefundTransactionResponseType) {
             if (isset($response->Errors)) {
@@ -683,20 +684,31 @@ class MethodEC extends AbstractMethodPaypal
 
     public function void($authorization)
     {
-        $this->_getCredentialsInfo($authorization);
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-        $result = $sdk->doVoid($authorization);
-        if ($result['ACK'] == "Success") {
-            $response =  array(
-                'authorization_id' => $result['AUTHORIZATIONID'],
-                'status' => $result['ACK'],
-                'success' => true,
-            );
-        } else {
-            $response =  array(
-                'error_code' => $result['L_ERRORCODE0'],
-                'error_message' => $result['L_LONGMESSAGE0'],
-            );
+        $doVoidReqType = new DoVoidRequestType();
+        $doVoidReqType->AuthorizationID = $authorization;
+        $doVoidReq = new DoVoidReq();
+        $doVoidReq->DoVoidRequest = $doVoidReqType;
+
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        try {
+            $response = $paypalService->DoVoid($doVoidReq);
+        } catch (Exception $ex) {
+            $response = $ex;
+        }
+
+        if ($response instanceof PayPal\PayPalAPI\DoVoidResponseType) {
+            if (isset($response->Errors)) {
+                $response =  array(
+                    'error_code' => $response->Errors[0]->ErrorCode,
+                    'error_message' => $response->Errors[0]->LongMessage,
+                );
+            } else {
+                $response =  array(
+                    'authorization_id' => $response->AuthorizationID,
+                    'status' => $response->Ack,
+                    'success' => true,
+                );
+            }
         }
         return $response;
     }
@@ -727,9 +739,15 @@ class MethodEC extends AbstractMethodPaypal
 
     public function getInfo($params)
     {
-        $this->_getCredentialsInfo($params);
-
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
-        return $sdk->getExpressCheckout($params);
+        $getExpressCheckoutDetailsRequest = new GetExpressCheckoutDetailsRequestType($params['token']);
+        $getExpressCheckoutReq = new GetExpressCheckoutDetailsReq();
+        $getExpressCheckoutReq->GetExpressCheckoutDetailsRequest = $getExpressCheckoutDetailsRequest;
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        try {
+            $response = $paypalService->GetExpressCheckoutDetails($getExpressCheckoutReq);
+        } catch (Exception $ex) {
+            $response = $ex;
+        }
+        return $response;
     }
 }
