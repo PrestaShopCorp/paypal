@@ -534,9 +534,6 @@ class MethodEC extends AbstractMethodPaypal
             $exec_payment = $ex;
         }
 
-      // echo '<pre>';print_r($exec_payment);die;
-
-
         if ($exec_payment instanceof PayPal\PayPalAPI\DoExpressCheckoutPaymentResponseType) {
             if (isset($exec_payment->Errors)) {
                 Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment->Errors[0]->ErrorCode)));
