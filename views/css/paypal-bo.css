@@ -34,7 +34,7 @@
 }
 .active-products img.product-img {
     height: 20px;
-    padding-right: 3px;
+    padding-right: 1px;
 }
 .active-products .panel span {
     font-weight: bold;
@@ -59,7 +59,7 @@
     border: 2px solid;
 }
 .active-products .panel.active-panel {
-    background-color: #F0F8FF !important; 
+    background-color: #F0F8FF !important;
 }
 .paypal-signup .btn.btn-info {
     padding: 0px 15px 0 0;
@@ -78,10 +78,10 @@
 .paypal-bold{font-weight:700}
 .box ul.tick li{background:url(../img/blue_tick.png) no-repeat left 3px;padding:4px 26px}
 #paypal_conf .right, .box ul.tick{float:right}
-#paypal_conf .left{width:77%}
-#paypal_conf .right{width:18%}
+#paypal_conf .left{width:79%}
+#paypal_conf .right{width:17%}
 #paypal_conf .box{margin:6px 1%;text-align:left}
-#paypal_conf .box ul{list-style:none;margin:0;padding:0}
+#paypal_conf .box ul{list-style:none;margin:0;padding:0;width:66%;}
 #paypal_conf .left {float:left}
 #paypal_conf .left img {margin-bottom: -5px; /*float:left;  */   width: 100px;}
 #paypal_conf .left .logo {
@@ -216,10 +216,14 @@ p.contentPara {
 .blue a:hover, .dark a:hover {
     color: #fff;
 }
+@media only screen and (max-width: 1240px) {
+    #paypal_conf .box ul {
+        width: 55%;
+    }
+}
 @media only screen and (max-width: 900px) {
     #paypal_conf .left .logo {
         float: none;
-        width: 50%;
         margin: 0px;
     }
     #paypal_conf .left .info {
@@ -228,10 +232,14 @@ p.contentPara {
         width: 90%;
     }
     #paypal_conf .left {
-        width: 50%;
+        width: 97%;
     }
     #paypal_conf .right {
-        width: 40%;
+        width: 94%;
+    }
+    #paypal_conf .box ul {
+        width:100%;
+        float: none;
     }
 }
 @media only screen and (max-width: 570px) {

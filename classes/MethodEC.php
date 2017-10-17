@@ -45,7 +45,7 @@ use PayPal\PayPalAPI\DoVoidRequestType;
 use PayPal\PayPalAPI\GetExpressCheckoutDetailsRequestType;
 use PayPal\PayPalAPI\GetExpressCheckoutDetailsReq;
 use PayPal\Service\PayPalAPIInterfaceServiceService;
-require_once(_PS_MODULE_DIR_.'paypal/sdk/paypal/PPBootStrap.php');
+require_once(_PS_MODULE_DIR_.'paypal/sdk/paypalNVP/PPBootStrap.php');
 
 
 
@@ -286,7 +286,7 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails = new SetExpressCheckoutRequestDetailsType();
         $setECReqDetails->PaymentDetails[0] = $paymentDetails;
         $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true).'&step=1';
-        $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);;
+        $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);
         $setECReqDetails->NoShipping = 1;
         $setECReqDetails->AddressOverride = 0;
         $setECReqDetails->ReqConfirmShipping = 0;
@@ -312,19 +312,13 @@ class MethodEC extends AbstractMethodPaypal
         Configuration::getAcctAndConfig() returns array that contains credential and config parameters
         */
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
-        try {
-            /* wrap API method calls on the service object with a try catch */
-            $payment = $paypalService->SetExpressCheckout($setECReq);
-            if (isset($payment->Errors)) {
-                Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $payment->Errors[0]->ErrorCode)));
-            }
-            $this->token = $payment->Token;
-            $return = $this->redirectToAPI($payment->Token, 'setExpressCheckout');
-        } catch (Exception $ex) {
-            $return = $ex;
+        /* wrap API method calls on the service object with a try catch */
+        $payment = $paypalService->SetExpressCheckout($setECReq);
+        if (isset($payment->Errors)) {
+            throw new Exception('ERROR in SetExpressCheckout',$payment->Errors[0]->ErrorCode);
         }
-
-        return $return;
+        $this->token = $payment->Token;
+        return $this->redirectToAPI($payment->Token, 'setExpressCheckout');
     }
 
     private function _getPaymentDetails(&$paymentDetails, &$total_products, &$tax)
@@ -493,9 +487,11 @@ class MethodEC extends AbstractMethodPaypal
     {
         switch (Configuration::get('PAYPAL_SANDBOX')) {
             case 0:
-                $params['user'] = Configuration::get('PAYPAL_USERNAME_LIVE');
-                $params['pwd'] = Configuration::get('PAYPAL_PSWD_LIVE');
-                $params['signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
+                $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_LIVE');
+                $params['acct1.Password'] = Configuration::get('PAYPAL_PSWD_LIVE');
+                $params['acct1.Signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
+                $params['mode'] = Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live';
+                $params['log.LogEnabled'] = false;
                 break;
             case 1:
                 $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_SANDBOX');

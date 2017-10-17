@@ -39,6 +39,7 @@ include_once 'classes/PaypalOrder.php';
 // EC = express checkout
 // ECS = express checkout sortcut
 // BT = Braintree
+// PPP = PayPal Plus
 
 class PayPal extends PaymentModule
 {
@@ -380,6 +381,10 @@ class PayPal extends PaymentModule
             $context->smarty->assign(array(
                 'braintree_available' => true,
             ));
+        } elseif ($country_default == "DE") {
+            $context->smarty->assign(array(
+                'ppp_available' => true,
+            ));
         }
 
 
@@ -524,6 +529,7 @@ class PayPal extends PaymentModule
 
         $method_active = Configuration::get('PAYPAL_METHOD');
         $payments_options = array();
+        $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
 
         switch ($method_active) {
             case 'EC':
@@ -570,7 +576,6 @@ class PayPal extends PaymentModule
                 }
                 break;
             case 'BT':
-                $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
                 $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
                 $curr = context::getContext()->currency->iso_code;
                 if (!isset($merchant_accounts->$curr)) {
@@ -597,6 +602,20 @@ class PayPal extends PaymentModule
 
                     $payments_options[] = $embeddedOption;
                 }
+                break;
+            case 'PPP':
+                if (!Configuration::get('PAYPAL_PLUS_ENABLED')) {
+                    return;
+                }
+                $embeddedOption = new PaymentOption();
+                $action_text = $this->l('Pay with PayPal Plus');
+                if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
+                    $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
+                }
+                $embeddedOption->setCallToActionText($action_text)
+                    ->setForm($this->generateFormPaypalPpp());
+                $embeddedOption->setModuleName('paypal_plus');
+                $payments_options[] = $embeddedOption;
                 break;
         }
 
@@ -625,6 +644,9 @@ class PayPal extends PaymentModule
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
                 $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
+            }
+            if (Configuration::get('PAYPAL_METHOD') == 'PPP' && Configuration::get('PAYPAL_PLUS_ENABLED')) {
+                $this->context->controller->registerJavascript($this->name . '-plus-minjs', 'https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js', array('server' => 'remote'));
             }
         }
     }
@@ -673,6 +695,23 @@ class PayPal extends PaymentModule
             $merchant_accounts[$params['object']->iso_code] = $merchant_account[$params['object']->iso_code];
             Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($merchant_accounts));
         }
+    }
+
+    protected function generateFormPaypalPpp()
+    {
+        $context = $this->context;
+        $amount = $context->cart->getOrderTotal();
+
+        $this->context->smarty->assign(array(
+            'pppSubmitUrl'=> $context->link->getModuleLink('paypal', 'pppValidation', array(), true),
+            'braintreeAmount'=> $amount,
+            'baseDir' => $context->link->getBaseLink($context->shop->id, true),
+            'path' => $this->_path,
+            'mode' => Configuration::get('PAYPAL_SANDBOX')  ? 'sandbox' : 'production',
+        ));
+
+
+        return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_ppp.tpl');
     }
 
     protected function generateFormPaypalBt()

@@ -30,21 +30,24 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $method_ec = AbstractMethodPaypal::load('EC');
-
-        $response = $method_ec->init(array('use_card'=>Tools::getValue('credit_card')));
         $paypal = Module::getInstanceByName('paypal');
-
-        if($response instanceof PayPal\Exception\PPConnectionException) {
-            $ex_detailed_message = $paypal->l('Error connecting to ') . $response->getUrl();
-        } else if($response instanceof PayPal\Exception\PPMissingCredentialException || $response instanceof PayPal\Exception\PPInvalidCredentialException) {
-            $ex_detailed_message = $response->errorMessage();
-        } else if($response instanceof PayPal\Exception\PPConfigurationException) {
+        $method_ec = AbstractMethodPaypal::load('EC');
+        try{
+            $url = $method_ec->init(array('use_card'=>Tools::getValue('credit_card')));
+        } catch (PayPal\Exception\PPConnectionException $e) {
+            $ex_detailed_message = $paypal->l('Error connecting to ') . $e->getUrl();
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PPMissingCredentialException $e) {
+            $ex_detailed_message = $e->errorMessage();
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PPConfigurationException $e) {
             $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
-        } else {
-            Tools::redirect($response.'&useraction=commit');
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (Exception $e) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $e->getCode())));
         }
 
-        Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg_ec' => $ex_detailed_message)));
+        Tools::redirect($url.'&useraction=commit');
+
     }
 }
