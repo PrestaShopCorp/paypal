@@ -118,6 +118,26 @@ class MethodEC extends AbstractMethodPaypal
                         'label' => $module->l('Disabled'),
                     )
                 ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Enabled In context'),
+                'name' => 'paypal_ec_in_context',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'hint' => $module->l(''),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_ec_in_context_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_ec_in_context_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
             )
         ));
 
@@ -125,6 +145,7 @@ class MethodEC extends AbstractMethodPaypal
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
             'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
+            'paypal_ec_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
         );
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
@@ -227,6 +248,7 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', $params['paypal_ec_in_context']);
         }
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
