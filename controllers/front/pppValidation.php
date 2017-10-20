@@ -28,5 +28,34 @@ include_once _PS_MODULE_DIR_.'paypal/classes/AbstractMethodPaypal.php';
 
 class PaypalPppValidationModuleFrontController extends ModuleFrontController
 {
+    public function postProcess()
+    {
+        $method_ppp = AbstractMethodPaypal::load('PPP');
+        $paypal = Module::getInstanceByName('paypal');
+        try {
+            $method_ppp->validation();
+        } catch (PayPal\Exception\PayPalConnectionException $e) {
+            $decoded_message = Tools::jsonDecode($e->getData());
+            $ex_detailed_message = $decoded_message->message;
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PayPalInvalidCredentialException $e) {
+            $ex_detailed_message = $e->errorMessage();
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PayPalMissingCredentialException $e) {
+            $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (Exception $e) {
+            echo'<pre>';var_dump($e);die;
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $e->getMessage())));
+        }
+
+        Context::getContext()->cookie->__unset('paypal_plus_payment');
+
+        $cart = Context::getContext()->cart;
+        $customer = new Customer($cart->id_customer);
+
+        Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$paypal->id.'&id_order='.$paypal->currentOrder.'&key='.$customer->secure_key);
+
+    }
 
 }

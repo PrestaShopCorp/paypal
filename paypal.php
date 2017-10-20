@@ -248,7 +248,6 @@ class PayPal extends PaymentModule
             || !$this->registerHook('displayOrderConfirmation')
             || !$this->registerHook('displayAdminOrder')
             || !$this->registerHook('actionOrderStatusPostUpdate')
-            || !$this->registerHook('actionValidateOrder')
             || !$this->registerHook('actionOrderStatusUpdate')
             || !$this->registerHook('header')
             || !$this->registerHook('actionObjectCurrencyAddAfter')
@@ -351,6 +350,7 @@ class PayPal extends PaymentModule
             return 'https://pp-ps-auth.com/';
         }
     }
+
 
     public function getContent()
     {
@@ -570,7 +570,7 @@ class PayPal extends PaymentModule
                         $payment_options->setCallToActionText($action_text);
                         $payment_options->setModuleName('express_checkout_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
-                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/express_checkout.tpl'));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ec.tpl'));
                         $payments_options[] = $payment_options;
                     }
                 }
@@ -607,15 +607,18 @@ class PayPal extends PaymentModule
                 if (!Configuration::get('PAYPAL_PLUS_ENABLED')) {
                     return;
                 }
-                $embeddedOption = new PaymentOption();
+
+                $payment_options = new PaymentOption();
                 $action_text = $this->l('Pay with PayPal Plus');
                 if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
                     $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
                 }
-                $embeddedOption->setCallToActionText($action_text)
-                    ->setForm($this->generateFormPaypalPpp());
-                $embeddedOption->setModuleName('paypal_plus');
-                $payments_options[] = $embeddedOption;
+                $payment_options->setCallToActionText($action_text);
+                $payment_options->setModuleName('paypal_plus');
+                $payment_options->setAction('javascript:doPatchPPP();');
+                $this->assignInfoPaypalPlus();
+                $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ppp.tpl'));
+                $payments_options[] = $payment_options;
                 break;
         }
 
@@ -624,7 +627,6 @@ class PayPal extends PaymentModule
 
     public function hookHeader()
     {
-        //echo '<pre>';print_r($this->context->cart);die;
         if (Tools::getValue('controller') == "order") {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
@@ -637,9 +639,9 @@ class PayPal extends PaymentModule
                     $this->context->controller->registerJavascript($this->name . '-braintreejs', 'modules/' . $this->name . '/views/js/payment_bt.js');
                 }
                 if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
-                    $this->context->controller->registerJavascript($this->name . '-paypal-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
-                    $this->context->controller->registerJavascript($this->name . '-paypal-checkout-min', 'https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js', array('server' => 'remote'));
-                    $this->context->controller->registerJavascript($this->name . '-paypal-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
+                    $this->context->controller->registerJavascript($this->name . '-pp-braintree-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
+                    $this->context->controller->registerJavascript($this->name . '-pp-braintree-checkout-min', 'https://js.braintreegateway.com/web/3.16.0/js/paypal-checkout.min.js', array('server' => 'remote'));
+                    $this->context->controller->registerJavascript($this->name . '-pp-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
                 }
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
@@ -647,6 +649,8 @@ class PayPal extends PaymentModule
             }
             if (Configuration::get('PAYPAL_METHOD') == 'PPP' && Configuration::get('PAYPAL_PLUS_ENABLED')) {
                 $this->context->controller->registerJavascript($this->name . '-plus-minjs', 'https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-plus-payment-js', 'modules/' . $this->name . '/views/js/payment_ppp.js');
+                $this->context->controller->addJqueryPlugin('fancybox');
             }
         }
     }
@@ -697,21 +701,37 @@ class PayPal extends PaymentModule
         }
     }
 
-    protected function generateFormPaypalPpp()
+    protected function assignInfoPaypalPlus()
     {
         $context = $this->context;
-        $amount = $context->cart->getOrderTotal();
+        $ppplus = AbstractMethodPaypal::load('PPP');
+        try{
+            $result = $ppplus->init(true);
+            $this->context->cookie->__set('paypal_plus_payment', $result['payment_id']);
+        } catch (PayPal\Exception\PayPalConnectionException $e) {
+            $decoded_message = Tools::jsonDecode($e->getData());
+            $ex_detailed_message = $decoded_message->details[0]->issue;
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PayPalInvalidCredentialException $e) {
+            $ex_detailed_message = $e->errorMessage();
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PayPalMissingCredentialException $e) {
+            $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (Exception $e) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $e->getCode())));
+        }
 
-        $this->context->smarty->assign(array(
+        $context->smarty->assign(array(
             'pppSubmitUrl'=> $context->link->getModuleLink('paypal', 'pppValidation', array(), true),
-            'braintreeAmount'=> $amount,
+            'approval_url_ppp'=> $result['approval_url'],
             'baseDir' => $context->link->getBaseLink($context->shop->id, true),
             'path' => $this->_path,
-            'mode' => Configuration::get('PAYPAL_SANDBOX')  ? 'sandbox' : 'production',
+            'mode' => Configuration::get('PAYPAL_SANDBOX')  ? 'sandbox' : 'live',
+            'ppp_iso_code' => $context->language->iso_code,
+            'ajax_patch_url' => $context->link->getModuleLink('paypal', 'pppPatch', array(), true),
         ));
 
-
-        return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_ppp.tpl');
     }
 
     protected function generateFormPaypalBt()
@@ -721,7 +741,7 @@ class PayPal extends PaymentModule
 
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
-        $this->context->smarty->assign(array(
+        $context->smarty->assign(array(
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
             'braintreeAmount'=> $amount,
@@ -747,7 +767,7 @@ class PayPal extends PaymentModule
         if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
             $check3DS = 1;
         }
-        $this->context->smarty->assign(array(
+        $context->smarty->assign(array(
             'error_msg'=> Tools::getValue('bt_error_msg'),
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
@@ -778,14 +798,6 @@ class PayPal extends PaymentModule
         return $this->context->smarty->fetch('module:paypal/views/templates/hook/order_confirmation.tpl');
     }
 
-    /* public function hookDisplayFooterProduct($params)
-    {
-        if (Configuration::get('PAYPAL_METHOD') != 'EC') {
-            return false;
-        }
-        $method = AbstractMethodPaypal::load('EC');
-        return $method->renderExpressCheckout($this->context, 'EC');
-    }*/
 
     public function hookDisplayReassurance()
     {
@@ -801,6 +813,9 @@ class PayPal extends PaymentModule
         $this->amount_paid_paypal = (float)$amount_paid;
         $cart = new Cart((int) $id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
+        if($amount_paid > $total_ps+0.10 || $amount_paid < $total_ps-0.10) {
+            $total_ps = $amount_paid;
+        }
         parent::validateOrder(
             (int) $id_cart,
             (int) $id_order_state,
@@ -814,6 +829,24 @@ class PayPal extends PaymentModule
             $shop
         );
 
+        if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
+            $id_order = Order::getByCartId($id_cart);
+        } else {
+            $id_order = Order::getOrderByCartId($id_cart);
+        }
+        $order = new Order($id_order);
+
+        if (isset($amount_paid) && $amount_paid != 0 && $order->total_paid != $amount_paid) {
+            $order->total_paid = $amount_paid;
+            $order->total_paid_real = $amount_paid;
+            $order->total_paid_tax_incl = $amount_paid;
+            $order->update();
+
+            $sql = 'UPDATE `'._DB_PREFIX_.'order_payment`
+		    SET `amount` = '.(float)$amount_paid.'
+		    WHERE  `order_reference` = "'.pSQL($order->reference).'"';
+            Db::getInstance()->execute($sql);
+        }
 
         $paypal_order = new PaypalOrder();
         $paypal_order->id_order = $this->currentOrder;
@@ -835,23 +868,6 @@ class PayPal extends PaymentModule
             $paypal_capture = new PaypalCapture();
             $paypal_capture->id_paypal_order = $paypal_order->id;
             $paypal_capture->save();
-        }
-    }
-
-    public function hookActionValidateOrder($params)
-    {
-        $order = $params['order'];
-        $amount_paid = (float) $this->amount_paid_paypal;
-        if (isset($amount_paid) && $amount_paid != 0 && $order->total_paid != $amount_paid) {
-            $order->total_paid = $amount_paid;
-            $order->total_paid_real = $amount_paid;
-            $order->total_paid_tax_incl = $amount_paid;
-            $order->update();
-
-            $sql = 'UPDATE `'._DB_PREFIX_.'order_payment`
-		    SET `amount` = '.(float)$amount_paid.'
-		    WHERE  `order_reference` = "'.pSQL($order->reference).'"';
-            Db::getInstance()->execute($sql);
         }
     }
 
@@ -945,11 +961,23 @@ class PayPal extends PaymentModule
         $method = AbstractMethodPaypal::load($paypal_order->method);
         $orderMessage = new CustomerMessage();
         $orderMessage->message = "";
+        $ex_detailed_message = '';
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
+            if ($paypal_order->method == "PPP") {
+                return;
+            }
             $orderPayPal = PaypalOrder::loadByOrderId($params['id_order']);
             $paypalCapture = PaypalCapture::loadByOrderPayPalId($orderPayPal->id);
 
-            $response_void = $method->void(array('authorization_id'=>$orderPayPal->id_transaction));
+            try {
+                $response_void = $method->void(array('authorization_id'=>$orderPayPal->id_transaction));
+            } catch (PayPal\Exception\PPConnectionException $e) {
+                $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+            } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                $ex_detailed_message = $e->errorMessage();
+            } catch (PayPal\Exception\PPConfigurationException $e) {
+                $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+            }
             if ($response_void['success']) {
                 $paypalCapture->result = 'voided';
                 $paypalCapture->save();
@@ -971,9 +999,12 @@ class PayPal extends PaymentModule
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&cancel_failed=1');
             }
 
-
-            foreach ($response_void as $key => $msg) {
-                $orderMessage->message .= $key." : ".$msg.";\r";
+            if ($ex_detailed_message) {
+                $orderMessage->message = $ex_detailed_message;
+            } else {
+                foreach ($response_void as $key => $msg) {
+                    $orderMessage->message .= $key." : ".$msg.";\r";
+                }
             }
             $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
             $orderMessage->id_order = $params['id_order'];
@@ -982,12 +1013,9 @@ class PayPal extends PaymentModule
             if ($orderMessage->message) {
                 $orderMessage->save();
             }
-
-
         }
 
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_REFUND')) {
-
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             if (Validate::isLoadedObject($capture) && !$capture->id_capture) {
                 $orderMessage = new Message();
@@ -1005,13 +1033,39 @@ class PayPal extends PaymentModule
             }
 
             if ($paypal_order->method == "BT" && $status == "submitted_for_settlement") {
-                $refund_response = $method->void(array('authorization_id'=>$paypal_order->id_transaction));
+                try {
+                    $refund_response = $method->void(array('authorization_id'=>$paypal_order->id_transaction));
+                } catch (PayPal\Exception\PPConnectionException $e) {
+                    $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+                } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                } catch (PayPal\Exception\PPConfigurationException $e) {
+                    $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+                }
                 if ($refund_response['success']) {
                     $capture->result = 'voided';
                     $paypal_order->payment_status = 'voided';
                 }
             } else {
-                $refund_response = $method->refund();
+                try {
+                    $refund_response = $method->refund();
+                } catch (PayPal\Exception\PPConnectionException $e) {
+                    $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+                } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                } catch (PayPal\Exception\PPConfigurationException $e) {
+                    $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+                } catch (PayPal\Exception\PayPalConnectionException $e) {
+                    $decoded_message = Tools::jsonDecode($e->getData());
+                    $ex_detailed_message = $decoded_message->message;
+                } catch (PayPal\Exception\PayPalInvalidCredentialException $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                } catch (PayPal\Exception\PayPalMissingCredentialException $e) {
+                    $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+                } catch (Exception $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                }
+
                 if ($refund_response['success']) {
                     $capture->result = 'refunded';
                     $paypal_order->payment_status = 'refunded';
@@ -1023,9 +1077,12 @@ class PayPal extends PaymentModule
                 $paypal_order->save();
             }
 
-
-            foreach ($refund_response as $key => $msg) {
-                $orderMessage->message .= $key." : ".$msg.";\r";
+            if ($ex_detailed_message) {
+                $orderMessage->message = $ex_detailed_message;
+            } else {
+                foreach ($refund_response as $key => $msg) {
+                    $orderMessage->message .= $key." : ".$msg.";\r";
+                }
             }
             $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
             $orderMessage->id_order = $params['id_order'];
@@ -1034,7 +1091,7 @@ class PayPal extends PaymentModule
             if ($orderMessage->message) {
                 $orderMessage->save();
             }
-
+//echo '<pre>';print_r($orderMessage);die;
             if (!isset($refund_response['already_refunded']) && !isset($refund_response['success'])) {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_refund=1');
             }
@@ -1046,16 +1103,28 @@ class PayPal extends PaymentModule
                 return false;
             }
 
-            $capture_response = $method->confirmCapture();
+            try {
+                $capture_response = $method->confirmCapture();
+            } catch (PayPal\Exception\PPConnectionException $e) {
+                $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+            } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                $ex_detailed_message = $e->errorMessage();
+            } catch (PayPal\Exception\PPConfigurationException $e) {
+                $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+            }
 
             if (isset($capture_response['success'])) {
                 $paypal_order->payment_status = $capture_response['status'];
                 $paypal_order->save();
             }
-
-            foreach ($capture_response as $key => $msg) {
-                $orderMessage->message .= $key." : ".$msg.";\r";
+            if ($ex_detailed_message) {
+                $orderMessage->message = $ex_detailed_message;
+            } else {
+                foreach ($capture_response as $key => $msg) {
+                    $orderMessage->message .= $key." : ".$msg.";\r";
+                }
             }
+
             $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
             $orderMessage->id_order = $params['id_order'];
             $orderMessage->id_customer = $this->context->customer->id;

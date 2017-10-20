@@ -26,8 +26,18 @@
 
 include_once _PS_MODULE_DIR_.'paypal/classes/AbstractMethodPaypal.php';
 
-class PaypalPppInitModuleFrontController extends ModuleFrontController
+class PaypalPppPatchModuleFrontController extends ModuleFrontController
 {
-
-
+    public function postProcess()
+    {
+        $method_ppp = AbstractMethodPaypal::load('PPP');
+        if (Context::getContext()->cookie->paypal_plus_payment) {
+            try {
+                $method_ppp->doPatch();
+                echo Tools::jsonEncode(array('success' => true));
+            } catch (Exception $e) {
+                die($e->getMessage());
+            }
+        }
+    }
 }

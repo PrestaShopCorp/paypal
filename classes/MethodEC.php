@@ -248,6 +248,7 @@ class MethodEC extends AbstractMethodPaypal
             if ((isset($params['modify']) && $params['modify']) || (Configuration::get('PAYPAL_METHOD') != $params['method'])) {
                 $response = $paypal->getPartnerInfo($params['method']);
                 $result = Tools::jsonDecode($response);
+
                 if (!$result->error && isset($result->data->url)) {
                     $PartnerboardingURL = $result->data->url;
                     Tools::redirectLink($PartnerboardingURL);
@@ -346,7 +347,7 @@ class MethodEC extends AbstractMethodPaypal
             $itemDetails->Amount = $itemAmount;
             $itemDetails->Quantity = $product['quantity'];
             /** Indicates whether an item is digital or physical. For digital goods, this field is required and must be set to Digital. It is one of the following values:*/
-            $itemDetails->ItemCategory = 'Physical';
+            $itemDetails->ItemCategory = $product['is_virtual']?'Digital':'Physical';
             $itemDetails->Tax = new BasicAmountType($currency, number_format($product['product_tax'], 2, ".", ''));
             $paymentDetails->PaymentDetailsItem[] = $itemDetails;
 
@@ -527,39 +528,29 @@ class MethodEC extends AbstractMethodPaypal
 
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
 
-        try {
-            /* wrap API method calls on the service object with a try catch */
-            $exec_payment = $paypalService->DoExpressCheckoutPayment($DoECReq);
-        } catch (Exception $ex) {
-            $exec_payment = $ex;
+        $exec_payment = $paypalService->DoExpressCheckoutPayment($DoECReq);
+
+        if (isset($exec_payment->Errors)) {
+            throw new Exception('ERROR in SetExpressCheckout',$exec_payment->Errors[0]->ErrorCode);
         }
 
-        if ($exec_payment instanceof PayPal\PayPalAPI\DoExpressCheckoutPaymentResponseType) {
-            if (isset($exec_payment->Errors)) {
-                Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $exec_payment->Errors[0]->ErrorCode)));
-            }
-            $cart = $context->cart;
-            $customer = new Customer($cart->id_customer);
-            if (!Validate::isLoadedObject($customer)) {
-                Tools::redirect('index.php?controller=order&step=1');
-            }
-            $currency = $context->currency;
-            if(isset($exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo)) {
-                $payment_info = $exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo[0];
-                $total = (float)$payment_info->GrossAmount->value;
-                $paypal = Module::getInstanceByName('paypal');
-                if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
-                    $order_state = Configuration::get('PS_OS_PAYMENT');
-                } else {
-                    $order_state = Configuration::get('PAYPAL_OS_WAITING');
-                }
-                $transactionDetail = $this->getDetailsTransaction($exec_payment->DoExpressCheckoutPaymentResponseDetails);
-                $paypal->validateOrder($cart->id, $order_state, $total, 'PayPal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
-                return true;
-            }
-        } else {
-            return $exec_payment;
+        $cart = $context->cart;
+        $customer = new Customer($cart->id_customer);
+        if (!Validate::isLoadedObject($customer)) {
+            Tools::redirect('index.php?controller=order&step=1');
         }
+        $currency = $context->currency;
+        $payment_info = $exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo[0];
+        $total = (float)$payment_info->GrossAmount->value;
+        $paypal = Module::getInstanceByName('paypal');
+        if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
+            $order_state = Configuration::get('PS_OS_PAYMENT');
+        } else {
+            $order_state = Configuration::get('PAYPAL_OS_WAITING');
+        }
+        $transactionDetail = $this->getDetailsTransaction($exec_payment->DoExpressCheckoutPaymentResponseDetails);
+        $paypal->validateOrder($cart->id, $order_state, $total, 'PayPal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
+        return true;
     }
 
     public function getDetailsTransaction($transaction)
@@ -592,11 +583,7 @@ class MethodEC extends AbstractMethodPaypal
         $doCaptureReq->DoCaptureRequest = $doCaptureRequestType;
 
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
-        try {
-            $response = $paypalService->DoCapture($doCaptureReq);
-        } catch (Exception $ex) {
-            $response = $ex;
-        }
+        $response = $paypalService->DoCapture($doCaptureReq);
 
         if ($response instanceof PayPal\PayPalAPI\DoCaptureResponseType) {
             $authorization_id = $response->DoCaptureResponseDetails->AuthorizationID;
@@ -647,11 +634,7 @@ class MethodEC extends AbstractMethodPaypal
         $refundTransactionReq->RefundTransactionRequest = $refundTransactionReqType;
 
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
-        try {
-            $response = $paypalService->RefundTransaction($refundTransactionReq);
-        } catch (Exception $ex) {
-            $response = $ex;
-        }
+        $response = $paypalService->RefundTransaction($refundTransactionReq);
 
         if ($response instanceof PayPal\PayPalAPI\RefundTransactionResponseType) {
             if (isset($response->Errors)) {
@@ -686,11 +669,7 @@ class MethodEC extends AbstractMethodPaypal
         $doVoidReq->DoVoidRequest = $doVoidReqType;
 
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
-        try {
-            $response = $paypalService->DoVoid($doVoidReq);
-        } catch (Exception $ex) {
-            $response = $ex;
-        }
+        $response = $paypalService->DoVoid($doVoidReq);
 
         if ($response instanceof PayPal\PayPalAPI\DoVoidResponseType) {
             if (isset($response->Errors)) {
