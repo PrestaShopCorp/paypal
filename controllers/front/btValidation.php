@@ -33,8 +33,8 @@ class PaypalBtValidationModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $method_bt = AbstractMethodPaypal::load('BT');
-       // echo'<pre>';print_r($_POST);echo'<pre>';die;
-        $result = $method_bt->validation();
+
+        $method_bt->validation();
 
         $cart = Context::getContext()->cart;
         $customer = new Customer($cart->id_customer);

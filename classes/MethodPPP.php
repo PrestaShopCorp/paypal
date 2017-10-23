@@ -49,15 +49,20 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function setConfig($params)
     {
+        $paypal = Module::getInstanceByName($this->name);
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_TITLE', $params['ppp_config_title']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_BRAND', $params['ppp_config_brand']);
 
             if (isset($_FILES['ppp_config_logo']['tmp_name'])) {
-                $tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS');
-                move_uploaded_file($_FILES['ppp_config_logo']['tmp_name'], $tmpName);
-                ImageManager::resize($tmpName, _PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png');
+                if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
+                !move_uploaded_file($_FILES['ppp_config_logo']['tmp_name'], $tmpName)) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
+                }
+                if (!ImageManager::resize($tmpName, _PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
+                }
                 Configuration::updateValue('PAYPAL_PPP_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png');
             }
             $experience_web = $this->createWebExperience();
@@ -138,7 +143,6 @@ class MethodPPP extends AbstractMethodPaypal
         try {
             // Use this call to create a profile.
             $createProfileResponse = $webProfile->create($this->_getCredentialsInfo());
-            //echo '<pre>';print_r($createProfileResponse);die;
         } catch (\PayPal\Exception\PayPalConnectionException $ex) {
             return false;
         }
@@ -196,6 +200,7 @@ class MethodPPP extends AbstractMethodPaypal
                 'label' => $module->l('Shop logo field'),
                 'name' => 'ppp_config_logo',
                 'hint' => $module->l('Leave it empty to use your default shop logo'),
+                'thumb' => file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/ppp_logo.png':''
             ),
             array(
                 'type' => 'switch',

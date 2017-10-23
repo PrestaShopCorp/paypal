@@ -32,8 +32,9 @@ function doPatchPPP() {
     if (exec_ppp_payment) {
         exec_ppp_payment = false;
         $.fancybox.open({
-            content : '<div class="message"><h2>'+waiting_redirection+'</h2></div>',
+            content : '<div id="popup-ppp-waiting"><p>'+waiting_redirection+'</p></div>',
             closeClick : false,
+            height : "auto",
             helpers : {
                 overlay : {
                     closeClick: false

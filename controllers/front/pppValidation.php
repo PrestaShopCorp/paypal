@@ -45,7 +45,6 @@ class PaypalPppValidationModuleFrontController extends ModuleFrontController
             $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
             Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
         } catch (Exception $e) {
-            echo'<pre>';var_dump($e);die;
             Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $e->getMessage())));
         }
 

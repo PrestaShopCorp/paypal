@@ -830,11 +830,11 @@ class PayPal extends PaymentModule
         );
 
         if (Tools::version_compare(_PS_VERSION_, '1.7.1.0', '>')) {
-            $id_order = Order::getByCartId($id_cart);
+            $order = Order::getByCartId($id_cart);
         } else {
             $id_order = Order::getOrderByCartId($id_cart);
+            $order = new Order($id_order);
         }
-        $order = new Order($id_order);
 
         if (isset($amount_paid) && $amount_paid != 0 && $order->total_paid != $amount_paid) {
             $order->total_paid = $amount_paid;
@@ -1091,7 +1091,7 @@ class PayPal extends PaymentModule
             if ($orderMessage->message) {
                 $orderMessage->save();
             }
-//echo '<pre>';print_r($orderMessage);die;
+
             if (!isset($refund_response['already_refunded']) && !isset($refund_response['success'])) {
                 Tools::redirect($_SERVER['HTTP_REFERER'].'&error_refund=1');
             }

@@ -23,6 +23,14 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+<style>
+    #popup-ppp-waiting p{
+        font-size: 16px;
+        margin: 10px;
+        line-height: 1.5em;
+        color: #373a3c;
+    }
+</style>
 <div class="row">
     <div class="col-xs-12 col-md-10">
         <div class="paypal-plus-row-payment">

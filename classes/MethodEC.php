@@ -718,10 +718,9 @@ class MethodEC extends AbstractMethodPaypal
         $getExpressCheckoutReq = new GetExpressCheckoutDetailsReq();
         $getExpressCheckoutReq->GetExpressCheckoutDetailsRequest = $getExpressCheckoutDetailsRequest;
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
-        try {
-            $response = $paypalService->GetExpressCheckoutDetails($getExpressCheckoutReq);
-        } catch (Exception $ex) {
-            $response = $ex;
+        $response = $paypalService->GetExpressCheckoutDetails($getExpressCheckoutReq);
+        if (isset($response->Errors)) {
+            throw new Exception('ERROR in SetExpressCheckout',$response->Errors[0]->ErrorCode);
         }
         return $response;
     }
