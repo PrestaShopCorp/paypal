@@ -138,7 +138,7 @@ class MethodEC extends AbstractMethodPaypal
                         'label' => $module->l('Disabled'),
                     )
                 ),
-            )
+            ),
         ));
 
         $params['fields_value'] = array(
@@ -243,6 +243,8 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_PSWD_'.$mode, $params['api_password']);
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
+            Configuration::updateValue('PAYPAL_MERCHANT_ID_'.$mode, $params['merchant_id']);
+
         }
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
@@ -340,7 +342,7 @@ class MethodEC extends AbstractMethodPaypal
             throw new Exception('ERROR in SetExpressCheckout',$payment->Errors[0]->ErrorCode);
         }
         $this->token = $payment->Token;
-        return $this->redirectToAPI($payment->Token, 'setExpressCheckout');
+        return $this->redirectToAPI('setExpressCheckout');
     }
 
     private function _getPaymentDetails(&$paymentDetails, &$total_products, &$tax)
@@ -480,7 +482,7 @@ class MethodEC extends AbstractMethodPaypal
         return $address_pp;
     }
 
-    public function redirectToAPI($token, $method)
+    public function redirectToAPI($method)
     {
         if ($this->useMobile()) {
             $url = '/cgi-bin/webscr?cmd=_express-checkout-mobile';
@@ -492,7 +494,7 @@ class MethodEC extends AbstractMethodPaypal
             $url .= '&useraction=commit';
         }
         $paypal = Module::getInstanceByName('paypal');
-        return $paypal->getUrl().$url.'&token='.urldecode($token);
+        return $paypal->getUrl().$url.'&token='.urldecode($this->token);
     }
 
     public function useMobile()

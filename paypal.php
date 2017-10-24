@@ -521,10 +521,10 @@ class PayPal extends PaymentModule
 
     public function hookPaymentOptions($params)
     {
-        $not_refunded = 0;
+        $is_virtual = 0;
         foreach ($params['cart']->getProducts() as $key => $product) {
             if ($product['is_virtual']) {
-                $not_refunded = 1;
+                $is_virtual = 1;
                 break;
             }
         }
@@ -548,8 +548,12 @@ class PayPal extends PaymentModule
                         'path' => $this->_path,
                     ));
                     $payment_options->setCallToActionText($action_text);
-                    $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0'), true));
-                    if (!$not_refunded) {
+                    if(Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
+                        $payment_options->setAction('javascript:ECInContext()');
+                    } else {
+                        $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0'), true));
+                    }
+                    if (!$is_virtual) {
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos.tpl'));
                     }
                     $payments_options = [
@@ -644,11 +648,19 @@ class PayPal extends PaymentModule
                 }
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
-                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
-                if(Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')){
-                    $this->context->controller->registerJavascript($this->name . '-paypal-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
-                }
 
+                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
+
+            }
+            if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')){
+                $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
+                Media::addJsDef(array(
+                    'environment' => $environment,
+                    'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
+                    'url_token'   => $this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0','getToken'=>1), true),
+                ));
+                $this->context->controller->registerJavascript($this->name . '-paypal-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-paypal-checkout-in-context', 'modules/' . $this->name . '/views/js/ec_in_context.js', array('server' => 'remote'));
             }
             if (Configuration::get('PAYPAL_METHOD') == 'PPP' && Configuration::get('PAYPAL_PLUS_ENABLED')) {
                 $this->context->controller->registerJavascript($this->name . '-plus-minjs', 'https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js', array('server' => 'remote'));
