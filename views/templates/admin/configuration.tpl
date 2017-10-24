@@ -380,6 +380,17 @@
         $('#configuration_form').insertAfter($('.configuration-block'));
         $('#configuration_form_1').insertAfter($('.configuration-block'));
 
+        $('input[name=paypal_ec_in_context]').on("change", function(){
+            if (this.value == 0) {
+                $('#paypal_ec_merchant_id').parents('.form-group').hide();
+            } else {
+                $('#paypal_ec_merchant_id').parents('.form-group').show();
+            }
+        });
+        if ($('input[name=paypal_ec_in_context]:checked').val() == 0) {
+            $('#paypal_ec_merchant_id').parents('.form-group').hide();
+        }
+
     });
 
 </script>

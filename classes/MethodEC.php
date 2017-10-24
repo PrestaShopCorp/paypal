@@ -57,6 +57,7 @@ class MethodEC extends AbstractMethodPaypal
 
     public function getConfig(PayPal $module)
     {
+        $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
         $params = array('inputs' => array(
             array(
                 'type' => 'select',
@@ -139,6 +140,12 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             ),
+            array(
+                'type' => 'text',
+                'label' => $module->l('Merchant Id'),
+                'name' => 'paypal_ec_merchant_id',
+                'hint' => $module->l('Fill this field with your merchant id')
+            ),
         ));
 
         $params['fields_value'] = array(
@@ -146,6 +153,7 @@ class MethodEC extends AbstractMethodPaypal
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
             'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
             'paypal_ec_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
+            'paypal_ec_merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.$mode),
         );
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
