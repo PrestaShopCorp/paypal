@@ -26,5 +26,35 @@ function setInput()
     });
     $('#paypal_url_page').val(document.location.href);
     $('#paypal_combination').val(combination.join('|'));
-    $('#paypal_payment_form_cart').submit();
+    if (ec_sc_in_context) {
+        ECInContext(combination);
+    } else {
+        $('#paypal_payment_form_cart').submit();
+    }
+
+}
+
+function ECInContext(combination) {
+    window.paypalCheckoutReady = function() {
+        paypal.checkout.setup(merchant_id, {
+            environment: ec_sc_environment,
+        });
+    };
+    paypal.checkout.initXO();
+    $.support.cors = true;
+    $.ajax({
+        url: ec_sc_action_url,
+        type: "GET",
+        data: 'getToken=1&id_product='+$('#paypal_payment_form_cart input[name="id_product"]').val()+'&quantity='+
+        $('[name="qty"]').val()+'&combination='+combination.join('|'),
+        success: function (token) {
+            var url = paypal.checkout.urlPrefix +token;
+            paypal.checkout.startFlow(url);
+        },
+        error: function (responseData, textStatus, errorThrown) {
+            alert("Error in ajax post"+responseData.statusText);
+
+            paypal.checkout.closeFlow();
+        }
+    });
 }

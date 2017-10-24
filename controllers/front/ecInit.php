@@ -47,8 +47,7 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
             Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $e->getCode())));
         }
 
-        if(Tools::getvalue('getToken'))
-        {
+        if (Tools::getvalue('getToken')) {
             die($method_ec->token);
         }
 

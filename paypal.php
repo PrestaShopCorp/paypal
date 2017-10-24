@@ -654,7 +654,7 @@ class PayPal extends PaymentModule
                 $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
 
             }
-            if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')){
+            if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
                 Media::addJsDef(array(
                     'environment' => $environment,
@@ -753,11 +753,12 @@ class PayPal extends PaymentModule
 
     protected function generateFormPaypalBt()
     {
+        $context = $this->context;
         $amount = $context->cart->getOrderTotal();
 
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
-        $this->context->smarty->assign(array(
+        $context->smarty->assign(array(
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
             'braintreeAmount'=> $amount,
@@ -767,12 +768,13 @@ class PayPal extends PaymentModule
         ));
 
 
-        return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
+        return $context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
     }
 
 
     protected function generateFormBt()
     {
+        $context = $this->context;
         $amount = $context->cart->getOrderTotal();
 
         $braintree = AbstractMethodPaypal::load('BT');
@@ -782,7 +784,7 @@ class PayPal extends PaymentModule
         if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
             $check3DS = 1;
         }
-        $this->context->smarty->assign(array(
+        $context->smarty->assign(array(
             'error_msg'=> Tools::getValue('bt_error_msg'),
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
@@ -792,7 +794,7 @@ class PayPal extends PaymentModule
         ));
 
 
-        return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
+        return $context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
     }
 
     public function hookPaymentReturn($params)

@@ -59,6 +59,9 @@ class PaypalEcScInitModuleFrontController extends ModuleFrontController
             'short_cut' => 1
         ));
         if (!isset($response['L_ERRORCODE0'])) {
+            if (Tools::getvalue('getToken')) {
+                die($method_ec->token);
+            }
             Tools::redirect($response);
         } else {
             Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $response['L_ERRORCODE0'])));

@@ -719,7 +719,7 @@ class MethodEC extends AbstractMethodPaypal
         }
 
         $lang = $context->country->iso_code;
-
+        $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
         $img_esc = "/modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
 
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
@@ -729,9 +729,15 @@ class MethodEC extends AbstractMethodPaypal
             'PayPal_payment_type' => $type,
             'PayPal_tracking_code' => 'PRESTASHOP_ECM',
             'PayPal_img_esc' => $img_esc,
-            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true)
+            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true),
+            'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
         ));
-        $context->controller->registerJavascript($this->name.'-order_confirmation_js', 'modules/paypal/views/js/ec_shortcut.js');
+        if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
+            $context->smarty->assign(array(
+                'environment' => $environment,
+                'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
+            ));
+        }
 
         return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
     }
