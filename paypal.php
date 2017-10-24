@@ -255,6 +255,7 @@ class PayPal extends PaymentModule
             || !$this->registerHook('displayFooterProduct')
             || !$this->registerHook('actionBeforeCartUpdateQty')
             || !$this->registerHook('displayReassurance')
+            || !$this->registerHook('displayInvoiceLegalFreeText')
         ) {
             return false;
         }
@@ -350,22 +351,6 @@ class PayPal extends PaymentModule
             return 'https://pp-ps-auth.com/';
         }
     }
-
-    public function hookDisplayInvoiceLegalFreeText()
-    {
-        $method = AbstractMethodPaypal::load('PPP');
-        $information = $method->printppp();
-        $tab = $this->l('The bank name').' : '.$information->recipient_banking_instruction->bank_name.'; 
-        '.$this->l('Account holder name').' : '.$information->recipient_banking_instruction->account_holder_name.'; 
-        '.$this->l('IBAN').' : '.$information->recipient_banking_instruction->international_bank_account_number.'; 
-        '.$this->l('BIC').' : '.$information->recipient_banking_instruction->bank_identifier_code.'; 
-        '.$this->l('Amount due / currency').' : '.$information->amount->value.' '.$information->amount->currency.';
-        '.$this->l('Payment due date').' : '.$information->payment_due_date.'; 
-        '.$this->l('reference').' : '.$information->reference_number.'.';
-        return $tab;
-
-    }
-
 
     public function getContent()
     {
@@ -1182,5 +1167,24 @@ class PayPal extends PaymentModule
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
         $response = $sdk->getUrlOnboarding($partner_info);
         return $response;
+    }
+
+    public function hookDisplayInvoiceLegalFreeText($params)
+    {
+        $paypal_order = PaypalOrder::loadByOrderId($params['order']->id);
+        if (!Validate::isLoadedObject($paypal_order) || $paypal_order->method != 'PPP'
+            || $paypal_order->payment_tool != 'PAY_UPON_INVOICE') {
+            return;
+        }
+        $method = AbstractMethodPaypal::load('PPP');
+        $information = $method->getInstructionInfo($paypal_order->id_payment);
+        $tab = $this->l('The bank name').' : '.$information->recipient_banking_instruction->bank_name.'; 
+        '.$this->l('Account holder name').' : '.$information->recipient_banking_instruction->account_holder_name.'; 
+        '.$this->l('IBAN').' : '.$information->recipient_banking_instruction->international_bank_account_number.'; 
+        '.$this->l('BIC').' : '.$information->recipient_banking_instruction->bank_identifier_code.'; 
+        '.$this->l('Amount due / currency').' : '.$information->amount->value.' '.$information->amount->currency.';
+        '.$this->l('Payment due date').' : '.$information->payment_due_date.'; 
+        '.$this->l('Reference').' : '.$information->reference_number.'.';
+        return $tab;
     }
 }

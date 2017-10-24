@@ -324,7 +324,6 @@ class MethodPPP extends AbstractMethodPaypal
     private function _getProductsList(&$items, &$itemTotalValue, &$taxTotalValue)
     {
         $products = Context::getContext()->cart->getProducts();
-
         $items = array();
         foreach ($products as $product) {
             $product['product_tax'] = $product['price_wt'] - $product['price'];
@@ -514,6 +513,7 @@ class MethodPPP extends AbstractMethodPaypal
             'id_payment' => pSQL($transaction->id),
             'client_token' => "",
             'capture' => false,
+            'payment_tool' => isset($transaction->payment_instruction)?$transaction->payment_instruction->instruction_type:'',
         );
     }
 
@@ -560,9 +560,9 @@ class MethodPPP extends AbstractMethodPaypal
 
     }
 
-    public function printppp()
+    public function getInstructionInfo($id_payment)
     {
-        $sale = Payment::get("PAY-5YW23177125799032LHXBAAA", $this->_getCredentialsInfo());
+        $sale = Payment::get($id_payment, $this->_getCredentialsInfo());
         return $sale->payment_instruction;
     }
 }
