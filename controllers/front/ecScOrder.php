@@ -33,24 +33,22 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         $method = AbstractMethodPaypal::load('EC');
-        $info = $method->getInfo(array('token'=>Tools::getValue('token')));
-        $ex_detailed_message = '';
         $paypal = Module::getInstanceByName('paypal');
-        if($info instanceof PayPal\Exception\PPConnectionException) {
-            $ex_detailed_message = $paypal->l('Error connecting to ') . $info->getUrl();
-        } else if($info instanceof PayPal\Exception\PPMissingCredentialException || $info instanceof PayPal\Exception\PPInvalidCredentialException) {
-            $ex_detailed_message = $info->errorMessage();
-        } else if($info instanceof PayPal\Exception\PPConfigurationException) {
-            $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
-        } else if($info instanceof PayPal\PayPalAPI\GetExpressCheckoutDetailsResponseType) {
-            if (isset($info->Errors)) {
-                Tools::redirect($this->context->link->getModuleLink('paypal', 'error', array('error_code'=>$info->Errors[0]->ErrorCode)));
-            }
-        }
-        if ($ex_detailed_message) {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg_ec' => $ex_detailed_message)));
-        }
 
+        try {
+            $info = $method->getInfo(array('token'=>Tools::getValue('token')));
+        } catch (PayPal\Exception\PPConnectionException $e) {
+            $ex_detailed_message = $paypal->l('Error connecting to ') . $e->getUrl();
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PPMissingCredentialException $e) {
+            $ex_detailed_message = $e->errorMessage();
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (PayPal\Exception\PPConfigurationException $e) {
+            $ex_detailed_message = $paypal->l('Invalid configuration. Please check your configuration file');
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
+        } catch (Exception $e) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $e->getCode())));
+        }
 
         $payer_info = $info->GetExpressCheckoutDetailsResponseDetails->PayerInfo;
         $ship_addr = $info->GetExpressCheckoutDetailsResponseDetails->PaymentDetails[0]->ShipToAddress;
@@ -103,8 +101,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
                 }
             }
         }
-        //echo '<pre>';print_r($addresses);echo '<pre>';;print_r($info);die;
-       // echo '<pre>';print_r($count+1);echo '<pre>';die;
+
         if (!$address_exist) {
             $orderAddress = new Address();
             $separated_name = explode(" ", $ship_addr->Name);

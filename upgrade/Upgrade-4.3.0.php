@@ -28,9 +28,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_2_0($module)
+function upgrade_module_4_3_0($module)
 {
-    Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', '');
+    if ($module->registerHook('displayInvoiceLegalFreeText')) {
+        return false;
+    }
 
     return true;
 }

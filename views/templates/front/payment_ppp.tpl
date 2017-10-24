@@ -22,18 +22,25 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+
+<style>
+    #popup-ppp-waiting p{
+        font-size: 16px;
+        margin: 10px;
+        line-height: 1.5em;
+        color: #373a3c;
+    }
+</style>
 <div class="row">
     <div class="col-xs-12 col-md-10">
         <div class="paypal-plus-row-payment">
             <div class="payment_module paypal-plus">
-                <div id="ppplus"> </div>
-                <form action="{$pppSubmitUrl}" id="paypal-plus-form" method="post">
-                    {include file="module:paypal/views/templates/front/payment_infos.tpl"}
-                    <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
-                    <input type="hidden" name="payment_method_bt" value="paypal-braintree"/>
-                    <div id="paypal-button"></div>
-                </form>
+
+                {include file="module:paypal/views/templates/front/payment_infos.tpl"}
+
+                <div id="ppplus" style="width: 100%;"> </div>
                 <div id="bt-paypal-error-msg"></div>
+
             </div>
         </div>
     </div>
@@ -41,16 +48,9 @@
 
 
 <script>
-    var ppp = PAYPAL.apps.PPP({
-        "approvalUrl": "'.$approval_url.'",
-        "placeholder": "ppplus",
-        "mode": "sandbox",
-        "country": "DE"
-    });
-    var authorization = '{$braintreeToken}';
-    var bt_amount = {$braintreeAmount};
-    var pbt_translations = {
-        empty_nonce:"{l s='Click paypal button first' mod='paypal'}"
-    };
-    var mode = '{$mode}';
+    var ppp_approval_url = '{$approval_url_ppp nofilter}';
+    var ppp_mode = '{$mode}';
+    var ppp_iso_code = '{$ppp_iso_code}';
+    var ajax_patch_url = '{$ajax_patch_url nofilter}';
+    var waiting_redirection = '{l s='In few seconds you will be redirected to PayPal. Please wait.' mod='paypal'}';
 </script>

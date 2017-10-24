@@ -33,8 +33,8 @@ class PaypalErrorModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
-        if (Tools::getValue('error_msg_ec')) {
-            $error_message = Tools::getValue('error_msg_ec');
+        if (Tools::getValue('error_msg')) {
+            $error_message = Tools::getValue('error_msg');
         } else {
             $error_code = Tools::getValue('error_code');
             $error_message = $this->getErrorMsg($error_code);
