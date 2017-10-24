@@ -351,6 +351,21 @@ class PayPal extends PaymentModule
         }
     }
 
+    public function hookDisplayInvoiceLegalFreeText()
+    {
+        $method = AbstractMethodPaypal::load('PPP');
+        $information = $method->printppp();
+        $tab = $this->l('The bank name').' : '.$information->recipient_banking_instruction->bank_name.'; 
+        '.$this->l('Account holder name').' : '.$information->recipient_banking_instruction->account_holder_name.'; 
+        '.$this->l('IBAN').' : '.$information->recipient_banking_instruction->international_bank_account_number.'; 
+        '.$this->l('BIC').' : '.$information->recipient_banking_instruction->bank_identifier_code.'; 
+        '.$this->l('Amount due / currency').' : '.$information->amount->value.' '.$information->amount->currency.';
+        '.$this->l('Payment due date').' : '.$information->payment_due_date.'; 
+        '.$this->l('reference').' : '.$information->reference_number.'.';
+        return $tab;
+
+    }
+
 
     public function getContent()
     {

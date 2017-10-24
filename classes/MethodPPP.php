@@ -55,7 +55,7 @@ class MethodPPP extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_PPP_CONFIG_TITLE', $params['ppp_config_title']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_BRAND', $params['ppp_config_brand']);
 
-            if (isset($_FILES['ppp_config_logo']['tmp_name'])) {
+            if (isset($_FILES['ppp_config_logo']['tmp_name']) && $_FILES['ppp_config_logo']['tmp_name'] != '') {
                 if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
                 !move_uploaded_file($_FILES['ppp_config_logo']['tmp_name'], $tmpName)) {
                     $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
@@ -65,9 +65,14 @@ class MethodPPP extends AbstractMethodPaypal
                 }
                 Configuration::updateValue('PAYPAL_PPP_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png');
             }
-            $experience_web = $this->createWebExperience();
-            if ($experience_web) {
-                Configuration::updateValue('PAYPAL_PLUS_EXPERIENCE', $experience_web->id);
+            if ((Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_SANDBOX_CLIENTID') && Configuration::get('PAYPAL_SANDBOX_SECRET'))
+                || (!Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_LIVE_CLIENTID') && Configuration::get('PAYPAL_LIVE_SECRET'))) {
+                $experience_web = $this->createWebExperience();
+                if ($experience_web) {
+                    Configuration::updateValue('PAYPAL_PLUS_EXPERIENCE', $experience_web->id);
+                } else {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while creating your web experience. Check your credentials.'));
+                }
             }
         }
 
@@ -84,9 +89,14 @@ class MethodPPP extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_METHOD', 'PPP');
             Configuration::updateValue('PAYPAL_PLUS_ENABLED', 1);
 
-            $experience_web = $this->createWebExperience();
-            if ($experience_web) {
-                Configuration::updateValue('PAYPAL_PLUS_EXPERIENCE', $experience_web->id);
+            if ((Configuration::get('PAYPAL_SANDBOX') && $sandbox['client_id'] && $sandbox['secret'])
+            || (!Configuration::get('PAYPAL_SANDBOX') && $live['client_id'] && $live['secret'])) {
+                $experience_web = $this->createWebExperience();
+                if ($experience_web) {
+                    Configuration::updateValue('PAYPAL_PLUS_EXPERIENCE', $experience_web->id);
+                } else {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while creating your web experience. Check your credentials.'));
+                }
             }
         }
     }
@@ -95,7 +105,7 @@ class MethodPPP extends AbstractMethodPaypal
     {
 
         $brand_name = Configuration::get('PAYPAL_PPP_CONFIG_BRAND')?Configuration::get('PAYPAL_PPP_CONFIG_BRAND'):Configuration::get('PS_SHOP_NAME');
-        $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/ppp_logo.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
+        $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/ppp_logo.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
 
         $flowConfig = new \PayPal\Api\FlowConfig();
         // Type of PayPal page to be displayed when a user lands on the PayPal site for checkout. Allowed values: Billing or Login. When set to Billing, the Non-PayPal account landing page is used. When set to Login, the PayPal account login landing page is used.
@@ -139,7 +149,6 @@ class MethodPPP extends AbstractMethodPaypal
             // Indicates whether the profile persists for three hours or permanently. Set to `false` to persist the profile permanently. Set to `true` to persist the profile for three hours.
             ->setTemporary(false);
         // For Sample Purposes Only.
-
         try {
             // Use this call to create a profile.
             $createProfileResponse = $webProfile->create($this->_getCredentialsInfo());
@@ -154,11 +163,12 @@ class MethodPPP extends AbstractMethodPaypal
     {
         switch (Configuration::get('PAYPAL_SANDBOX')) {
             case 0:
-                $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_LIVE');
-                $params['acct1.Password'] = Configuration::get('PAYPAL_PSWD_LIVE');
-                $params['acct1.Signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
-                $params['mode'] = Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live';
-                $params['log.LogEnabled'] = false;
+                $apiContext = new ApiContext(
+                    new OAuthTokenCredential(
+                        Configuration::get('PAYPAL_LIVE_CLIENTID'),
+                        Configuration::get('PAYPAL_LIVE_SECRET')
+                    )
+                );
                 break;
             case 1:
                 $apiContext = new ApiContext(
@@ -167,16 +177,15 @@ class MethodPPP extends AbstractMethodPaypal
                         Configuration::get('PAYPAL_SANDBOX_SECRET')
                     )
                 );
-
-                $apiContext->setConfig(
-                    array(
-                        'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
-                        'log.LogEnabled' => false,
-                        'cache.enabled' => false,
-                    )
-                );
                 break;
         }
+        $apiContext->setConfig(
+            array(
+                'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
+                'log.LogEnabled' => false,
+                'cache.enabled' => false,
+            )
+        );
         return $apiContext;
     }
 
@@ -516,6 +525,7 @@ class MethodPPP extends AbstractMethodPaypal
     {
 
     }
+
     public function refund()
     {
         $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
@@ -548,5 +558,11 @@ class MethodPPP extends AbstractMethodPaypal
     public function void($params)
     {
 
+    }
+
+    public function printppp()
+    {
+        $sale = Payment::get("PAY-5YW23177125799032LHXBAAA", $this->_getCredentialsInfo());
+        return $sale->payment_instruction;
     }
 }

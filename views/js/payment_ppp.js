@@ -25,6 +25,7 @@ var ppp = PAYPAL.apps.PPP({
     "language": ppp_iso_code,
     "country": ppp_iso_code,
     "buttonLocation": "outside",
+    "useraction": "continue",
     "showPuiOnSandbox": showPui,
 });
 exec_ppp_payment = true;
