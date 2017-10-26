@@ -822,7 +822,7 @@ class PayPal extends PaymentModule
             return false;
         }
         $method = AbstractMethodPaypal::load('EC');
-        return $method->renderExpressCheckout($this->context, 'EC');
+        return $method->renderExpressCheckoutShortCut($this->context, 'EC');
     }
 
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)

@@ -12,12 +12,17 @@
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
-function ECInContext() {
+
+// init in-context
+window.load = function(){
     window.paypalCheckoutReady = function() {
         paypal.checkout.setup(merchant_id, {
             environment: environment,
         });
     };
+};
+
+function ECInContext() {
     paypal.checkout.initXO();
     $.support.cors = true;
     $.ajax({
@@ -30,7 +35,6 @@ function ECInContext() {
         },
         error: function (responseData, textStatus, errorThrown) {
             alert("Error in ajax post"+responseData.statusText);
-
             paypal.checkout.closeFlow();
         }
     });

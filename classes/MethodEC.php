@@ -720,7 +720,7 @@ class MethodEC extends AbstractMethodPaypal
         return $response;
     }
 
-    public function renderExpressCheckout(&$context, $type)
+    public function renderExpressCheckoutShortCut(&$context,$type)
     {
         if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
             return false;

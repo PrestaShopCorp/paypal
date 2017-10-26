@@ -12,6 +12,17 @@
  * @license   http://addons.prestashop.com/en/content/12-terms-and-conditions-of-use
  * International Registered Trademark & Property of PrestaShop SA
  */
+// init incontext
+window.load = function(){
+    if (ec_sc_in_context) {
+        window.paypalCheckoutReady = function () {
+            paypal.checkout.setup(merchant_id, {
+                environment: ec_sc_environment,
+            });
+        };
+    }
+};
+
 
 function setInput()
 {
@@ -27,26 +38,20 @@ function setInput()
     $('#paypal_url_page').val(document.location.href);
     $('#paypal_combination').val(combination.join('|'));
     if (ec_sc_in_context) {
-        ECInContext(combination);
+        ECSInContext(combination);
     } else {
         $('#paypal_payment_form_cart').submit();
     }
 
 }
 
-function ECInContext(combination) {
-    window.paypalCheckoutReady = function() {
-        paypal.checkout.setup(merchant_id, {
-            environment: ec_sc_environment,
-        });
-    };
+function ECSInContext(combination) {
     paypal.checkout.initXO();
     $.support.cors = true;
     $.ajax({
         url: ec_sc_action_url,
         type: "GET",
-        data: 'getToken=1&id_product='+$('#paypal_payment_form_cart input[name="id_product"]').val()+'&quantity='+
-        $('[name="qty"]').val()+'&combination='+combination.join('|'),
+        data: 'getToken=1&id_product='+$('#paypal_payment_form_cart input[name="id_product"]').val()+'&quantity='+$('[name="qty"]').val()+'&combination='+combination.join('|'),
         success: function (token) {
             var url = paypal.checkout.urlPrefix +token;
             paypal.checkout.startFlow(url);
