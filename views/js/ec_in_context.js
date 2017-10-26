@@ -14,13 +14,12 @@
  */
 
 // init in-context
-window.load = function(){
-    window.paypalCheckoutReady = function() {
+document.addEventListener("DOMContentLoaded", function(){    window.paypalCheckoutReady = function() {
         paypal.checkout.setup(merchant_id, {
             environment: environment,
         });
     };
-};
+});
 
 function ECInContext() {
     paypal.checkout.initXO();

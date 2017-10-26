@@ -670,6 +670,17 @@ class PayPal extends PaymentModule
                 $this->context->controller->addJqueryPlugin('fancybox');
             }
         }
+        if (Tools::getValue('controller') == "product" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
+            $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
+            Media::addJsDef(array(
+                'ec_sc_in_context' => 1,
+                'ec_sc_environment' => $environment,
+                'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
+                'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array('credit_card'=>'0','getToken'=>1), true),
+            ));
+
+
+        }
     }
 
     public function hookDisplayBackOfficeHeader()

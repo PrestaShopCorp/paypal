@@ -13,7 +13,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 // init incontext
-window.load = function(){
+document.addEventListener("DOMContentLoaded", function(){
     if (ec_sc_in_context) {
         window.paypalCheckoutReady = function () {
             paypal.checkout.setup(merchant_id, {
@@ -21,7 +21,7 @@ window.load = function(){
             });
         };
     }
-};
+});
 
 
 function setInput()
@@ -54,6 +54,7 @@ function ECSInContext(combination) {
         data: 'getToken=1&id_product='+$('#paypal_payment_form_cart input[name="id_product"]').val()+'&quantity='+$('[name="qty"]').val()+'&combination='+combination.join('|'),
         success: function (token) {
             var url = paypal.checkout.urlPrefix +token;
+            console.log(url);
             paypal.checkout.startFlow(url);
         },
         error: function (responseData, textStatus, errorThrown) {

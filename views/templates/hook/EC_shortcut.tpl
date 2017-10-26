@@ -39,11 +39,3 @@
 <div class="clearfix"></div>
 <script type="text/javascript" src="https://www.paypalobjects.com/api/checkout.js"></script>
 <script type="text/javascript" src="/modules/paypal/views/js/ec_shortcut.js"></script>
-<script>
-    var ec_sc_in_context = {$ec_sc_in_context};
-    if (ec_sc_in_context) {
-        var ec_sc_action_url = "{$action_url nofilter}";
-        var ec_sc_environment = "{$environment}";
-        var merchant_id = "{$merchant_id}";
-    }
-</script>
