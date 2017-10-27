@@ -34,5 +34,7 @@ function upgrade_module_4_3_0($module)
         return false;
     }
 
+    Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', '');
+
     return true;
 }

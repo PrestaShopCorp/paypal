@@ -357,7 +357,6 @@ class PayPal extends PaymentModule
     public function getContent()
     {
         $this->_postProcess();
-
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
         $context = $this->context;
