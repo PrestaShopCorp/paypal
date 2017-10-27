@@ -75,7 +75,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         $this->context->cart->id_customer = $customer->id;
         $this->context->cart->update();
 
-        Hook::exec('actionAuthentication', ['customer' => $this->context->customer]);
+        Hook::exec('actionAuthentication', array('customer' => $this->context->customer));
         // Login information have changed, so we check if the cart rules still apply
         CartRule::autoRemoveFromCart($this->context);
         CartRule::autoAddToCart($this->context);
@@ -85,7 +85,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         $count = 1;
 
         foreach ($addresses as $address) {
-            if($address['firstname'].' '.$address['lastname'] == $ship_addr->Name
+            if ($address['firstname'].' '.$address['lastname'] == $ship_addr->Name
                 && $address['address1'] == $ship_addr->Street1
                 && (isset($ship_addr->Street2)?$address['address2'] == $ship_addr->Street2:true)
                 && $address['id_country'] == Country::getByIso($ship_addr->Country)

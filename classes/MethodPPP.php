@@ -328,7 +328,7 @@ class MethodPPP extends AbstractMethodPaypal
         foreach ($products as $product) {
             $product['product_tax'] = $product['price_wt'] - $product['price'];
             $item = new Item();
-            $item->setName(substr($product['name'],0, 126))
+            $item->setName(Tools::substr($product['name'], 0, 126))
                 ->setCurrency(Context::getContext()->currency->iso_code)
                 ->setDescription($product['attributes'])
                 ->setQuantity($product['quantity'])
@@ -497,7 +497,6 @@ class MethodPPP extends AbstractMethodPaypal
         $transactionDetail = $this->getDetailsTransaction($exec_payment);
         $paypal->validateOrder($cart->id, $order_state, $total, 'PayPal', null, $transactionDetail, (int)$currency->id, false, $customer->secure_key);
         return true;
-
     }
 
     public function getDetailsTransaction($transaction)
@@ -519,11 +518,9 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function confirmCapture()
     {
-
     }
     public function check()
     {
-
     }
 
     public function refund()
@@ -557,7 +554,6 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function void($params)
     {
-
     }
 
     public function getInstructionInfo($id_payment)

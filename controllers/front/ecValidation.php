@@ -34,7 +34,7 @@ class PaypalEcValidationModuleFrontController extends ModuleFrontController
     {
         $method_ec = AbstractMethodPaypal::load('EC');
         $paypal = Module::getInstanceByName('paypal');
-        try{
+        try {
             $method_ec->validation();
         } catch (PayPal\Exception\PPConnectionException $e) {
             $ex_detailed_message = $paypal->l('Error connecting to ') . $e->getUrl();
@@ -56,8 +56,5 @@ class PaypalEcValidationModuleFrontController extends ModuleFrontController
         Context::getContext()->cookie->__unset('paypal_ecs_payerid');
 
         Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$paypal->id.'&id_order='.$paypal->currentOrder.'&key='.$customer->secure_key);
-
-//echo '<pre>';print_r($response);die;
-
     }
 }

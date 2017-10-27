@@ -24,7 +24,6 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-
 use PayPal\CoreComponentTypes\BasicAmountType;
 use PayPal\EBLBaseComponents\DoExpressCheckoutPaymentRequestDetailsType;
 use PayPal\EBLBaseComponents\AddressType;
@@ -45,9 +44,8 @@ use PayPal\PayPalAPI\DoVoidRequestType;
 use PayPal\PayPalAPI\GetExpressCheckoutDetailsRequestType;
 use PayPal\PayPalAPI\GetExpressCheckoutDetailsReq;
 use PayPal\Service\PayPalAPIInterfaceServiceService;
+
 require_once(_PS_MODULE_DIR_.'paypal/sdk/paypalNVP/PPBootStrap.php');
-
-
 
 class MethodEC extends AbstractMethodPaypal
 {
@@ -252,7 +250,6 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
             Configuration::updateValue('PAYPAL_MERCHANT_ID_'.$mode, $params['merchant_id']);
-
         }
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
@@ -307,7 +304,7 @@ class MethodEC extends AbstractMethodPaypal
         $taxTotalValue = 0;
 
         // shipping address
-        if (!isset($params['short_cut'])) {
+        if (!isset($data['short_cut'])) {
             $address = $this->_getShippingAddress();
             $paymentDetails->ShipToAddress = $address;
         }
@@ -315,7 +312,7 @@ class MethodEC extends AbstractMethodPaypal
         /** The total cost of the transaction to the buyer. If shipping cost and tax charges are known, include them in this value. If not, this value should be the current subtotal of the order. If the transaction includes one or more one-time purchases, this field must be equal to the sum of the purchases. If the transaction does not include a one-time purchase such as when you set up a billing agreement for a recurring payment, set this field to 0.*/
         $this->_getPaymentDetails($paymentDetails, $itemTotalValue, $taxTotalValue);
 
-        $paymentDetails->PaymentAction = ucfirst(Configuration::get('PAYPAL_API_INTENT'));
+        $paymentDetails->PaymentAction = Tools::ucfirst(Configuration::get('PAYPAL_API_INTENT'));
         $setECReqDetails = new SetExpressCheckoutRequestDetailsType();
         $setECReqDetails->PaymentDetails[0] = $paymentDetails;
         $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true).'&step=1';
@@ -348,7 +345,7 @@ class MethodEC extends AbstractMethodPaypal
         /* wrap API method calls on the service object with a try catch */
         $payment = $paypalService->SetExpressCheckout($setECReq);
         if (isset($payment->Errors)) {
-            throw new Exception('ERROR in SetExpressCheckout',$payment->Errors[0]->ErrorCode);
+            throw new Exception('ERROR in SetExpressCheckout', $payment->Errors[0]->ErrorCode);
         }
         $this->token = $payment->Token;
         return $this->redirectToAPI('setExpressCheckout');
@@ -361,7 +358,6 @@ class MethodEC extends AbstractMethodPaypal
         $this->_getDiscountsList($paymentDetails, $total_products);
         $this->_getGiftWrapping($paymentDetails, $total_products);
         $this->_getPaymentValues($paymentDetails, $total_products, $tax);
-
     }
 
     private function _getProductsList(&$paymentDetails, &$itemTotalValue, &$taxTotalValue)
@@ -392,7 +388,6 @@ class MethodEC extends AbstractMethodPaypal
     {
         $discounts = Context::getContext()->cart->getCartRules();
         $currency = Context::getContext()->currency->iso_code;
-        $params['products_list']['discounts'] = array();
         if (count($discounts) > 0) {
             foreach ($discounts as $discount) {
                 if (isset($discount['description']) && !empty($discount['description'])) {
@@ -518,6 +513,7 @@ class MethodEC extends AbstractMethodPaypal
 
     public function _getCredentialsInfo()
     {
+        $params = array();
         switch (Configuration::get('PAYPAL_SANDBOX')) {
             case 0:
                 $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_LIVE');
@@ -550,7 +546,7 @@ class MethodEC extends AbstractMethodPaypal
         $DoECRequestDetails = new DoExpressCheckoutPaymentRequestDetailsType();
         $DoECRequestDetails->PayerID = Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID');
         $DoECRequestDetails->Token = Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token');
-        $DoECRequestDetails->PaymentAction = ucfirst(Configuration::get('PAYPAL_API_INTENT'));;
+        $DoECRequestDetails->PaymentAction = Tools::ucfirst(Configuration::get('PAYPAL_API_INTENT'));;
         $DoECRequestDetails->PaymentDetails[0] = $paymentDetails;
 
         $DoECRequest = new DoExpressCheckoutPaymentRequestType();
@@ -563,7 +559,7 @@ class MethodEC extends AbstractMethodPaypal
         $exec_payment = $paypalService->DoExpressCheckoutPayment($DoECReq);
 
         if (isset($exec_payment->Errors)) {
-            throw new Exception('ERROR in SetExpressCheckout',$exec_payment->Errors[0]->ErrorCode);
+            throw new Exception('ERROR in SetExpressCheckout', $exec_payment->Errors[0]->ErrorCode);
         }
 
         $cart = $context->cart;
@@ -720,7 +716,7 @@ class MethodEC extends AbstractMethodPaypal
         return $response;
     }
 
-    public function renderExpressCheckoutShortCut(&$context,$type)
+    public function renderExpressCheckoutShortCut(&$context, $type)
     {
         if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
             return false;
@@ -754,7 +750,7 @@ class MethodEC extends AbstractMethodPaypal
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
         $response = $paypalService->GetExpressCheckoutDetails($getExpressCheckoutReq);
         if (isset($response->Errors)) {
-            throw new Exception('ERROR in SetExpressCheckout',$response->Errors[0]->ErrorCode);
+            throw new Exception('ERROR in SetExpressCheckout', $response->Errors[0]->ErrorCode);
         }
         return $response;
     }
