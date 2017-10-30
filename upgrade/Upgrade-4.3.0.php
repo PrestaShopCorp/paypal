@@ -35,6 +35,8 @@ function upgrade_module_4_3_0($module)
     }
 
     Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', '');
+    Configuration::updateValue('PAYPAL_MERCHANT_ID_SANDBOX', '');
+    Configuration::updateValue('PAYPAL_MERCHANT_ID_LIVE', '');
 
     return true;
 }
