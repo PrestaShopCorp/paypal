@@ -281,8 +281,7 @@ class MethodBT extends AbstractMethodPaypal
             foreach ($response as $account) {
                 $result[$account->currencyIsoCode] = $account->id;
             }
-        }
-        catch  (Exception $e) {
+        } catch (Exception $e) {
         }
         return $result;
     }
@@ -300,8 +299,7 @@ class MethodBT extends AbstractMethodPaypal
                 if ($response->success) {
                     $result[$response->merchantAccount->currencyIsoCode] = $response->merchantAccount->id;
                 }
-            }
-            catch  (Exception $e) {
+            } catch (Exception $e) {
             }
         } else {
             $currencies = Currency::getCurrencies();
@@ -313,8 +311,7 @@ class MethodBT extends AbstractMethodPaypal
                     if ($response->success) {
                         $result[$response->merchantAccount->currencyIsoCode] = $response->merchantAccount->id;
                     }
-                }
-                catch  (Exception $e) {
+                } catch (Exception $e) {
                 }
             }
         }

@@ -32,7 +32,7 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
     {
         $paypal = Module::getInstanceByName('paypal');
         $method_ec = AbstractMethodPaypal::load('EC');
-        try{
+        try {
             $url = $method_ec->init(array('use_card'=>Tools::getValue('credit_card')));
         } catch (PayPal\Exception\PPConnectionException $e) {
             $ex_detailed_message = $paypal->l('Error connecting to ') . $e->getUrl();
@@ -52,6 +52,5 @@ class PaypalEcInitModuleFrontController extends ModuleFrontController
         }
 
         Tools::redirect($url.'&useraction=commit');
-
     }
 }

@@ -224,8 +224,8 @@
         </div>
 
     </div>
-    <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}in active{/if}">
-        {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}
+    <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($ppp_active)}in active{/if}">
+        {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($ppp_active)}
         <div class="panel parametres">
             <div class="panel-body">
                 <div class="col-sm-8 help-left">

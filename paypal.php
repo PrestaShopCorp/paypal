@@ -358,7 +358,6 @@ class PayPal extends PaymentModule
     public function getContent()
     {
         $this->_postProcess();
-
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
         $context = $this->context;
@@ -549,7 +548,7 @@ class PayPal extends PaymentModule
                         'path' => $this->_path,
                     ));
                     $payment_options->setCallToActionText($action_text);
-                    if(Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
+                    if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
                         $payment_options->setAction('javascript:ECInContext()');
                     } else {
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0'), true));
@@ -653,7 +652,6 @@ class PayPal extends PaymentModule
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
                 $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
-
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
@@ -679,8 +677,6 @@ class PayPal extends PaymentModule
                 'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
                 'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array('credit_card'=>'0','getToken'=>1), true),
             ));
-
-
         }
     }
 
@@ -734,7 +730,7 @@ class PayPal extends PaymentModule
     {
         $context = $this->context;
         $ppplus = AbstractMethodPaypal::load('PPP');
-        try{
+        try {
             $result = $ppplus->init(true);
             $this->context->cookie->__set('paypal_plus_payment', $result['payment_id']);
         } catch (PayPal\Exception\PayPalConnectionException $e) {
@@ -760,7 +756,6 @@ class PayPal extends PaymentModule
             'ppp_iso_code' => $context->language->iso_code,
             'ajax_patch_url' => $context->link->getModuleLink('paypal', 'pppPatch', array(), true),
         ));
-
     }
 
     protected function generateFormPaypalBt()
@@ -778,7 +773,6 @@ class PayPal extends PaymentModule
             'path' => $this->_path,
             'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
         ));
-
 
         return $context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
     }
@@ -842,7 +836,7 @@ class PayPal extends PaymentModule
         $this->amount_paid_paypal = (float)$amount_paid;
         $cart = new Cart((int) $id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
-        if($amount_paid > $total_ps+0.10 || $amount_paid < $total_ps-0.10) {
+        if ($amount_paid > $total_ps+0.10 || $amount_paid < $total_ps-0.10) {
             $total_ps = $amount_paid;
         }
         parent::validateOrder(
@@ -982,7 +976,6 @@ class PayPal extends PaymentModule
 
     public function hookActionOrderStatusUpdate(&$params)
     {
-
         $paypal_order = PaypalOrder::loadByOrderId($params['id_order']);
         if (!Validate::isLoadedObject($paypal_order)) {
             return false;
@@ -1012,9 +1005,7 @@ class PayPal extends PaymentModule
                 $paypalCapture->save();
                 $orderPayPal->payment_status = 'voided';
                 $orderPayPal->save();
-            }
-            else
-            {
+            } else {
                 foreach ($response_void as $key => $msg) {
                     $orderMessage->message .= $key." : ".$msg.";\r";
                 }

@@ -54,7 +54,5 @@ class PaypalPppValidationModuleFrontController extends ModuleFrontController
         $customer = new Customer($cart->id_customer);
 
         Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$paypal->id.'&id_order='.$paypal->currentOrder.'&key='.$customer->secure_key);
-
     }
-
 }
