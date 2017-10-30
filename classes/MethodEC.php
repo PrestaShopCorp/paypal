@@ -671,7 +671,7 @@ class MethodEC extends AbstractMethodPaypal
                     'error_code' => $response->Errors[0]->ErrorCode,
                     'error_message' => $response->Errors[0]->LongMessage,
                 );
-                if ($response->Errors[0]->ErrorCode == "10009") {
+                if (Validate::isLoadedObject($capture) && $response->Errors[0]->ErrorCode == "10009") {
                     $result['already_refunded'] = true;
                 }
             } else {

@@ -114,7 +114,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
             $orderAddress->id_country = Country::getByIso($ship_addr->Country);
             $orderAddress->city = $ship_addr->CityName;
             if (Country::containsStates($orderAddress->id_country)) {
-                $orderAddress->id_state = (int) State::getIdByIso($ship_addr->StateOrProvince, $orderAddress->id_country);
+                $orderAddress->id_state = (int) State::getIdByName($ship_addr->StateOrProvince);
             }
 
             $orderAddress->postcode = $ship_addr->PostalCode;
