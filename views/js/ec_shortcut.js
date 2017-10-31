@@ -14,7 +14,7 @@
  */
 // init incontext
 document.addEventListener("DOMContentLoaded", function(){
-    if (ec_sc_in_context) {
+    if (typeof ec_sc_in_context != "undefined" && ec_sc_in_context) {
         window.paypalCheckoutReady = function () {
             paypal.checkout.setup(merchant_id, {
                 environment: ec_sc_environment,
@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function(){
         };
     }
 });
-
 
 function setInput()
 {
@@ -37,7 +36,7 @@ function setInput()
     });
     $('#paypal_url_page').val(document.location.href);
     $('#paypal_combination').val(combination.join('|'));
-    if (ec_sc_in_context) {
+    if (typeof ec_sc_in_context != "undefined" && ec_sc_in_context) {
         ECSInContext(combination);
     } else {
         $('#paypal_payment_form_cart').submit();
