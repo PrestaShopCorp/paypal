@@ -80,33 +80,35 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         CartRule::autoRemoveFromCart($this->context);
         CartRule::autoAddToCart($this->context);
         // END Login
-        $addresses = $customer->getAddresses($this->context->language->id);
+        $addresses = $this->context->customer->getAddresses($this->context->language->id);
         $address_exist = false;
         $count = 1;
-
+        $id_address = 0;
         foreach ($addresses as $address) {
+
             if ($address['firstname'].' '.$address['lastname'] == $ship_addr->Name
                 && $address['address1'] == $ship_addr->Street1
-                && (isset($ship_addr->Street2)?$address['address2'] == $ship_addr->Street2:true)
+                && (empty($ship_addr->Street2) || $address['address2'] == $ship_addr->Street2)
                 && $address['id_country'] == Country::getByIso($ship_addr->Country)
                 && $address['city'] == $ship_addr->CityName
-                && (isset($ship_addr->StateOrProvince)?$address['id_state'] == $ship_addr->StateOrProvince:true)
+                && (empty($ship_addr->StateOrProvince) || $address['id_state'] == State::getIdByName($ship_addr->StateOrProvince))
                 && $address['postcode'] == $ship_addr->PostalCode
-                && (isset($ship_addr->Phone)?$address['phone'] == $ship_addr->Phone:true)
+                && (empty($ship_addr->Phone) || $address['phone'] == $ship_addr->Phone)
             ) {
                 $address_exist = true;
+                $id_address = $address['id_address'];
+                break;
             } else {
                 if ((strrpos($address['alias'], 'Paypal_Address')) !== false) {
                     $count = (int)(Tools::substr($address['alias'], -1)) + 1;
                 }
             }
         }
-
         if (!$address_exist) {
             $orderAddress = new Address();
-            $separated_name = explode(" ", $ship_addr->Name);
-            $orderAddress->firstname = $separated_name[0];
-            $orderAddress->lastname = $separated_name[1];
+            $pos_separator = strpos($ship_addr->Name,' ');
+            $orderAddress->firstname = substr($ship_addr->Name,0,$pos_separator);
+            $orderAddress->lastname = substr($ship_addr->Name,$pos_separator+1);
             $orderAddress->address1 = $ship_addr->Street1;
             if (isset($ship_addr->Street2)) {
                 $orderAddress->address2 = $ship_addr->Street2;
@@ -124,10 +126,13 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
 
             $orderAddress->id_customer = $customer->id;
             $orderAddress->alias = 'Paypal_Address '.($count);
-
             $orderAddress->save();
+            $id_address = $orderAddress->id;
         }
 
+        $this->context->cart->id_address_delivery = $id_address;
+        $this->context->cart->id_address_invoice = $id_address;
+        $this->context->cart->save();
 
         $this->context->cookie->__set('paypal_ecs', $info->GetExpressCheckoutDetailsResponseDetails->Token);
         $this->context->cookie->__set('paypal_ecs_payerid', $info->GetExpressCheckoutDetailsResponseDetails->PayerInfo->PayerID);
