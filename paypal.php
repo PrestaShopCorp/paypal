@@ -683,14 +683,15 @@ class PayPal extends PaymentModule
     public function hookDisplayBackOfficeHeader()
     {
         $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
-        if ($diff_cron_time->h > 4) {
+        if (true || $diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
             $bt_orders = PaypalOrder::getPaypalBtOrdersIds();
             if (!$bt_orders) {
                 return true;
             }
-            Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:i:s'));
+
             $method = AbstractMethodPaypal::load('BT');
             $transactions = $method->searchTransactions($bt_orders);
+
             foreach ($transactions as $transaction) {
                 $paypal_order_id = PaypalOrder::getIdOrderByTransactionId($transaction->id);
                 $paypal_order = PaypalOrder::loadByOrderId($paypal_order_id);
@@ -704,12 +705,15 @@ class PayPal extends PaymentModule
                         $paypal_order->payment_status = $transaction->status;
                         $ps_order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
                         break;
+                    case 'settling': // waiting
+                    case 'submit_for_settlement': //waiting
                     default:
                         // do nothing and check later one more time
                         break;
                 }
                 $paypal_order->update();
             }
+            Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:i:s'));
         }
     }
 

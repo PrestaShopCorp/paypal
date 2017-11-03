@@ -320,6 +320,8 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails->NoShipping = 1;
         $setECReqDetails->AddressOverride = 0;
         $setECReqDetails->ReqConfirmShipping = 0;
+        $setECReqDetails->LandingPage = ((isset($data['use_card']) && $data['use_card']) ? 'Billing' : 'Login');
+
 
         if (isset($data['short_cut'])) {
             $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
@@ -334,6 +336,7 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails->AllowNote = 0;
         $setECReqType = new SetExpressCheckoutRequestType();
         $setECReqType->SetExpressCheckoutRequestDetails = $setECReqDetails;
+
         $setECReq = new SetExpressCheckoutReq();
         $setECReq->SetExpressCheckoutRequest = $setECReqType;
         /*
