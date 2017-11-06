@@ -107,8 +107,8 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
         if (!$address_exist) {
             $orderAddress = new Address();
             $pos_separator = strpos($ship_addr->Name,' ');
-            $orderAddress->firstname = substr($ship_addr->Name,0,$pos_separator);
-            $orderAddress->lastname = substr($ship_addr->Name,$pos_separator+1);
+            $orderAddress->firstname = Tools::substr($ship_addr->Name,0,$pos_separator);
+            $orderAddress->lastname = Tools::substr($ship_addr->Name,$pos_separator+1);
             $orderAddress->address1 = $ship_addr->Street1;
             if (isset($ship_addr->Street2)) {
                 $orderAddress->address2 = $ship_addr->Street2;
