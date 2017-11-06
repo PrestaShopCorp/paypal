@@ -610,21 +610,24 @@ class PayPal extends PaymentModule
                 }
                 break;
             case 'PPP':
-                if (!Configuration::get('PAYPAL_PLUS_ENABLED')) {
-                    return;
+                if (Configuration::get('PAYPAL_PLUS_ENABLED') && $this->assignInfoPaypalPlus()) {
+                    $payment_options = new PaymentOption();
+                    $action_text = $this->l('Pay with PayPal Plus');
+                    if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
+                        $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
+                    }
+                    $payment_options->setCallToActionText($action_text);
+                    $payment_options->setModuleName('paypal_plus');
+                    $payment_options->setAction('javascript:doPatchPPP();');
+                    try {
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ppp.tpl'));
+                    }catch (Exception $e)
+                    {
+                        die($e);
+                    }
+                    $payments_options[] = $payment_options;
                 }
 
-                $payment_options = new PaymentOption();
-                $action_text = $this->l('Pay with PayPal Plus');
-                if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
-                    $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
-                }
-                $payment_options->setCallToActionText($action_text);
-                $payment_options->setModuleName('paypal_plus');
-                $payment_options->setAction('javascript:doPatchPPP();');
-                $this->assignInfoPaypalPlus();
-                $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ppp.tpl'));
-                $payments_options[] = $payment_options;
                 break;
         }
 
@@ -682,38 +685,41 @@ class PayPal extends PaymentModule
 
     public function hookDisplayBackOfficeHeader()
     {
-        $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
-        if (true || $diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
-            $bt_orders = PaypalOrder::getPaypalBtOrdersIds();
-            if (!$bt_orders) {
-                return true;
-            }
-
-            $method = AbstractMethodPaypal::load('BT');
-            $transactions = $method->searchTransactions($bt_orders);
-
-            foreach ($transactions as $transaction) {
-                $paypal_order_id = PaypalOrder::getIdOrderByTransactionId($transaction->id);
-                $paypal_order = PaypalOrder::loadByOrderId($paypal_order_id);
-                $ps_order = new Order($paypal_order_id);
-                switch ($transaction->status) {
-                    case 'declined':
-                        $paypal_order->payment_status = $transaction->status;
-                        $ps_order->setCurrentState(Configuration::get('PS_OS_ERROR'));
-                        break;
-                    case 'settled':
-                        $paypal_order->payment_status = $transaction->status;
-                        $ps_order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
-                        break;
-                    case 'settling': // waiting
-                    case 'submit_for_settlement': //waiting
-                    default:
-                        // do nothing and check later one more time
-                        break;
+        if(Configuration::get('PAYPAL_METHOD') == 'BT')
+        {
+            $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
+            if (true || $diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
+                $bt_orders = PaypalOrder::getPaypalBtOrdersIds();
+                if (!$bt_orders) {
+                    return true;
                 }
-                $paypal_order->update();
+
+                $method = AbstractMethodPaypal::load('BT');
+                $transactions = $method->searchTransactions($bt_orders);
+
+                foreach ($transactions as $transaction) {
+                    $paypal_order_id = PaypalOrder::getIdOrderByTransactionId($transaction->id);
+                    $paypal_order = PaypalOrder::loadByOrderId($paypal_order_id);
+                    $ps_order = new Order($paypal_order_id);
+                    switch ($transaction->status) {
+                        case 'declined':
+                            $paypal_order->payment_status = $transaction->status;
+                            $ps_order->setCurrentState(Configuration::get('PS_OS_ERROR'));
+                            break;
+                        case 'settled':
+                            $paypal_order->payment_status = $transaction->status;
+                            $ps_order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+                            break;
+                        case 'settling': // waiting
+                        case 'submit_for_settlement': //waiting
+                        default:
+                            // do nothing and check later one more time
+                            break;
+                    }
+                    $paypal_order->update();
+                }
+                Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:i:s'));
             }
-            Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:i:s'));
         }
     }
 
@@ -732,34 +738,25 @@ class PayPal extends PaymentModule
 
     protected function assignInfoPaypalPlus()
     {
-        $context = $this->context;
         $ppplus = AbstractMethodPaypal::load('PPP');
         try {
             $result = $ppplus->init(true);
             $this->context->cookie->__set('paypal_plus_payment', $result['payment_id']);
-        } catch (PayPal\Exception\PayPalConnectionException $e) {
-            $decoded_message = Tools::jsonDecode($e->getData());
-            $ex_detailed_message = $decoded_message->details[0]->issue;
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
-        } catch (PayPal\Exception\PayPalInvalidCredentialException $e) {
-            $ex_detailed_message = $e->errorMessage();
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
-        } catch (PayPal\Exception\PayPalMissingCredentialException $e) {
-            $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $ex_detailed_message)));
         } catch (Exception $e) {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $e->getCode())));
+            die('etest');
+            return false;
         }
-
-        $context->smarty->assign(array(
-            'pppSubmitUrl'=> $context->link->getModuleLink('paypal', 'pppValidation', array(), true),
+        $this->context->smarty->assign(array(
+            'pppSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'pppValidation', array(), true),
             'approval_url_ppp'=> $result['approval_url'],
-            'baseDir' => $context->link->getBaseLink($context->shop->id, true),
+            'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
             'path' => $this->_path,
             'mode' => Configuration::get('PAYPAL_SANDBOX')  ? 'sandbox' : 'live',
-            'ppp_iso_code' => $context->language->iso_code,
-            'ajax_patch_url' => $context->link->getModuleLink('paypal', 'pppPatch', array(), true),
+            'ppp_language_iso_code' => $this->context->language->iso_code,
+            'ppp_country_iso_code' => $this->context->country->iso_code,
+            'ajax_patch_url' => $this->context->link->getModuleLink('paypal', 'pppPatch', array(), true),
         ));
+        return true;
     }
 
     protected function generateFormPaypalBt()
@@ -1200,6 +1197,7 @@ class PayPal extends PaymentModule
             || $paypal_order->payment_tool != 'PAY_UPON_INVOICE') {
             return;
         }
+
         $method = AbstractMethodPaypal::load('PPP');
         $information = $method->getInstructionInfo($paypal_order->id_payment);
         $tab = $this->l('The bank name').' : '.$information->recipient_banking_instruction->bank_name.'; 
