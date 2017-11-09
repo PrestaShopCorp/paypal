@@ -360,31 +360,31 @@ class PayPal extends PaymentModule
         $this->_postProcess();
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        $context = $this->context;
-        $lang = $context->country->iso_code;
+
+        $lang = $this->context->country->iso_code;
         $img_esc = $this->_path."/views/img/ECShortcut/".Tools::strtolower($lang)."/checkout.png";
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
             $img_esc = "/modules/paypal/views/img/ECShortcut/us/checkout.png";
         }
 
-        $context->smarty->assign(array(
+        $this->context->smarty->assign(array(
             'path' => $this->_path,
             'active_products' => $this->express_checkout,
             'return_url' => $this->module_link,
-            'country' => Country::getNameById($context->language->id, $context->country->id),
-            'localization' => $context->link->getAdminLink('AdminLocalization', true),
-            'preference' => $context->link->getAdminLink('AdminPreferences', true),
+            'country' => Country::getNameById($this->context->language->id, $this->context->country->id),
+            'localization' => $this->context->link->getAdminLink('AdminLocalization', true),
+            'preference' => $this->context->link->getAdminLink('AdminPreferences', true),
             'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
             'iso_code' => $lang,
             'img_checkout' => $img_esc,
         ));
 
         if ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES") {
-            $context->smarty->assign(array(
+            $this->context->smarty->assign(array(
                 'braintree_available' => true,
             ));
         } elseif ($country_default == "DE") {
-            $context->smarty->assign(array(
+            $this->context->smarty->assign(array(
                 'ppp_available' => true,
             ));
         }
@@ -472,7 +472,7 @@ class PayPal extends PaymentModule
             }
         }
 
-        $context->controller->addCSS($this->_path.'views/css/paypal-bo.css', 'all');
+        $this->context->controller->addCSS($this->_path.'views/css/paypal-bo.css', 'all');
 
         $result = $this->message;
         if (isset($config['block_info'])) {
@@ -688,7 +688,7 @@ class PayPal extends PaymentModule
         if(Configuration::get('PAYPAL_METHOD') == 'BT')
         {
             $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
-            if (true || $diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
+            if ($diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
                 $bt_orders = PaypalOrder::getPaypalBtOrdersIds();
                 if (!$bt_orders) {
                     return true;
@@ -743,7 +743,6 @@ class PayPal extends PaymentModule
             $result = $ppplus->init(true);
             $this->context->cookie->__set('paypal_plus_payment', $result['payment_id']);
         } catch (Exception $e) {
-            die('etest');
             return false;
         }
         $this->context->smarty->assign(array(
@@ -761,47 +760,46 @@ class PayPal extends PaymentModule
 
     protected function generateFormPaypalBt()
     {
-        $context = $this->context;
-        $amount = $context->cart->getOrderTotal();
+        $amount = $this->context->cart->getOrderTotal();
 
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
-        $context->smarty->assign(array(
+        $this->context->smarty->assign(array(
             'braintreeToken'=> $clientToken,
-            'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
+            'braintreeSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'btValidation', array(), true),
             'braintreeAmount'=> $amount,
-            'baseDir' => $context->link->getBaseLink($context->shop->id, true),
+            'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
             'path' => $this->_path,
             'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
         ));
 
-        return $context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
+        return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
     }
 
 
     protected function generateFormBt()
     {
-        $context = $this->context;
-        $amount = $context->cart->getOrderTotal();
+
+        $amount = $this->context->cart->getOrderTotal();
 
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
         $check3DS = 0;
-        $required_3ds_amount = Tools::convertPrice(Configuration::get('PAYPAL_3D_SECURE_AMOUNT'), Currency::getCurrencyInstance((int)$context->currency->id));
+        $required_3ds_amount = Tools::convertPrice(Configuration::get('PAYPAL_3D_SECURE_AMOUNT'), Currency::getCurrencyInstance((int)$this->context->currency->id));
         if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
             $check3DS = 1;
         }
-        $context->smarty->assign(array(
+        $this->context->smarty->assign(array(
             'error_msg'=> Tools::getValue('bt_error_msg'),
             'braintreeToken'=> $clientToken,
-            'braintreeSubmitUrl'=> $context->link->getModuleLink('paypal', 'btValidation', array(), true),
+            'braintreeSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'btValidation', array(), true),
             'braintreeAmount'=> $amount,
             'check3Dsecure'=> $check3DS,
-            'baseDir' => $context->link->getBaseLink($context->shop->id, true),
+            'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
         ));
 
 
-        return $context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
+        return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
     }
 
     public function hookPaymentReturn($params)

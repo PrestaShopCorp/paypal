@@ -36,12 +36,12 @@
 </div>
 
 <div class="container-fluid paypal-nav">
-<ul class="nav nav-pills navbar-separator">
-    <li {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>
-    <li {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_params"><span>{l s='Settings' mod='paypal'}</span></a></li>
-</ul>
+    <ul class="nav nav-pills navbar-separator">
+        <li {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_conf"><span>{l s='Products' mod='paypal'}</span></a></li>
+        <li {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active)}class="active"{/if}><a data-toggle="pill" href="#paypal_params"><span>{l s='Settings' mod='paypal'}</span></a></li>
+    </ul>
     <div class="tab-content">
-    <div id="paypal_conf"  class="tab-pane fade {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active) && !isset($bt_active)}in active{/if}">
+        <div id="paypal_conf"  class="tab-pane fade {if !isset($ec_paypal_active) && !isset($ec_card_active) && !isset($bt_active) && !isset($ppp_active)}in active{/if}">
         <div class="box half left">
             <div class="logo">
                  <img src="{$path|escape:'html':'UTF-8'}/views/img/paypal_btm.png" alt=""  />
@@ -224,7 +224,7 @@
         </div>
 
     </div>
-    <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($ppp_active)}in active{/if}">
+        <div id="paypal_params" class="tab-pane fade col-sm-12 {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($ppp_active)}in active{/if}">
         {if isset($ec_paypal_active) || isset($ec_card_active) || isset($bt_active) || isset($ppp_active)}
         <div class="panel parametres">
             <div class="panel-body">
@@ -307,7 +307,7 @@
         <div class="configuration-block"></div>
     </div>
 
-</div>
+    </div>
 </div>
 {if isset($ppp_available)}
 <div style="display: none;">
