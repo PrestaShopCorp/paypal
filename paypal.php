@@ -872,7 +872,7 @@ class PayPal extends PaymentModule
 
         $paypal_order = new PaypalOrder();
         $paypal_order->id_order = $this->currentOrder;
-        $paypal_order->id_cart = Context::getContext()->cart->id;
+        $paypal_order->id_cart = $id_cart;
         $paypal_order->id_transaction = $transaction['transaction_id'];
         $paypal_order->id_payment = $transaction['id_payment'];
         $paypal_order->client_token = $transaction['client_token'];
