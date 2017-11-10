@@ -236,14 +236,19 @@ class MethodPPP extends AbstractMethodPaypal
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
         );
 
+
         $context = Context::getContext();
         $context->smarty->assign(array(
+            'need_rounding' => Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN,
             'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
             'PAYPAL_SANDBOX_CLIENTID' => Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
             'PAYPAL_SANDBOX_SECRET' => Configuration::get('PAYPAL_SANDBOX_SECRET'),
             'PAYPAL_LIVE_CLIENTID' => Configuration::get('PAYPAL_LIVE_CLIENTID'),
             'PAYPAL_LIVE_SECRET' => Configuration::get('PAYPAL_LIVE_SECRET'),
         ));
+        if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN)  {
+            $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
+        }
 
         return $params;
     }

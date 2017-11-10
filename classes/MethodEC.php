@@ -187,11 +187,11 @@ class MethodEC extends AbstractMethodPaypal
             'access_token_live' => Configuration::get('PAYPAL_LIVE_ACCESS'),
             'ec_card_active' => Configuration::get('PAYPAL_API_CARD'),
             'ec_paypal_active' => !Configuration::get('PAYPAL_API_CARD'),
-            'need_rounding' => Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM ? 0 : 1,
+            'need_rounding' => Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN ? 0 : 1,
             'ec_active' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT'),
         ));
 
-        if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) {
+        if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) {
             $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
         }
 
