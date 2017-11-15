@@ -456,7 +456,6 @@ class MethodBT extends AbstractMethodPaypal
         try {
             $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
             $result = $this->gateway->transaction()->submitForSettlement($paypal_order->id_transaction, number_format($paypal_order->total_paid, 2, ".", ''));
-           // echo '<pre>';print_r($result);die;
             if ($result instanceof Braintree_Result_Successful && $result->success) {
                 PaypalCapture::updateCapture($result->transaction->id, $result->transaction->amount, $result->transaction->status, $paypal_order->id);
                 $response =  array(

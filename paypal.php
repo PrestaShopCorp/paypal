@@ -1180,7 +1180,7 @@ class PayPal extends PaymentModule
             'first_name'    => $this->context->employee->firstname,
             'last_name'     => $this->context->employee->lastname,
             'shop_name'     => Configuration::get('PS_SHOP_NAME', null, null, null, ''),
-            'ref_merchant'  => ((defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'presto':'prestashop_')._PS_VERSION_.'_'.$this->version,
+            'ref_merchant'  => 'PrestaShop_'.(defined('PLATEFORM') && PLATEFORM == 'PSREADY' ? 'Ready':''),
         );
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
