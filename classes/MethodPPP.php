@@ -175,6 +175,7 @@ class MethodPPP extends AbstractMethodPaypal
                 );
                 break;
         }
+
         $apiContext->setConfig(
             array(
                 'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
@@ -182,6 +183,7 @@ class MethodPPP extends AbstractMethodPaypal
                 'cache.enabled' => false,
             )
         );
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
         return $apiContext;
     }
 

@@ -138,12 +138,6 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             ),
-            array(
-                'type' => 'text',
-                'label' => $module->l('Merchant Id'),
-                'name' => 'paypal_ec_merchant_id',
-                'hint' => $module->l('Fill this field with your merchant id')
-            ),
         ));
 
         $params['fields_value'] = array(

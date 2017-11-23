@@ -1169,6 +1169,7 @@ class PayPal extends PaymentModule
 
         $partner_info = array(
             'email'         => $this->context->employee->email,
+            'language'      => $this->context->language->iso_code.'_'.Tools::strtoupper($this->context->country->iso_code),
             'shop_url'      => Tools::getShopDomainSsl(true),
             'address1'      => Configuration::get('PS_SHOP_ADDR1', null, null, null, ''),
             'address2'      => Configuration::get('PS_SHOP_ADDR2', null, null, null, ''),
@@ -1184,6 +1185,7 @@ class PayPal extends PaymentModule
         );
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
+
         $response = $sdk->getUrlOnboarding($partner_info);
         return $response;
     }
