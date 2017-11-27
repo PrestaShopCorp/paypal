@@ -5,3 +5,4 @@ config.xml
 api/Results.txt
 .idea/
 202/
+/sdk/paypalREST/vendor/paypal/rest-api-sdk-php/var/*

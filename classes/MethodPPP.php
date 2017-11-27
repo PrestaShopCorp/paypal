@@ -108,8 +108,6 @@ class MethodPPP extends AbstractMethodPaypal
         $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/ppp_logo.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
 
         $flowConfig = new \PayPal\Api\FlowConfig();
-        // Type of PayPal page to be displayed when a user lands on the PayPal site for checkout. Allowed values: Billing or Login. When set to Billing, the Non-PayPal account landing page is used. When set to Login, the PayPal account login landing page is used.
-        $flowConfig->setLandingPageType("Billing");
         // When set to "commit", the buyer is shown an amount, and the button text will read "Pay Now" on the checkout page.
         $flowConfig->setUserAction("commit");
         // Defines the HTTP method to use to redirect the user to a return URL. A valid value is `GET` or `POST`.
@@ -180,7 +178,7 @@ class MethodPPP extends AbstractMethodPaypal
             array(
                 'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
                 'log.LogEnabled' => false,
-                'cache.enabled' => false,
+                'cache.enabled' => true,
             )
         );
         $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
@@ -243,10 +241,6 @@ class MethodPPP extends AbstractMethodPaypal
         $context->smarty->assign(array(
             'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
             'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
-            'PAYPAL_SANDBOX_CLIENTID' => Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
-            'PAYPAL_SANDBOX_SECRET' => Configuration::get('PAYPAL_SANDBOX_SECRET'),
-            'PAYPAL_LIVE_CLIENTID' => Configuration::get('PAYPAL_LIVE_CLIENTID'),
-            'PAYPAL_LIVE_SECRET' => Configuration::get('PAYPAL_LIVE_SECRET'),
         ));
         if ((Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN))  {
             $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');

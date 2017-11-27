@@ -377,6 +377,10 @@ class PayPal extends PaymentModule
             'paypal_card' => Configuration::get('PAYPAL_API_CARD'),
             'iso_code' => $lang,
             'img_checkout' => $img_esc,
+            'PAYPAL_SANDBOX_CLIENTID' => Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
+            'PAYPAL_SANDBOX_SECRET' => Configuration::get('PAYPAL_SANDBOX_SECRET'),
+            'PAYPAL_LIVE_CLIENTID' => Configuration::get('PAYPAL_LIVE_CLIENTID'),
+            'PAYPAL_LIVE_SECRET' => Configuration::get('PAYPAL_LIVE_SECRET'),
         ));
 
         if ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES") {
@@ -812,10 +816,18 @@ class PayPal extends PaymentModule
         if (!Validate::isLoadedObject($paypal_order)) {
             return;
         }
+
+
         $this->context->smarty->assign(array(
             'transaction_id' => $paypal_order->id_transaction,
             'method' => $paypal_order->method,
         ));
+        if($paypal_order->method == 'PPP' && $paypal_order->payment_tool == 'PAY_UPON_INVOICE')
+        {
+            $method = AbstractMethodPaypal::load('PPP');
+            $information = $method->getInstructionInfo($paypal_order->id_payment);
+            $this->context->smarty->assign('ppp_information',$method->getInstructionInfo($paypal_order->id_payment));
+        }
         $this->context->controller->registerJavascript($this->name.'-order_confirmation_js', $this->_path.'/views/js/order_confirmation.js');
         return $this->context->smarty->fetch('module:paypal/views/templates/hook/order_confirmation.tpl');
     }

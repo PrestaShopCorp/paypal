@@ -30,3 +30,28 @@
     {/if}
     {$transaction_id}
 </li>
+{if isset($ppp_information)}
+    <dl>
+        <dd>
+            {l s='The bank name'} : {$ppp_information.recipient_banking_instruction.bank_name}
+        </dd>
+        <dd>
+            {l s='Account holder name'} : {$ppp_information.recipient_banking_instruction.account_holder_name}
+        </dd>
+        <dd>
+            {l s='IBAN'} : {$ppp_information.recipient_banking_instruction.international_bank_account_number}
+        </dd>
+        <dd>
+            {l s='BIC'} : {$ppp_information.recipient_banking_instruction.bank_identifier_code}
+        </dd>
+        <dd>
+            {l s='Amount due / currency'} : {$ppp_information.amount.value} {$ppp_information.amount.currency}
+        </dd>
+        <dd>
+            {l s='Payment due date'} : {$ppp_information.payment_due_date}
+        </dd>
+        <dd>
+            {l s='Reference'} : {$ppp_information.reference_number}
+        </dd>
+    </dl>
+{/if}
