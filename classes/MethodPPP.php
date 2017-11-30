@@ -467,19 +467,7 @@ class MethodPPP extends AbstractMethodPaypal
         // If you wish to update the amount that you wish to charge the customer,
         // based on the shipping address or any other reason, you could
         // do that by passing the transaction object with just `amount` field in it.
-        $itemTotalValue = 0;
-        $taxTotalValue = 0;
-        $items = array();
-        $itemList = new ItemList();
-        $amount = new Amount();
 
-        $this->_getPaymentDetails($items, $itemTotalValue, $taxTotalValue, $itemList, $amount);
-
-        $transaction = new Transaction();
-        $transaction->setAmount($amount);
-        // Add the above transaction object inside our Execution object.
-        $execution->addTransaction($transaction);
-        // Execute the payment
         $exec_payment = $payment->execute($execution, $this->_getCredentialsInfo());
 
         $cart = $context->cart;

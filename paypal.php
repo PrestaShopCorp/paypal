@@ -749,6 +749,9 @@ class PayPal extends PaymentModule
         } catch (Exception $e) {
             return false;
         }
+        $address_invoice = new Address($this->context->cart->id_address_invoice);
+        $country_invoice = new Country($address_invoice->id_country);
+
         $this->context->smarty->assign(array(
             'pppSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'pppValidation', array(), true),
             'approval_url_ppp'=> $result['approval_url'],
@@ -756,7 +759,7 @@ class PayPal extends PaymentModule
             'path' => $this->_path,
             'mode' => Configuration::get('PAYPAL_SANDBOX')  ? 'sandbox' : 'live',
             'ppp_language_iso_code' => $this->context->language->iso_code,
-            'ppp_country_iso_code' => $this->context->country->iso_code,
+            'ppp_country_iso_code' => $country_invoice->iso_code,
             'ajax_patch_url' => $this->context->link->getModuleLink('paypal', 'pppPatch', array(), true),
         ));
         return true;
