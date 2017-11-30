@@ -44,6 +44,12 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         $this->id_module = (int) Tools::getValue('id_module');
         $this->id_order = (int) Tools::getValue('id_order');
         $order = new Order($this->id_order);
+        // fix security issue
+        if($order->id_cart != Tools::getValue('id_cart') || $order->secure_key != Tools::getValue('key'))
+        {
+            Tools::redirect($this->context->link->getPageLink('history'));
+        }
+
         $order_state = new OrderState($order->current_state);
         $paypal_order = PayPalOrder::getOrderById($this->id_order);
 
