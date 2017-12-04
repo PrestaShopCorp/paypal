@@ -828,8 +828,13 @@ class PayPal extends PaymentModule
         if($paypal_order->method == 'PPP' && $paypal_order->payment_tool == 'PAY_UPON_INVOICE')
         {
             $method = AbstractMethodPaypal::load('PPP');
-            $information = $method->getInstructionInfo($paypal_order->id_payment);
-            $this->context->smarty->assign('ppp_information',$method->getInstructionInfo($paypal_order->id_payment));
+            try{
+                throw new Exception();
+                $this->context->smarty->assign('ppp_information',$method->getInstructionInfo($paypal_order->id_payment));
+            } catch (Exception $e) {
+                $this->context->smarty->assign('error_msg',$this->l('We are not able to verify if payment was successful. Please check if you have received confirmation from PayPal.'));
+            }
+
         }
         $this->context->controller->registerJavascript($this->name.'-order_confirmation_js', $this->_path.'/views/js/order_confirmation.js');
         return $this->context->smarty->fetch('module:paypal/views/templates/hook/order_confirmation.tpl');
