@@ -829,7 +829,6 @@ class PayPal extends PaymentModule
         {
             $method = AbstractMethodPaypal::load('PPP');
             try{
-                throw new Exception();
                 $this->context->smarty->assign('ppp_information',$method->getInstructionInfo($paypal_order->id_payment));
             } catch (Exception $e) {
                 $this->context->smarty->assign('error_msg',$this->l('We are not able to verify if payment was successful. Please check if you have received confirmation from PayPal.'));
