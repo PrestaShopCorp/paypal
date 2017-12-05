@@ -22,9 +22,11 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
+{if isset($error_msg)}
 <div class=".alert.alert-danger">
     {$error_msg}
 </div>
+{/if}
 <li id="paypal_transaction_id">
     {if $method == 'BT'}
         {l s='Braintree transaction id :' mod='paypal'}
