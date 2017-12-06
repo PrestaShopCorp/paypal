@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 {if isset($error_msg)}
-<div class=".alert.alert-danger">
+<div class="alert alert-danger">
     {$error_msg}
 </div>
 {/if}
