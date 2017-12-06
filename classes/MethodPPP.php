@@ -300,7 +300,6 @@ class MethodPPP extends AbstractMethodPaypal
         // The return object contains the state and the
         // url to which the buyer must be redirected to
         // for payment approval
-
         $payment->create($this->_getCredentialsInfo());
 
         // ### Get redirect url
@@ -419,10 +418,18 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function doPatch()
     {
+        $discounts = Context::getContext()->cart->getCartRules();
+        if (count($discounts) > 0) {
+            $total_discount = 0;
+            foreach ($discounts as $discount) {
+                $total_discount += $discount['value_real'];
+            }
+        }
+
         // Retrieve the payment object by calling the tatic `get` method
         // on the Payment class by passing a valid Payment ID
         $payment = Payment::get(Context::getContext()->cookie->paypal_plus_payment, $this->_getCredentialsInfo());
-
+       // echo'<pre>';print_r($payment);die;
         $cart = new Cart(Context::getContext()->cart->id);
         $address_delivery = new Address($cart->id_address_delivery);
 
@@ -431,6 +438,22 @@ class MethodPPP extends AbstractMethodPaypal
             $state = new State((int) $address_delivery->id_state);
         }
         $state_name = $state ? $state->iso_code : '';
+
+
+        $patchReplace = new Patch();
+        $patchReplace->setOp('replace')
+            ->setPath('/transactions/0/amount')
+            ->setValue(json_decode('{
+                    "total": "'.number_format(30.19,2, ".", "").'",
+                    "currency": "EUR",
+                     "details": {
+                        "subtotal": "'.number_format(25.99,2, ".", "").'",
+                        "shipping": "'.number_format(0,2, ".", "").'",
+                        "tax": "'.number_format(5.20,2, ".", "").'",
+                        "shipping_discount": "'.number_format(1,2, ".", "").'"
+                    }
+                }'));
+
         $patchAdd = new Patch();
         $patchAdd->setOp('add')
             ->setPath('/transactions/0/item_list/shipping_address')
@@ -443,8 +466,15 @@ class MethodPPP extends AbstractMethodPaypal
                     "country_code": "'.Country::getIsoById($address_delivery->id_country).'"
                 }'));
 
+
+
+
+
+
+
         $patchRequest = new PatchRequest();
-        $patchRequest->setPatches(array($patchAdd));
+        $patchRequest->setPatches(array($patchReplace, $patchAdd));
+//echo'<pre>';print_r($patchRequest);die;
         return $payment->update($patchRequest, $this->_getCredentialsInfo());
     }
 
