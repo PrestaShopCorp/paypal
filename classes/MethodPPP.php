@@ -312,7 +312,7 @@ class MethodPPP extends AbstractMethodPaypal
     {
         $tax = $total_products = 0;
         $this->_getProductsList($items, $total_products, $tax);
-        $this->_getDiscountsList($items, $total_products);
+        //$this->_getDiscountsList($items, $total_products);
         $this->_getGiftWrapping($items, $total_products);
         $this->_getPaymentValues($items, $total_products, $tax, $itemList, $amount);
     }
@@ -334,27 +334,6 @@ class MethodPPP extends AbstractMethodPaypal
             $items[] = $item;
             $itemTotalValue += number_format($product['price'], 2, ".", '') * $product['quantity'];
             $taxTotalValue += number_format($product['product_tax'], 2, ".", '') * $product['quantity'];
-        }
-    }
-
-    private function _getDiscountsList(&$items, &$itemTotalValue)
-    {
-        $discounts = Context::getContext()->cart->getCartRules();
-        if (count($discounts) > 0) {
-            foreach ($discounts as $discount) {
-                if (isset($discount['description']) && !empty($discount['description'])) {
-                    $discount['description'] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
-                }
-                $discount['value_real'] = -1 * number_format($discount['value_real'], 2, ".", '');
-                $item = new Item();
-                $item->setName($discount['name'])
-                    ->setCurrency(Context::getContext()->currency->iso_code)
-                    ->setQuantity(1)
-                    ->setSku($discount['code']) // Similar to `item_number` in Classic API
-                    ->setPrice($discount['value_real']);
-                $items[] = $item;
-                $itemTotalValue += number_format($discount['value_real'], 2, ".", '');
-            }
         }
     }
 
@@ -419,8 +398,8 @@ class MethodPPP extends AbstractMethodPaypal
     public function doPatch()
     {
         $discounts = Context::getContext()->cart->getCartRules();
+        $total_discount = 0;
         if (count($discounts) > 0) {
-            $total_discount = 0;
             foreach ($discounts as $discount) {
                 $total_discount += $discount['value_real'];
             }
@@ -429,7 +408,7 @@ class MethodPPP extends AbstractMethodPaypal
         // Retrieve the payment object by calling the tatic `get` method
         // on the Payment class by passing a valid Payment ID
         $payment = Payment::get(Context::getContext()->cookie->paypal_plus_payment, $this->_getCredentialsInfo());
-       // echo'<pre>';print_r($payment);die;
+        // echo'<pre>';print_r($payment);die;
         $cart = new Cart(Context::getContext()->cart->id);
         $address_delivery = new Address($cart->id_address_delivery);
 
@@ -439,20 +418,19 @@ class MethodPPP extends AbstractMethodPaypal
         }
         $state_name = $state ? $state->iso_code : '';
 
+        $items = array();
+        $tax = $total = 0;
+        $itemList = new ItemList();
+        $amount = new Amount();
+        $this->_getPaymentDetails($items,$total,$tax,$itemList,$amount);
+
+        $amount->getDetails()->setShippingDiscount(-$total_discount);
+        $amount->setTotal($amount->getTotal()-$total_discount);
 
         $patchReplace = new Patch();
         $patchReplace->setOp('replace')
             ->setPath('/transactions/0/amount')
-            ->setValue(json_decode('{
-                    "total": "'.number_format(30.19,2, ".", "").'",
-                    "currency": "EUR",
-                     "details": {
-                        "subtotal": "'.number_format(25.99,2, ".", "").'",
-                        "shipping": "'.number_format(0,2, ".", "").'",
-                        "tax": "'.number_format(5.20,2, ".", "").'",
-                        "shipping_discount": "'.number_format(1,2, ".", "").'"
-                    }
-                }'));
+            ->setValue(json_decode($amount->toJSON()));
 
         $patchAdd = new Patch();
         $patchAdd->setOp('add')
@@ -466,15 +444,8 @@ class MethodPPP extends AbstractMethodPaypal
                     "country_code": "'.Country::getIsoById($address_delivery->id_country).'"
                 }'));
 
-
-
-
-
-
-
         $patchRequest = new PatchRequest();
         $patchRequest->setPatches(array($patchReplace, $patchAdd));
-//echo'<pre>';print_r($patchRequest);die;
         return $payment->update($patchRequest, $this->_getCredentialsInfo());
     }
 
