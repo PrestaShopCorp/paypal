@@ -404,7 +404,6 @@ class MethodEC extends AbstractMethodPaypal
     private function _getGiftWrapping(&$paymentDetails, &$itemTotalValue)
     {
         $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
-        $wrapping = array();
         $currency = Context::getContext()->currency->iso_code;
         if ($wrapping_price > 0) {
             $wrapping_price = number_format($wrapping_price, 2, ".", '');
@@ -415,7 +414,6 @@ class MethodEC extends AbstractMethodPaypal
             $paymentDetails->PaymentDetailsItem[] = $itemDetails;
             $itemTotalValue += number_format($wrapping_price, 2, ".", '');
         }
-        $params['products_list']['wrapping'] = $wrapping;
     }
 
     private function _getPaymentValues(&$paymentDetails, &$itemTotalValue, &$taxTotalValue)
