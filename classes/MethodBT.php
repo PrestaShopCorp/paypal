@@ -365,6 +365,10 @@ class MethodBT extends AbstractMethodPaypal
             'payment_tool' => $transaction->paymentInstrumentType,
         );
     }
+    public function getOrderId($cart)
+    {
+        return $cart->secure_key.'_'.$cart->id;
+    }
 
     public function sale($cart, $token_payment, $device_data)
     {
@@ -395,8 +399,8 @@ class MethodBT extends AbstractMethodPaypal
                 'amount'                => $cart->getOrderTotal(),
                 'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts->$current_currency,
-                'orderId'               => $cart->id,
-                'channel'               => (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_BT',
+                'orderId'               => $this->getOrderId($cart),
+                'channel'               => (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
                 'billing' => [
                     'firstName'         => $address_billing->firstname,
                     'lastName'          => $address_billing->lastname,
