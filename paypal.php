@@ -642,6 +642,10 @@ class PayPal extends PaymentModule
 
         $braintree_message = '';
         $braintree_style = '';
+        if(version_compare(phpversion(),'5.4','<'))
+        {
+            $output = $this->displayWarning($this->l('Your server is not compatible with PayPal module upcoming release. Please contact your hosting company in order to upgrade PHP version to at least version 5.4 or latest.'));
+        }
 
         if (!Tools::isSubmit('submitButton') && Tools::getIsset('accessToken') && Tools::getIsset('expiresAt') && Tools::getIsset('refreshToken')) {
             $output = $this->displayConfirmation((Configuration::get('PAYPAL_SANDBOX')?$this->l('Your Braintree account is now configured in sandbox mode. You can sell on Euro only. If you have problems, you can join Braintree support on 08 05 54 27 14'):$this->l('Your Braintree account is now configured in live mode. If you have problems, you can join Braintree support on 08 05 54 27 14') ));
