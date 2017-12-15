@@ -181,7 +181,7 @@ class MethodPPP extends AbstractMethodPaypal
                 'cache.enabled' => true,
             )
         );
-        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
         return $apiContext;
     }
 

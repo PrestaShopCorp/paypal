@@ -400,7 +400,7 @@ class MethodBT extends AbstractMethodPaypal
                 'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts->$current_currency,
                 'orderId'               => $this->getOrderId($cart),
-                'channel'               => (defined('PLATEFORM') && PLATEFORM == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
+                'channel'               => (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
                 'billing' => [
                     'firstName'         => $address_billing->firstname,
                     'lastName'          => $address_billing->lastname,
@@ -426,7 +426,6 @@ class MethodBT extends AbstractMethodPaypal
             ];
 
             $result = $this->gateway->transaction()->sale($data);
-           // print_r("result");echo'<pre>';print_r($result);echo'<pre>';die;
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 return $result->transaction;
             } else {

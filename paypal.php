@@ -617,10 +617,10 @@ class PayPal extends PaymentModule
                 if (Configuration::get('PAYPAL_PLUS_ENABLED') && $this->assignInfoPaypalPlus()) {
                     $payment_options = new PaymentOption();
                     $action_text = $this->l('Pay with PayPal Plus');
+                    $payment_options->setCallToActionText($action_text);
                     if (Configuration::get('PAYPAL_API_ADVANTAGES')) {
                         $action_text .= ' | '.$this->l('It\'s easy, simple and secure');
                     }
-                    $payment_options->setCallToActionText($action_text);
                     $payment_options->setModuleName('paypal_plus');
                     $payment_options->setAction('javascript:doPatchPPP();');
                     try {
@@ -1200,7 +1200,7 @@ class PayPal extends PaymentModule
             'first_name'    => $this->context->employee->firstname,
             'last_name'     => $this->context->employee->lastname,
             'shop_name'     => Configuration::get('PS_SHOP_NAME', null, null, null, ''),
-            'ref_merchant'  => 'PrestaShop_'.(defined('PLATEFORM') && PLATEFORM == 'PSREADY' ? 'Ready':''),
+            'ref_merchant'  => 'PrestaShop_'.(getenv('PLATEFORM') == 'PSREADY' ? 'Ready':''),
         );
 
         $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));

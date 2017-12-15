@@ -541,7 +541,7 @@ class MethodEC extends AbstractMethodPaypal
         $DoECRequestDetails = new DoExpressCheckoutPaymentRequestDetailsType();
         $DoECRequestDetails->PayerID = Tools::getValue('shortcut') ? $context->cookie->paypal_ecs_payerid : Tools::getValue('PayerID');
         $DoECRequestDetails->Token = Tools::getValue('shortcut') ? $context->cookie->paypal_ecs : Tools::getValue('token');
-        $DoECRequestDetails->ButtonSource = 'PrestaShop_Cart_'.(defined('PLATEFORM') && PLATEFORM == 'PSREADY' ? 'Ready_':'').'EC';
+        $DoECRequestDetails->ButtonSource = 'PrestaShop_Cart_'.(getenv('PLATEFORM') == 'PSREADY' ? 'Ready_':'').'EC';
         $DoECRequestDetails->PaymentAction = Tools::ucfirst(Configuration::get('PAYPAL_API_INTENT'));;
         $DoECRequestDetails->PaymentDetails[0] = $paymentDetails;
 
