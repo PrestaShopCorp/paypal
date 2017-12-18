@@ -17,6 +17,7 @@ $_MODULE['<{paypal}prestashop>paypal_bd6b3cca1e559117a964cdfab6a977cf'] = 'Le th
 $_MODULE['<{paypal}prestashop>paypal_c9d8a8d3c76c69e9a5ba6387acb8655a'] = 'Avant d\'utiliser le module vous devez installer le module \"\"Rétro-compatibilité\"\".\"\"';
 $_MODULE['<{paypal}prestashop>paypal_ea5eb3f904bf42377277255cbd0e2251'] = 'Pour fonctionner correctement le module \"\"Rétro-compatibilité\"\" doit être activé.\"\"';
 $_MODULE['<{paypal}prestashop>paypal_48878e69ef59b9e9d2d9a8c18e4de520'] = 'Pour fonctionner correctement ce module requiert le module \"\"Rétro-compatibilité\"\" v\"\"';
+$_MODULE['<{paypal}prestashop>paypal_98aba438b26738216a5674199a9a4159'] = 'Votre serveur n\'est pas compatible avec la prochaine version du module paypal. Merci de vous rapprocher de votre hébergeur pour mettre la version 5.4 de PHP au minimum.';
 $_MODULE['<{paypal}prestashop>paypal_3561ead2eb61bae51846055b28d11bb7'] = 'Votre compte Braintree est maintenant configuré en mode sandbox. Uniquement l\'Euro est utilisé. Si vous rencontrez un problème, contactez-nous au 08 05 54 27 14.';
 $_MODULE['<{paypal}prestashop>paypal_e3b6254241629c649ac441fb85ecf695'] = 'Votre compte Braintree est maintenant configuré en mode production. Si vous rencontrez un problème, contactez-nous au 08 05 54 27 14.';
 $_MODULE['<{paypal}prestashop>paypal_7c52f2d084c19bb0511be6eba8f7387c'] = 'Braintree n\'est pas configuré. Si vous rencontrez un problème, contactez-nous au 08 05 54 27 14.';

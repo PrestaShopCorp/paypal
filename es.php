@@ -27,6 +27,7 @@ $_MODULE['<{paypal}prestashop>about_7934d7d1280bfbb8778743e39292af30'] = '¡Util
 $_MODULE['<{paypal}prestashop>error_a40cab5994f36d4c48103a22ca082e8f'] = 'Carrito de la compra';
 $_MODULE['<{paypal}prestashop>error_ad69e733ebae8d264bccaa38d68830e8'] = 'PayPal';
 $_MODULE['<{paypal}prestashop>error_0557fa923dcee4d0f86b1409f5c2167f'] = 'Anterior';
+$_MODULE['<{paypal}prestashop>paypal_98aba438b26738216a5674199a9a4159'] = 'Su servidor no es compatible con la futura versión del módulo de PayPal". Puede ponerse en contacto con su empresa de hosting para actualizar a la versión PHP 5.4 como mínimo o las siguientes versiones';
 $_MODULE['<{paypal}prestashop>order-confirmation_fb077ecba55e5552916bde26d8b9e794'] = 'Confirmación de pedido';
 $_MODULE['<{paypal}prestashop>order-confirmation_a378cd7a0839cbd4ec3e45bbdeeb69be'] = 'Su ID de pedido es:';
 $_MODULE['<{paypal}prestashop>order-confirmation_4082ea29b4f196c4f60533500139725a'] = 'Seguimiento de mi pedido';

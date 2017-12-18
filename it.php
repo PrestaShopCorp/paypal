@@ -16,6 +16,7 @@ $_MODULE['<{paypal}prestashop>paypal_connect_842a183be225d415b2b4375ba1dd1c94'] 
 $_MODULE['<{paypal}prestashop>paypal_lib_7c2d00d8c94d1ce0f515db8b0481db40'] = 'risposta di PayPal:';
 $_MODULE['<{paypal}prestashop>notifier_36ec50c0e914dd2fb48a1b27540512ce'] = 'Pagamento accettato.';
 $_MODULE['<{paypal}prestashop>back_office_e9f91995a69772872f7a386c6909403d'] = 'Conquista nuovi clienti';
+$_MODULE['<{paypal}prestashop>paypal_98aba438b26738216a5674199a9a4159'] = 'Il tuo server non è compatibile con la prossima versione del modulo PayPal. Si prega di contattare la società di hosting per aggiornare la versione di PHP almeno alla versione 5.4 o successiva';
 $_MODULE['<{paypal}prestashop>back_office_bbf54c5f55856a290f0deae540368071'] = 'Oltre 110 milioni di conti PayPal attivi nel mondo';
 $_MODULE['<{paypal}prestashop>back_office_ad78c46c5d6edc542ad2153e23518478'] = 'Espandi la tua base utenti anche all\'estero';
 $_MODULE['<{paypal}prestashop>back_office_2b91c701cecf505dc5af4e35d7067f1f'] = '190 Paesi e 25 valute diverse';
