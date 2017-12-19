@@ -309,7 +309,7 @@ class MethodEC extends AbstractMethodPaypal
         $paymentDetails->PaymentAction = Tools::ucfirst(Configuration::get('PAYPAL_API_INTENT'));
         $setECReqDetails = new SetExpressCheckoutRequestDetailsType();
         $setECReqDetails->PaymentDetails[0] = $paymentDetails;
-        $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true).'&step=1';
+        $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true);
         $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);
         $setECReqDetails->NoShipping = 1;
         $setECReqDetails->AddressOverride = 0;
@@ -561,7 +561,7 @@ class MethodEC extends AbstractMethodPaypal
         $cart = $context->cart;
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
-            Tools::redirect('index.php?controller=order&step=1');
+            Tools::redirect('index.php?controller=order');
         }
         $currency = $context->currency;
         $payment_info = $exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo[0];

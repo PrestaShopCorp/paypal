@@ -281,7 +281,7 @@ class MethodPPP extends AbstractMethodPaypal
 
         $redirectUrls = new RedirectUrls();
         $redirectUrls->setReturnUrl(Context::getContext()->link->getModuleLink($this->name, 'pppValidation', array(), true))
-            ->setCancelUrl(Context::getContext()->link->getPageLink('order', true).'&step=1');
+            ->setCancelUrl(Context::getContext()->link->getPageLink('order', true));
 
         // ### Payment
         // A Payment Resource; create one using
