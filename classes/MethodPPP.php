@@ -47,6 +47,16 @@ class MethodPPP extends AbstractMethodPaypal
 {
     public $name = 'paypal';
 
+    private $_items = array();
+
+    private $_itemTotalValue = 0;
+
+    private $_taxTotalValue = 0;
+
+    private $_itemList;
+
+    private $_amount;
+
     public function setConfig($params)
     {
         $paypal = Module::getInstanceByName($this->name);
@@ -255,13 +265,11 @@ class MethodPPP extends AbstractMethodPaypal
         $payer->setPaymentMethod("paypal");
         // ### Itemized information
         // (Optional) Lets you specify item wise information
-        $itemTotalValue = 0;
-        $taxTotalValue = 0;
-        $items = array();
-        $itemList = new ItemList();
-        $amount = new Amount();
 
-        $this->_getPaymentDetails($items, $itemTotalValue, $taxTotalValue, $itemList, $amount);
+        $this->_itemList = new ItemList();
+        $this->_amount = new Amount();
+
+        $this->_getPaymentDetails();
 
         // ### Transaction
         // A transaction defines the contract of a
@@ -270,8 +278,8 @@ class MethodPPP extends AbstractMethodPaypal
 
 
         $transaction = new Transaction();
-        $transaction->setAmount($amount)
-            ->setItemList($itemList)
+        $transaction->setAmount($this->_amount)
+            ->setItemList($this->_itemList)
             ->setDescription("Payment description")
             ->setInvoiceNumber(uniqid());
 
@@ -308,19 +316,17 @@ class MethodPPP extends AbstractMethodPaypal
         return array('approval_url' => $payment->getApprovalLink(), 'payment_id' => $payment->id);
     }
 
-    private function _getPaymentDetails(&$items, &$total_products, &$tax, &$itemList, &$amount)
+    private function _getPaymentDetails()
     {
-        $tax = $total_products = 0;
-        $this->_getProductsList($items, $total_products, $tax);
+        $this->_getProductsList();
         //$this->_getDiscountsList($items, $total_products);
-        $this->_getGiftWrapping($items, $total_products);
-        $this->_getPaymentValues($items, $total_products, $tax, $itemList, $amount);
+        $this->_getGiftWrapping();
+        $this->_getPaymentValues();
     }
 
-    private function _getProductsList(&$items, &$itemTotalValue, &$taxTotalValue)
+    private function _getProductsList()
     {
         $products = Context::getContext()->cart->getProducts();
-        $items = array();
         foreach ($products as $product) {
             $product['product_tax'] = $product['price_wt'] - $product['price'];
             $item = new Item();
@@ -331,13 +337,13 @@ class MethodPPP extends AbstractMethodPaypal
                 ->setSku($product['id_product']) // Similar to `item_number` in Classic API
                 ->setPrice(number_format($product['price'], 2, ".", ''));
 
-            $items[] = $item;
-            $itemTotalValue += number_format($product['price'], 2, ".", '') * $product['quantity'];
-            $taxTotalValue += number_format($product['product_tax'], 2, ".", '') * $product['quantity'];
+            $this->_items[] = $item;
+            $this->_itemTotalValue += number_format($product['price'], 2, ".", '') * $product['quantity'];
+            $this->_taxTotalValue += number_format($product['product_tax'], 2, ".", '') * $product['quantity'];
         }
     }
 
-    private function _getGiftWrapping(&$items, &$itemTotalValue)
+    private function _getGiftWrapping()
     {
         $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
         if ($wrapping_price > 0) {
@@ -348,14 +354,14 @@ class MethodPPP extends AbstractMethodPaypal
                 ->setQuantity(1)
                 ->setSku('wrapping') // Similar to `item_number` in Classic API
                 ->setPrice($wrapping_price);
-            $items[] = $item;
-            $itemTotalValue += $wrapping_price;
+            $this->_items[] = $item;
+            $this->_itemTotalValue += $wrapping_price;
         }
     }
 
-    private function _getPaymentValues(&$items, &$itemTotalValue, &$taxTotalValue, &$itemList, &$amount)
+    private function _getPaymentValues()
     {
-        $itemList->setItems($items);
+        $this->_itemList->setItems($this->_items);
         $context = Context::getContext();
         $currency = $context->currency->iso_code;
         $cart = $context->cart;
@@ -364,15 +370,15 @@ class MethodPPP extends AbstractMethodPaypal
         $total = $cart->getOrderTotal(true, Cart::BOTH);
         $summary = $cart->getSummaryDetails();
         $subtotal = Tools::ps_round($summary['total_products'], 2);
-        $total_tax = round($taxTotalValue, 2);
+        $total_tax = round($this->_taxTotalValue, 2);
         // total shipping amount
         $shippingTotal = number_format($shipping, 2, ".", '');
 
-        if ($subtotal != $itemTotalValue) {
-            $subtotal = $itemTotalValue;
+        if ($subtotal != $this->_itemTotalValue) {
+            $subtotal = $this->_itemTotalValue;
         }
         //total
-        $total_cart = $shippingTotal + $itemTotalValue + $taxTotalValue;
+        $total_cart = $shippingTotal + $this->_itemTotalValue + $this->_taxTotalValue;
 
         if ($total != $total_cart) {
             $total = $total_cart;
@@ -390,7 +396,7 @@ class MethodPPP extends AbstractMethodPaypal
         // Lets you specify a payment amount.
         // You can also specify additional details
         // such as shipping, tax.
-        $amount->setCurrency($currency)
+        $this->_amount->setCurrency($currency)
             ->setTotal(number_format($total, 2, ".", ''))
             ->setDetails($details);
     }
@@ -418,19 +424,17 @@ class MethodPPP extends AbstractMethodPaypal
         }
         $state_name = $state ? $state->iso_code : '';
 
-        $items = array();
-        $tax = $total = 0;
-        $itemList = new ItemList();
-        $amount = new Amount();
-        $this->_getPaymentDetails($items,$total,$tax,$itemList,$amount);
+        $this->_itemList = new ItemList();
+        $this->_amount = new Amount();
+        $this->_getPaymentDetails();
 
-        $amount->getDetails()->setShippingDiscount(-$total_discount);
-        $amount->setTotal($amount->getTotal()-$total_discount);
+        $this->_amount->getDetails()->setShippingDiscount(-$total_discount);
+        $this->_amount->setTotal($this->_amount->getTotal()-$total_discount);
 
         $patchReplace = new Patch();
         $patchReplace->setOp('replace')
             ->setPath('/transactions/0/amount')
-            ->setValue(json_decode($amount->toJSON()));
+            ->setValue(json_decode($this->_amount->toJSON()));
 
         $patchAdd = new Patch();
         $patchAdd->setOp('add')
