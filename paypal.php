@@ -695,7 +695,7 @@ class PayPal extends PaymentModule
             if ($diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
                 $bt_orders = PaypalOrder::getPaypalBtOrdersIds();
                 if (!$bt_orders) {
-                    return true;
+                    return;
                 }
 
                 $method = AbstractMethodPaypal::load('BT');
