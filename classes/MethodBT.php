@@ -146,7 +146,7 @@ class MethodBT extends AbstractMethodPaypal
     public function getMerchantCurrenciesForm($module)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
-        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
+        $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
 
         $ps_currencies = Currency::getCurrencies();
         $fields_form2 = array();
@@ -163,9 +163,9 @@ class MethodBT extends AbstractMethodPaypal
                     'type' => 'text',
                     'label' => $module->l('Merchant account Id for ').$curr['iso_code'],
                     'name' => 'braintree_curr_'.$curr['iso_code'],
-                    'value' => isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : ''
+                    'value' => isset($merchant_accounts[$curr['iso_code']])?$merchant_accounts[$curr['iso_code']] : ''
                 );
-            $fields_value['braintree_curr_'.$curr['iso_code']] =  isset($merchant_accounts->$curr['iso_code'])?$merchant_accounts->$curr['iso_code'] : '';
+            $fields_value['braintree_curr_'.$curr['iso_code']] =  isset($merchant_accounts[$curr['iso_code']])?$merchant_accounts[$curr['iso_code']] : '';
         }
         $fields_form2[0]['form']['submit'] = array(
             'title' => $module->l('Save'),
@@ -275,7 +275,7 @@ class MethodBT extends AbstractMethodPaypal
     public function getAllCurrency()
     {
         $this->initConfig();
-        $result = '';
+        $result = array();
         try {
             $response = $this->gateway->merchantAccount()->all();
             foreach ($response as $account) {
@@ -289,7 +289,7 @@ class MethodBT extends AbstractMethodPaypal
     public function createForCurrency($currency = null)
     {
         $this->initConfig();
-        $result = '';
+        $result = array();
 
         if ($currency) {
             try {
@@ -387,7 +387,7 @@ class MethodBT extends AbstractMethodPaypal
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
             );
         }
-        $merchant_accounts = Tools::jsonDecode(Configuration::get('PAYPAL_'.$this->mode.'_BRAINTREE_ACCOUNT_ID'));
+        $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_'.$this->mode.'_BRAINTREE_ACCOUNT_ID'));
         $address_billing = new Address($cart->id_address_invoice);
         $country_billing = new Country($address_billing->id_country);
         $address_shipping = new Address($cart->id_address_delivery);
@@ -398,7 +398,7 @@ class MethodBT extends AbstractMethodPaypal
             $data = [
                 'amount'                => $cart->getOrderTotal(),
                 'paymentMethodNonce'    => $token_payment,
-                'merchantAccountId'     => $merchant_accounts->$current_currency,
+                'merchantAccountId'     => $merchant_accounts[$current_currency],
                 'orderId'               => $this->getOrderId($cart),
                 'channel'               => (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
                 'billing' => [
@@ -449,8 +449,6 @@ class MethodBT extends AbstractMethodPaypal
     {
         return in_array($status, array('submitted_for_settlement','authorized','settled', 'settling'));
     }
-
-
 
 
     public function confirmCapture()
