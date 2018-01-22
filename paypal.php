@@ -1,6 +1,6 @@
 <?php
 /**
- * 2007-2017 PrestaShop
+ * 2007-2018 PrestaShop
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
- *  @copyright 2007-2017 PrestaShop SA
+ *  @copyright 2007-2018 PrestaShop SA
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  *  International Registered Trademark & Property of PrestaShop SA
  */
@@ -37,7 +37,6 @@ include_once _PS_MODULE_DIR_.'paypal/paypal_login/paypal_login.php';
 include_once _PS_MODULE_DIR_.'paypal/paypal_login/PayPalLoginUser.php';
 include_once _PS_MODULE_DIR_.'paypal/classes/PaypalCapture.php';
 include_once _PS_MODULE_DIR_.'paypal/classes/AuthenticatePaymentMethods.php';
-//include_once _PS_MODULE_DIR_.'paypal/classes/TLSVerificator.php';
 include_once _PS_MODULE_DIR_.'paypal/classes/PaypalPlusPui.php';
 
 define('WPS', 1); //Paypal Integral
