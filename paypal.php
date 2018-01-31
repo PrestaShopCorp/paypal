@@ -383,7 +383,7 @@ class PayPal extends PaymentModule
             'PAYPAL_LIVE_SECRET' => Configuration::get('PAYPAL_LIVE_SECRET'),
         ));
 
-        if ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES") {
+        if (getenv('PLATEFORM') != 'PSREADY' && ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES")) {
             $this->context->smarty->assign(array(
                 'braintree_available' => true,
             ));
