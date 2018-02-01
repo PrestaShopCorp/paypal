@@ -325,10 +325,6 @@ class MethodEC extends AbstractMethodPaypal
             $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
             $setECReqDetails->NoShipping = 2;
         }
-        // Billing agreement details
-        $billingAgreementDetails = new BillingAgreementDetailsType(1);
-        $billingAgreementDetails->BillingAgreementDescription = 1;
-        $setECReqDetails->BillingAgreementDetails = array($billingAgreementDetails);
 
         // Advanced options
         $setECReqDetails->AllowNote = 0;
