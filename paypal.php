@@ -100,7 +100,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '3.11.5';
+        $this->version = '3.11.6';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -643,7 +643,11 @@ class PayPal extends PaymentModule
         $braintree_style = '';
         if(version_compare(phpversion(),'5.4','<'))
         {
-            $output = $this->displayWarning($this->l('Your server is not compatible with PayPal module upcoming release. Please contact your hosting company in order to upgrade PHP version to at least version 5.4 or latest.'));
+            if (version_compare(_PS_VERSION_, '1.6', '>=')) {
+                $output = $this->displayWarning($this->l('Your server is not compatible with PayPal module upcoming release. Please contact your hosting company in order to upgrade PHP version to at least version 5.4 or latest.'));
+            } else {
+                $output = $this->displayError($this->l('Your server is not compatible with PayPal module upcoming release. Please contact your hosting company in order to upgrade PHP version to at least version 5.4 or latest.'));
+            }
         }
 
         if (!Tools::isSubmit('submitButton') && Tools::getIsset('accessToken') && Tools::getIsset('expiresAt') && Tools::getIsset('refreshToken')) {
