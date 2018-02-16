@@ -54,7 +54,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '4.3.1';
+        $this->version = '4.3.2';
         $this->author = 'PrestaShop';
         $this->display = 'view';
         $this->module_key = '336225a5988ad434b782f2d868d7bfcd';
@@ -689,8 +689,7 @@ class PayPal extends PaymentModule
 
     public function hookDisplayBackOfficeHeader()
     {
-        if(Configuration::get('PAYPAL_METHOD') == 'BT')
-        {
+        if (Configuration::get('PAYPAL_METHOD') == 'BT') {
             $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
             if ($diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
                 $bt_orders = PaypalOrder::getPaypalBtOrdersIds();
@@ -727,14 +726,16 @@ class PayPal extends PaymentModule
 
     public function hookActionObjectCurrencyAddAfter($params)
     {
-        $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
-        $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID'));
-        $method_bt = AbstractMethodPaypal::load('BT');
-        $merchant_account = $method_bt->createForCurrency($params['object']->iso_code);
+        if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+            $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
+            $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_' . $mode . '_BRAINTREE_ACCOUNT_ID'));
+            $method_bt = AbstractMethodPaypal::load('BT');
+            $merchant_account = $method_bt->createForCurrency($params['object']->iso_code);
 
-        if ($merchant_account) {
-            $merchant_accounts[$params['object']->iso_code] = $merchant_account[$params['object']->iso_code];
-            Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($merchant_accounts));
+            if ($merchant_account) {
+                $merchant_accounts[$params['object']->iso_code] = $merchant_account[$params['object']->iso_code];
+                Configuration::updateValue('PAYPAL_' . $mode . '_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($merchant_accounts));
+            }
         }
     }
 
