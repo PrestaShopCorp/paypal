@@ -1179,10 +1179,10 @@ class PayPal extends PaymentModule
     public function getPartnerInfo($method)
     {
         $return_url = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'&active_method='.Tools::getValue('method');
-        if (Configuration::get('PS_SSL_ENABLED')) {
-            $shop_url = Tools::getShopDomainSsl(true);
+        if ($this->context->country->iso_code == "CN") {
+            $country = "C2";
         } else {
-            $shop_url = Tools::getShopDomain(true);
+            $country = $this->context->country->iso_code;
         }
 
         $partner_info = array(
@@ -1192,7 +1192,7 @@ class PayPal extends PaymentModule
             'address1'      => Configuration::get('PS_SHOP_ADDR1', null, null, null, ''),
             'address2'      => Configuration::get('PS_SHOP_ADDR2', null, null, null, ''),
             'city'          => Configuration::get('PS_SHOP_CITY', null, null, null, ''),
-            'country_code'  => Tools::strtoupper($this->context->country->iso_code),
+            'country_code'  => Tools::strtoupper($country),
             'postal_code'   => Configuration::get('PS_SHOP_CODE', null, null, null, ''),
             'state'         => Configuration::get('PS_SHOP_STATE_ID', null, null, null, ''),
             'return_url'    => $return_url,
