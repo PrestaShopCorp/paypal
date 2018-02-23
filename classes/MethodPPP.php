@@ -316,41 +316,55 @@ class MethodPPP extends AbstractMethodPaypal
         return array('approval_url' => $payment->getApprovalLink(), 'payment_id' => $payment->id);
     }
 
-    private function _getPaymentDetails()
+    public function formatPrice($price)
     {
-        $this->_getProductsList();
-        //$this->_getDiscountsList($items, $total_products);
-        $this->_getGiftWrapping();
-        $this->_getPaymentValues();
+        $context = Context::getContext();
+        $context_currency = $context->currency;
+        $paypal = Module::getInstanceByName('paypal');
+        if ($paypal->needConvert()) {
+            $price = Tools::convertPrice($price, $context_currency, false);
+        }
+        $price = number_format($price, Paypal::getDecimal(), ".", '');
+        return $price;
     }
 
-    private function _getProductsList()
+    private function _getPaymentDetails()
+    {
+        $paypal = Module::getInstanceByName('paypal');
+        $currency = $paypal->getPaymentCurrencyIso();
+        $this->_getProductsList($currency);
+        //$this->_getDiscountsList($items, $total_products);
+        $this->_getGiftWrapping($currency);
+        $this->_getPaymentValues($currency);
+    }
+
+    private function _getProductsList($currency)
     {
         $products = Context::getContext()->cart->getProducts();
         foreach ($products as $product) {
-            $product['product_tax'] = $product['price_wt'] - $product['price'];
+            $product['product_tax'] = $this->formatPrice($product['price_wt'] - $product['price']);
             $item = new Item();
             $item->setName(Tools::substr($product['name'], 0, 126))
-                ->setCurrency(Context::getContext()->currency->iso_code)
+                ->setCurrency($currency)
                 ->setDescription($product['attributes'])
                 ->setQuantity($product['quantity'])
                 ->setSku($product['id_product']) // Similar to `item_number` in Classic API
-                ->setPrice(number_format($product['price'], 2, ".", ''));
+                ->setPrice($this->formatPrice($product['price']));
 
             $this->_items[] = $item;
-            $this->_itemTotalValue += number_format($product['price'], 2, ".", '') * $product['quantity'];
-            $this->_taxTotalValue += number_format($product['product_tax'], 2, ".", '') * $product['quantity'];
+            $this->_itemTotalValue += $this->formatPrice($product['price']) * $product['quantity'];
+            $this->_taxTotalValue += $product['product_tax'] * $product['quantity'];
         }
     }
 
-    private function _getGiftWrapping()
+    private function _getGiftWrapping($currency)
     {
         $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
         if ($wrapping_price > 0) {
-            $wrapping_price = number_format($wrapping_price, 2, ".", '');
+            $wrapping_price = $this->formatPrice($wrapping_price);
             $item = new Item();
             $item->setName('Gift wrapping')
-                ->setCurrency(Context::getContext()->currency->iso_code)
+                ->setCurrency($currency)
                 ->setQuantity(1)
                 ->setSku('wrapping') // Similar to `item_number` in Classic API
                 ->setPrice($wrapping_price);
@@ -359,20 +373,19 @@ class MethodPPP extends AbstractMethodPaypal
         }
     }
 
-    private function _getPaymentValues()
+    private function _getPaymentValues($currency)
     {
         $this->_itemList->setItems($this->_items);
         $context = Context::getContext();
-        $currency = $context->currency->iso_code;
         $cart = $context->cart;
         $shipping_cost_wt = $cart->getTotalShippingCost();
-        $shipping = round($shipping_cost_wt, 2);
-        $total = $cart->getOrderTotal(true, Cart::BOTH);
+        $shipping = $this->formatPrice($shipping_cost_wt);
+        $total = $this->formatPrice($cart->getOrderTotal(true, Cart::BOTH));
         $summary = $cart->getSummaryDetails();
-        $subtotal = Tools::ps_round($summary['total_products'], 2);
-        $total_tax = round($this->_taxTotalValue, 2);
+        $subtotal = $this->formatPrice($summary['total_products']);
+        $total_tax = number_format($this->_taxTotalValue, Paypal::getDecimal(), ".", '');
         // total shipping amount
-        $shippingTotal = number_format($shipping, 2, ".", '');
+        $shippingTotal = $shipping;
 
         if ($subtotal != $this->_itemTotalValue) {
             $subtotal = $this->_itemTotalValue;
@@ -390,14 +403,14 @@ class MethodPPP extends AbstractMethodPaypal
         // charges etc.
         $details = new Details();
         $details->setShipping($shippingTotal)
-            ->setTax(number_format($total_tax, 2, ".", ''))
-            ->setSubtotal(number_format($subtotal, 2, ".", ''));
+            ->setTax($total_tax)
+            ->setSubtotal($subtotal);
         // ### Amount
         // Lets you specify a payment amount.
         // You can also specify additional details
         // such as shipping, tax.
         $this->_amount->setCurrency($currency)
-            ->setTotal(number_format($total, 2, ".", ''))
+            ->setTotal($total)
             ->setDetails($details);
     }
 
@@ -407,7 +420,7 @@ class MethodPPP extends AbstractMethodPaypal
         $total_discount = 0;
         if (count($discounts) > 0) {
             foreach ($discounts as $discount) {
-                $total_discount += $discount['value_real'];
+                $total_discount += $this->formatPrice($discount['value_real']);
             }
         }
 

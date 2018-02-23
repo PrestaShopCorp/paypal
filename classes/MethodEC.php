@@ -59,6 +59,7 @@ class MethodEC extends AbstractMethodPaypal
 
     private $_taxTotalValue = 0;
 
+
     public function getConfig(PayPal $module)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
@@ -187,11 +188,11 @@ class MethodEC extends AbstractMethodPaypal
             'access_token_live' => Configuration::get('PAYPAL_LIVE_ACCESS'),
             'ec_card_active' => Configuration::get('PAYPAL_API_CARD'),
             'ec_paypal_active' => !Configuration::get('PAYPAL_API_CARD'),
-            'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
+            'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_UP) ? 0 : 1),
             'ec_active' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT'),
         ));
 
-        if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) {
+        if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_UP) {
             $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
         }
 
@@ -340,7 +341,11 @@ class MethodEC extends AbstractMethodPaypal
         */
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
         /* wrap API method calls on the service object with a try catch */
+
+
         $payment = $paypalService->SetExpressCheckout($setECReq);
+       // echo '<pre>';print_r($setECReq);die;
+        //You are not signed up to accept payment for digitally delivered goods.
         if (isset($payment->Errors)) {
             throw new Exception('ERROR in SetExpressCheckout', $payment->Errors[0]->ErrorCode);
         }
@@ -350,20 +355,21 @@ class MethodEC extends AbstractMethodPaypal
 
     private function _getPaymentDetails()
     {
-        $this->_getProductsList();
-        $this->_getDiscountsList();
-        $this->_getGiftWrapping();
-        $this->_getPaymentValues();
+        $paypal = Module::getInstanceByName('paypal');
+        $currency = $paypal->getPaymentCurrencyIso();
+        $this->_getProductsList($currency);
+        $this->_getDiscountsList($currency);
+        $this->_getGiftWrapping($currency);
+        $this->_getPaymentValues($currency);
     }
 
-    private function _getProductsList()
+    private function _getProductsList($currency)
     {
         $products = Context::getContext()->cart->getProducts();
-        $currency = Context::getContext()->currency->iso_code;
         foreach ($products as $product) {
             $itemDetails = new PaymentDetailsItemType();
-            $product['product_tax'] = $product['price_wt'] - $product['price'];
-            $itemAmount = new BasicAmountType($currency, number_format($product['price'], 2, ".", ''));
+            $product['product_tax'] = $this->formatPrice($product['price_wt'] - $product['price']);
+            $itemAmount = new BasicAmountType($currency, $this->formatPrice($product['price']));
             if (isset($product['attributes']) && (empty($product['attributes']) === false)) {
                 $product['name'] .= ' - '.$product['attributes'];
             }
@@ -372,66 +378,77 @@ class MethodEC extends AbstractMethodPaypal
             $itemDetails->Quantity = $product['quantity'];
             /** Indicates whether an item is digital or physical. For digital goods, this field is required and must be set to Digital. It is one of the following values:*/
             $itemDetails->ItemCategory = $product['is_virtual']?'Digital':'Physical';
-            $itemDetails->Tax = new BasicAmountType($currency, number_format($product['product_tax'], 2, ".", ''));
+            $itemDetails->Tax = new BasicAmountType($currency, $product['product_tax']);
             $this->_paymentDetails->PaymentDetailsItem[] = $itemDetails;
-
-            $this->_itemTotalValue += number_format($product['price'], 2, ".", '') * $product['quantity'];
-            $this->_taxTotalValue += number_format($product['product_tax'], 2, ".", '') * $product['quantity'];
+            $this->_itemTotalValue += $this->formatPrice($product['price']) * $product['quantity'];
+            $this->_taxTotalValue += $product['product_tax'] * $product['quantity'];
         }
+
     }
 
-    private function _getDiscountsList()
+    public function formatPrice($price)
+    {
+        $context = Context::getContext();
+        $context_currency = $context->currency;
+        $paypal = Module::getInstanceByName('paypal');
+        if ($paypal->needConvert()) {
+            $price = Tools::convertPrice($price, $context_currency, false);
+        }
+        $price = number_format($price, Paypal::getDecimal(), ".", '');
+        return $price;
+    }
+
+
+
+    private function _getDiscountsList($currency)
     {
         $discounts = Context::getContext()->cart->getCartRules();
-        $currency = Context::getContext()->currency->iso_code;
         if (count($discounts) > 0) {
             foreach ($discounts as $discount) {
                 if (isset($discount['description']) && !empty($discount['description'])) {
                     $discount['description'] = Tools::substr(strip_tags($discount['description']), 0, 50).'...';
                 }
-                $discount['value_real'] = -1 * number_format($discount['value_real'], 2, ".", '');
+                $discount['value_real'] = -1 * $this->formatPrice($discount['value_real']);
                 $itemDetails = new PaymentDetailsItemType();
                 $itemDetails->Name = $discount['name'];
                 $itemDetails->Amount = new BasicAmountType($currency, $discount['value_real']);;
                 $itemDetails->Quantity = 1;
                 $this->_paymentDetails->PaymentDetailsItem[] = $itemDetails;
-                $this->_itemTotalValue += number_format($discount['value_real'], 2, ".", '');
+                $this->_itemTotalValue += $discount['value_real'];
             }
         }
     }
 
-    private function _getGiftWrapping()
+    private function _getGiftWrapping($currency)
     {
         $wrapping_price = Context::getContext()->cart->gift ? Context::getContext()->cart->getGiftWrappingPrice() : 0;
-        $currency = Context::getContext()->currency->iso_code;
         if ($wrapping_price > 0) {
-            $wrapping_price = number_format($wrapping_price, 2, ".", '');
+            $wrapping_price = $this->formatPrice($wrapping_price);
             $itemDetails = new PaymentDetailsItemType();
             $itemDetails->Name = 'Gift wrapping';
             $itemDetails->Amount = new BasicAmountType($currency, $wrapping_price);;
             $itemDetails->Quantity = 1;
             $this->_paymentDetails->PaymentDetailsItem[] = $itemDetails;
-            $this->_itemTotalValue += number_format($wrapping_price, 2, ".", '');
+            $this->_itemTotalValue += $wrapping_price;
         }
     }
 
-    private function _getPaymentValues()
+    private function _getPaymentValues($currency)
     {
-        $currency = Context::getContext()->currency->iso_code;
         $context = Context::getContext();
         $cart = $context->cart;
         $shipping_cost_wt = $cart->getTotalShippingCost();
-        $shipping = round($shipping_cost_wt, 2);
-        $total = $cart->getOrderTotal(true, Cart::BOTH);
+        $shipping = $this->formatPrice($shipping_cost_wt);
+        $total = $this->formatPrice($cart->getOrderTotal(true, Cart::BOTH));
         $summary = $cart->getSummaryDetails();
-        $subtotal = Tools::ps_round($summary['total_products'], 2);
-        $total_tax = round($this->_taxTotalValue, 2);
+        $subtotal = $this->formatPrice($summary['total_products']);
+        $total_tax = number_format($this->_taxTotalValue, Paypal::getDecimal(), ".", '');
         // total shipping amount
-        $shippingTotal = new BasicAmountType($currency, number_format($shipping, 2, ".", ''));
+        $shippingTotal = new BasicAmountType($currency, $this->formatPrice($shipping));
         //total handling amount if any
-        $handlingTotal = new BasicAmountType($currency, number_format(0, 2, ".", ''));
+        $handlingTotal = new BasicAmountType($currency, number_format(0, Paypal::getDecimal(), ".", ''));
         //total insurance amount if any
-        $insuranceTotal = new BasicAmountType($currency, number_format(0, 2, ".", ''));
+        $insuranceTotal = new BasicAmountType($currency, number_format(0, Paypal::getDecimal(), ".", ''));
 
         if ($subtotal != $this->_itemTotalValue) {
             $subtotal = $this->_itemTotalValue;
@@ -445,9 +462,9 @@ class MethodEC extends AbstractMethodPaypal
             $total = $total_cart;
         }
 
-        $this->_paymentDetails->ItemTotal = new BasicAmountType($currency, number_format($subtotal, 2, ".", ''));
-        $this->_paymentDetails->TaxTotal = new BasicAmountType($currency, number_format($total_tax, 2, ".", ''));
-        $this->_paymentDetails->OrderTotal = new BasicAmountType($currency, number_format($total, 2, ".", ''));
+        $this->_paymentDetails->ItemTotal = new BasicAmountType($currency, $subtotal);
+        $this->_paymentDetails->TaxTotal = new BasicAmountType($currency, $total_tax);
+        $this->_paymentDetails->OrderTotal = new BasicAmountType($currency, $total);
 
         $this->_paymentDetails->HandlingTotal = $handlingTotal;
         $this->_paymentDetails->InsuranceTotal = $insuranceTotal;
@@ -513,6 +530,7 @@ class MethodEC extends AbstractMethodPaypal
                 $params['acct1.UserName'] = Configuration::get('PAYPAL_USERNAME_LIVE');
                 $params['acct1.Password'] = Configuration::get('PAYPAL_PSWD_LIVE');
                 $params['acct1.Signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
+                $params['acct1.Signature'] = Configuration::get('PAYPAL_SIGNATURE_LIVE');
                 $params['mode'] = Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live';
                 $params['log.LogEnabled'] = false;
                 break;
@@ -562,7 +580,8 @@ class MethodEC extends AbstractMethodPaypal
         }
         $currency = $context->currency;
         $payment_info = $exec_payment->DoExpressCheckoutPaymentResponseDetails->PaymentInfo[0];
-        $total = (float)$payment_info->GrossAmount->value;
+
+        $total = $payment_info->GrossAmount->value;
         $paypal = Module::getInstanceByName('paypal');
         if (Configuration::get('PAYPAL_API_INTENT') == "sale") {
             $order_state = Configuration::get('PS_OS_PAYMENT');
@@ -598,7 +617,7 @@ class MethodEC extends AbstractMethodPaypal
         $amount = $paypal_order->total_paid;
         $doCaptureRequestType = new DoCaptureRequestType();
         $doCaptureRequestType->AuthorizationID = $paypal_order->id_transaction;
-        $doCaptureRequestType->Amount = new BasicAmountType($currency, number_format($amount, 2, ".", ''));
+        $doCaptureRequestType->Amount = new BasicAmountType($currency, number_format($amount, Paypal::getDecimal(), ".", ''));
         $doCaptureRequestType->CompleteType = 'Complete';
         $doCaptureReq = new DoCaptureReq();
         $doCaptureReq->DoCaptureRequest = $doCaptureRequestType;

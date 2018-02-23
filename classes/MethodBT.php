@@ -370,6 +370,17 @@ class MethodBT extends AbstractMethodPaypal
         return $cart->secure_key.'_'.$cart->id;
     }
 
+    public function formatPrice($price)
+    {
+        $context = Context::getContext();
+        $context_currency = $context->currency;
+        $paypal = Module::getInstanceByName('paypal');
+        if ($paypal->needConvert()) {
+            $price = Tools::ps_round(Tools::convertPrice($price, $context_currency, false), _PS_PRICE_COMPUTE_PRECISION_);
+        }
+        return $price;
+    }
+
     public function sale($cart, $token_payment, $device_data)
     {
 
@@ -392,13 +403,15 @@ class MethodBT extends AbstractMethodPaypal
         $country_billing = new Country($address_billing->id_country);
         $address_shipping = new Address($cart->id_address_delivery);
         $country_shipping = new Country($address_shipping->id_country);
-        $current_currency = context::getContext()->currency->iso_code;
+        $amount = $this->formatPrice($cart->getOrderTotal());
+        $paypal = Module::getInstanceByName('paypal');
+        $currency = $paypal->getPaymentCurrencyIso();
 
         try {
             $data = [
-                'amount'                => $cart->getOrderTotal(),
+                'amount'                => $amount,
                 'paymentMethodNonce'    => $token_payment,
-                'merchantAccountId'     => $merchant_accounts[$current_currency],
+                'merchantAccountId'     => $merchant_accounts[$currency],
                 'orderId'               => $this->getOrderId($cart),
                 'channel'               => (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
                 'billing' => [
@@ -426,6 +439,7 @@ class MethodBT extends AbstractMethodPaypal
             ];
 
             $result = $this->gateway->transaction()->sale($data);
+           // echo '<pre>';print_r($result);die;
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 return $result->transaction;
             } else {

@@ -726,6 +726,7 @@ class PayPal extends PaymentModule
 
     public function hookActionObjectCurrencyAddAfter($params)
     {
+
         if (Configuration::get('PAYPAL_METHOD') == 'BT') {
             $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
             $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_' . $mode . '_BRAINTREE_ACCOUNT_ID'));
@@ -848,13 +849,39 @@ class PayPal extends PaymentModule
         return $method->renderExpressCheckoutShortCut($this->context, 'EC');
     }
 
+    public function needConvert()
+    {
+        $currency_mode = Currency::getPaymentCurrenciesSpecial($this->id);
+        $mode_id = $currency_mode['id_currency'];
+        if ($mode_id == -2) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getPaymentCurrencyIso()
+    {
+        if ($this->needConvert()) {
+            $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
+        } else {
+            $currency = Context::getContext()->currency;
+        }
+        return $currency->iso_code;
+    }
+
     public function validateOrder($id_cart, $id_order_state, $amount_paid, $payment_method = 'Unknown', $message = null, $transaction = array(), $currency_special = null, $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
+        if ($this->needConvert()) {
+            $amount_paid_curr = Tools::ps_round(Tools::convertPrice($amount_paid, new Currency($currency_special), true), 2);
+        } else {
+            $amount_paid_curr = Tools::ps_round($amount_paid, 2);
+        }
+        $amount_paid = Tools::ps_round($amount_paid, 2);
         $this->amount_paid_paypal = (float)$amount_paid;
         $cart = new Cart((int) $id_cart);
         $total_ps = (float)$cart->getOrderTotal(true, Cart::BOTH);
-        if ($amount_paid > $total_ps+0.10 || $amount_paid < $total_ps-0.10) {
-            $total_ps = $amount_paid;
+        if ($amount_paid_curr > $total_ps+0.10 || $amount_paid_curr < $total_ps-0.10) {
+            $total_ps = $amount_paid_curr;
         }
         parent::validateOrder(
             (int) $id_cart,
@@ -876,14 +903,14 @@ class PayPal extends PaymentModule
             $order = new Order($id_order);
         }
 
-        if (isset($amount_paid) && $amount_paid != 0 && $order->total_paid != $amount_paid) {
-            $order->total_paid = $amount_paid;
-            $order->total_paid_real = $amount_paid;
-            $order->total_paid_tax_incl = $amount_paid;
+        if (isset($amount_paid_curr) && $amount_paid_curr != 0 && $order->total_paid != $amount_paid_curr) {
+            $order->total_paid = $amount_paid_curr;
+            $order->total_paid_real = $amount_paid_curr;
+            $order->total_paid_tax_incl = $amount_paid_curr;
             $order->update();
 
             $sql = 'UPDATE `'._DB_PREFIX_.'order_payment`
-		    SET `amount` = '.(float)$amount_paid.'
+		    SET `amount` = '.(float)$amount_paid_curr.'
 		    WHERE  `order_reference` = "'.pSQL($order->reference).'"';
             Db::getInstance()->execute($sql);
         }
@@ -1226,5 +1253,16 @@ class PayPal extends PaymentModule
         '.$this->l('Payment due date').' : '.$information->payment_due_date.'; 
         '.$this->l('Reference').' : '.$information->reference_number.'.';
         return $tab;
+    }
+
+    public static function getDecimal()
+    {
+        $paypal = Module::getInstanceByName('paypal');
+        $currency_wt_decimal = array('HUF', 'JPY', 'TWD');
+        if (in_array($paypal->getPaymentCurrencyIso(), $currency_wt_decimal)) {
+            return (int)0;
+        } else {
+            return (int)2;
+        }
     }
 }
