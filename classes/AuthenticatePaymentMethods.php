@@ -107,6 +107,7 @@ class AuthenticatePaymentMethods
             'CL'=>array(WPS, ECS),
             'CO'=>array(WPS, ECS),
             'PE'=>array(WPS, ECS),
+            'GP'=>array(WPS, ECS),
 
             //AFRIQUE
             'SL'=>array(WPS, ECS),
