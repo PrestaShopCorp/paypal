@@ -303,7 +303,7 @@ class MethodEC extends AbstractMethodPaypal
         $this->_paymentDetails = new PaymentDetailsType();
 
         // shipping address
-        if (!isset($data['short_cut'])) {
+        if (!isset($data['short_cut']) && !Context::getContext()->cart->isVirtualCart()) {
             $address = $this->_getShippingAddress();
             $this->_paymentDetails->ShipToAddress = $address;
         }
@@ -320,7 +320,6 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails->AddressOverride = 0;
         $setECReqDetails->ReqConfirmShipping = 0;
         $setECReqDetails->LandingPage = ((isset($data['use_card']) && $data['use_card']) ? 'Billing' : 'Login');
-
 
         if (isset($data['short_cut'])) {
             $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
@@ -376,8 +375,6 @@ class MethodEC extends AbstractMethodPaypal
             $itemDetails->Name = $product['name'];
             $itemDetails->Amount = $itemAmount;
             $itemDetails->Quantity = $product['quantity'];
-            /** Indicates whether an item is digital or physical. For digital goods, this field is required and must be set to Digital. It is one of the following values:*/
-            $itemDetails->ItemCategory = $product['is_virtual']?'Digital':'Physical';
             $itemDetails->Tax = new BasicAmountType($currency, $product['product_tax']);
             $this->_paymentDetails->PaymentDetailsItem[] = $itemDetails;
             $this->_itemTotalValue += $this->formatPrice($product['price']) * $product['quantity'];

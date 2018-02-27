@@ -46,14 +46,20 @@ class PaypalEcScInitModuleFrontController extends ModuleFrontController
             }
         }
 
-        // build group for search product attribute
-        $temp_group = explode('|', Tools::getValue('combination'));
-        $group = array();
-        foreach ($temp_group as $item) {
-            $temp = explode(':', $item);
-            $group[$temp[0]] = $temp[1];
+
+        if (Tools::getValue('combination')) {
+            // build group for search product attribute
+            $temp_group = explode('|', Tools::getValue('combination'));
+            $group = array();
+            foreach ($temp_group as $item) {
+                $temp = explode(':', $item);
+                $group[$temp[0]] = $temp[1];
+            }
+            $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'), Product::getIdProductAttributesByIdAttributes(Tools::getValue('id_product'), $group));
+        } else {
+            $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'));
         }
-        $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'), Product::getIdProductAttributesByIdAttributes(Tools::getValue('id_product'), $group));
+
         $response = $method_ec->init(array(
             'use_card'=>0,
             'short_cut' => 1
