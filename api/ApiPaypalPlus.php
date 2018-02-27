@@ -235,7 +235,7 @@ class ApiPaypalPlus
         }
 
         $cartItems = $cart->getProducts();
-
+        $discounts = Context::getContext()->cart->getCartRules();
         $shop_url = PayPal::getShopDomainSsl(true, true);
 
         /*
@@ -276,6 +276,19 @@ class ApiPaypalPlus
             //$item->price = number_format(round($cartItem['price_wt'], 2), 2);
             $item->price = number_format(round($cartItem['price'], 2), 2);
             $item->tax = number_format(round($cartItem['price_wt'] - $cartItem['price'], 2), 2);
+            $aItems[] = $item;
+            unset($item);
+        }
+
+        foreach ($discounts as $discount) {
+
+            $item = new stdClass();
+            $item->name = $discount['name'];
+            $item->currency = $oCurrency->iso_code;
+            $item->quantity = 1;
+            //$item->price = number_format(round($cartItem['price_wt'], 2), 2);
+            $item->price = (number_format(round($discount['value_tax_exc'], 2), 2)) * -1;
+            $item->tax = (number_format(round($discount['value_real'] - $discount['value_tax_exc'], 2), 2)) * -1;
             $aItems[] = $item;
             unset($item);
         }
