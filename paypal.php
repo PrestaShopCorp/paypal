@@ -163,6 +163,22 @@ class PayPal extends PaymentModule
             }
         }
 
+        if (!$this->updateRadioCurrencyRestrictionsForModule()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function updateRadioCurrencyRestrictionsForModule()
+    {
+        $shops = Shop::getShops(true, null, true);
+        foreach ($shops as $s) {
+            if (!Db::getInstance()->execute('UPDATE `'._DB_PREFIX_.'module_currency` SET `id_currency` = -1
+                WHERE `id_shop` = "'.(int)$s.'" AND `id_module` = '.(int)$this->id)) {
+                return false;
+            }
+        }
         return true;
     }
 
