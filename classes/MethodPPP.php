@@ -342,7 +342,7 @@ class MethodPPP extends AbstractMethodPaypal
     {
         $products = Context::getContext()->cart->getProducts();
         foreach ($products as $product) {
-            $product['product_tax'] = $this->formatPrice($product['price_wt'] - $product['price']);
+            $product['product_tax'] = $this->formatPrice($product['price_wt']) - $this->formatPrice($product['price']);
             $item = new Item();
             $item->setName(Tools::substr($product['name'], 0, 126))
                 ->setCurrency($currency)
