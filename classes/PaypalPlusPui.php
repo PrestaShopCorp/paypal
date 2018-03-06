@@ -42,7 +42,7 @@ class PaypalPlusPui extends ObjectModel
     );
 
 
-    public function getByIdOrder($id_order)
+    public static function getByIdOrder($id_order)
     {
         $sql = new DbQuery();
         $sql->select('*');

@@ -2621,10 +2621,10 @@ class PayPal extends PaymentModule
 
     public function hookDisplayPDFInvoice($params)
     {
-
         $order_detail = PaypalPlusPui::getByIdOrder($params['object']->id_order);
         $information = Tools::jsonDecode($order_detail['pui_informations'], true);
-        $tab = '<table style="border: solid 1pt black; padding:0 10pt">
+        if ($information['recipient_banking_instruction']['bank_name']) {
+            $tab = '<table style="border: solid 1pt black; padding:0 10pt">
     <tr><td></td><td></td></tr>
     <tr><td><b>'.$this->l('Bank name').'</b></td><td>'.$information['recipient_banking_instruction']['bank_name'].'</td></tr>
     <tr><td><b>'.$this->l('Account holder name').'</b></td><td>'.$information['recipient_banking_instruction']['account_holder_name'].'</td></tr>
@@ -2636,6 +2636,8 @@ class PayPal extends PaymentModule
     <tr><td><b>'.$this->l('reference').'</b></td><td>'.$information['reference_number'].'</td></tr>
     <tr><td></td><td></td></tr>
 </table>';
-        return $tab;
+            return $tab;
+        }
+
     }
 }
