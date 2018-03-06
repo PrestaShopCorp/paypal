@@ -54,7 +54,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '4.3.2';
+        $this->version = '4.4.0';
         $this->author = 'PrestaShop';
         $this->display = 'view';
         $this->module_key = '336225a5988ad434b782f2d868d7bfcd';
@@ -1031,6 +1031,103 @@ class PayPal extends PaymentModule
         $orderThread->token = Tools::passwdGen(12);
         $orderThread->add();
         return (int)$orderThread->id;
+    }
+
+    public function hookActionOrderSlipAdd($params)
+    {
+        $paypal_order = PaypalOrder::loadByOrderId($params['order']->id);
+        //var_dump(Tools::isSubmit('reinjectQuantities'));die;
+        //echo'<pre>';print_r($paypal_order);die;
+        //$(document).on('click', '#desc-order-partial_refund', function(){console.log('szefse')})
+        
+        if (!Validate::isLoadedObject($paypal_order)) {
+            return false;
+        }
+        $method = AbstractMethodPaypal::load($paypal_order->method);
+        $orderMessage = new CustomerMessage();
+        $orderMessage->message = "";
+        $ex_detailed_message = '';
+        $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
+        if (Validate::isLoadedObject($capture) && !$capture->id_capture) {
+            $orderMessage = new CustomerMessage();
+            $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
+            $orderMessage->message = $this->l('You couldn\'t refund order, it\'s not payed yet.');
+            $orderMessage->id_order = $params['id_order'];
+            $orderMessage->id_customer = $this->context->customer->id;
+            $orderMessage->private = 1;
+            $orderMessage->save();
+            return true;
+        }
+        $status = '';
+        if ($paypal_order->method == "BT") {
+            $status = $method->getTransactionStatus($paypal_order->id_transaction);
+        }
+
+        if ($paypal_order->method == "BT" && $status == "submitted_for_settlement") {
+           /* try {
+                $refund_response = $method->void(array('authorization_id'=>$paypal_order->id_transaction));
+            } catch (PayPal\Exception\PPConnectionException $e) {
+                $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+            } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                $ex_detailed_message = $e->errorMessage();
+            } catch (PayPal\Exception\PPConfigurationException $e) {
+                $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+            }
+            if ($refund_response['success']) {
+                $capture->result = 'voided';
+                $paypal_order->payment_status = 'voided';
+            }*/
+           return true;
+        } else {
+            try {
+                $refund_response = $method->partialRefund($params);
+            } catch (PayPal\Exception\PPConnectionException $e) {
+                $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+            } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                $ex_detailed_message = $e->errorMessage();
+            } catch (PayPal\Exception\PPConfigurationException $e) {
+                $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+            } catch (PayPal\Exception\PayPalConnectionException $e) {
+                $decoded_message = Tools::jsonDecode($e->getData());
+                $ex_detailed_message = $decoded_message->message;
+            } catch (PayPal\Exception\PayPalInvalidCredentialException $e) {
+                $ex_detailed_message = $e->errorMessage();
+            } catch (PayPal\Exception\PayPalMissingCredentialException $e) {
+                $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+            } catch (Exception $e) {
+                $ex_detailed_message = $e->errorMessage();
+            }
+
+            if ($refund_response['success']) {
+                $capture->result = 'refunded';
+                $paypal_order->payment_status = 'refunded';
+            }
+        }
+
+        if ($refund_response['success']) {
+            $capture->save();
+            $paypal_order->save();
+        }
+
+        if ($ex_detailed_message) {
+            $orderMessage->message = $ex_detailed_message;
+        } else {
+            foreach ($refund_response as $key => $msg) {
+                $orderMessage->message .= $key." : ".$msg.";\r";
+            }
+        }
+        $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
+        $orderMessage->id_order = $params['id_order'];
+        $orderMessage->id_customer = $this->context->customer->id;
+        $orderMessage->private = 1;
+        if ($orderMessage->message) {
+            $orderMessage->save();
+        }
+
+        /*if (!isset($refund_response['already_refunded']) && !isset($refund_response['success'])) {
+            Tools::redirect($_SERVER['HTTP_REFERER'].'&error_refund=1');
+        }*/
+
     }
 
 

@@ -564,6 +564,11 @@ class MethodBT extends AbstractMethodPaypal
         }
     }
 
+    public function partialRefund($params)
+    {
+
+    }
+
     public function void($authorization)
     {
         $this->initConfig();

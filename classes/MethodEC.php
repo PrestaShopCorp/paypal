@@ -317,7 +317,7 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true);
         $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);
         $setECReqDetails->NoShipping = 1;
-        $setECReqDetails->AddressOverride = 0;
+        $setECReqDetails->AddressOverride = 1;
         $setECReqDetails->ReqConfirmShipping = 0;
         $setECReqDetails->LandingPage = ((isset($data['use_card']) && $data['use_card']) ? 'Billing' : 'Login');
 
@@ -340,8 +340,7 @@ class MethodEC extends AbstractMethodPaypal
         */
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
         /* wrap API method calls on the service object with a try catch */
-
-
+       // echo '<pre>';print_r($setECReq);die;
         $payment = $paypalService->SetExpressCheckout($setECReq);
        // echo '<pre>';print_r($setECReq);die;
         //You are not signed up to accept payment for digitally delivered goods.
@@ -667,6 +666,52 @@ class MethodEC extends AbstractMethodPaypal
         $refundTransactionReqType = new RefundTransactionRequestType();
         $refundTransactionReqType->TransactionID = $id_transaction;
         $refundTransactionReqType->RefundType = 'Full';
+        $refundTransactionReq = new RefundTransactionReq();
+        $refundTransactionReq->RefundTransactionRequest = $refundTransactionReqType;
+
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        $response = $paypalService->RefundTransaction($refundTransactionReq);
+
+        if ($response instanceof PayPal\PayPalAPI\RefundTransactionResponseType) {
+            if (isset($response->Errors)) {
+                $result = array(
+                    'status' => $response->Ack,
+                    'error_code' => $response->Errors[0]->ErrorCode,
+                    'error_message' => $response->Errors[0]->LongMessage,
+                );
+                if (Validate::isLoadedObject($capture) && $response->Errors[0]->ErrorCode == "10009") {
+                    $result['already_refunded'] = true;
+                }
+            } else {
+                $result =  array(
+                    'success' => true,
+                    'refund_id' => $response->RefundTransactionID,
+                    'status' => $response->Ack,
+                    'total_amount' => $response->TotalRefundedAmount->value,
+                    'net_amount' => $response->NetRefundAmount->value,
+                    'currency' => $response->TotalRefundedAmount->currencyID,
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    public function partialRefund($params)
+    {
+        $paypal_order = PaypalOrder::loadByOrderId($params['order']->id);
+        $id_paypal_order = $paypal_order->id;
+        $capture = PaypalCapture::loadByOrderPayPalId($id_paypal_order);
+        $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
+        $currency = $paypal_order->currency;
+        $amount = 0;
+        foreach ($params['productList'] as $product) {
+            $amount += $product['amount'];
+        }
+        $refundTransactionReqType = new RefundTransactionRequestType();
+        $refundTransactionReqType->TransactionID = $id_transaction;
+        $refundTransactionReqType->RefundType = 'Partial';
+        $refundTransactionReqType->Amount =  new BasicAmountType($currency, number_format($amount, Paypal::getDecimal(), ".", ''));
         $refundTransactionReq = new RefundTransactionReq();
         $refundTransactionReq->RefundTransactionRequest = $refundTransactionReqType;
 

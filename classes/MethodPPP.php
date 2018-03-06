@@ -555,6 +555,11 @@ class MethodPPP extends AbstractMethodPaypal
         return $result;
     }
 
+    public function partialRefund($params)
+    {
+
+    }
+
     public function void($params)
     {
     }
