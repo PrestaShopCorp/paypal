@@ -317,13 +317,14 @@ class MethodEC extends AbstractMethodPaypal
         $setECReqDetails->CancelURL = Context::getContext()->link->getPageLink('order', true);
         $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecValidation', array(), true);
         $setECReqDetails->NoShipping = 1;
-        $setECReqDetails->AddressOverride = 0;
+        $setECReqDetails->AddressOverride = 1;
         $setECReqDetails->ReqConfirmShipping = 0;
         $setECReqDetails->LandingPage = ((isset($data['use_card']) && $data['use_card']) ? 'Billing' : 'Login');
 
         if (isset($data['short_cut'])) {
             $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
             $setECReqDetails->NoShipping = 2;
+            $setECReqDetails->AddressOverride = 0;
         }
 
         // Advanced options
