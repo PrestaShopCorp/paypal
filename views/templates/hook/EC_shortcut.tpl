@@ -32,6 +32,7 @@
         <input type="hidden" name="current_shop_url" id="paypal_url_page" value="" />
         <input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
         <input type="hidden" id="in_context_checkout_enabled" value="0">
+        <input type="hidden" id="es_cs_product_attribute" value="{$es_cs_product_attribute|escape:'htmlall':'UTF-8'}" />
         <img id="payment_paypal_express_checkout" src="{$PayPal_img_esc|escape:'htmlall':'UTF-8'}" alt="{l s='PayPal' mod='paypal'}" style="cursor:pointer;" onclick="setInput();return false"/>
 
     </form>

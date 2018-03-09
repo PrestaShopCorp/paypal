@@ -751,6 +751,7 @@ class MethodEC extends AbstractMethodPaypal
             'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
             'environment' => $environment,
+            'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
         ));
 
         return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');

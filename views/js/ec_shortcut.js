@@ -14,6 +14,12 @@
  */
 // init incontext
 document.addEventListener("DOMContentLoaded", function(){
+    var ec_sc_qty_wanted = $('#quantity_wanted').val();
+    var ec_sc_productId = $('#paypal_payment_form_cart input[name="id_product"]').val();
+    EcCheckProductAvailability(ec_sc_qty_wanted, ec_sc_productId, $('#es_cs_product_attribute').val());
+    prestashop.on('updatedProduct', function(e, xhr, settings) {
+        EcCheckProductAvailability(ec_sc_qty_wanted, ec_sc_productId, e.id_product_attribute);
+    });
     if (typeof ec_sc_in_context != "undefined" && ec_sc_in_context) {
         window.paypalCheckoutReady = function () {
             paypal.checkout.setup(merchant_id, {
@@ -22,6 +28,23 @@ document.addEventListener("DOMContentLoaded", function(){
         };
     }
 });
+
+function EcCheckProductAvailability(qty, productId, id_product_attribute) {
+    $.ajax({
+        url: ec_sc_init_url,
+        type: "POST",
+        data: 'checkAvailability=1&id_product='+productId+'&quantity='+qty+'&product_attribute='+id_product_attribute,
+        success: function (json) {
+            if (json == 1) {
+                $('#container_express_checkout').show();
+            } else {
+                $('#container_express_checkout').hide();
+            }
+        },
+        error: function (responseData, textStatus, errorThrown) {
+        }
+    });
+}
 
 function setInput()
 {
@@ -53,7 +76,6 @@ function ECSInContext(combination) {
         data: 'getToken=1&id_product='+$('#paypal_payment_form_cart input[name="id_product"]').val()+'&quantity='+$('[name="qty"]').val()+'&combination='+combination.join('|'),
         success: function (token) {
             var url = paypal.checkout.urlPrefix +token;
-            console.log(url);
             paypal.checkout.startFlow(url);
         },
         error: function (responseData, textStatus, errorThrown) {
