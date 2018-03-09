@@ -324,7 +324,6 @@ class MethodEC extends AbstractMethodPaypal
         if (isset($data['short_cut'])) {
             $setECReqDetails->ReturnURL = Context::getContext()->link->getModuleLink($this->name, 'ecScOrder', array(), true);
             $setECReqDetails->NoShipping = 2;
-            $setECReqDetails->AddressOverride = 0;
         }
 
         // Advanced options
@@ -548,6 +547,11 @@ class MethodEC extends AbstractMethodPaypal
         $context = Context::getContext();
 
         $this->_paymentDetails = new PaymentDetailsType();
+
+        if (!Context::getContext()->cart->isVirtualCart()) {
+            $address = $this->_getShippingAddress();
+            $this->_paymentDetails->ShipToAddress = $address;
+        }
 
         $this->_getPaymentDetails();
 
