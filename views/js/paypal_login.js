@@ -59,7 +59,7 @@ $(function(){ldelim}
 			"scopes": "openid profile email address phone https://uri.paypal.com/services/paypalattributes https://uri.paypal.com/services/expresscheckout",
 			"containerid": "buttonPaypalLogin1",
 			{if $PAYPAL_LOGIN_TPL == 2} "theme" : "neutral", {/if}
-			"returnurl": "{$PAYPAL_RETURN_LINK}?{$page_name}",
+			"returnurl": "{$PAYPAL_RETURN_LINK}",
 			'locale' : '{$paypal_locale}',
 		{rdelim});
 	{rdelim});
