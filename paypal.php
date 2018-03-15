@@ -2509,8 +2509,13 @@ class PayPal extends PaymentModule
         }
 
         $params = urlencode($_SERVER['QUERY_STRING']);
+        if ($params) {
+            $url = $protocol_link.Tools::getShopDomainSsl().$request.'?'.$params;
+        } else {
+            $url = $protocol_link.Tools::getShopDomainSsl().$request;
+        }
 
-        return $protocol_link.Tools::getShopDomainSsl().$request.'?'.$params;
+        return $url;
     }
 
     /**
