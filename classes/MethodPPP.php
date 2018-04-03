@@ -557,7 +557,36 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function partialRefund($params)
     {
+        $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
 
+        $sale = Sale::get($paypal_order->id_transaction, $this->_getCredentialsInfo());
+
+        $amount = 0;
+        foreach ($params['productList'] as $product) {
+            $amount += $product['amount'];
+        }
+        if (Tools::getValue('partialRefundShippingCost')) {
+            $amount += Tools::getValue('partialRefundShippingCost');
+        }
+
+        $amt = new Amount();
+        $amt->setCurrency($sale->getAmount()->getCurrency())
+            ->setTotal(number_format($amount, Paypal::getDecimal(), ".", ''));
+        $refundRequest = new RefundRequest();
+        $refundRequest->setAmount($amt);
+
+        $response = $sale->refundSale($refundRequest, $this->_getCredentialsInfo());
+
+        $result =  array(
+            'success' => true,
+            'refund_id' => $response->id,
+            'status' => $response->state,
+            'total_amount' => $response->total_refunded_amount->value,
+            'currency' => $response->total_refunded_amount->currency,
+            'saleId' => $response->sale_id,
+        );
+
+        return $result;
     }
 
     public function void($params)

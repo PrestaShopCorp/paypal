@@ -566,7 +566,52 @@ class MethodBT extends AbstractMethodPaypal
 
     public function partialRefund($params)
     {
+        $this->initConfig();
+        try {
+            $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
+            $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
+            $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
+            $amount = 0;
+            foreach ($params['productList'] as $product) {
+                $amount += $product['amount'];
+            }
+            if (Tools::getValue('partialRefundShippingCost')) {
+                $amount += Tools::getValue('partialRefundShippingCost');
+            }
+            $result = $this->gateway->transaction()->refund($id_transaction, number_format($amount, 2, ".", ''));
 
+            if ($result->success) {
+                $response =  array(
+                    'success' => true,
+                    'refund_id' => $result->transaction->refundedTransactionId,
+                    'transaction_id' => $result->transaction->id,
+                    'status' => $result->transaction->status,
+                    'amount' => $result->transaction->amount,
+                    'currency' => $result->transaction->currencyIsoCode,
+                    'payment_type' => $result->transaction->payment_type,
+                    'merchantAccountId' => $result->transaction->merchantAccountId,
+                );
+            } else {
+                $errors = $result->errors->deepAll();
+                foreach ($errors as $error) {
+                    $response = array(
+                        'transaction_id' => $result->transaction->refundedTransactionId,
+                        'status' => 'Failure',
+                        'error_code' => $error->code,
+                        'error_message' => $error->message,
+                    );
+                    if ($error->code == Braintree_Error_Codes::TRANSACTION_HAS_ALREADY_BEEN_REFUNDED) {
+                        $response['already_refunded'] = true;
+                    }
+                }
+            }
+            return $response;
+        } catch (Exception $e) {
+            $response =  array(
+                'error_message' => $e->getCode().'=>'.$e->getMessage(),
+            );
+            return $response;
+        }
     }
 
     public function void($authorization)

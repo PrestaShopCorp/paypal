@@ -708,6 +708,9 @@ class MethodEC extends AbstractMethodPaypal
         foreach ($params['productList'] as $product) {
             $amount += $product['amount'];
         }
+        if (Tools::getValue('partialRefundShippingCost')) {
+            $amount += Tools::getValue('partialRefundShippingCost');
+        }
         $refundTransactionReqType = new RefundTransactionRequestType();
         $refundTransactionReqType->TransactionID = $id_transaction;
         $refundTransactionReqType->RefundType = 'Partial';
