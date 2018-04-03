@@ -1050,11 +1050,21 @@ class PayPal extends PaymentModule
         $orderMessage->message = "";
         $ex_detailed_message = '';
         if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
-            if ($paypal_order->method == "PPP") {
+            if ($paypal_order->method == "PPP" || $paypal_order->payment_status == "refunded") {
                 return;
             }
             $orderPayPal = PaypalOrder::loadByOrderId($params['id_order']);
             $paypalCapture = PaypalCapture::loadByOrderPayPalId($orderPayPal->id);
+            if ($paypal_order->method == "EC" && $paypal_order->payment_status != "refunded" && ((!Validate::isLoadedObject($paypalCapture))
+            || (Validate::isLoadedObject($paypalCapture) && $paypalCapture->id_capture))) {
+                $orderMessage->message = $this->l('You canceled the order that hadn\'t been refunded yet');
+                $orderMessage->id_customer_thread = $this->createOrderThread($params['id_order']);
+                $orderMessage->id_order = $params['id_order'];
+                $orderMessage->id_customer = $this->context->customer->id;
+                $orderMessage->private = 1;
+                $orderMessage->save();
+                return;
+            }
 
             try {
                 $response_void = $method->void(array('authorization_id'=>$orderPayPal->id_transaction));
