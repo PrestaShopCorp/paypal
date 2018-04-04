@@ -47,5 +47,5 @@
     var pbt_translations = {
         empty_nonce:"{l s='Click paypal button first' mod='paypal'}"
     };
-    var mode = '{$mode}';
+    var mode_pbt = '{$mode}';
 </script>

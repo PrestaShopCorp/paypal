@@ -145,6 +145,19 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             ),
+            array(
+                'type' => 'text',
+                'label' => $module->l('Brand name'),
+                'name' => 'config_brand',
+                'placeholder' => $module->l('Leave it empty to use your Shop name'),
+            ),
+            array(
+                'type' => 'file',
+                'label' => $module->l('Shop logo field'),
+                'name' => 'config_logo',
+                'hint' => $module->l('An image must be stored on a secure (https) server. Leave it empty to use your default shop logo'),
+                'thumb' => file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png':'',
+            ),
         ));
 
         $params['fields_value'] = array(
@@ -153,6 +166,8 @@ class MethodEC extends AbstractMethodPaypal
             'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
             'paypal_ec_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'paypal_ec_merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.$mode),
+            'config_brand' => Configuration::get('PAYPAL_CONFIG_BRAND'),
+            'config_logo' => Configuration::get('PAYPAL_CONFIG_LOGO'),
         );
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
@@ -257,6 +272,17 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', $params['paypal_ec_in_context']);
+            Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
+            if (isset($_FILES['config_logo']['tmp_name']) && $_FILES['config_logo']['tmp_name'] != '') {
+                if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
+                    !move_uploaded_file($_FILES['config_logo']['tmp_name'], $tmpName)) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
+                }
+                if (!ImageManager::resize($tmpName, _PS_MODULE_DIR_.'paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png')) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
+                }
+                Configuration::updateValue('PAYPAL_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png');
+            }
         }
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
@@ -326,6 +352,11 @@ class MethodEC extends AbstractMethodPaypal
             $setECReqDetails->NoShipping = 2;
         }
 
+        $brand_name = Configuration::get('PAYPAL_CONFIG_BRAND')?Configuration::get('PAYPAL_CONFIG_BRAND'):Configuration::get('PS_SHOP_NAME');
+        $brand_logo = file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
+        $setECReqDetails->cppheaderimage = $brand_logo;
+        $setECReqDetails->BrandName = $brand_name;
+      //  print_r($brand_logo);die;
         // Advanced options
         $setECReqDetails->AllowNote = 0;
         $setECReqType = new SetExpressCheckoutRequestType();

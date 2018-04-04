@@ -669,6 +669,9 @@ class PayPal extends PaymentModule
                     $this->context->controller->registerJavascript($this->name . '-braintreejs', 'modules/' . $this->name . '/views/js/payment_bt.js');
                 }
                 if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
+                    Media::addJsDef(array(
+                        'pbt_brand_title' => Configuration::get('PAYPAL_CONFIG_BRAND') ? Configuration::get('PAYPAL_CONFIG_BRAND') : Configuration::get('PS_SHOP_NAME'),
+                    ));
                     $this->context->controller->registerJavascript($this->name . '-pp-braintree-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-pp-braintree-checkout-min', 'https://js.braintreegateway.com/web/3.24.0/js/paypal-checkout.min.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-pp-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');

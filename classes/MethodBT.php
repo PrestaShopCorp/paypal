@@ -98,6 +98,12 @@ class MethodBT extends AbstractMethodPaypal
                 ),
             ),
             array(
+                'type' => 'text',
+                'label' => $module->l('Brand name'),
+                'name' => 'config_brand',
+                'placeholder' => $module->l('Leave it empty to use your Shop name'),
+            ),
+            array(
                 'type' => 'switch',
                 'label' => $module->l('Activate 3D Secure for Braintree'),
                 'name' => 'paypal_3DSecure',
@@ -130,6 +136,7 @@ class MethodBT extends AbstractMethodPaypal
             'activate_paypal' => Configuration::get('PAYPAL_BY_BRAINTREE'),
             'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
             'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
+            'config_brand' => Configuration::get('PAYPAL_CONFIG_BRAND'),
         );
         $context = Context::getContext();
         $context->smarty->assign(array(
@@ -229,6 +236,7 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_USE_3D_SECURE', $params['paypal_3DSecure']);
             Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
+            Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
         }
 
         if (isset($params['method'])) {

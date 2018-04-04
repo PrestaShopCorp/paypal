@@ -48,7 +48,7 @@ function initPaypalBraintree() {
             }
 
             paypal.Button.render({
-                env: mode, // 'production' or 'sandbox'
+                env: mode_pbt, // 'production' or 'sandbox'
 
                 payment: function () {
                     return paypalCheckoutInstance.createPayment({
@@ -56,6 +56,7 @@ function initPaypalBraintree() {
                         billingAgreementDescription: 'Your agreement description',
                         enableShippingAddress: false,
                         shippingAddressEditable: false,
+                        displayName: pbt_brand_title
                     });
                 },
 
