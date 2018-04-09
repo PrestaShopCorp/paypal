@@ -113,7 +113,7 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
             || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
             || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
-            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 1)
+            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 0)
         ) {
             return false;
         }
