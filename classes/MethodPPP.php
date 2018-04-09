@@ -64,7 +64,7 @@ class MethodPPP extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_TITLE', $params['ppp_config_title']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_BRAND', $params['ppp_config_brand']);
-
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
             if (isset($_FILES['ppp_config_logo']['tmp_name']) && $_FILES['ppp_config_logo']['tmp_name'] != '') {
                 if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
                 !move_uploaded_file($_FILES['ppp_config_logo']['tmp_name'], $tmpName)) {
@@ -111,90 +111,6 @@ class MethodPPP extends AbstractMethodPaypal
         }
     }
 
-    public function createWebExperience()
-    {
-
-        $brand_name = Configuration::get('PAYPAL_PPP_CONFIG_BRAND')?Configuration::get('PAYPAL_PPP_CONFIG_BRAND'):Configuration::get('PS_SHOP_NAME');
-        $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/ppp_logo.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
-
-        $flowConfig = new \PayPal\Api\FlowConfig();
-        // When set to "commit", the buyer is shown an amount, and the button text will read "Pay Now" on the checkout page.
-        $flowConfig->setUserAction("commit");
-        // Defines the HTTP method to use to redirect the user to a return URL. A valid value is `GET` or `POST`.
-        $flowConfig->setReturnUriHttpMethod("GET");
-        // Parameters for style and presentation.
-        $presentation = new \PayPal\Api\Presentation();
-        // A URL to logo image. Allowed vaues: .gif, .jpg, or .png.
-        $presentation->setLogoImage($brand_logo)
-        //	A label that overrides the business name in the PayPal account on the PayPal pages.
-            ->setBrandName($brand_name)
-        //  Locale of pages displayed by PayPal payment experience.
-            ->setLocaleCode(Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')))
-        // A label to use as hypertext for the return to merchant link.
-            ->setReturnUrlLabel("Return");
-        // Parameters for input fields customization.
-        $inputFields = new \PayPal\Api\InputFields();
-        // Enables the buyer to enter a note to the merchant on the PayPal page during checkout.
-        $inputFields->setAllowNote(false)
-            // Determines whether or not PayPal displays shipping address fields on the experience pages. Allowed values: 0, 1, or 2. When set to 0, PayPal displays the shipping address on the PayPal pages. When set to 1, PayPal does not display shipping address fields whatsoever. When set to 2, if you do not pass the shipping address, PayPal obtains it from the buyer’s account profile. For digital goods, this field is required, and you must set it to 1.
-            ->setNoShipping(0)
-            // Determines whether or not the PayPal pages should display the shipping address and not the shipping address on file with PayPal for this buyer. Displaying the PayPal street address on file does not allow the buyer to edit that address. Allowed values: 0 or 1. When set to 0, the PayPal pages should not display the shipping address. When set to 1, the PayPal pages should display the shipping address.
-            ->setAddressOverride(1);
-        // #### Payment Web experience profile resource
-        $webProfile = new \PayPal\Api\WebProfile();
-        // Name of the web experience profile. Required. Must be unique
-        $webProfile->setName(Tools::substr(Configuration::get('PS_SHOP_NAME'), 0, 30) . uniqid())
-            // Parameters for flow configuration.
-            ->setFlowConfig($flowConfig)
-            // Parameters for style and presentation.
-            ->setPresentation($presentation)
-            // Parameters for input field customization.
-            ->setInputFields($inputFields)
-            // Indicates whether the profile persists for three hours or permanently. Set to `false` to persist the profile permanently. Set to `true` to persist the profile for three hours.
-            ->setTemporary(false);
-        // For Sample Purposes Only.
-        try {
-            // Use this call to create a profile.
-            $createProfileResponse = $webProfile->create($this->_getCredentialsInfo());
-        } catch (\PayPal\Exception\PayPalConnectionException $ex) {
-            return false;
-        }
-
-        return $createProfileResponse;
-    }
-
-    public function _getCredentialsInfo()
-    {
-        switch (Configuration::get('PAYPAL_SANDBOX')) {
-            case 0:
-                $apiContext = new ApiContext(
-                    new OAuthTokenCredential(
-                        Configuration::get('PAYPAL_LIVE_CLIENTID'),
-                        Configuration::get('PAYPAL_LIVE_SECRET')
-                    )
-                );
-                break;
-            case 1:
-                $apiContext = new ApiContext(
-                    new OAuthTokenCredential(
-                        Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
-                        Configuration::get('PAYPAL_SANDBOX_SECRET')
-                    )
-                );
-                break;
-        }
-
-        $apiContext->setConfig(
-            array(
-                'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
-                'log.LogEnabled' => false,
-                'cache.enabled' => true,
-            )
-        );
-        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
-        return $apiContext;
-    }
-
     public function getConfig(Paypal $module)
     {
         $params = array('inputs' => array(
@@ -236,7 +152,27 @@ class MethodPPP extends AbstractMethodPaypal
                         'label' => $module->l('Disabled'),
                     )
                 ),
-            )
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Enabled Shortcut'),
+                'name' => 'paypal_show_shortcut',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product and shopping cart pages. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
         ));
 
         $params['fields_value'] = array(
@@ -244,6 +180,7 @@ class MethodPPP extends AbstractMethodPaypal
             'ppp_config_brand' => Configuration::get('PAYPAL_PPP_CONFIG_BRAND'),
             'ppp_config_logo' => Configuration::get('PAYPAL_PPP_CONFIG_LOGO'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
+            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
         );
 
 
@@ -257,6 +194,90 @@ class MethodPPP extends AbstractMethodPaypal
         }
 
         return $params;
+    }
+
+    public function _getCredentialsInfo()
+    {
+        switch (Configuration::get('PAYPAL_SANDBOX')) {
+            case 0:
+                $apiContext = new ApiContext(
+                    new OAuthTokenCredential(
+                        Configuration::get('PAYPAL_LIVE_CLIENTID'),
+                        Configuration::get('PAYPAL_LIVE_SECRET')
+                    )
+                );
+                break;
+            case 1:
+                $apiContext = new ApiContext(
+                    new OAuthTokenCredential(
+                        Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
+                        Configuration::get('PAYPAL_SANDBOX_SECRET')
+                    )
+                );
+                break;
+        }
+
+        $apiContext->setConfig(
+            array(
+                'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
+                'log.LogEnabled' => false,
+                'cache.enabled' => true,
+            )
+        );
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
+        return $apiContext;
+    }
+
+    public function createWebExperience()
+    {
+
+        $brand_name = Configuration::get('PAYPAL_PPP_CONFIG_BRAND')?Configuration::get('PAYPAL_PPP_CONFIG_BRAND'):Configuration::get('PS_SHOP_NAME');
+        $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/ppp_logo.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
+
+        $flowConfig = new \PayPal\Api\FlowConfig();
+        // When set to "commit", the buyer is shown an amount, and the button text will read "Pay Now" on the checkout page.
+        $flowConfig->setUserAction("commit");
+        // Defines the HTTP method to use to redirect the user to a return URL. A valid value is `GET` or `POST`.
+        $flowConfig->setReturnUriHttpMethod("GET");
+        // Parameters for style and presentation.
+        $presentation = new \PayPal\Api\Presentation();
+        // A URL to logo image. Allowed vaues: .gif, .jpg, or .png.
+        $presentation->setLogoImage($brand_logo)
+            //	A label that overrides the business name in the PayPal account on the PayPal pages.
+            ->setBrandName($brand_name)
+            //  Locale of pages displayed by PayPal payment experience.
+            ->setLocaleCode(Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')))
+            // A label to use as hypertext for the return to merchant link.
+            ->setReturnUrlLabel("Return");
+        // Parameters for input fields customization.
+        $inputFields = new \PayPal\Api\InputFields();
+        // Enables the buyer to enter a note to the merchant on the PayPal page during checkout.
+        $inputFields->setAllowNote(false)
+            // Determines whether or not PayPal displays shipping address fields on the experience pages. Allowed values: 0, 1, or 2. When set to 0, PayPal displays the shipping address on the PayPal pages. When set to 1, PayPal does not display shipping address fields whatsoever. When set to 2, if you do not pass the shipping address, PayPal obtains it from the buyer’s account profile. For digital goods, this field is required, and you must set it to 1.
+            ->setNoShipping(0)
+            // Determines whether or not the PayPal pages should display the shipping address and not the shipping address on file with PayPal for this buyer. Displaying the PayPal street address on file does not allow the buyer to edit that address. Allowed values: 0 or 1. When set to 0, the PayPal pages should not display the shipping address. When set to 1, the PayPal pages should display the shipping address.
+            ->setAddressOverride(1);
+        // #### Payment Web experience profile resource
+        $webProfile = new \PayPal\Api\WebProfile();
+        // Name of the web experience profile. Required. Must be unique
+        $webProfile->setName(Tools::substr(Configuration::get('PS_SHOP_NAME'), 0, 30) . uniqid())
+            // Parameters for flow configuration.
+            ->setFlowConfig($flowConfig)
+            // Parameters for style and presentation.
+            ->setPresentation($presentation)
+            // Parameters for input field customization.
+            ->setInputFields($inputFields)
+            // Indicates whether the profile persists for three hours or permanently. Set to `false` to persist the profile permanently. Set to `true` to persist the profile for three hours.
+            ->setTemporary(false);
+        // For Sample Purposes Only.
+        try {
+            // Use this call to create a profile.
+            $createProfileResponse = $webProfile->create($this->_getCredentialsInfo());
+        } catch (\PayPal\Exception\PayPalConnectionException $ex) {
+            return false;
+        }
+
+        return $createProfileResponse;
     }
 
     public function init($params)
@@ -597,5 +618,31 @@ class MethodPPP extends AbstractMethodPaypal
     {
         $sale = Payment::get($id_payment, $this->_getCredentialsInfo());
         return $sale->payment_instruction;
+    }
+
+    public function renderExpressCheckoutShortCut(&$context, $type)
+    {
+        if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
+            return false;
+        }
+
+        $lang = $context->country->iso_code;
+        $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
+        $img_esc = "/modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
+
+        if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
+            $img_esc = "/modules/paypal/views/img/ECShortcut/us/buy/buy.png";
+        }
+        $context->smarty->assign(array(
+            'PayPal_payment_type' => $type,
+            'PayPal_tracking_code' => 'PRESTASHOP_ECM',
+            'PayPal_img_esc' => $img_esc,
+            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true),
+            'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
+            'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
+            'environment' => $environment,
+        ));
+
+        return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
     }
 }

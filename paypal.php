@@ -112,7 +112,7 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
             || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
             || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
-            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 0)
+            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 1)
         ) {
             return false;
         }
@@ -863,11 +863,11 @@ class PayPal extends PaymentModule
 
     public function hookDisplayReassurance()
     {
-        if ('product' !== $this->context->controller->php_self || Configuration::get('PAYPAL_METHOD') != 'EC') {
+        if ('product' !== $this->context->controller->php_self || (Configuration::get('PAYPAL_METHOD') != 'EC' && Configuration::get('PAYPAL_METHOD') != 'PPP')) {
             return false;
         }
-        $method = AbstractMethodPaypal::load('EC');
-        return $method->renderExpressCheckoutShortCut($this->context, 'EC');
+        $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
+        return $method->renderExpressCheckoutShortCut($this->context, Configuration::get('PAYPAL_METHOD'));
     }
 
     public function needConvert()
