@@ -49,6 +49,7 @@ class PayPal extends PaymentModule
     public $amount_paid_paypal;
     public $module_link;
     public $errors;
+    public $bt_countries = array("FR", "UK", "IT", "ES", "US");
 
     public function __construct()
     {
@@ -400,7 +401,7 @@ class PayPal extends PaymentModule
             'PAYPAL_LIVE_SECRET' => Configuration::get('PAYPAL_LIVE_SECRET'),
         ));
 
-        if (getenv('PLATEFORM') != 'PSREADY' && ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES")) {
+        if (getenv('PLATEFORM') != 'PSREADY' && in_array($country_default, $this->bt_countries)) {
             $this->context->smarty->assign(array(
                 'braintree_available' => true,
             ));
