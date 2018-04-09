@@ -251,6 +251,7 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
             Configuration::updateValue('PAYPAL_MERCHANT_ID_'.$mode, $params['merchant_id']);
+            Tools::redirect($paypal->module_link);
         }
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
@@ -270,7 +271,7 @@ class MethodEC extends AbstractMethodPaypal
         if (Tools::isSubmit('save_rounding_settings')) {
             Configuration::updateValue('PAYPAL_SANDBOX', 0);
             Configuration::updateValue('PS_ROUND_TYPE', Order::ROUND_ITEM);
-            Tools::redirect($this->module_link);
+            Tools::redirect($paypal->module_link);
         }
 
         if (isset($params['method'])) {
