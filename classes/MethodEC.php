@@ -353,11 +353,13 @@ class MethodEC extends AbstractMethodPaypal
             $setECReqDetails->NoShipping = 2;
         }
 
-        $brand_name = Configuration::get('PAYPAL_CONFIG_BRAND')?Configuration::get('PAYPAL_CONFIG_BRAND'):Configuration::get('PS_SHOP_NAME');
-        $brand_logo = file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
-        $setECReqDetails->cppheaderimage = $brand_logo;
-        $setECReqDetails->BrandName = $brand_name;
-      //  print_r($brand_logo);die;
+        if (Configuration::get('PAYPAL_CONFIG_BRAND')) {
+            $setECReqDetails->BrandName = Configuration::get('PAYPAL_CONFIG_BRAND');
+        }
+        if (file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))) {
+            $setECReqDetails->cppheaderimage = Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png';
+        }
+
         // Advanced options
         $setECReqDetails->AllowNote = 0;
         $setECReqType = new SetExpressCheckoutRequestType();
