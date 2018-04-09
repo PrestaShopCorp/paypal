@@ -635,14 +635,11 @@ class MethodPPP extends AbstractMethodPaypal
         }
         $context->smarty->assign(array(
             'PayPal_payment_type' => $type,
-            'PayPal_tracking_code' => 'PRESTASHOP_ECM',
             'PayPal_img_esc' => $img_esc,
-            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true),
-            'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
-            'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
+            'action_url' => $context->link->getModuleLink('paypal', 'pppScInit', array(), true),
             'environment' => $environment,
         ));
 
-        return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
+        return $context->smarty->fetch('module:paypal/views/templates/hook/PPP_shortcut.tpl');
     }
 }
