@@ -15,8 +15,13 @@
 
 $(document).ready(function(){
     if ($('section#checkout-payment-step').hasClass('js-current-step')) {
-        $('input[data-module-name=express_checkout_schortcut]').click();
         $('.payment-options div').hide();
-        $('.payment-options').append($('#paypal-es-checked'));
+        if ($('input[data-module-name=express_checkout_schortcut]').length > 0) {
+            $('input[data-module-name=express_checkout_schortcut]').click();
+            $('.payment-options').append($('#paypal-es-checked').show());
+        } else if($('input[data-module-name=paypal_plus_schortcut]').length > 0) {
+            $('input[data-module-name=paypal_plus_schortcut]').click();
+            $('.payment-options').append($('#paypal-ppp-checked').show());
+        }
     }
 });

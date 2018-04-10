@@ -113,6 +113,8 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function getConfig(Paypal $module)
     {
+       // $payment = Payment::get('PAY-5JX860011P403903SLLGHTSQ', $this->_getCredentialsInfo());
+        //echo'<pre>';print_r($payment);die;
         $params = array('inputs' => array(
             array(
                 'type' => 'text',
@@ -309,7 +311,12 @@ class MethodPPP extends AbstractMethodPaypal
         // payment approval/ cancellation.
 
         $redirectUrls = new RedirectUrls();
-        $redirectUrls->setReturnUrl(Context::getContext()->link->getModuleLink($this->name, 'pppValidation', array(), true))
+        if ($params['short_cut']) {
+            $return_url = Context::getContext()->link->getModuleLink($this->name, 'pppScOrder', array(), true);
+        } else {
+            $return_url = Context::getContext()->link->getModuleLink($this->name, 'pppValidation', array(), true);
+        }
+        $redirectUrls->setReturnUrl($return_url)
             ->setCancelUrl(Context::getContext()->link->getPageLink('order', true));
 
         // ### Payment
@@ -448,7 +455,7 @@ class MethodPPP extends AbstractMethodPaypal
         // Retrieve the payment object by calling the tatic `get` method
         // on the Payment class by passing a valid Payment ID
         $payment = Payment::get(Context::getContext()->cookie->paypal_plus_payment, $this->_getCredentialsInfo());
-        // echo'<pre>';print_r($payment);die;
+
         $cart = new Cart(Context::getContext()->cart->id);
         $address_delivery = new Address($cart->id_address_delivery);
 
@@ -490,26 +497,56 @@ class MethodPPP extends AbstractMethodPaypal
     public function validation()
     {
         $context = Context::getContext();
+        $cart = $context->cart;
         // Get the payment Object by passing paymentId
         // payment id was previously stored in session in
         // CreatePaymentUsingPayPal.php
-        $paymentId = Tools::getValue('paymentId');
+        $paymentId = Tools::getValue('shortcut') ? $context->cookie->paypal_pSc : Tools::getValue('paymentId');
         $payment = Payment::get($paymentId, $this->_getCredentialsInfo());
+        if (Tools::getValue('shortcut')) {
+            $discounts = Context::getContext()->cart->getCartRules();
+            if (count($discounts) > 0) {
+                Context::getContext()->cookie->__unset('paypal_pSc');
+                Context::getContext()->cookie->__unset('paypal_pSc_payerid');
+                throw new Exception('The total of the order do not match amount paid.');
+            }
+            $address_delivery = new Address($cart->id_address_delivery);
+            $state = '';
+            if ($address_delivery->id_state) {
+                $state = new State((int) $address_delivery->id_state);
+            }
+            $state_name = $state ? $state->iso_code : '';
+            $patchAdd = new Patch();
+            $patchAdd->setOp('replace')
+                ->setPath('/transactions/0/item_list/shipping_address')
+                ->setValue(json_decode('{
+                    "recipient_name": "'.$address_delivery->firstname.' '.$address_delivery->lastname.'",
+                    "line1": "'.$address_delivery->address1.'",
+                    "city": "'.$address_delivery->city.'",
+                    "state": "'.$state_name.'",
+                    "postal_code": "'.$address_delivery->postcode.'",
+                    "country_code": "'.Country::getIsoById($address_delivery->id_country).'"
+                }'));
+
+            $patchRequest = new PatchRequest();
+            $patchRequest->setPatches(array($patchAdd));
+            $payment->update($patchRequest, $this->_getCredentialsInfo());
+           // echo'<pre>';print_r($payment);die;
+        }
+
         // ### Payment Execute
         // PaymentExecution object includes information necessary
         // to execute a PayPal account payment.
         // The payer_id is added to the request query parameters
         // when the user is redirected from paypal back to your site
         $execution = new PaymentExecution();
-        $execution->setPayerId(Tools::getValue('PayerID'));
+        $execution->setPayerId(Tools::getValue('shortcut') ? $context->cookie->paypal_pSc_payerid : Tools::getValue('PayerID'));
         // ### Optional Changes to Amount
         // If you wish to update the amount that you wish to charge the customer,
         // based on the shipping address or any other reason, you could
         // do that by passing the transaction object with just `amount` field in it.
-
         $exec_payment = $payment->execute($execution, $this->_getCredentialsInfo());
 
-        $cart = $context->cart;
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');

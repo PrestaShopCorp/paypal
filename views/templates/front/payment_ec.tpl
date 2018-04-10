@@ -22,6 +22,9 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<p id="paypal-es-checked">
+<p id="paypal-es-checked" style="display: none">
     {l s='You have already payed with PayPal express checkout.' mod='paypal'}
+</p>
+<p id="paypal-ppp-checked" style="display: none">
+    {l s='You have already payed with PayPal Plus checkout.' mod='paypal'}
 </p>

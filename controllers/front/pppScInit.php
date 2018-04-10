@@ -60,7 +60,7 @@ class PaypalPppScInitModuleFrontController extends ModuleFrontController
         }
 
         try {
-            $response = $method->init(array());
+            $response = $method->init(array('short_cut' => 1));
         } catch (Exception $e) {
             Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $e->getMessage())));
         }

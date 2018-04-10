@@ -648,6 +648,15 @@ class PayPal extends PaymentModule
                         die($e);
                     }
                     $payments_options[] = $payment_options;
+                    if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_pSc)) {
+                        $payment_options = new PaymentOption();
+                        $action_text = $this->l('Pay with paypal plus shortcut');
+                        $payment_options->setCallToActionText($action_text);
+                        $payment_options->setModuleName('paypal_plus_schortcut');
+                        $payment_options->setAction($this->context->link->getModuleLink($this->name, 'pppValidation', array('shortcut'=>'1'), true));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ec.tpl'));
+                        $payments_options[] = $payment_options;
+                    }
                 }
 
                 break;
@@ -658,6 +667,7 @@ class PayPal extends PaymentModule
 
     public function hookHeader()
     {
+        // echo'<pre>';print_r($this->context->cart);die;
         if (Tools::getValue('controller') == "order") {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
@@ -678,7 +688,7 @@ class PayPal extends PaymentModule
                     $this->context->controller->registerJavascript($this->name . '-pp-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
                 }
             }
-            if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
+            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && (isset($this->context->cookie->paypal_ecs) || isset($this->context->cookie->paypal_pSc))) {
                 $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
@@ -1029,6 +1039,11 @@ class PayPal extends PaymentModule
             //unset cookie of payment init if it's no more same cart
             Context::getContext()->cookie->__unset('paypal_ecs');
             Context::getContext()->cookie->__unset('paypal_ecs_payerid');
+        }
+        if (isset($this->context->cookie->paypal_pSc) || isset($this->context->cookie->paypal_pSc_payerid)) {
+            //unset cookie of payment init if it's no more same cart
+            Context::getContext()->cookie->__unset('paypal_pSc');
+            Context::getContext()->cookie->__unset('paypal_pSc_payerid');
         }
     }
 
