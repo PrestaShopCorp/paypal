@@ -716,8 +716,13 @@ class PayPal extends PaymentModule
                     'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array('credit_card'=>'0','getToken'=>1), true),
                 ));
             }
+            if (Configuration::get('PAYPAL_METHOD') == 'PPP') {
+                $url = $this->context->link->getModuleLink($this->name, 'pppScInit', array(), true);
+            } else {
+                $url = $this->context->link->getModuleLink($this->name, 'ecScInit', array(), true);
+            }
             Media::addJsDef(array(
-                'ec_sc_init_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array(), true),
+                'sc_init_url'   => $url,
             ));
         }
     }

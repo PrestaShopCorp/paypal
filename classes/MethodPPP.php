@@ -674,6 +674,7 @@ class MethodPPP extends AbstractMethodPaypal
             'PayPal_img_esc' => $img_esc,
             'action_url' => $context->link->getModuleLink('paypal', 'pppScInit', array(), true),
             'environment' => $environment,
+            'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
         ));
 
         return $context->smarty->fetch('module:paypal/views/templates/hook/PPP_shortcut.tpl');

@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 function EcCheckProductAvailability(qty, productId, id_product_attribute) {
     $.ajax({
-        url: ec_sc_init_url,
+        url: sc_init_url,
         type: "POST",
         data: 'checkAvailability=1&id_product='+productId+'&quantity='+qty+'&product_attribute='+id_product_attribute,
         success: function (json) {
