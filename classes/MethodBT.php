@@ -228,6 +228,7 @@ class MethodBT extends AbstractMethodPaypal
             if ($all_merchant_accounts) {
                 Configuration::updateValue('PAYPAL_'.$mode.'_BRAINTREE_ACCOUNT_ID', Tools::jsonEncode($all_merchant_accounts));
             }
+            Tools::redirect($paypal->module_link);
         }
 
         if (Tools::isSubmit('paypal_config')) {

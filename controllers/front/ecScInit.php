@@ -32,6 +32,15 @@ class PaypalEcScInitModuleFrontController extends ModuleFrontController
 
     public function postProcess()
     {
+        if (Tools::getValue('checkAvailability')) {
+            $product = new Product(Tools::getValue('id_product'));
+            $product->id_product_attribute = Tools::getValue('product_attribute') != 0 ? Tools::getValue('product_attribute') : Tools::getValue('id_product_attribute');
+            if ($product->checkQty(Tools::getValue('quantity'))) {
+                die(Tools::jsonEncode(1));
+            } else {
+                die(Tools::jsonEncode(0));
+            }
+        }
         $method_ec = AbstractMethodPaypal::load('EC');
 
         if (empty($this->context->cart->id)) {
