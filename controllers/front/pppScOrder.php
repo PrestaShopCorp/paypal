@@ -126,8 +126,8 @@ class PaypalPppScOrderModuleFrontController extends ModuleFrontController
 
         $this->context->cart->id_address_delivery = $id_address;
         $this->context->cart->id_address_invoice = $id_address;
-        // TODO : change product adress delivery
-      //  $this->context->cart->setProductAddressDelivery($id_product, $id_product_attribute, $old_id_address_delivery, $new_id_address_delivery);
+        $product = $this->context->cart->getProducts();
+        $this->context->cart->setProductAddressDelivery($product[0]['id_product'], $product[0]['id_product_attribute'], $product[0]['id_address_delivery'], $id_address);
         $this->context->cart->save();
 
         $this->context->cookie->__set('paypal_pSc', $info->id);

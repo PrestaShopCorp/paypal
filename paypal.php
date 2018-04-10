@@ -598,7 +598,7 @@ class PayPal extends PaymentModule
                         $payment_options->setCallToActionText($action_text);
                         $payment_options->setModuleName('express_checkout_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
-                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ec.tpl'));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_sc.tpl'));
                         $payments_options[] = $payment_options;
                     }
                 }
@@ -654,7 +654,7 @@ class PayPal extends PaymentModule
                         $payment_options->setCallToActionText($action_text);
                         $payment_options->setModuleName('paypal_plus_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'pppValidation', array('shortcut'=>'1'), true));
-                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ec.tpl'));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_sc.tpl'));
                         $payments_options[] = $payment_options;
                     }
                 }
@@ -667,7 +667,6 @@ class PayPal extends PaymentModule
 
     public function hookHeader()
     {
-        // echo'<pre>';print_r($this->context->cart);die;
         if (Tools::getValue('controller') == "order") {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
                 if (Configuration::get('PAYPAL_BRAINTREE_ENABLED')) {
@@ -689,7 +688,7 @@ class PayPal extends PaymentModule
                 }
             }
             if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && (isset($this->context->cookie->paypal_ecs) || isset($this->context->cookie->paypal_pSc))) {
-                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
+                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/shortcut_payment.js');
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');

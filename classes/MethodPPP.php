@@ -531,7 +531,6 @@ class MethodPPP extends AbstractMethodPaypal
             $patchRequest = new PatchRequest();
             $patchRequest->setPatches(array($patchAdd));
             $payment->update($patchRequest, $this->_getCredentialsInfo());
-           // echo'<pre>';print_r($payment);die;
         }
 
         // ### Payment Execute
