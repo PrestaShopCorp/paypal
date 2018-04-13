@@ -114,6 +114,7 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
             || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 0)
+            || !Configuration::updateValue('PAYPAL_VAULTING', 0)
         ) {
             return false;
         }
@@ -153,6 +154,24 @@ class PayPal extends PaymentModule
               `id_paypal_order` INT(11),
               `capture_amount` FLOAT(11),
               `result` VARCHAR(255),
+              `date_add` DATETIME,
+              `date_upd` DATETIME
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
+
+        $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_customer` (
+              `id_paypal_customer` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `id_customer` INT(11),
+              `reference` VARCHAR(55),
+              `method` VARCHAR(55),
+              `date_add` DATETIME,
+              `date_upd` DATETIME
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
+
+        $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_vaulting` (
+              `id_paypal_vaulting` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `token` VARCHAR(255),
+              `name_card` VARCHAR(255),
+              `info_card` VARCHAR(255),
               `date_add` DATETIME,
               `date_upd` DATETIME
         ) ENGINE = " . _MYSQL_ENGINE_ ;
@@ -315,7 +334,10 @@ class PayPal extends PaymentModule
             'PAYPAL_BY_BRAINTREE',
             'PAYPAL_CRON_TIME',
             'PAYPAL_EXPRESS_CHECKOUT',
-            'PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'
+            'PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT',
+            'PAYPAL_VAULTING',
+            'PAYPAL_CONFIG_BRAND',
+            'PAYPAL_CONFIG_LOGO'
         );
 
         foreach ($config as $var) {
@@ -341,10 +363,10 @@ class PayPal extends PaymentModule
     private function uninstallSQL()
     {
         $sql = array();
-
         $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_capture`";
-
         $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_order`";
+        $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_customer`";
+        $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_vaulting`";
 
         foreach ($sql as $q) {
             if (!DB::getInstance()->execute($q)) {

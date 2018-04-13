@@ -105,6 +105,24 @@ class MethodBT extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
+                'label' => $module->l('Activate Vaulting'),
+                'name' => 'paypal_vaulting',
+                'is_bool' => true,
+                'values' => array(
+                    array(
+                        'id' => 'paypal_vaulting_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_vaulting_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
                 'label' => $module->l('Activate 3D Secure for Braintree'),
                 'name' => 'paypal_3DSecure',
                 'desc' => $module->l(''),
@@ -137,6 +155,7 @@ class MethodBT extends AbstractMethodPaypal
             'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
             'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
             'config_brand' => Configuration::get('PAYPAL_CONFIG_BRAND'),
+            'paypal_vaulting' => Configuration::get('PAYPAL_VAULTING'),
         );
         $context = Context::getContext();
         $context->smarty->assign(array(
@@ -238,6 +257,7 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
+            Configuration::updateValue('PAYPAL_VAULTING', $params['paypal_vaulting']);
         }
 
         if (isset($params['method'])) {
