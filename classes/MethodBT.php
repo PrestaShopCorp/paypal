@@ -414,7 +414,13 @@ class MethodBT extends AbstractMethodPaypal
     {
 
         $this->initConfig();
+        include_once 'PaypalCustomer.php';
+        include_once 'PaypalVaulting.php';
+       /* $cc = $this->gateway->customer()->find('815616216');
+        $payment_methods = $cc->paymentMethods;
+        echo '<pre>';print_r($cc);die;*/
         $bt_method = Tools::getValue('payment_method_bt');
+
         if ($bt_method == "paypal-braintree") {
             $options = array(
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
@@ -427,6 +433,8 @@ class MethodBT extends AbstractMethodPaypal
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
             );
         }
+        $options['storeInVaultOnSuccess'] = true;
+
         $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_'.$this->mode.'_BRAINTREE_ACCOUNT_ID'));
         $address_billing = new Address($cart->id_address_invoice);
         $country_billing = new Country($address_billing->id_country);
@@ -435,11 +443,12 @@ class MethodBT extends AbstractMethodPaypal
         $amount = $this->formatPrice($cart->getOrderTotal());
         $paypal = Module::getInstanceByName('paypal');
         $currency = $paypal->getPaymentCurrencyIso();
-
+        //$this->createCustomer($address_billing);
         try {
             $data = [
                 'amount'                => $amount,
                 'paymentMethodNonce'    => $token_payment,
+                //'paymentMethodToken' => 'fdyn23',
                 'merchantAccountId'     => $merchant_accounts[$currency],
                 'orderId'               => $this->getOrderId($cart),
                 'channel'               => (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
@@ -466,9 +475,19 @@ class MethodBT extends AbstractMethodPaypal
                 "deviceData"            => $device_data,
                 'options' => $options,
             ];
+          //  $data['customerId'] = 815616216;
 
             $result = $this->gateway->transaction()->sale($data);
-           // echo '<pre>';print_r($result);die;
+           echo '<pre>';print_r($result);die;
+            $vaulting = new PaypalVaulting();
+            $vaulting->token = $result->transaction->creditCard['token'];
+            $vaulting->id_paypal_customer = $result->transaction->customer['id'];
+            $vaulting->info_card = $result->transaction->creditCard['cardType'].' *';
+            $vaulting->info_card .= $result->transaction->creditCard['last4'].' ';
+            $vaulting->info_card .= $result->transaction->creditCard['expirationMonth'].'/';
+            $vaulting->info_card .= $result->transaction->creditCard['expirationYear'];
+            $vaulting->save();
+           // echo '<pre>';print_r($vaulting);die;
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 return $result->transaction;
             } else {
@@ -486,6 +505,35 @@ class MethodBT extends AbstractMethodPaypal
         }
 
         return false;
+    }
+
+    public function createCustomer($address_billing)
+    {
+        include_once 'PaypalCustomer.php';
+        $context = Context::getContext();
+        $country_billing =  new Country($address_billing->id_country);
+        $data = [
+            'firstName' => $context->customer->firstname,
+            'lastName' => $context->customer->lastname,
+            'email' => $context->customer->email,
+            'billingAddress' => [
+                'firstName'         => $address_billing->firstname,
+                'lastName'          => $address_billing->lastname,
+                'company'           => $address_billing->company,
+                'streetAddress'     => $address_billing->address1,
+                'extendedAddress'   => $address_billing->address2,
+                'locality'          => $address_billing->city,
+                'postalCode'        => $address_billing->postcode,
+                'countryCodeAlpha2' => $country_billing->iso_code,
+            ]
+        ];
+
+        $result = $this->gateway->customer()->create($data);
+        $customer = new PaypalCustomer();
+        $customer->id_customer = $context->customer->id;
+        $customer->reference = $result->customer->id;
+        $customer->method = Tools::getValue('payment_method_bt');
+        $customer->save();
     }
 
     public function isValidStatus($status)

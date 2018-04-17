@@ -169,6 +169,7 @@ class PayPal extends PaymentModule
 
         $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_vaulting` (
               `id_paypal_vaulting` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `id_paypal_customer` INT(11),
               `token` VARCHAR(255),
               `name_card` VARCHAR(255),
               `info_card` VARCHAR(255),

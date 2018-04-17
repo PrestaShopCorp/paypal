@@ -26,13 +26,11 @@
 
 class PaypalCustomer extends ObjectModel
 {
-    public $id_capture;
+    public $id_customer;
 
-    public $id_paypal_order;
+    public $reference;
 
-    public $capture_amount;
-
-    public $result;
+    public $method;
 
     public $date_add;
 
@@ -53,5 +51,10 @@ class PaypalCustomer extends ObjectModel
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
     );
+
+    public function customerExist()
+    {
+
+    }
 
 }

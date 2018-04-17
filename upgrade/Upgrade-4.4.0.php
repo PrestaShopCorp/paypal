@@ -34,5 +34,33 @@ function upgrade_module_4_4_0($module)
     Configuration::updateValue('PAYPAL_CONFIG_BRAND', '');
     Configuration::updateValue('PAYPAL_CONFIG_LOGO', '');
 
+    $sql = array();
+
+    $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_customer` (
+              `id_paypal_customer` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `id_customer` INT(11),
+              `reference` VARCHAR(55),
+              `method` VARCHAR(55),
+              `date_add` DATETIME,
+              `date_upd` DATETIME
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
+
+    $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_vaulting` (
+              `id_paypal_vaulting` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `id_paypal_customer` INT(11),
+              `token` VARCHAR(255),
+              `name_card` VARCHAR(255),
+              `info_card` VARCHAR(255),
+              `date_add` DATETIME,
+              `date_upd` DATETIME
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
+
+
+    foreach ($sql as $q) {
+        if (!DB::getInstance()->execute($q)) {
+            return false;
+        }
+    }
+
     return true;
 }

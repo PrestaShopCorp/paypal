@@ -28,7 +28,9 @@ class PaypalVaulting extends ObjectModel
 {
     public $token;
 
-    public $name_card;
+    public $id_paypal_customer;
+
+    public $name_card; // client can set card name in prestashop account
 
     public $info_card;
 
@@ -45,6 +47,7 @@ class PaypalVaulting extends ObjectModel
         'multilang' => false,
         'fields' => array(
             'token' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'id_paypal_customer' => array('type' => self::TYPE_INT),
             'name_card' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'info_card' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
