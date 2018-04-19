@@ -52,9 +52,15 @@ class PaypalCustomer extends ObjectModel
         )
     );
 
-    public function customerExist()
+    public static function loadCustomerByMethod($id_customer, $method)
     {
-
+        $db = Db::getInstance();
+        $query = new DbQuery();
+        $query->select('id_paypal_customer');
+        $query->from('paypal_customer');
+        $query->where('id_customer = '.(int)$id_customer. ' AND method = "'.pSQL($method).'"');
+        $id = $db->getValue($query);
+        return new PaypalCustomer($id);
     }
 
 }

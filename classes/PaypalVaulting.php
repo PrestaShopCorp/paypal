@@ -55,4 +55,15 @@ class PaypalVaulting extends ObjectModel
         )
     );
 
+    public static function vaultingExist($token, $customer)
+    {
+        $db = Db::getInstance();
+        $query = new DbQuery();
+        $query->select('id_paypal_vaulting');
+        $query->from('paypal_vaulting');
+        $query->where('token = "'.pSQL($token).'" AND id_paypal_customer = '.(int)$customer);
+        $result = $db->getValue($query);
+        return $result ? true : false;
+    }
+
 }
