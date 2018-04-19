@@ -298,10 +298,11 @@ class PayPal extends PaymentModule
             || !$this->registerHook('displayReassurance')
             || !$this->registerHook('displayInvoiceLegalFreeText')
             || !$this->registerHook('actionAdminControllerSetMedia')
+            || !$this->registerHook('displayMyAccountBlock')
+            || !$this->registerHook('displayCustomerAccount')
         ) {
             return false;
         }
-
 
         return true;
     }
@@ -754,7 +755,6 @@ class PayPal extends PaymentModule
 
     public function hookDisplayBackOfficeHeader()
     {
-
         if (Configuration::get('PAYPAL_METHOD') == 'BT') {
             $diff_cron_time = date_diff(date_create('now'), date_create(Configuration::get('PAYPAL_CRON_TIME')));
             if ($diff_cron_time->d > 0 || $diff_cron_time->h > 4) {
@@ -852,6 +852,7 @@ class PayPal extends PaymentModule
             'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
             'path' => $this->_path,
             'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
+            'bt_method' => BT_PAYPAL_PAYMENT,
         ));
 
         return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
@@ -1446,6 +1447,20 @@ class PayPal extends PaymentModule
             return (int)0;
         } else {
             return (int)2;
+        }
+    }
+
+    public function hookDisplayCustomerAccount()
+    {
+        if (Configuration::get('PAYPAL_VAULTING')) {
+            return $this->display(__FILE__, 'my-account.tpl');
+        }
+    }
+
+    public function hookDisplayMyAccountBlock()
+    {
+        if (Configuration::get('PAYPAL_VAULTING')) {
+            return $this->display(__FILE__, 'my-account-footer.tpl');
         }
     }
 }

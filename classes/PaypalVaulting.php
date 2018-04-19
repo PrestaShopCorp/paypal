@@ -78,4 +78,16 @@ class PaypalVaulting extends ObjectModel
         return $result;
     }
 
+    public static function getCustomerAllMethods($customer)
+    {
+        $db = Db::getInstance();
+        $query = new DbQuery();
+        $query->select('*');
+        $query->from('paypal_vaulting', 'pv');
+        $query->leftJoin('paypal_customer','pc','pv.id_paypal_customer = pc.id_paypal_customer');
+        $query->where('pc.id_customer = '.(int)$customer);
+        $result = $db->executeS($query);
+        return $result;
+    }
+
 }

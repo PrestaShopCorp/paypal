@@ -29,7 +29,7 @@
                 <form action="{$braintreeSubmitUrl}" id="paypal-braintree-form" method="post">
                 {include file="module:paypal/views/templates/front/payment_infos.tpl"}
                 <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
-                <input type="hidden" name="payment_method_bt" value="paypal-braintree"/>
+                <input type="hidden" name="payment_method_bt" value="{$bt_method|escape:'htmlall':'UTF-8'}"/>
                 <div id="paypal-button"></div>
                 <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
             </form>
