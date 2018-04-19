@@ -482,6 +482,7 @@ class MethodBT extends AbstractMethodPaypal
                     if (!$paypal_customer->id) {
                         $paypal_customer = $this->createCustomer($address_billing);
                     }
+
                     $options['storeInVaultOnSuccess'] = true;
                     $data['paymentMethodNonce'] = $token_payment;
                     $data['customerId'] = $paypal_customer->reference;
@@ -493,13 +494,14 @@ class MethodBT extends AbstractMethodPaypal
             $data['options'] = $options;
 
             $result = $this->gateway->transaction()->sale($data);
+         //   echo '<pre>';print_r($result);die;
 
-            if (Configuration::get('PAYPAL_VAULTING') && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
-                $this->createVaulting($result);
-            }
           // echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
+                if (Configuration::get('PAYPAL_VAULTING') && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
+                    $this->createVaulting($result, $paypal_customer);
+                }
                 return $result->transaction;
             } else {
                 $errors = $result->errors->deepAll();
@@ -518,12 +520,12 @@ class MethodBT extends AbstractMethodPaypal
         return false;
     }
 
-    public function createVaulting($result)
+    public function createVaulting($result, $paypal_customer)
     {
         $vaulting = new PaypalVaulting();
         $vaulting->token = $result->transaction->creditCard['token'];
-        $vaulting->id_paypal_customer = $result->transaction->customer['id'];
-        $vaulting->info_card = $result->transaction->creditCard['cardType'].' *';
+        $vaulting->id_paypal_customer = $paypal_customer->id;
+        $vaulting->info_card = $result->transaction->creditCard['cardType'].': *';
         $vaulting->info_card .= $result->transaction->creditCard['last4'].' ';
         $vaulting->info_card .= $result->transaction->creditCard['expirationMonth'].'/';
         $vaulting->info_card .= $result->transaction->creditCard['expirationYear'];

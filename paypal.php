@@ -35,7 +35,8 @@ include_once 'classes/AbstractMethodPaypal.php';
 include_once 'classes/PaypalCapture.php';
 include_once 'classes/PaypalOrder.php';
 
-
+const BT_CARD_PAYMENT = 'card-braintree';
+const BT_PAYPAL_PAYMENT = 'paypal-braintree';
 // EC = express checkout
 // ECS = express checkout sortcut
 // BT = Braintree
@@ -50,6 +51,7 @@ class PayPal extends PaymentModule
     public $module_link;
     public $errors;
     public $bt_countries = array("FR", "UK", "IT", "ES", "US");
+
 
     public function __construct()
     {
@@ -861,12 +863,22 @@ class PayPal extends PaymentModule
 
         $amount = $this->context->cart->getOrderTotal();
 
+
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
         $check3DS = 0;
         $required_3ds_amount = Tools::convertPrice(Configuration::get('PAYPAL_3D_SECURE_AMOUNT'), Currency::getCurrencyInstance((int)$this->context->currency->id));
         if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
             $check3DS = 1;
+        }
+
+        if (Configuration::get('PAYPAL_VAULTING')) {
+            $payment_methods = PaypalVaulting::getCustomerMethods($this->context->customer->id, BT_CARD_PAYMENT);
+           // echo '<pre>';print_r($payment_methods);die;
+            $this->context->smarty->assign(array(
+                'active_vaulting'=> true,
+                'payment_methods' => $payment_methods,
+            ));
         }
         $this->context->smarty->assign(array(
             'error_msg'=> Tools::getValue('bt_error_msg'),
@@ -875,6 +887,7 @@ class PayPal extends PaymentModule
             'braintreeAmount'=> $amount,
             'check3Dsecure'=> $check3DS,
             'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
+            'method_bt' => BT_CARD_PAYMENT,
         ));
 
 

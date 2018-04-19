@@ -92,6 +92,10 @@
                     }
                     event.preventDefault();
                     event.stopPropagation();
+                    if ($('select[name=paypal_vaulting_token]').val()) {
+                        bt_form.submit();
+                        return;
+                    }
                     hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
                         if (tokenizeErr) {
                             var popup_message = '';

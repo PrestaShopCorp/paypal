@@ -49,10 +49,25 @@
                     <input type="hidden" name="liabilityShiftPossible" id="liabilityShiftPossible"/>
                     <input type="hidden" name="payment_method_nonce" id="payment_method_nonce"/>
                     <input type="hidden" name="card_type" id="braintree_card_type"/>
-                    <input type="hidden" name="payment_method_bt" value="card-braintree"/>
+                    <input type="hidden" name="payment_method_bt" value="{$method_bt|escape:'htmlall':'UTF-8'}"/>
                     <div class="paypal_clear"></div>
                     <div id="bt-card-error-msg"></div>
                     <div id="logo_braintree_by_paypal"><img src="https://s3-us-west-1.amazonaws.com/bt-partner-assets/paypal-braintree.png" height="20px"></div>
+                    {if $active_vaulting && isset($payment_methods)}
+                        <div id="bt-vault-form">
+                         <p><b>{l s='Choose your card' mod='paypal'}:</b></p>
+                            <select name="paypal_vaulting_token" class="form-control">
+                            <option value="">{l s='Choose your card' mod='paypal'}</option>
+                            {foreach from=$payment_methods key=method_key  item=method}
+                                <option value="{$method.token|escape:'htmlall':'UTF-8'}">{$method.info_card|escape:'htmlall':'UTF-8'}</option>
+                                {*<p class="method">
+                                    <input type="radio" value="{$method.token|escape:'htmlall':'UTF-8'}" name="paypal_vaulting_token" />
+                                    {$method.info_card|escape:'htmlall':'UTF-8'}
+                                </p>*}
+                            {/foreach}
+                            </select>
+                        </div>
+                    {/if}
                 </form>
             </div>
         </div>
