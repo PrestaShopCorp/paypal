@@ -52,6 +52,11 @@
                     <input type="hidden" name="payment_method_bt" value="{$method_bt|escape:'htmlall':'UTF-8'}"/>
                     <div class="paypal_clear"></div>
                     <div id="bt-card-error-msg"></div>
+                    {if $active_vaulting}
+                        <div class="save-in-vault">
+                            <input type="checkbox" name="save_method_in_vault"/> <span> {l s='Save my card' mod='paypal'}</span>
+                        </div>
+                    {/if}
                     <div id="logo_braintree_by_paypal"><img src="https://s3-us-west-1.amazonaws.com/bt-partner-assets/paypal-braintree.png" height="20px"></div>
                     {if $active_vaulting && isset($payment_methods)}
                         <div id="bt-vault-form">

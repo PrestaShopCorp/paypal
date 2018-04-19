@@ -189,6 +189,9 @@
     border: 1px solid rgba(0,0,0,.25);
     padding: 0.4rem 1rem;
 }
+.save-in-vault {
+    margin-top: 10px;
+}
 
 @media only screen and (max-width: 500px) {
     .braintree-row-payment .block_field {

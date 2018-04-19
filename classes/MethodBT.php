@@ -414,12 +414,12 @@ class MethodBT extends AbstractMethodPaypal
 
     public function sale($cart, $token_payment, $device_data)
     {
-
+        //echo '<pre>';print_r(Tools::getValue('save_method_in_vault'));die;
         $this->initConfig();
 
         $bt_method = Tools::getValue('payment_method_bt');
 
-        if ($bt_method == "paypal-braintree") {
+        if ($bt_method == BT_PAYPAL_PAYMENT) {
             $options = array(
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
                 'threeDSecure' => array(
@@ -471,7 +471,7 @@ class MethodBT extends AbstractMethodPaypal
                 "deviceData"            => $device_data,
             ];
 
-            if (Configuration::get('PAYPAL_VAULTING')) {
+            if (Configuration::get('PAYPAL_VAULTING') && Tools::getValue('save_method_in_vault')) {
                 $vault_token = Tools::getValue('paypal_vaulting_token');
                 $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, $bt_method);
                 if ($vault_token && $paypal_customer->id) {
@@ -494,12 +494,12 @@ class MethodBT extends AbstractMethodPaypal
             $data['options'] = $options;
 
             $result = $this->gateway->transaction()->sale($data);
-         //   echo '<pre>';print_r($result);die;
+
 
           // echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
-                if (Configuration::get('PAYPAL_VAULTING') && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
+                if (Configuration::get('PAYPAL_VAULTING') && Tools::getValue('save_method_in_vault') && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
                     $this->createVaulting($result, $paypal_customer);
                 }
                 return $result->transaction;
