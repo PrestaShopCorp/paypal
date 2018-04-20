@@ -175,6 +175,7 @@ class PayPal extends PaymentModule
               `token` VARCHAR(255),
               `name_card` VARCHAR(255),
               `info_card` VARCHAR(255),
+              `method` VARCHAR(255),
               `date_add` DATETIME,
               `date_upd` DATETIME
         ) ENGINE = " . _MYSQL_ENGINE_ ;
@@ -845,6 +846,7 @@ class PayPal extends PaymentModule
 
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
+
         $this->context->smarty->assign(array(
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'btValidation', array(), true),
@@ -853,6 +855,9 @@ class PayPal extends PaymentModule
             'path' => $this->_path,
             'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
             'bt_method' => BT_PAYPAL_PAYMENT,
+            'flow' => Configuration::get('PAYPAL_VAULTING') ? 'vault' : 'checkout',
+            'active_vaulting'=> Configuration::get('PAYPAL_VAULTING'),
+            'currency' => $this->context->currency->iso_code,
         ));
 
         return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
@@ -881,7 +886,7 @@ class PayPal extends PaymentModule
                     $payment_methods[$key]['nonce'] = $nonce;
                 }
             }
-          //  echo '<pre>';print_r($payment_methods);die;
+
             $this->context->smarty->assign(array(
                 'active_vaulting'=> true,
                 'payment_methods' => $payment_methods,
@@ -897,7 +902,7 @@ class PayPal extends PaymentModule
             'method_bt' => BT_CARD_PAYMENT,
         ));
 
-
+       // echo '<pre>';print_r($payment_methods);die;
         return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
     }
 

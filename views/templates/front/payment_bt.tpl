@@ -54,7 +54,7 @@
                     <div id="bt-card-error-msg"></div>
                     {if $active_vaulting}
                         <div class="save-in-vault">
-                            <input type="checkbox" name="save_method_in_vault"/> <span> {l s='Save my card' mod='paypal'}</span>
+                            <input type="checkbox" name="save_card_in_vault"/> <span> {l s='Memorize my card' mod='paypal'}</span>
                         </div>
                     {/if}
                     <div id="logo_braintree_by_paypal"><img src="https://s3-us-west-1.amazonaws.com/bt-partner-assets/paypal-braintree.png" height="20px"></div>

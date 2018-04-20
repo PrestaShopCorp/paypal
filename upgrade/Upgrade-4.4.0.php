@@ -57,6 +57,7 @@ function upgrade_module_4_4_0($module)
               `token` VARCHAR(255),
               `name_card` VARCHAR(255),
               `info_card` VARCHAR(255),
+              `method` VARCHAR(255),
               `date_add` DATETIME,
               `date_upd` DATETIME
         ) ENGINE = " . _MYSQL_ENGINE_ ;

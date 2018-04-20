@@ -32,6 +32,11 @@
                 <input type="hidden" name="payment_method_bt" value="{$bt_method|escape:'htmlall':'UTF-8'}"/>
                 <div id="paypal-button"></div>
                 <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
+                {if $active_vaulting}
+                    <div class="save-in-vault">
+                        <input type="checkbox" name="save_account_in_vault"/> <span> {l s='Memorize my paypal account' mod='paypal'}</span>
+                    </div>
+                {/if}
             </form>
                 <div id="bt-paypal-error-msg"></div>
             </div>
@@ -41,11 +46,16 @@
 
 
 <script>
-
-    var authorization = '{$braintreeToken}';
-    var bt_amount = {$braintreeAmount};
-    var pbt_translations = {
+    var paypal_braintree = {
+        authorization : '{$braintreeToken}',
+        amount : {$braintreeAmount},
+        mode : '{$mode}',
+        flow : '{$flow}',
+        currency : '{$currency}'
+    };
+    paypal_braintree.translations = {
         empty_nonce:"{l s='Click paypal button first' mod='paypal'}"
     };
-    var mode_pbt = '{$mode}';
+
+
 </script>

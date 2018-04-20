@@ -23,7 +23,7 @@ function initPaypalBraintree() {
     var paypal_bt_form = document.querySelector('#paypal-braintree-form');
 
     braintree.client.create({
-        authorization: authorization
+        authorization: paypal_braintree.authorization
     }, function (clientErr, clientInstance) {
 
         // Stop if there was a problem creating the client.
@@ -48,12 +48,14 @@ function initPaypalBraintree() {
             }
 
             paypal.Button.render({
-                env: mode_pbt, // 'production' or 'sandbox'
+                env: paypal_braintree.mode, // 'production' or 'sandbox'
 
                 payment: function () {
                     return paypalCheckoutInstance.createPayment({
-                        flow: 'vault',
-                        billingAgreementDescription: 'Your agreement description',
+                        flow: paypal_braintree.flow,
+                        amount : paypal_braintree.amount,
+                        currency : paypal_braintree.currency,
+                        billingAgreementDescription: '',
                         enableShippingAddress: false,
                         shippingAddressEditable: false,
                         displayName: pbt_brand_title
@@ -90,7 +92,7 @@ function initPaypalBraintree() {
                 if (!document.querySelector('input#paypal_payment_method_nonce').value) {
                     event.preventDefault();
                     event.stopPropagation();
-                    $('#bt-paypal-error-msg').show().text(pbt_translations.empty_nonce);
+                    $('#bt-paypal-error-msg').show().text(paypal_braintree.translations.empty_nonce);
                 }
             });
 

@@ -34,6 +34,8 @@ class PaypalVaulting extends ObjectModel
 
     public $info_card;
 
+    public $method; // card ou paypal, etc...
+
     public $date_add;
 
     public $date_upd;
@@ -50,6 +52,7 @@ class PaypalVaulting extends ObjectModel
             'id_paypal_customer' => array('type' => self::TYPE_INT),
             'name_card' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'info_card' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'method' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
@@ -73,7 +76,7 @@ class PaypalVaulting extends ObjectModel
         $query->select('*');
         $query->from('paypal_vaulting', 'pv');
         $query->leftJoin('paypal_customer','pc','pv.id_paypal_customer = pc.id_paypal_customer');
-        $query->where('pc.id_customer = '.(int)$customer.' AND pc.method = "'.pSQL($method).'"');
+        $query->where('pc.id_customer = '.(int)$customer.' AND pv.method = "'.pSQL($method).'"');
         $result = $db->executeS($query);
         return $result;
     }

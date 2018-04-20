@@ -414,7 +414,7 @@ class MethodBT extends AbstractMethodPaypal
 
     public function sale($cart, $token_payment, $device_data)
     {
-        //echo '<pre>';print_r(Tools::getValue('save_method_in_vault'));die;
+
         $this->initConfig();
 
         $bt_method = Tools::getValue('payment_method_bt');
@@ -472,7 +472,8 @@ class MethodBT extends AbstractMethodPaypal
 
             if (Configuration::get('PAYPAL_VAULTING')) {
                 $vault_token = Tools::getValue('paypal_vaulting_token');
-                $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, $bt_method);
+                $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, 'BT');
+
                 if ($vault_token && $paypal_customer->id) {
                     if (PaypalVaulting::vaultingExist($vault_token, $paypal_customer->id)) {
                         $data['paymentMethodToken'] = $vault_token;
@@ -481,7 +482,7 @@ class MethodBT extends AbstractMethodPaypal
                     if (!$paypal_customer->id) {
                         $paypal_customer = $this->createCustomer($address_billing);
                     }
-                    if (Tools::getValue('save_method_in_vault')) {
+                    if (Tools::getValue('save_card_in_vault') || Tools::getValue('save_account_in_vault')) {
                         $options['storeInVaultOnSuccess'] = true;
                         $data['customerId'] = $paypal_customer->reference;
                     }
@@ -499,7 +500,9 @@ class MethodBT extends AbstractMethodPaypal
             //echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
-                if (Configuration::get('PAYPAL_VAULTING') && Tools::getValue('save_method_in_vault') && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
+                if (Configuration::get('PAYPAL_VAULTING')
+                    && (Tools::getValue('save_card_in_vault'))
+                    && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
                     $this->createVaulting($result, $paypal_customer);
                 }
                 return $result->transaction;
@@ -529,6 +532,7 @@ class MethodBT extends AbstractMethodPaypal
         $vaulting->info_card .= $result->transaction->creditCard['last4'].' ';
         $vaulting->info_card .= $result->transaction->creditCard['expirationMonth'].'/';
         $vaulting->info_card .= $result->transaction->creditCard['expirationYear'];
+        $vaulting->method = Tools::getValue('payment_method_bt');
         $vaulting->save();
     }
 
@@ -556,7 +560,7 @@ class MethodBT extends AbstractMethodPaypal
         $customer = new PaypalCustomer();
         $customer->id_customer = $context->customer->id;
         $customer->reference = $result->customer->id;
-        $customer->method = Tools::getValue('payment_method_bt');
+        $customer->method = 'BT';
         $customer->save();
         return $customer;
     }

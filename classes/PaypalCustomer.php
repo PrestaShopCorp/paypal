@@ -30,7 +30,7 @@ class PaypalCustomer extends ObjectModel
 
     public $reference;
 
-    public $method;
+    public $method; // BT, EC, etc...
 
     public $date_add;
 
