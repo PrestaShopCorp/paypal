@@ -64,7 +64,7 @@
                             <select name="paypal_vaulting_token" class="form-control">
                             <option value="">{l s='Choose your card' mod='paypal'}</option>
                             {foreach from=$payment_methods key=method_key  item=method}
-                                <option value="{$method.token|escape:'htmlall':'UTF-8'}">
+                                <option value="{$method.token|escape:'htmlall':'UTF-8'}" data-nonce="{$method.nonce}">
                                     {if $method.name_card}{$method.name_card|escape:'htmlall':'UTF-8'} - {/if}
                                     {$method.info_card|escape:'htmlall':'UTF-8'}
                                 </option>

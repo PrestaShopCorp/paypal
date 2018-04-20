@@ -444,7 +444,6 @@ class MethodBT extends AbstractMethodPaypal
         try {
             $data = [
                 'amount'                => $amount,
-                'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts[$currency],
                 'orderId'               => $this->getOrderId($cart),
                 'channel'               => (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
@@ -471,7 +470,7 @@ class MethodBT extends AbstractMethodPaypal
                 "deviceData"            => $device_data,
             ];
 
-            if (Configuration::get('PAYPAL_VAULTING') && Tools::getValue('save_method_in_vault')) {
+            if (Configuration::get('PAYPAL_VAULTING')) {
                 $vault_token = Tools::getValue('paypal_vaulting_token');
                 $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, $bt_method);
                 if ($vault_token && $paypal_customer->id) {
@@ -482,10 +481,11 @@ class MethodBT extends AbstractMethodPaypal
                     if (!$paypal_customer->id) {
                         $paypal_customer = $this->createCustomer($address_billing);
                     }
-
-                    $options['storeInVaultOnSuccess'] = true;
+                    if (Tools::getValue('save_method_in_vault')) {
+                        $options['storeInVaultOnSuccess'] = true;
+                        $data['customerId'] = $paypal_customer->reference;
+                    }
                     $data['paymentMethodNonce'] = $token_payment;
-                    $data['customerId'] = $paypal_customer->reference;
                 }
             } else {
                 $data['paymentMethodNonce'] = $token_payment;
@@ -496,7 +496,7 @@ class MethodBT extends AbstractMethodPaypal
             $result = $this->gateway->transaction()->sale($data);
 
 
-          // echo '<pre>';print_r($result);die;
+            //echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING') && Tools::getValue('save_method_in_vault') && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
@@ -758,5 +758,11 @@ class MethodBT extends AbstractMethodPaypal
             $ids_transaction
         ]);
         return $collection;
+    }
+
+    public function createMethodNonce($token) {
+        $this->initConfig();
+        $nonce = $this->gateway->paymentMethodNonce()->create($token);
+        return $nonce->paymentMethodNonce->nonce;
     }
 }

@@ -875,7 +875,13 @@ class PayPal extends PaymentModule
 
         if (Configuration::get('PAYPAL_VAULTING')) {
             $payment_methods = PaypalVaulting::getCustomerMethods($this->context->customer->id, BT_CARD_PAYMENT);
-           // echo '<pre>';print_r($payment_methods);die;
+            if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
+                foreach ($payment_methods as $key => $method) {
+                    $nonce = $braintree->createMethodNonce($method['token']);
+                    $payment_methods[$key]['nonce'] = $nonce;
+                }
+            }
+          //  echo '<pre>';print_r($payment_methods);die;
             $this->context->smarty->assign(array(
                 'active_vaulting'=> true,
                 'payment_methods' => $payment_methods,

@@ -86,6 +86,7 @@ class PaypalVaulting extends ObjectModel
         $query->from('paypal_vaulting', 'pv');
         $query->leftJoin('paypal_customer','pc','pv.id_paypal_customer = pc.id_paypal_customer');
         $query->where('pc.id_customer = '.(int)$customer);
+
         $result = $db->executeS($query);
         return $result;
     }
