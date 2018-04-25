@@ -440,6 +440,11 @@ class MethodBT extends AbstractMethodPaypal
         $amount = $this->formatPrice($cart->getOrderTotal());
         $paypal = Module::getInstanceByName('paypal');
         $currency = $paypal->getPaymentCurrencyIso();
+        $iso_state = '';
+        if ($address_shipping->id_state) {
+            $state = new State((int) $address_shipping->id_state);
+            $iso_state = $state->iso_code;
+        }
 
         try {
             $data = [
@@ -456,6 +461,7 @@ class MethodBT extends AbstractMethodPaypal
                     'locality'          => $address_billing->city,
                     'postalCode'        => $address_billing->postcode,
                     'countryCodeAlpha2' => $country_billing->iso_code,
+                    'region'            => $iso_state,
                 ],
                 'shipping' => [
                     'firstName'         => $address_shipping->firstname,
@@ -466,6 +472,7 @@ class MethodBT extends AbstractMethodPaypal
                     'locality'          => $address_shipping->city,
                     'postalCode'        => $address_shipping->postcode,
                     'countryCodeAlpha2' => $country_shipping->iso_code,
+                    'region'            => $iso_state,
                 ],
                 "deviceData"            => $device_data,
             ];
@@ -480,7 +487,7 @@ class MethodBT extends AbstractMethodPaypal
                     }
                 } else {
                     if (!$paypal_customer->id) {
-                        $paypal_customer = $this->createCustomer($address_billing);
+                        $paypal_customer = $this->createCustomer($address_billing, $iso_state);
                     }
                     if (Tools::getValue('save_card_in_vault') || Tools::getValue('save_account_in_vault')) {
                         $options['storeInVaultOnSuccess'] = true;
@@ -536,7 +543,7 @@ class MethodBT extends AbstractMethodPaypal
         $vaulting->save();
     }
 
-    public function createCustomer($address_billing)
+    public function createCustomer($address_billing, $iso_state)
     {
         $context = Context::getContext();
         $country_billing =  new Country($address_billing->id_country);
@@ -553,6 +560,7 @@ class MethodBT extends AbstractMethodPaypal
                 'locality'          => $address_billing->city,
                 'postalCode'        => $address_billing->postcode,
                 'countryCodeAlpha2' => $country_billing->iso_code,
+                'region'            => $iso_state,
             ]
         ];
 
