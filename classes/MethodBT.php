@@ -519,7 +519,8 @@ class MethodBT extends AbstractMethodPaypal
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING')
-                    && (Tools::getValue('save_card_in_vault') || Tools::getValue('save_account_in_vault'))
+                    && ((Tools::getValue('save_card_in_vault') && $bt_method == BT_CARD_PAYMENT)
+                        || (Tools::getValue('save_account_in_vault') && $bt_method == BT_PAYPAL_PAYMENT))
                     && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
                     $this->createVaulting($result, $paypal_customer);
                 }

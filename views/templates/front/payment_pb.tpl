@@ -37,7 +37,7 @@
                         <input type="checkbox" name="save_account_in_vault"/> <span> {l s='Memorize my paypal account' mod='paypal'}</span>
                     </div>
                 {/if}
-                {if $active_vaulting && isset($payment_methods)}
+                {if $active_vaulting && isset($payment_methods) && !empty($payment_methods)}
                     <div id="bt-vault-form">
                         <p><b>{l s='Choose your paypal account' mod='paypal'}:</b></p>
                         <select name="pbt_vaulting_token" class="form-control">

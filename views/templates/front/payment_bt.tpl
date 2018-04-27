@@ -58,7 +58,7 @@
                         </div>
                     {/if}
                     <div id="logo_braintree_by_paypal"><img src="https://s3-us-west-1.amazonaws.com/bt-partner-assets/paypal-braintree.png" height="20px"></div>
-                    {if $active_vaulting && isset($payment_methods)}
+                    {if $active_vaulting && isset($payment_methods) && !empty($payment_methods)}
                         <div id="bt-vault-form">
                          <p><b>{l s='Choose your card' mod='paypal'}:</b></p>
                             <select name="bt_vaulting_token" class="form-control">
