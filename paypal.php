@@ -173,9 +173,9 @@ class PayPal extends PaymentModule
               `id_paypal_vaulting` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
               `id_paypal_customer` INT(11),
               `token` VARCHAR(255),
-              `name_card` VARCHAR(255),
-              `info_card` VARCHAR(255),
-              `method` VARCHAR(255),
+              `name` VARCHAR(255),
+              `info` VARCHAR(255),
+              `payment_tool` VARCHAR(255),
               `date_add` DATETIME,
               `date_upd` DATETIME
         ) ENGINE = " . _MYSQL_ENGINE_ ;

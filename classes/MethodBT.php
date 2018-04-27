@@ -545,18 +545,18 @@ class MethodBT extends AbstractMethodPaypal
     {
         $vaulting = new PaypalVaulting();
         $vaulting->id_paypal_customer = $paypal_customer->id;
-        $vaulting->method = Tools::getValue('payment_method_bt');
+        $vaulting->payment_tool = Tools::getValue('payment_method_bt');
         if (Tools::getValue('payment_method_bt') == BT_CARD_PAYMENT) {
             $vaulting->token = $result->transaction->creditCard['token'];
-            $vaulting->info_card = $result->transaction->creditCard['cardType'].': *';
-            $vaulting->info_card .= $result->transaction->creditCard['last4'].' ';
-            $vaulting->info_card .= $result->transaction->creditCard['expirationMonth'].'/';
-            $vaulting->info_card .= $result->transaction->creditCard['expirationYear'];
+            $vaulting->info = $result->transaction->creditCard['cardType'].': *';
+            $vaulting->info .= $result->transaction->creditCard['last4'].' ';
+            $vaulting->info .= $result->transaction->creditCard['expirationMonth'].'/';
+            $vaulting->info .= $result->transaction->creditCard['expirationYear'];
         } elseif (Tools::getValue('payment_method_bt') == BT_PAYPAL_PAYMENT) {
             $vaulting->token = $result->transaction->paypal['token'];
-            $vaulting->info_card = $result->transaction->paypal['payerFirstName'].' ';
-            $vaulting->info_card .= $result->transaction->paypal['payerLastName'].' ';
-            $vaulting->info_card .= $result->transaction->paypal['payerEmail'];
+            $vaulting->info = $result->transaction->paypal['payerFirstName'].' ';
+            $vaulting->info .= $result->transaction->paypal['payerLastName'].' ';
+            $vaulting->info .= $result->transaction->paypal['payerEmail'];
         }
         $vaulting->save();
     }
@@ -588,6 +588,12 @@ class MethodBT extends AbstractMethodPaypal
         $customer->method = 'BT';
         $customer->save();
         return $customer;
+    }
+
+    public function deleteVaultedMethod($payment_method)
+    {
+        $this->initConfig();
+        $this->gateway->paymentMethod()->delete($payment_method->token);
     }
 
     public function isValidStatus($status)

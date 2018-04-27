@@ -65,12 +65,12 @@
                             <option value="">{l s='Choose your card' mod='paypal'}</option>
                             {foreach from=$payment_methods key=method_key  item=method}
                                 <option value="{$method.token|escape:'htmlall':'UTF-8'}" data-nonce="{$method.nonce}">
-                                    {if $method.name_card}{$method.name_card|escape:'htmlall':'UTF-8'} - {/if}
-                                    {$method.info_card|escape:'htmlall':'UTF-8'}
+                                    {if $method.name}{$method.name|escape:'htmlall':'UTF-8'} - {/if}
+                                    {$method.info|escape:'htmlall':'UTF-8'}
                                 </option>
                                 {*<p class="method">
                                     <input type="radio" value="{$method.token|escape:'htmlall':'UTF-8'}" name="paypal_vaulting_token" />
-                                    {$method.info_card|escape:'htmlall':'UTF-8'}
+                                    {$method.info|escape:'htmlall':'UTF-8'}
                                 </p>*}
                             {/foreach}
                             </select>

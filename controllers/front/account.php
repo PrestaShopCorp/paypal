@@ -44,17 +44,19 @@ class PaypalAccountModuleFrontController extends ModuleFrontController
     {
         if (Tools::getValue('process') == 'delete') {
             $id = (int)Tools::getValue('id_method');
-            $method = new PaypalVaulting($id);
-            $method->delete();
+            $payment_method = new PaypalVaulting($id);
+            $method = AbstractMethodPaypal::load(Tools::getValue('method'));
+            $method->deleteVaultedMethod($payment_method);
+            $payment_method->delete();
         }
         if (Tools::getValue('process') == 'save') {
             $all_values = Tools::getAllValues();
             foreach ($all_values as $key => $value) {
                 $val_arr = explode('_', $key);
                 if ($val_arr[0] == 'name') {
-                    $method = new PaypalVaulting($val_arr[1]);
-                    $method->name_card = $value;
-                    $method->save();
+                    $payment_method = new PaypalVaulting($val_arr[1]);
+                    $payment_method->name = $value;
+                    $payment_method->save();
                 }
             }
         }
@@ -67,10 +69,10 @@ class PaypalAccountModuleFrontController extends ModuleFrontController
     {
         parent::initContent();
 
-        $methods = PaypalVaulting::getCustomerAllMethods($this->context->customer->id);
+        $methods = PaypalVaulting::getCustomerGroupedMethods($this->context->customer->id);
 //echo '<pre>';print_r($methods);die;
         $this->context->smarty->assign(array(
-            'methods'                 => $methods,
+            'payment_methods'                 => $methods,
         ));
         $this->setTemplate('module:paypal/views/templates/front/payment_methods.tpl');
     }

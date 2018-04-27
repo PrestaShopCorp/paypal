@@ -30,11 +30,11 @@ class PaypalVaulting extends ObjectModel
 
     public $id_paypal_customer;
 
-    public $name_card; // client can set card name in prestashop account
+    public $name; // client can set card name in prestashop account
 
-    public $info_card;
+    public $info;
 
-    public $method; // card ou paypal, etc...
+    public $payment_tool; // card ou paypal, etc...
 
     public $date_add;
 
@@ -50,9 +50,9 @@ class PaypalVaulting extends ObjectModel
         'fields' => array(
             'token' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'id_paypal_customer' => array('type' => self::TYPE_INT),
-            'name_card' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
-            'info_card' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
-            'method' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'name' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'info' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'payment_tool' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
         )
@@ -76,22 +76,25 @@ class PaypalVaulting extends ObjectModel
         $query->select('*');
         $query->from('paypal_vaulting', 'pv');
         $query->leftJoin('paypal_customer','pc','pv.id_paypal_customer = pc.id_paypal_customer');
-        $query->where('pc.id_customer = '.(int)$customer.' AND pv.method = "'.pSQL($method).'"');
+        $query->where('pc.id_customer = '.(int)$customer.' AND pv.payment_tool = "'.pSQL($method).'"');
         $result = $db->executeS($query);
         return $result;
     }
 
-    public static function getCustomerAllMethods($customer)
+    public static function getCustomerGroupedMethods($customer)
     {
         $db = Db::getInstance();
+        $methods = array();
         $query = new DbQuery();
         $query->select('*');
         $query->from('paypal_vaulting', 'pv');
         $query->leftJoin('paypal_customer','pc','pv.id_paypal_customer = pc.id_paypal_customer');
         $query->where('pc.id_customer = '.(int)$customer);
-
-        $result = $db->executeS($query);
-        return $result;
+        $results = $db->query($query);
+        while ($result = $db->nextRow($results)) {
+            $methods[$result['payment_tool']][] = $result;
+        }
+        return $methods;
     }
 
 }
