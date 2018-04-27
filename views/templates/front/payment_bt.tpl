@@ -61,7 +61,7 @@
                     {if $active_vaulting && isset($payment_methods)}
                         <div id="bt-vault-form">
                          <p><b>{l s='Choose your card' mod='paypal'}:</b></p>
-                            <select name="paypal_vaulting_token" class="form-control">
+                            <select name="bt_vaulting_token" class="form-control">
                             <option value="">{l s='Choose your card' mod='paypal'}</option>
                             {foreach from=$payment_methods key=method_key  item=method}
                                 <option value="{$method.token|escape:'htmlall':'UTF-8'}" data-nonce="{$method.nonce}">

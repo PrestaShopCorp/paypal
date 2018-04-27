@@ -94,7 +94,7 @@
                     event.stopPropagation();
 
                     // use vaulted card
-                    if ($('select[name=paypal_vaulting_token]').val()) {
+                    if ($('select[name=bt_vaulting_token]').val()) {
                         if (check3DS) {
                             braintree.threeDSecure.create({
                                 client: clientInstance
@@ -114,7 +114,7 @@
                                 }
                             threeDSecure.verifyCard({
                                 amount: bt_amount,
-                                nonce: $('select[name=paypal_vaulting_token] option:checked').data('nonce'),
+                                nonce: $('select[name=bt_vaulting_token] option:checked').data('nonce'),
                                 addFrame: function (err, iframe) {
                                     $.fancybox.open([
                                         {

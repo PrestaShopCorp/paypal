@@ -296,6 +296,8 @@ class MethodBT extends AbstractMethodPaypal
     {
         try {
             $this->initConfig();
+           /* $cc = $this->gateway->customer()->find('815616216');
+            echo '<pre>';print_r($cc);die;*/
             $clientToken = $this->gateway->clientToken()->generate();
             return $clientToken;
         } catch (Exception $e) {
@@ -416,9 +418,10 @@ class MethodBT extends AbstractMethodPaypal
     {
 
         $this->initConfig();
-
+        //$cc = $this->gateway->customer()->find('815616216');
+       // echo '<pre>';print_r($cc);die;
         $bt_method = Tools::getValue('payment_method_bt');
-
+        $vault_token = '';
         if ($bt_method == BT_PAYPAL_PAYMENT) {
             $options = array(
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
@@ -477,18 +480,26 @@ class MethodBT extends AbstractMethodPaypal
                 "deviceData"            => $device_data,
             ];
 
+            $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, 'BT');
+
+            if (!$paypal_customer->id) {
+                $paypal_customer = $this->createCustomer();
+            } else {
+                $this->updateCustomer($paypal_customer->reference);
+            }
+
             if (Configuration::get('PAYPAL_VAULTING')) {
-                $vault_token = Tools::getValue('paypal_vaulting_token');
-                $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, 'BT');
+                if ($bt_method == BT_CARD_PAYMENT) {
+                    $vault_token = Tools::getValue('bt_vaulting_token');
+                } elseif ($bt_method == BT_PAYPAL_PAYMENT) {
+                    $vault_token = Tools::getValue('pbt_vaulting_token');
+                }
 
                 if ($vault_token && $paypal_customer->id) {
                     if (PaypalVaulting::vaultingExist($vault_token, $paypal_customer->id)) {
                         $data['paymentMethodToken'] = $vault_token;
                     }
                 } else {
-                    if (!$paypal_customer->id) {
-                        $paypal_customer = $this->createCustomer($address_billing, $iso_state);
-                    }
                     if (Tools::getValue('save_card_in_vault') || Tools::getValue('save_account_in_vault')) {
                         $options['storeInVaultOnSuccess'] = true;
                         $data['customerId'] = $paypal_customer->reference;
@@ -504,11 +515,11 @@ class MethodBT extends AbstractMethodPaypal
             $result = $this->gateway->transaction()->sale($data);
 
 
-            //echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
+           // echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING')
-                    && (Tools::getValue('save_card_in_vault'))
+                    && (Tools::getValue('save_card_in_vault') || Tools::getValue('save_account_in_vault'))
                     && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
                     $this->createVaulting($result, $paypal_customer);
                 }
@@ -533,35 +544,41 @@ class MethodBT extends AbstractMethodPaypal
     public function createVaulting($result, $paypal_customer)
     {
         $vaulting = new PaypalVaulting();
-        $vaulting->token = $result->transaction->creditCard['token'];
         $vaulting->id_paypal_customer = $paypal_customer->id;
-        $vaulting->info_card = $result->transaction->creditCard['cardType'].': *';
-        $vaulting->info_card .= $result->transaction->creditCard['last4'].' ';
-        $vaulting->info_card .= $result->transaction->creditCard['expirationMonth'].'/';
-        $vaulting->info_card .= $result->transaction->creditCard['expirationYear'];
         $vaulting->method = Tools::getValue('payment_method_bt');
+        if (Tools::getValue('payment_method_bt') == BT_CARD_PAYMENT) {
+            $vaulting->token = $result->transaction->creditCard['token'];
+            $vaulting->info_card = $result->transaction->creditCard['cardType'].': *';
+            $vaulting->info_card .= $result->transaction->creditCard['last4'].' ';
+            $vaulting->info_card .= $result->transaction->creditCard['expirationMonth'].'/';
+            $vaulting->info_card .= $result->transaction->creditCard['expirationYear'];
+        } elseif (Tools::getValue('payment_method_bt') == BT_PAYPAL_PAYMENT) {
+            $vaulting->token = $result->transaction->paypal['token'];
+            $vaulting->info_card = $result->transaction->paypal['payerFirstName'].' ';
+            $vaulting->info_card .= $result->transaction->paypal['payerLastName'].' ';
+            $vaulting->info_card .= $result->transaction->paypal['payerEmail'];
+        }
         $vaulting->save();
     }
 
-    public function createCustomer($address_billing, $iso_state)
+    public function updateCustomer($id_customer)
     {
         $context = Context::getContext();
-        $country_billing =  new Country($address_billing->id_country);
         $data = [
             'firstName' => $context->customer->firstname,
             'lastName' => $context->customer->lastname,
-            'email' => $context->customer->email,
-            'billingAddress' => [
-                'firstName'         => $address_billing->firstname,
-                'lastName'          => $address_billing->lastname,
-                'company'           => $address_billing->company,
-                'streetAddress'     => $address_billing->address1,
-                'extendedAddress'   => $address_billing->address2,
-                'locality'          => $address_billing->city,
-                'postalCode'        => $address_billing->postcode,
-                'countryCodeAlpha2' => $country_billing->iso_code,
-                'region'            => $iso_state,
-            ]
+            'email' => $context->customer->email
+        ];
+        $this->gateway->customer()->update($id_customer, $data);
+    }
+
+    public function createCustomer()
+    {
+        $context = Context::getContext();
+        $data = [
+            'firstName' => $context->customer->firstname,
+            'lastName' => $context->customer->lastname,
+            'email' => $context->customer->email
         ];
 
         $result = $this->gateway->customer()->create($data);

@@ -89,7 +89,7 @@ function initPaypalBraintree() {
                 if (!$('#pay-with-'+payment_selected+'-form .payment_module').hasClass('paypal-braintree')) {
                     return true;
                 }
-                if (!document.querySelector('input#paypal_payment_method_nonce').value) {
+                if (!document.querySelector('input#paypal_payment_method_nonce').value && !$('select[name=pbt_vaulting_token]').val()) {
                     event.preventDefault();
                     event.stopPropagation();
                     $('#bt-paypal-error-msg').show().text(paypal_braintree.translations.empty_nonce);
