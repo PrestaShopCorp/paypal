@@ -780,8 +780,8 @@ class PayPal extends PaymentModule
                                 if ($paypal_order->payment_status != "settled") {
                                     $paypal_order->payment_status = $transaction->status;
                                     $paypal_order->update();
-                                    $this->setTransactinId($ps_order, $transaction->id);
                                     $ps_order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+                                    $this->setTransactionId($ps_order, $transaction->id);
                                 }
                                 break;
                             case 'settling': // waiting
@@ -800,10 +800,10 @@ class PayPal extends PaymentModule
         }
     }
 
-    public function setTransactinId($ps_order, $transaction_id)
+    public function setTransactionId($ps_order, $transaction_id)
     {
         Db::getInstance()->update('order_payment', array(
-            'transaction_id' => '"'.pSQL($transaction_id).'"',
+            'transaction_id' => pSQL($transaction_id),
         ), 'order_reference = "'.pSQL($ps_order->reference).'"');
     }
 
@@ -1478,14 +1478,14 @@ class PayPal extends PaymentModule
 
     public function hookDisplayCustomerAccount()
     {
-        if (Configuration::get('PAYPAL_VAULTING')) {
+        if (Configuration::get('PAYPAL_METHOD') == 'BT' && Configuration::get('PAYPAL_VAULTING')) {
             return $this->display(__FILE__, 'my-account.tpl');
         }
     }
 
     public function hookDisplayMyAccountBlock()
     {
-        if (Configuration::get('PAYPAL_VAULTING')) {
+        if (Configuration::get('PAYPAL_METHOD') == 'BT' && Configuration::get('PAYPAL_VAULTING')) {
             return $this->display(__FILE__, 'my-account-footer.tpl');
         }
     }
