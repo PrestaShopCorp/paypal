@@ -296,7 +296,7 @@ class MethodBT extends AbstractMethodPaypal
     {
         try {
             $this->initConfig();
-           /* $cc = $this->gateway->customer()->find('815616216');
+           /* $cc = $this->gateway->customer()->find('280691121');
             echo '<pre>';print_r($cc);die;*/
             $clientToken = $this->gateway->clientToken()->generate();
             return $clientToken;
@@ -487,7 +487,7 @@ class MethodBT extends AbstractMethodPaypal
             } else {
                 $this->updateCustomer($paypal_customer->reference);
             }
-
+           // echo '<pre>';print_r($paypal_customer);die;
             if (Configuration::get('PAYPAL_VAULTING')) {
                 if ($bt_method == BT_CARD_PAYMENT) {
                     $vault_token = Tools::getValue('bt_vaulting_token');
@@ -515,7 +515,7 @@ class MethodBT extends AbstractMethodPaypal
             $result = $this->gateway->transaction()->sale($data);
 
 
-           // echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
+            //echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING')

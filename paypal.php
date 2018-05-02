@@ -1217,6 +1217,17 @@ class PayPal extends PaymentModule
         }
     }
 
+    public function hookActionOrderStatusPostUpdate(&$params)
+    {
+        if ($params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
+            $capture = PaypalCapture::getByOrderId($params['id_order']);
+            $ps_order = new Order($params['id_order']);
+            if ($capture['id_capture']) {
+                $this->setTransactionId($ps_order, $capture['id_capture']);
+            }
+        }
+    }
+
 
     public function hookActionOrderStatusUpdate(&$params)
     {

@@ -32,12 +32,12 @@
                 <input type="hidden" name="payment_method_bt" value="{$bt_method|escape:'htmlall':'UTF-8'}"/>
                 <div id="paypal-button"></div>
                 <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
-                {if $active_vaulting}
+                {if isset($active_vaulting) && $active_vaulting}
                     <div class="save-in-vault">
                         <input type="checkbox" name="save_account_in_vault"/> <span> {l s='Memorize my paypal account' mod='paypal'}</span>
                     </div>
                 {/if}
-                {if $active_vaulting && isset($payment_methods) && !empty($payment_methods)}
+                {if isset($active_vaulting) && isset($payment_methods) && !empty($payment_methods)}
                     <div id="bt-vault-form">
                         <p><b>{l s='Choose your paypal account' mod='paypal'}:</b></p>
                         <select name="pbt_vaulting_token" class="form-control">
