@@ -178,3 +178,4 @@ $_MODULE['<{paypal}prestashop>payment_pb_7bf595e2b494eadf0e7007d10e29d3e0'] = 'C
 $_MODULE['<{paypal}prestashop>ec_shortcut_dac2693baa5c5c9a5318609ed81c4f2a'] = 'Payer avec PayPal';
 $_MODULE['<{paypal}prestashop>ec_shortcut_ad69e733ebae8d264bccaa38d68830e8'] = 'PayPal';
 $_MODULE['<{paypal}prestashop>order_confirmation_9c8ac8395067fc07472fdd8c558798a8'] = 'Numéro de transaction Braintree :';
+$_MODULE['<{paypal}prestashop>payment_sc_328c5b4ed5c1eeb46038ac1e76447092'] = 'Vous êtes sur le point de payer avec votre compte PayPal';

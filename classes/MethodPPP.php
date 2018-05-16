@@ -374,7 +374,7 @@ class MethodPPP extends AbstractMethodPaypal
             $item = new Item();
             $item->setName(Tools::substr($product['name'], 0, 126))
                 ->setCurrency($currency)
-                ->setDescription($product['attributes'])
+                ->setDescription(isset($product['attributes']) ? $product['attributes'] : '')
                 ->setQuantity($product['quantity'])
                 ->setSku($product['id_product']) // Similar to `item_number` in Classic API
                 ->setPrice($this->formatPrice($product['price']));

@@ -54,6 +54,7 @@ class PaypalEcValidationModuleFrontController extends ModuleFrontController
         //unset cookie of payment init
         Context::getContext()->cookie->__unset('paypal_ecs');
         Context::getContext()->cookie->__unset('paypal_ecs_payerid');
+        Context::getContext()->cookie->__unset('paypal_ecs_email');
 
         Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$paypal->id.'&id_order='.$paypal->currentOrder.'&key='.$customer->secure_key);
     }

@@ -138,6 +138,7 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
 
         $this->context->cookie->__set('paypal_ecs', $info->GetExpressCheckoutDetailsResponseDetails->Token);
         $this->context->cookie->__set('paypal_ecs_payerid', $info->GetExpressCheckoutDetailsResponseDetails->PayerInfo->PayerID);
+        $this->context->cookie->__set('paypal_ecs_email', $info->GetExpressCheckoutDetailsResponseDetails->PayerInfo->Payer);
         Tools::redirect($this->context->link->getPageLink('order', null, null, array('step'=>2)));
     }
 }

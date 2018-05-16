@@ -23,8 +23,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 <p id="paypal-es-checked" style="display: none">
-    {l s='You have already payed with PayPal express checkout.' mod='paypal'}
+    {l s='You are about to pay with your PayPal account' mod='paypal'} {$paypal_account_email|escape:'htmlall':'UTF-8'}
 </p>
 <p id="paypal-ppp-checked" style="display: none">
-    {l s='You have already payed with PayPal Plus checkout.' mod='paypal'}
+    {l s='You are about to pay with your PayPal account' mod='paypal'} {$paypal_account_email|escape:'htmlall':'UTF-8'}
 </p>

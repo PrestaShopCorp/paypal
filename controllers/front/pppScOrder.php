@@ -132,6 +132,7 @@ class PaypalPppScOrderModuleFrontController extends ModuleFrontController
 
         $this->context->cookie->__set('paypal_pSc', $info->id);
         $this->context->cookie->__set('paypal_pSc_payerid', $payer_info->payer_id);
+        $this->context->cookie->__set('paypal_pSc_email', $payer_info->email);
         Tools::redirect($this->context->link->getPageLink('order', null, null, array('step'=>2)));
     }
 }

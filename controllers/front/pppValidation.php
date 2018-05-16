@@ -55,6 +55,7 @@ class PaypalPppValidationModuleFrontController extends ModuleFrontController
 
         Context::getContext()->cookie->__unset('paypal_pSc');
         Context::getContext()->cookie->__unset('paypal_pSc_payerid');
+        Context::getContext()->cookie->__unset('paypal_pSc_email');
 
         Tools::redirect('index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$paypal->id.'&id_order='.$paypal->currentOrder.'&key='.$customer->secure_key);
     }

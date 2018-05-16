@@ -625,6 +625,9 @@ class PayPal extends PaymentModule
                         $payment_options->setCallToActionText($action_text);
                         $payment_options->setModuleName('express_checkout_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
+                        $this->context->smarty->assign(array(
+                            'paypal_account_email' => $this->context->cookie->paypal_ecs_email,
+                        ));
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_sc.tpl'));
                         $payments_options[] = $payment_options;
                     }
@@ -681,6 +684,9 @@ class PayPal extends PaymentModule
                         $payment_options->setCallToActionText($action_text);
                         $payment_options->setModuleName('paypal_plus_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'pppValidation', array('shortcut'=>'1'), true));
+                        $this->context->smarty->assign(array(
+                            'paypal_account_email' => $this->context->cookie->paypal_pSc_email,
+                        ));
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_sc.tpl'));
                         $payments_options[] = $payment_options;
                     }
@@ -734,7 +740,7 @@ class PayPal extends PaymentModule
             }
         }
         if (Tools::getValue('controller') == "product" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
-            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
+            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT') && Configuration::get('PAYPAL_METHOD') == 'EC') {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
                 Media::addJsDef(array(
                     'ec_sc_in_context' => 1,
@@ -1118,11 +1124,13 @@ class PayPal extends PaymentModule
             //unset cookie of payment init if it's no more same cart
             Context::getContext()->cookie->__unset('paypal_ecs');
             Context::getContext()->cookie->__unset('paypal_ecs_payerid');
+            Context::getContext()->cookie->__unset('paypal_ecs_email');
         }
         if (isset($this->context->cookie->paypal_pSc) || isset($this->context->cookie->paypal_pSc_payerid)) {
             //unset cookie of payment init if it's no more same cart
             Context::getContext()->cookie->__unset('paypal_pSc');
             Context::getContext()->cookie->__unset('paypal_pSc_payerid');
+            Context::getContext()->cookie->__unset('paypal_pSc_email');
         }
     }
 
