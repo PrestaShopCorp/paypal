@@ -15,11 +15,19 @@
 
 $(document).ready(function(){
     if ($('section#checkout-payment-step').hasClass('js-current-step')) {
-        initPaypalBraintree();
+        initPaypalBraintree('checkout');
     }
+    $(document).on('change', 'input[name=save_account_in_vault]', function(){
+        $('#paypal-button').html('');
+        if ($(this).is(':checked')) {
+            initPaypalBraintree('vault');
+        } else {
+            initPaypalBraintree('checkout');
+        }
+    });
 });
 
-function initPaypalBraintree() {
+function initPaypalBraintree(flow) {
     var paypal_bt_form = document.querySelector('#paypal-braintree-form');
 
     braintree.client.create({
@@ -52,7 +60,7 @@ function initPaypalBraintree() {
 
                 payment: function () {
                     return paypalCheckoutInstance.createPayment({
-                        flow: paypal_braintree.flow,
+                        flow: flow,
                         amount : paypal_braintree.amount,
                         currency : paypal_braintree.currency,
                         billingAgreementDescription: '',

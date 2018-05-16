@@ -863,7 +863,6 @@ class PayPal extends PaymentModule
             'path' => $this->_path,
             'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
             'bt_method' => BT_PAYPAL_PAYMENT,
-            'flow' => Configuration::get('PAYPAL_VAULTING') ? 'vault' : 'checkout',
             'active_vaulting'=> Configuration::get('PAYPAL_VAULTING'),
             'currency' => $this->context->currency->iso_code,
         ));

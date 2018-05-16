@@ -64,7 +64,6 @@
         authorization : '{$braintreeToken}',
         amount : {$braintreeAmount},
         mode : '{$mode}',
-        flow : '{$flow}',
         currency : '{$currency}'
     };
     paypal_braintree.translations = {
