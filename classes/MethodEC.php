@@ -150,12 +150,13 @@ class MethodEC extends AbstractMethodPaypal
                 'label' => $module->l('Brand name'),
                 'name' => 'config_brand',
                 'placeholder' => $module->l('Leave it empty to use your Shop name'),
+                'hint' => $module->l('A label that overrides the business name in the PayPal account on the PayPal pages.'),
             ),
             array(
                 'type' => 'file',
                 'label' => $module->l('Shop logo field'),
                 'name' => 'config_logo',
-                'hint' => $module->l('An image must be stored on a secure (https) server. Leave it empty to use your default shop logo'),
+                'hint' => $module->l('An image must be stored on a secure (https) server. Use a valid graphics format, such as .gif, .jpg, or .png. Limit the image to 190 pixels wide by 60 pixels high. PayPal crops images that are larger. This logo will replace brand name  at the top of the cart review area.'),
                 'thumb' => file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png':'',
             ),
         ));
@@ -277,6 +278,15 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', $params['paypal_ec_in_context']);
             Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
             if (isset($_FILES['config_logo']['tmp_name']) && $_FILES['config_logo']['tmp_name'] != '') {
+                if (!in_array($_FILES['config_logo']['type'], array('image/gif', 'image/png', 'image/jpeg'))) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Use a valid graphics format, such as .gif, .jpg, or .png.'));
+                    return;
+                }
+                $size = getimagesize($_FILES['config_logo']['tmp_name']);
+                if ($size[0] > 190 || $size[1] > 60) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Limit the image to 190 pixels wide by 60 pixels high.'));
+                    return;
+                }
                 if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
                     !move_uploaded_file($_FILES['config_logo']['tmp_name'], $tmpName)) {
                     $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));

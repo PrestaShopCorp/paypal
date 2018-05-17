@@ -104,6 +104,7 @@ class MethodBT extends AbstractMethodPaypal
                 'label' => $module->l('Brand name'),
                 'name' => 'config_brand',
                 'placeholder' => $module->l('Leave it empty to use your Shop name'),
+                'hint' => $module->l('A label that overrides the business name in the PayPal account on the PayPal pages.'),
             ),
             array(
                 'type' => 'switch',

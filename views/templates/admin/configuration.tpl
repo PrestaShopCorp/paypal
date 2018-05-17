@@ -380,6 +380,16 @@
         $('#configuration_form').insertAfter($('.configuration-block'));
         $('#configuration_form_1').insertAfter($('.configuration-block'));
 
+        $('input[name=paypal_ec_in_context]').on("change", function(){
+            if (this.value == 0) {
+                $('#config_logo-name').parents('.form-group').hide();
+            } else {
+                $('#config_logo-name').parents('.form-group').show();
+            }
+        });
+        if ($('input[name=paypal_ec_in_context]:checked').val() == 0) {
+            $('#config_logo-name').parents('.form-group').hide();
+        }
     });
 
 </script>
