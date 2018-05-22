@@ -1455,11 +1455,12 @@ class PayPal extends PaymentModule
             'last_name'     => $this->context->employee->lastname,
             'shop_name'     => Configuration::get('PS_SHOP_NAME', null, null, null, ''),
             'ref_merchant'  => 'PrestaShop_'.(getenv('PLATEFORM') == 'PSREADY' ? 'Ready':''),
+            'ps_version'    => _PS_VERSION_,
+            'pp_version'    => $this->version,
         );
 
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
+        $response = "https://partners-subscribe.prestashop.com/paypal/request.php?".http_build_query($partner_info, '', '&');
 
-        $response = $sdk->getUrlOnboarding($partner_info);
         return $response;
     }
 

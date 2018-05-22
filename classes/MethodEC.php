@@ -316,14 +316,7 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_CARD', $params['with_card']);
             if ((isset($params['modify']) && $params['modify']) || (Configuration::get('PAYPAL_METHOD') != $params['method'])) {
                 $response = $paypal->getPartnerInfo($params['method']);
-                $result = Tools::jsonDecode($response);
-
-                if (!$result->error && isset($result->data->url)) {
-                    $PartnerboardingURL = $result->data->url;
-                    Tools::redirectLink($PartnerboardingURL);
-                } else {
-                    $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
-                }
+                Tools::redirectLink($response);
             }
         }
 
