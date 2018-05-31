@@ -479,7 +479,7 @@ class MethodEC extends AbstractMethodPaypal
         $subtotal = $this->formatPrice($summary['total_products']);
         $total_tax = number_format($this->_taxTotalValue, Paypal::getDecimal(), ".", '');
         // total shipping amount
-        $shippingTotal = new BasicAmountType($currency, $this->formatPrice($shipping));
+        $shippingTotal = new BasicAmountType($currency, $shipping);
         //total handling amount if any
         $handlingTotal = new BasicAmountType($currency, number_format(0, Paypal::getDecimal(), ".", ''));
         //total insurance amount if any
