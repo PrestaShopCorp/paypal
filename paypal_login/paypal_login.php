@@ -224,8 +224,9 @@ class PayPalLogin
     private function setCustomer($result)
     {
         $customer = new Customer();
-        $customer->firstname = $result->given_name;
-        $customer->lastname = $result->family_name;
+        $full_name_arr = strpos($result->name," ");
+        $customer->firstname = substr($result->name,0,$full_name_arr);
+        $customer->lastname = substr($result->name,$full_name_arr);
         if (version_compare(_PS_VERSION_, '1.5.3.1', '>')) {
             $customer->id_lang = Language::getIdByIso(strstr($result->language, '_', true));
         }
