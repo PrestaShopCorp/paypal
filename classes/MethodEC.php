@@ -156,11 +156,12 @@ class MethodEC extends AbstractMethodPaypal
                 'type' => 'file',
                 'label' => $module->l('Shop logo field'),
                 'name' => 'config_logo',
+                'display_image' => true,
+                'image' => file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?'<img src="'.Context::getContext()->link->getBaseLink().'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png" class="img img-thumbnail" />':'',
+                'delete_url' => $module->module_link.'&deleteLogoPp=1',
                 'hint' => $module->l('An image must be stored on a secure (https) server. Use a valid graphics format, such as .gif, .jpg, or .png. Limit the image to 190 pixels wide by 60 pixels high. PayPal crops images that are larger. This logo will replace brand name  at the top of the cart review area.'),
-                'thumb' => file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png':'',
             ),
         ));
-
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
@@ -296,6 +297,11 @@ class MethodEC extends AbstractMethodPaypal
                 }
                 Configuration::updateValue('PAYPAL_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png');
             }
+        }
+
+        if (Tools::getValue('deleteLogoPp')) {
+            unlink(Configuration::get('PAYPAL_CONFIG_LOGO'));
+            Configuration::updateValue('PAYPAL_CONFIG_LOGO', '');
         }
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));

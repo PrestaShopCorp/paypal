@@ -95,6 +95,11 @@ class MethodPPP extends AbstractMethodPaypal
             }
         }
 
+        if (Tools::getValue('deleteLogoPp')) {
+            unlink(Configuration::get('PAYPAL_PPP_CONFIG_LOGO'));
+            Configuration::updateValue('PAYPAL_PPP_CONFIG_LOGO', '');
+        }
+
         if (Tools::isSubmit('save_credentials')) {
             $sandbox = Tools::getValue('sandbox');
             $live = Tools::getValue('live');
@@ -142,8 +147,10 @@ class MethodPPP extends AbstractMethodPaypal
                 'type' => 'file',
                 'label' => $module->l('Shop logo field'),
                 'name' => 'ppp_config_logo',
+                'display_image' => true,
+                'delete_url' => $module->module_link.'&deleteLogoPp=1',
                 'hint' => $module->l('An image must be stored on a secure (https) server. Use a valid graphics format, such as .gif, .jpg, or .png. Limit the image to 190 pixels wide by 60 pixels high. PayPal crops images that are larger. This logo will replace brand name  at the top of the cart review area.'),
-                'thumb' => file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png')?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png':''
+                'image' => file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png')?'<img src="'.Context::getContext()->link->getBaseLink().'modules/paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png" class="img img-thumbnail" />':''
             ),
             array(
                 'type' => 'switch',
