@@ -111,6 +111,7 @@ class MethodBT extends AbstractMethodPaypal
                 'label' => $module->l('Activate Vaulting'),
                 'name' => 'paypal_vaulting',
                 'is_bool' => true,
+                'hint' => $module->l('Secure storage of customer information within the Braintree Vault used to process payment transactions so your customers do not have to re-enter their information each time they make a purchase on your website.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_vaulting_on',
