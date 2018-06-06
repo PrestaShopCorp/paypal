@@ -207,6 +207,7 @@ class MethodEC extends AbstractMethodPaypal
             'ec_paypal_active' => !Configuration::get('PAYPAL_API_CARD'),
             'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_UP) ? 0 : 1),
             'ec_active' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT'),
+            'ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
 
         if (Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM || Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_UP) {
