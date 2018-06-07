@@ -1457,6 +1457,7 @@ class PayPal extends PaymentModule
             'ref_merchant'  => 'PrestaShop_'.(getenv('PLATEFORM') == 'PSREADY' ? 'Ready':''),
             'ps_version'    => _PS_VERSION_,
             'pp_version'    => $this->version,
+            'sandbox'       => Configuration::get('PAYPAL_SANDBOX') ? "true" : '',
         );
 
         $response = "https://partners-subscribe.prestashop.com/paypal/request.php?".http_build_query($partner_info, '', '&');
