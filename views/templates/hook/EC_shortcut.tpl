@@ -39,4 +39,4 @@
 </div>
 <div class="clearfix"></div>
 <script type="text/javascript" src="https://www.paypalobjects.com/api/checkout.js"></script>
-<script type="text/javascript" src="/modules/paypal/views/js/shortcut.js"></script>
+<script type="text/javascript" src="{$shop_url}modules/paypal/views/js/shortcut.js"></script>

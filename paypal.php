@@ -57,7 +57,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '4.4.0';
+        $this->version = '4.3.0';
         $this->author = 'PrestaShop';
         $this->display = 'view';
         $this->module_key = '336225a5988ad434b782f2d868d7bfcd';
@@ -253,7 +253,11 @@ class PayPal extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
-            $order_state->add();
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'paypal/views/img/os_braintree.png';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING', (int) $order_state->id);
         }
         if (!Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION')
@@ -273,7 +277,11 @@ class PayPal extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
-            $order_state->add();
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'paypal/views/img/os_braintree.png';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION', (int) $order_state->id);
         }
         return true;
@@ -438,6 +446,11 @@ class PayPal extends PaymentModule
             ));
         }
 
+        if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+            $hint = $this->l('Set up a test environment in your Braintree account (only if you are a developer)');
+        } else {
+            $hint = $this->l('Set up a test environment in your PayPal account (only if you are a developer)');
+        }
 
         $fields_form = array();
         $inputs = array(
@@ -446,7 +459,7 @@ class PayPal extends PaymentModule
                 'label' => $this->l('Activate sandbox'),
                 'name' => 'paypal_sandbox',
                 'is_bool' => true,
-                'hint' => $this->l('Set up a test environment in your PayPal account (only if you are a developer)'),
+                'hint' => $hint,
                 'values' => array(
                     array(
                         'id' => 'paypal_sandbox_on',
@@ -712,9 +725,6 @@ class PayPal extends PaymentModule
                     $this->context->controller->registerJavascript($this->name . '-braintreejs', 'modules/' . $this->name . '/views/js/payment_bt.js');
                 }
                 if (Configuration::get('PAYPAL_BY_BRAINTREE')) {
-                    Media::addJsDef(array(
-                        'pbt_brand_title' => Configuration::get('PAYPAL_CONFIG_BRAND') ? Configuration::get('PAYPAL_CONFIG_BRAND') : Configuration::get('PS_SHOP_NAME'),
-                    ));
                     $this->context->controller->registerJavascript($this->name . '-pp-braintree-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-pp-braintree-checkout-min', 'https://js.braintreegateway.com/web/3.24.0/js/paypal-checkout.min.js', array('server' => 'remote'));
                     $this->context->controller->registerJavascript($this->name . '-pp-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
@@ -1092,13 +1102,23 @@ class PayPal extends PaymentModule
             );
         }
         if ($order->current_state == Configuration::get('PS_OS_REFUND') &&  $paypal_order->payment_status == 'Refunded') {
+            if ($paypal_order->method == 'BT') {
+                $msg = $this->l('Your order is fully refunded by Braintree.');
+            } else {
+                $msg = $this->l('Your order is fully refunded by PayPal.');
+            }
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">'.$this->l('Your order is fully refunded by PayPal.').'</p>'
+                '<p class="paypal-warning">'.$msg.'</p>'
             );
         }
         if ($order->current_state == Configuration::get('PS_OS_PAYMENT') && Validate::isLoadedObject($paypal_capture) && $paypal_capture->id_capture) {
+            if ($paypal_order->method == 'BT') {
+                $msg = $this->l('Your order is fully captured by Braintree.');
+            } else {
+                $msg = $this->l('Your order is fully captured by PayPal.');
+            }
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">'.$this->l('Your order is fully captured by PayPal.').'</p>'
+                '<p class="paypal-warning">'.$msg.'</p>'
             );
         }
         if (Tools::getValue('error_capture')) {
@@ -1153,8 +1173,6 @@ class PayPal extends PaymentModule
     {
         if (Tools::isSubmit('doPartialRefundPaypal')) {
             $paypal_order = PaypalOrder::loadByOrderId($params['order']->id);
-           // echo '<pre>';print_r(Tools::getAllValues());die;
-
 
             if (!Validate::isLoadedObject($paypal_order)) {
                 return false;

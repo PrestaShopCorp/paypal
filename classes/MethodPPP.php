@@ -682,14 +682,16 @@ class MethodPPP extends AbstractMethodPaypal
 
         $lang = $context->country->iso_code;
         $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
-        $img_esc = "/modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
+        $img_esc = "modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
 
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
-            $img_esc = "/modules/paypal/views/img/ECShortcut/us/buy/buy.png";
+            $img_esc = "modules/paypal/views/img/ECShortcut/us/buy/buy.png";
         }
+        $shop_url = Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true);
         $context->smarty->assign(array(
+            'shop_url' => $shop_url,
             'PayPal_payment_type' => $type,
-            'PayPal_img_esc' => $img_esc,
+            'PayPal_img_esc' => $shop_url.$img_esc,
             'action_url' => $context->link->getModuleLink('paypal', 'pppScInit', array(), true),
             'environment' => $environment,
             'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),

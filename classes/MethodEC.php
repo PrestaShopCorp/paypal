@@ -386,9 +386,9 @@ class MethodEC extends AbstractMethodPaypal
         */
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
         /* wrap API method calls on the service object with a try catch */
-       // echo '<pre>';print_r($setECReq);die;
+
         $payment = $paypalService->SetExpressCheckout($setECReq);
-       // echo '<pre>';print_r($setECReq);die;
+
         //You are not signed up to accept payment for digitally delivered goods.
         if (isset($payment->Errors)) {
             throw new Exception('ERROR in SetExpressCheckout', $payment->Errors[0]->ErrorCode);
@@ -832,15 +832,17 @@ class MethodEC extends AbstractMethodPaypal
 
         $lang = $context->country->iso_code;
         $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
-        $img_esc = "/modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
+        $img_esc = "modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
 
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
-            $img_esc = "/modules/paypal/views/img/ECShortcut/us/buy/buy.png";
+            $img_esc = "modules/paypal/views/img/ECShortcut/us/buy/buy.png";
         }
+        $shop_url = Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true);
         $context->smarty->assign(array(
+            'shop_url' => $shop_url,
             'PayPal_payment_type' => $type,
             'PayPal_tracking_code' => 'PRESTASHOP_ECM',
-            'PayPal_img_esc' => $img_esc,
+            'PayPal_img_esc' => $shop_url.$img_esc,
             'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true),
             'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),

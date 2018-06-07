@@ -34,12 +34,12 @@
                 <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
                 {if isset($active_vaulting) && $active_vaulting}
                     <div class="save-in-vault">
-                        <input type="checkbox" name="save_account_in_vault"/> <span> {l s='Memorize my paypal account' mod='paypal'}</span>
+                        <input type="checkbox" name="save_account_in_vault" id="save_account_in_vault"/> <label for="save_account_in_vault"> {l s='Memorize my PayPal account' mod='paypal'}</label>
                     </div>
                 {/if}
                 {if isset($active_vaulting) && isset($payment_methods) && !empty($payment_methods)}
                     <div id="bt-vault-form">
-                        <p><b>{l s='Choose your paypal account' mod='paypal'}:</b></p>
+                        <p><b>{l s='Choose your PayPal account' mod='paypal'}:</b></p>
                         <select name="pbt_vaulting_token" class="form-control">
                             <option value="">{l s='Choose your paypal account' mod='paypal'}</option>
                             {foreach from=$payment_methods key=method_key  item=method}

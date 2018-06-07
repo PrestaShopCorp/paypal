@@ -65,8 +65,7 @@ function initPaypalBraintree(flow) {
                         currency : paypal_braintree.currency,
                         billingAgreementDescription: '',
                         enableShippingAddress: false,
-                        shippingAddressEditable: false,
-                        displayName: pbt_brand_title
+                        shippingAddressEditable: false
                     });
                 },
 

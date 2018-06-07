@@ -100,13 +100,6 @@ class MethodBT extends AbstractMethodPaypal
                 ),
             ),
             array(
-                'type' => 'text',
-                'label' => $module->l('Brand name'),
-                'name' => 'config_brand',
-                'placeholder' => $module->l('Leave it empty to use your Shop name'),
-                'hint' => $module->l('A label that overrides the business name in the PayPal account on the PayPal pages.'),
-            ),
-            array(
                 'type' => 'switch',
                 'label' => $module->l('Activate Vaulting'),
                 'name' => 'paypal_vaulting',
@@ -158,7 +151,6 @@ class MethodBT extends AbstractMethodPaypal
             'activate_paypal' => Configuration::get('PAYPAL_BY_BRAINTREE'),
             'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
             'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
-            'config_brand' => Configuration::get('PAYPAL_CONFIG_BRAND'),
             'paypal_vaulting' => Configuration::get('PAYPAL_VAULTING'),
         );
         $context = Context::getContext();
@@ -260,7 +252,6 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_USE_3D_SECURE', $params['paypal_3DSecure']);
             Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
-            Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
             Configuration::updateValue('PAYPAL_VAULTING', $params['paypal_vaulting']);
         }
 
@@ -372,7 +363,7 @@ class MethodBT extends AbstractMethodPaypal
         $transaction = $this->sale(context::getContext()->cart, Tools::getValue('payment_method_nonce'), Tools::getValue('deviceData'));
 
         if (!$transaction) {
-            Tools::redirect('index.php?controller=order&step=3&bt_error_msg='.urlencode($this->error));
+            throw new Exception('', '00000');
         }
         $transactionDetail = $this->getDetailsTransaction($transaction);
         if (Configuration::get('PAYPAL_API_INTENT') == "sale" && $transaction->paymentInstrumentType == "paypal_account" && $transaction->status == "settling") { // or submitted for settlement?
@@ -418,10 +409,7 @@ class MethodBT extends AbstractMethodPaypal
 
     public function sale($cart, $token_payment, $device_data)
     {
-
         $this->initConfig();
-        //$cc = $this->gateway->customer()->find('815616216');
-       // echo '<pre>';print_r($cc);die;
         $bt_method = Tools::getValue('payment_method_bt');
         $vault_token = '';
         if ($bt_method == BT_PAYPAL_PAYMENT) {
@@ -489,7 +477,7 @@ class MethodBT extends AbstractMethodPaypal
             } else {
                 $this->updateCustomer($paypal_customer->reference);
             }
-           // echo '<pre>';print_r($paypal_customer);die;
+
             if (Configuration::get('PAYPAL_VAULTING')) {
                 if ($bt_method == BT_CARD_PAYMENT) {
                     $vault_token = Tools::getValue('bt_vaulting_token');
@@ -515,9 +503,6 @@ class MethodBT extends AbstractMethodPaypal
             $data['options'] = $options;
 
             $result = $this->gateway->transaction()->sale($data);
-
-
-            //echo '<pre>';print_r($data);echo '<pre>';print_r($result);die;
 
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING')
@@ -660,7 +645,7 @@ class MethodBT extends AbstractMethodPaypal
             $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
-         //  echo '<pre>';print_r($this->gateway->transaction()->find($id_transaction));die;
+
             $result = $this->gateway->transaction()->refund($id_transaction, number_format($paypal_order->total_paid, 2, ".", ''));
 
             if ($result->success) {

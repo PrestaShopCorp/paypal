@@ -30,6 +30,22 @@
         <div class="braintree-row-payment">
             <div class="payment_module braintree-card">
                 <form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
+
+                    {if isset($active_vaulting) && isset($payment_methods) && !empty($payment_methods)}
+                        <div id="bt-vault-form">
+                            <p><b>{l s='Choose your card' mod='paypal'}:</b></p>
+                            <select name="bt_vaulting_token" class="form-control">
+                                <option value="">{l s='Choose your card' mod='paypal'}</option>
+                                {foreach from=$payment_methods key=method_key  item=method}
+                                    <option value="{$method.token|escape:'htmlall':'UTF-8'}" {if $check3Dsecure} data-nonce="{$method.nonce}"{/if}>
+                                        {if $method.name}{$method.name|escape:'htmlall':'UTF-8'} - {/if}
+                                        {$method.info|escape:'htmlall':'UTF-8'}
+                                    </option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    {/if}
+
                     <div id="block-card-number" class="block_field">
                         <div id="card-number" class="hosted_field"><div id="card-image"></div></div>
 
@@ -54,28 +70,10 @@
                     <div id="bt-card-error-msg"></div>
                     {if isset($active_vaulting) && $active_vaulting}
                         <div class="save-in-vault">
-                            <input type="checkbox" name="save_card_in_vault"/> <span> {l s='Memorize my card' mod='paypal'}</span>
+                            <input type="checkbox" name="save_card_in_vault" id="save_card_in_vault"/> <label for="save_card_in_vault"> {l s='Memorize my card' mod='paypal'}</label>
                         </div>
                     {/if}
                     <div id="logo_braintree_by_paypal"><img src="https://s3-us-west-1.amazonaws.com/bt-partner-assets/paypal-braintree.png" height="20px"></div>
-                    {if isset($active_vaulting) && isset($payment_methods) && !empty($payment_methods)}
-                        <div id="bt-vault-form">
-                         <p><b>{l s='Choose your card' mod='paypal'}:</b></p>
-                            <select name="bt_vaulting_token" class="form-control">
-                            <option value="">{l s='Choose your card' mod='paypal'}</option>
-                            {foreach from=$payment_methods key=method_key  item=method}
-                                <option value="{$method.token|escape:'htmlall':'UTF-8'}" {if $check3Dsecure} data-nonce="{$method.nonce}"{/if}>
-                                    {if $method.name}{$method.name|escape:'htmlall':'UTF-8'} - {/if}
-                                    {$method.info|escape:'htmlall':'UTF-8'}
-                                </option>
-                                {*<p class="method">
-                                    <input type="radio" value="{$method.token|escape:'htmlall':'UTF-8'}" name="paypal_vaulting_token" />
-                                    {$method.info|escape:'htmlall':'UTF-8'}
-                                </p>*}
-                            {/foreach}
-                            </select>
-                        </div>
-                    {/if}
                 </form>
             </div>
         </div>

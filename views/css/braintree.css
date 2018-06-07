@@ -18,14 +18,6 @@
 }
 
 
-.braintree-row-payment label{
-    float: left;
-    margin: 9px 20px 0 0;
-    display:block;
-    width: 200px;
-    text-align: left !important;
-}
-
 .braintree-row-payment .half_block_field .hosted_field {
     width:100%;
 }
@@ -171,18 +163,7 @@
     margin-top: 10px;
     margin-bottom: 15px;
 }
-/*#bt-vault-form .method {
-    margin-bottom: 10px;
-    margin-top: 10px;
-    padding: 5px 10px;
-    border: 1px solid #bfbfbf;
-}
-#bt-vault-form input {
-    width: 100%;
-    visibility: hidden;
-    position: absolute;
-    height: 25px;
-}*/
+
 #bt-vault-form .form-control {
     background: #ffffff;
     border-radius: 5px;
@@ -194,7 +175,11 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
-
+label[for="save_card_in_vault"], label[for="save_account_in_vault"] {
+    display: inline-block !important;
+    padding-left: 5px;
+    vertical-align: text-top;
+}
 @media only screen and (max-width: 500px) {
     .braintree-row-payment .block_field {
         width: 81%;
