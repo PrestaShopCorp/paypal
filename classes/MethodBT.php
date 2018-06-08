@@ -157,6 +157,7 @@ class MethodBT extends AbstractMethodPaypal
         $context->smarty->assign(array(
             'bt_paypal_active' => Configuration::get('PAYPAL_BY_BRAINTREE'),
             'bt_active' => Configuration::get('PAYPAL_BRAINTREE_ENABLED'),
+            'ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
 
 

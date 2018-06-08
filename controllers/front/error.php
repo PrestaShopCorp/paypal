@@ -40,7 +40,7 @@ class PaypalErrorModuleFrontController extends ModuleFrontController
             $error_message = $this->getErrorMsg($error_code);
         }
 
-        $this->context->smarty->assign(array(
+        Context::getContext()->smarty->assign(array(
             'error_paypal' => $error_message,
         ));
 
