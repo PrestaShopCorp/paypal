@@ -390,9 +390,9 @@
         if ($('input[name=paypal_ec_in_context]:checked').val() != 0) {
             $('#config_logo-name').parents('.form-group').hide();
         }
-        var ssl_active = {$ssl_active|escape:'htmlall':'UTF-8'};
+        var ssl_active = "{$ssl_active|escape:'htmlall':'UTF-8'}";
         if ($('#config_logo-images-thumbnails').length && !ssl_active) {
-            $('#config_logo-images-thumbnails').after('{l s='An image is on a insecure (http) server and will not be shown on paypal' mod='paypal'}');
+            $('#config_logo-images-thumbnails').after("{l s='An image is on a insecure (http) server and will not be shown on paypal' mod='paypal'}");
         }
     });
 
