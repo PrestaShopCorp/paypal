@@ -75,7 +75,6 @@ $_MODULE['<{paypal}prestashop>paypal_70af36b4323d7c245c03af81d60ab86e'] = 'PayPa
 $_MODULE['<{paypal}prestashop>paypal_82469d237a242e5de8fee36650f52751'] = 'The nonce that was received is not a valid nonce.';
 $_MODULE['<{paypal}prestashop>paypal_4161303cd12f5ff86ee7f90f3406b609'] = 'A nonce was not provided.';
 $_MODULE['<{paypal}prestashop>paypal_a2a43f01e26245988a2c5bd9e34de48c'] = 'A funding source nonce may only be consumed once.';
-$_MODULE['<{paypal}prestashop>paypal_nonce.';
 $_MODULE['<{paypal}prestashop>paypal_5ed93bca01f9659de9b1567bae9e2c2b'] = 'Amount is an invalid format.';
 $_MODULE['<{paypal}prestashop>paypal_5b09a4c96eaade335373f4541f931372'] = 'Amount cannot be negative.';
 $_MODULE['<{paypal}prestashop>paypal_65f0735a0f42f35a481c03f39c511890'] = 'Credit card type is not accepted by this merchant account.';
