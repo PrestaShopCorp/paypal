@@ -207,7 +207,6 @@ class MethodPPP extends AbstractMethodPaypal
         $context->smarty->assign(array(
             'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
             'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
-            'ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
         if ((Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN))  {
             $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');

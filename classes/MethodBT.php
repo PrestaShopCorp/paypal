@@ -157,7 +157,6 @@ class MethodBT extends AbstractMethodPaypal
         $context->smarty->assign(array(
             'bt_paypal_active' => Configuration::get('PAYPAL_BY_BRAINTREE'),
             'bt_active' => Configuration::get('PAYPAL_BRAINTREE_ENABLED'),
-            'ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
 
 
@@ -290,8 +289,6 @@ class MethodBT extends AbstractMethodPaypal
     {
         try {
             $this->initConfig();
-           /* $cc = $this->gateway->customer()->find('280691121');
-            echo '<pre>';print_r($cc);die;*/
             $clientToken = $this->gateway->clientToken()->generate();
             return $clientToken;
         } catch (Exception $e) {
@@ -504,7 +501,6 @@ class MethodBT extends AbstractMethodPaypal
             $data['options'] = $options;
 
             $result = $this->gateway->transaction()->sale($data);
-
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING')
                     && ((Tools::getValue('save_card_in_vault') && $bt_method == BT_CARD_PAYMENT)
