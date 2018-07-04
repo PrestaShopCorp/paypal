@@ -65,6 +65,7 @@ class MethodPPP extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_PPP_CONFIG_TITLE', $params['ppp_config_title']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_BRAND', $params['ppp_config_brand']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
             if (isset($_FILES['ppp_config_logo']['tmp_name']) && $_FILES['ppp_config_logo']['tmp_name'] != '') {
                 if (!in_array($_FILES['ppp_config_logo']['type'], array('image/gif', 'image/png', 'image/jpeg'))) {
                     $paypal->errors .= $paypal->displayError($paypal->l('Use a valid graphics format, such as .gif, .jpg, or .png.'));
@@ -178,7 +179,7 @@ class MethodPPP extends AbstractMethodPaypal
                 'name' => 'paypal_show_shortcut',
                 'desc' => $module->l(''),
                 'is_bool' => true,
-                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product and shopping cart pages. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
+                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product page. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_show_shortcut_on',
@@ -192,6 +193,25 @@ class MethodPPP extends AbstractMethodPaypal
                     )
                 ),
             ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Enabled Shortcut in cart'),
+                'name' => 'paypal_show_shortcut_cart',
+                'is_bool' => true,
+                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your shopping cart page. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
         ));
 
         $params['fields_value'] = array(
@@ -200,6 +220,7 @@ class MethodPPP extends AbstractMethodPaypal
             'ppp_config_logo' => Configuration::get('PAYPAL_PPP_CONFIG_LOGO'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
             'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
+            'paypal_show_shortcut_cart' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'),
         );
 
 
@@ -673,12 +694,8 @@ class MethodPPP extends AbstractMethodPaypal
         return $sale->payment_instruction;
     }
 
-    public function renderExpressCheckoutShortCut(&$context, $type)
+    public function renderExpressCheckoutShortCut(&$context, $type, $page_source)
     {
-        if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
-            return false;
-        }
-
         $lang = $context->country->iso_code;
         $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
         $img_esc = "modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
@@ -693,9 +710,15 @@ class MethodPPP extends AbstractMethodPaypal
             'PayPal_img_esc' => $shop_url.$img_esc,
             'action_url' => $context->link->getModuleLink('paypal', 'pppScInit', array(), true),
             'environment' => $environment,
-            'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
         ));
 
-        return $context->smarty->fetch('module:paypal/views/templates/hook/PPP_shortcut.tpl');
+        if ($page_source == 'product') {
+            $context->smarty->assign(array(
+                'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
+            ));
+            return $context->smarty->fetch('module:paypal/views/templates/hook/PPP_shortcut.tpl');
+        } elseif ($page_source == 'cart') {
+            return $context->smarty->fetch('module:paypal/views/templates/hook/cart_shortcut.tpl');
+        }
     }
 }

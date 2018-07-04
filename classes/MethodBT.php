@@ -472,8 +472,10 @@ class MethodBT extends AbstractMethodPaypal
 
             if (!$paypal_customer->id) {
                 $paypal_customer = $this->createCustomer();
+                //echo '<pre>create';print_r($paypal_customer);die;
             } else {
-                $this->updateCustomer($paypal_customer->reference);
+                $cc = $this->updateCustomer($paypal_customer->reference);
+                //echo '<pre>update';print_r($cc);die;
             }
 
             if (Configuration::get('PAYPAL_VAULTING')) {

@@ -132,8 +132,11 @@ class PaypalEcScOrderModuleFrontController extends ModuleFrontController
 
         $this->context->cart->id_address_delivery = $id_address;
         $this->context->cart->id_address_invoice = $id_address;
-        $product = $this->context->cart->getProducts();
-        $this->context->cart->setProductAddressDelivery($product[0]['id_product'], $product[0]['id_product_attribute'], $product[0]['id_address_delivery'], $id_address);
+        $products = $this->context->cart->getProducts();
+        foreach ($products as $key => $product) {
+            $this->context->cart->setProductAddressDelivery($product['id_product'], $product['id_product_attribute'], $product['id_address_delivery'], $id_address);
+        }
+
         $this->context->cart->save();
 
         $this->context->cookie->__set('paypal_ecs', $info->GetExpressCheckoutDetailsResponseDetails->Token);

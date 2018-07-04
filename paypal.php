@@ -114,6 +114,7 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_API_CARD', 0)
             || !Configuration::updateValue('PAYPAL_METHOD', '')
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
+            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', 0)
             || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
             || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 0)
@@ -310,6 +311,7 @@ class PayPal extends PaymentModule
             || !$this->registerHook('actionAdminControllerSetMedia')
             || !$this->registerHook('displayMyAccountBlock')
             || !$this->registerHook('displayCustomerAccount')
+            || !$this->registerHook('displayShoppingCartFooter')
         ) {
             return false;
         }
@@ -407,6 +409,17 @@ class PayPal extends PaymentModule
         } else {
             return 'https://pp-ps-auth.com/';
         }
+    }
+
+    public function hookDisplayShoppingCartFooter()
+    {
+        if ('cart' !== $this->context->controller->php_self
+            || (Configuration::get('PAYPAL_METHOD') != 'EC' && Configuration::get('PAYPAL_METHOD') != 'PPP')
+            || !Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) {
+            return false;
+        }
+        $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
+        return $method->renderExpressCheckoutShortCut($this->context, Configuration::get('PAYPAL_METHOD'), 'cart');
     }
 
     public function getContent()
@@ -634,7 +647,7 @@ class PayPal extends PaymentModule
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos_card.tpl'));
                         $payments_options[] = $payment_options;
                     }
-                    if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
+                    if ((Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) && isset($this->context->cookie->paypal_ecs)) {
                         $payment_options = new PaymentOption();
                         $action_text = $this->l('Pay with paypal express checkout');
                         $payment_options->setCallToActionText($action_text);
@@ -693,7 +706,7 @@ class PayPal extends PaymentModule
                         die($e);
                     }
                     $payments_options[] = $payment_options;
-                    if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_pSc)) {
+                    if ((Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) && isset($this->context->cookie->paypal_pSc)) {
                         $payment_options = new PaymentOption();
                         $action_text = $this->l('Pay with paypal plus shortcut');
                         $payment_options->setCallToActionText($action_text);
@@ -751,7 +764,8 @@ class PayPal extends PaymentModule
                 $this->context->controller->addJqueryPlugin('fancybox');
             }
         }
-        if (Tools::getValue('controller') == "product" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
+        if ((Tools::getValue('controller') == "product" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'))
+        || (Tools::getValue('controller') == "cart" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'))) {
             if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT') && Configuration::get('PAYPAL_METHOD') == 'EC') {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
                 Media::addJsDef(array(
@@ -971,11 +985,11 @@ class PayPal extends PaymentModule
 
     public function hookDisplayReassurance()
     {
-        if ('product' !== $this->context->controller->php_self || (Configuration::get('PAYPAL_METHOD') != 'EC' && Configuration::get('PAYPAL_METHOD') != 'PPP')) {
+        if ('product' !== $this->context->controller->php_self || !Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || (Configuration::get('PAYPAL_METHOD') != 'EC' && Configuration::get('PAYPAL_METHOD') != 'PPP')) {
             return false;
         }
         $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
-        return $method->renderExpressCheckoutShortCut($this->context, Configuration::get('PAYPAL_METHOD'));
+        return $method->renderExpressCheckoutShortCut($this->context, Configuration::get('PAYPAL_METHOD'), 'product');
     }
 
     public function needConvert()
