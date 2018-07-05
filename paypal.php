@@ -516,7 +516,7 @@ class PayPal extends PaymentModule
         );
         $helper = new HelperForm();
         $helper->module = $this;
-        $helper->name_controller = $this->name;
+        $helper->name_controller = 'main_form';
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         $helper->title = $this->displayName;
@@ -556,6 +556,9 @@ class PayPal extends PaymentModule
             $result .= $config['block_info'];
         }
         $result .= $this->display(__FILE__, 'views/templates/admin/configuration.tpl').$form;
+        if (isset($config['shortcut'])) {
+            $result .= $config['shortcut'];
+        }
         if (isset($config['form'])) {
             $result .= $config['form'];
         }
@@ -576,7 +579,6 @@ class PayPal extends PaymentModule
         } else {
             $method_name = Configuration::get('PAYPAL_METHOD');
         }
-
 
         if ($method_name) {
             $method = AbstractMethodPaypal::load($method_name);

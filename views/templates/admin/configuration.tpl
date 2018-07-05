@@ -377,9 +377,11 @@
             event.preventDefault();
             $('a[href=#paypal_conf]').click();
         });
-        $('#configuration_form').insertAfter($('.configuration-block'));
-        $('#configuration_form_1').insertAfter($('.configuration-block'));
-
+        $('.main_form').insertAfter($('.configuration-block'));
+        $('.bt_currency_form').insertAfter($('.main_form'));
+        $('.form_shortcut').insertAfter($('.main_form'));
+        $('.form_api_username').insertAfter($('.form_shortcut'));
+        $('.form_shortcut .panel-heading').after("{$shortcut_description}<br/><br/>");
         $('input[name=paypal_ec_in_context]').on("change", function(){
             if (this.value != 0) {
                 $('#config_logo-name').parents('.form-group').hide();

@@ -196,7 +196,7 @@ class MethodBT extends AbstractMethodPaypal
 
         $helper = new HelperForm();
         $helper->module = $module;
-        $helper->name_controller = $module->name;
+        $helper->name_controller = 'bt_currency_form';
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
         $helper->title = $module->displayName;

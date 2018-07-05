@@ -107,44 +107,6 @@ class MethodEC extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Enabled Shortcut on product page'),
-                'name' => 'paypal_show_shortcut',
-                'is_bool' => true,
-                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product page. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
-                'values' => array(
-                    array(
-                        'id' => 'paypal_show_shortcut_on',
-                        'value' => 1,
-                        'label' => $module->l('Enabled'),
-                    ),
-                    array(
-                        'id' => 'paypal_show_shortcut_off',
-                        'value' => 0,
-                        'label' => $module->l('Disabled'),
-                    )
-                ),
-            ),
-            array(
-                'type' => 'switch',
-                'label' => $module->l('Enabled Shortcut in cart'),
-                'name' => 'paypal_show_shortcut_cart',
-                'is_bool' => true,
-                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your shopping cart page. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
-                'values' => array(
-                    array(
-                        'id' => 'paypal_show_shortcut_cart_on',
-                        'value' => 1,
-                        'label' => $module->l('Enabled'),
-                    ),
-                    array(
-                        'id' => 'paypal_show_shortcut_cart_off',
-                        'value' => 0,
-                        'label' => $module->l('Disabled'),
-                    )
-                ),
-            ),
-            array(
-                'type' => 'switch',
                 'label' => $module->l('Enabled In context'),
                 'name' => 'paypal_ec_in_context',
                 'desc' => $module->l(''),
@@ -183,8 +145,6 @@ class MethodEC extends AbstractMethodPaypal
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
-            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
-            'paypal_show_shortcut_cart' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'),
             'paypal_ec_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'paypal_ec_merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.$mode),
             'config_brand' => Configuration::get('PAYPAL_CONFIG_BRAND'),
@@ -234,6 +194,8 @@ class MethodEC extends AbstractMethodPaypal
 
         $params['form'] = $this->getApiUserName($module);
 
+        $params['shortcut'] = $this->createShortcutForm($module);
+
         return $params;
     }
 
@@ -259,7 +221,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $helper = new HelperForm();
         $helper->module = $module;
-        $helper->name_controller = $module->name;
+        $helper->name_controller = 'form_api_username';
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
         $helper->title = $module->displayName;
@@ -272,6 +234,90 @@ class MethodEC extends AbstractMethodPaypal
             'id_language' => Context::getContext()->language->id,
             'back_url' => $module->module_link.'#paypal_params'
         );
+        return $helper->generateForm($fields_form);
+    }
+
+    public function createShortcutForm($module)
+    {
+        $fields_form = array();
+        $fields_form[0]['form'] = array(
+            'legend' => array(
+                'title' => $module->l('PayPal Express Shortcut'),
+                'icon' => 'icon-cogs',
+            ),
+            'submit' => array(
+                'title' => $module->l('Save'),
+                'class' => 'btn btn-default pull-right button',
+            ),
+        );
+
+        $fields_form[0]['form']['input'] = array(
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Display the shortcut on product pages'),
+                'name' => 'paypal_show_shortcut',
+                'is_bool' => true,
+                'hint' => $module->l('Recommended for mono-product websites.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Display shortcut in the cart'),
+                'name' => 'paypal_show_shortcut_cart',
+                'is_bool' => true,
+                'hint' => $module->l('Recommended for multi-products websites.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+        );
+
+        $fields_value = array(
+            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
+            'paypal_show_shortcut_cart' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'),
+        );
+
+        $helper = new HelperForm();
+        $helper->module = $module;
+        $helper->name_controller = 'form_shortcut';
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
+        $helper->title = $module->displayName;
+        $helper->show_toolbar = false;
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = $default_lang;
+        $helper->submit_action = 'submit_shortcut';
+        $helper->allow_employee_form_lang = $default_lang;
+        $helper->tpl_vars = array(
+            'fields_value' => $fields_value,
+            'id_language' => Context::getContext()->language->id,
+            'back_url' => $module->module_link.'#paypal_params'
+        );
+
+        Context::getContext()->smarty->assign(array(
+            'shortcut_description' => $module->l('The PayPal shortcut is displayed directly in the cart or on your product pages, allowing a faster checkout experience for your buyers. It requires fewer pages, clicks and seconds in order to finalize the payment. PayPal provides you with the client’s billing and shipping information so that you don’t have to collect it yourself.'),
+        ));
+
         return $helper->generateForm($fields_form);
     }
 
@@ -291,11 +337,13 @@ class MethodEC extends AbstractMethodPaypal
             Tools::redirect($paypal->module_link);
 
         }
+        if (Tools::isSubmit('submit_shortcut')) {
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
+        }
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
-            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
-            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', $params['paypal_ec_in_context']);
             Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
             if (isset($_FILES['config_logo']['tmp_name']) && $_FILES['config_logo']['tmp_name'] != '') {
