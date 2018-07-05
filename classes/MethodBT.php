@@ -101,10 +101,10 @@ class MethodBT extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Activate Vaulting'),
+                'label' => $module->l('Enable Vault'),
                 'name' => 'paypal_vaulting',
                 'is_bool' => true,
-                'hint' => $module->l('Secure storage of customer information within the Braintree Vault used to process payment transactions so your customers do not have to re-enter their information each time they make a purchase on your website.'),
+                'hint' => $module->l('The Vault is used to process payments so your customers don\'t need to re-enter their information each time they make a purchase from you.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_vaulting_on',
@@ -472,10 +472,8 @@ class MethodBT extends AbstractMethodPaypal
 
             if (!$paypal_customer->id) {
                 $paypal_customer = $this->createCustomer();
-                //echo '<pre>create';print_r($paypal_customer);die;
             } else {
                 $cc = $this->updateCustomer($paypal_customer->reference);
-                //echo '<pre>update';print_r($cc);die;
             }
 
             if (Configuration::get('PAYPAL_VAULTING')) {
@@ -503,6 +501,7 @@ class MethodBT extends AbstractMethodPaypal
             $data['options'] = $options;
 
             $result = $this->gateway->transaction()->sale($data);
+
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
                 if (Configuration::get('PAYPAL_VAULTING')
                     && ((Tools::getValue('save_card_in_vault') && $bt_method == BT_CARD_PAYMENT)

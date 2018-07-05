@@ -89,7 +89,6 @@ class MethodEC extends AbstractMethodPaypal
                 'type' => 'switch',
                 'label' => $module->l('Show PayPal benefits to your customers'),
                 'name' => 'paypal_show_advantage',
-                'desc' => $module->l(''),
                 'is_bool' => true,
                 'hint' => $module->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
                 'values' => array(
@@ -107,11 +106,10 @@ class MethodEC extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Enabled In context'),
+                'label' => $module->l('PayPal In-Context'),
                 'name' => 'paypal_ec_in_context',
-                'desc' => $module->l(''),
                 'is_bool' => true,
-                'hint' => $module->l(''),
+                'hint' => $module->l('PayPal opens in a pop-up window, allowing your buyers to finalize their payment without leaving your website. Optimized, modern and reassuring experience which benefits from the same security standards than during a redirection to the PayPal website.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_ec_in_context_on',
