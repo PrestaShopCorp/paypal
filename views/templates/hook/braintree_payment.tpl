@@ -126,9 +126,11 @@
 				submit.removeAttribute('disabled');
 
 				form.addEventListener('submit', function (event) {
-					event.preventDefault();
+                    event.preventDefault();
+                    document.getElementById('braintree_submit').setAttribute('disabled', true);
 					hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
 						if (tokenizeErr) {
+                            document.getElementById('braintree_submit').removeAttribute('disabled');
 							var popup_message = '';
 							switch (tokenizeErr.code) {
 								case 'HOSTED_FIELDS_FIELDS_EMPTY':
@@ -164,6 +166,7 @@
 							if(ThreeDSecureerror)
 							{
 								switch (ThreeDSecureerror.code) {
+                                    document.getElementById('braintree_submit').removeAttribute('disabled');
 									case 'THREEDS_HTTPS_REQUIRED':
 										popup_message = "{/literal}{l s='3D Secure requires HTTPS.' mod='paypal'}{literal}";
 										break;
@@ -198,6 +201,7 @@
 								}
 							}, function (err, three_d_secure_response) {
 								if (err) {
+                                    document.getElementById('braintree_submit').removeAttribute('disabled');
 									var popup_message = '';
 									switch (err.code) {
 										case 'CLIENT_REQUEST_ERROR':
@@ -235,18 +239,15 @@
 								}
 								document.querySelector('input[name="payment_method_nonce"]').value = three_d_secure_response.nonce;
 								document.querySelector('input[name="card_type"]').value = payload.details.cardType;
-								form.submit()
+								form.submit();
 
 							});
 						});
 
 
 						{/literal}{else}{literal}
-
 						document.querySelector('input[name="payment_method_nonce"]').value = payload.nonce;
-
 						form.submit();
-
 						{/literal}{/if}{literal}
 
 					});
