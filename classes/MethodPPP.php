@@ -64,8 +64,6 @@ class MethodPPP extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_TITLE', $params['ppp_config_title']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_BRAND', $params['ppp_config_brand']);
-            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
-            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
             if (isset($_FILES['ppp_config_logo']['tmp_name']) && $_FILES['ppp_config_logo']['tmp_name'] != '') {
                 if (!in_array($_FILES['ppp_config_logo']['type'], array('image/gif', 'image/png', 'image/jpeg'))) {
                     $paypal->errors .= $paypal->displayError($paypal->l('Use a valid graphics format, such as .gif, .jpg, or .png.'));
@@ -94,6 +92,10 @@ class MethodPPP extends AbstractMethodPaypal
                     $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while creating your web experience. Check your credentials.'));
                 }
             }
+        }
+        if (Tools::isSubmit('submit_shortcut')) {
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
         }
 
         if (Tools::getValue('deleteLogoPp')) {
@@ -128,8 +130,6 @@ class MethodPPP extends AbstractMethodPaypal
 
     public function getConfig(Paypal $module)
     {
-       // $payment = Payment::get('PAY-5JX860011P403903SLLGHTSQ', $this->_getCredentialsInfo());
-        //echo'<pre>';print_r($payment);die;
         $params = array('inputs' => array(
             array(
                 'type' => 'text',
@@ -173,13 +173,51 @@ class MethodPPP extends AbstractMethodPaypal
                     )
                 ),
             ),
+        ));
+
+        $params['fields_value'] = array(
+            'ppp_config_title' => Configuration::get('PAYPAL_PPP_CONFIG_TITLE'),
+            'ppp_config_brand' => Configuration::get('PAYPAL_PPP_CONFIG_BRAND'),
+            'ppp_config_logo' => Configuration::get('PAYPAL_PPP_CONFIG_LOGO'),
+            'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
+        );
+
+        $params['shortcut'] = $this->createShortcutForm($module);
+
+
+        $context = Context::getContext();
+        $context->smarty->assign(array(
+            'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
+            'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
+        ));
+        if ((Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN))  {
+            $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
+        }
+
+        return $params;
+    }
+
+    public function createShortcutForm($module)
+    {
+        $fields_form = array();
+        $fields_form[0]['form'] = array(
+            'legend' => array(
+                'title' => $module->l('PayPal Express Shortcut'),
+                'icon' => 'icon-cogs',
+            ),
+            'submit' => array(
+                'title' => $module->l('Save'),
+                'class' => 'btn btn-default pull-right button',
+            ),
+        );
+
+        $fields_form[0]['form']['input'] = array(
             array(
                 'type' => 'switch',
-                'label' => $module->l('Enabled Shortcut'),
+                'label' => $module->l('Display the shortcut on product pages'),
                 'name' => 'paypal_show_shortcut',
-                'desc' => $module->l(''),
                 'is_bool' => true,
-                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product page. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
+                'hint' => $module->l('Recommended for mono-product websites.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_show_shortcut_on',
@@ -195,10 +233,10 @@ class MethodPPP extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Enabled Shortcut in cart'),
+                'label' => $module->l('Display shortcut in the cart'),
                 'name' => 'paypal_show_shortcut_cart',
                 'is_bool' => true,
-                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your shopping cart page. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
+                'hint' => $module->l('Recommended for multi-products websites.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_show_shortcut_cart_on',
@@ -212,28 +250,35 @@ class MethodPPP extends AbstractMethodPaypal
                     )
                 ),
             ),
-        ));
+        );
 
-        $params['fields_value'] = array(
-            'ppp_config_title' => Configuration::get('PAYPAL_PPP_CONFIG_TITLE'),
-            'ppp_config_brand' => Configuration::get('PAYPAL_PPP_CONFIG_BRAND'),
-            'ppp_config_logo' => Configuration::get('PAYPAL_PPP_CONFIG_LOGO'),
-            'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
+        $fields_value = array(
             'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
             'paypal_show_shortcut_cart' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'),
         );
 
+        $helper = new HelperForm();
+        $helper->module = $module;
+        $helper->name_controller = 'form_shortcut';
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
+        $helper->title = $module->displayName;
+        $helper->show_toolbar = false;
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = $default_lang;
+        $helper->submit_action = 'submit_shortcut';
+        $helper->allow_employee_form_lang = $default_lang;
+        $helper->tpl_vars = array(
+            'fields_value' => $fields_value,
+            'id_language' => Context::getContext()->language->id,
+            'back_url' => $module->module_link.'#paypal_params'
+        );
 
-        $context = Context::getContext();
-        $context->smarty->assign(array(
-            'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
-            'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
+        Context::getContext()->smarty->assign(array(
+            'shortcut_description' => $module->l('The PayPal shortcut is displayed directly in the cart or on your product pages, allowing a faster checkout experience for your buyers. It requires fewer pages, clicks and seconds in order to finalize the payment. PayPal provides you with the client’s billing and shipping information so that you don’t have to collect it yourself.'),
         ));
-        if ((Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN))  {
-            $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
-        }
 
-        return $params;
+        return $helper->generateForm($fields_form);
     }
 
     public function _getCredentialsInfo()
@@ -708,7 +753,7 @@ class MethodPPP extends AbstractMethodPaypal
             'shop_url' => $shop_url,
             'PayPal_payment_type' => $type,
             'PayPal_img_esc' => $shop_url.$img_esc,
-            'action_url' => $context->link->getModuleLink('paypal', 'pppScInit', array(), true),
+            'action_url' => $context->link->getModuleLink('paypal', 'ScInit', array(), true),
             'environment' => $environment,
         ));
 
@@ -719,6 +764,15 @@ class MethodPPP extends AbstractMethodPaypal
             return $context->smarty->fetch('module:paypal/views/templates/hook/PPP_shortcut.tpl');
         } elseif ($page_source == 'cart') {
             return $context->smarty->fetch('module:paypal/views/templates/hook/cart_shortcut.tpl');
+        }
+    }
+
+    public function processCheckoutSc($response)
+    {
+        if (isset($response['approval_url'])) {
+            Tools::redirect($response['approval_url']);
+        } else {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => '00000')));
         }
     }
 }

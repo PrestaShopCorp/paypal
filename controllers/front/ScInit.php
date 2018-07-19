@@ -26,11 +26,45 @@
 
 include_once _PS_MODULE_DIR_.'paypal/classes/AbstractMethodPaypal.php';
 
-class PaypalPppScInitModuleFrontController extends ModuleFrontController
+class PaypalScInitModuleFrontController extends ModuleFrontController
 {
     public $name = 'paypal';
 
     public function postProcess()
+    {
+        switch (Tools::getValue('source_page')) {
+            case 'cart':
+                $this->prepareCart();
+                break;
+            case 'product':
+                $this->prepareProduct();
+                break;
+            default:
+        }
+
+        $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
+
+        try {
+            $response = $method->init(array('use_card'=>0, 'short_cut' => 1));
+        } catch (Exception $e) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $e->getMessage())));
+        }
+
+        $method->processCheckoutSc($response);
+    }
+
+    public function prepareCart()
+    {
+        if (Tools::getValue('checkAvailability')) {
+            if ($this->context->cart->checkQuantities()) {
+                die(Tools::jsonEncode(1));
+            } else {
+                die(Tools::jsonEncode(0));
+            }
+        }
+    }
+
+    public function prepareProduct()
     {
         if (Tools::getValue('checkAvailability')) {
             $product = new Product(Tools::getValue('id_product'));
@@ -41,7 +75,6 @@ class PaypalPppScInitModuleFrontController extends ModuleFrontController
                 die(Tools::jsonEncode(0));
             }
         }
-        $method = AbstractMethodPaypal::load('PPP');
 
         if (empty($this->context->cart->id)) {
             $this->context->cart->add();
@@ -66,18 +99,6 @@ class PaypalPppScInitModuleFrontController extends ModuleFrontController
             $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'), Product::getIdProductAttributesByIdAttributes(Tools::getValue('id_product'), $group));
         } else {
             $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'));
-        }
-
-        try {
-            $response = $method->init(array('short_cut' => 1));
-        } catch (Exception $e) {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $e->getMessage())));
-        }
-
-        if (isset($response['approval_url'])) {
-            Tools::redirect($response['approval_url']);
-        } else {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => '00000')));
         }
     }
 }

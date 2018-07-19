@@ -774,16 +774,11 @@ class PayPal extends PaymentModule
                     'ec_sc_in_context' => 1,
                     'ec_sc_environment' => $environment,
                     'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
-                    'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array('credit_card'=>'0','getToken'=>1), true),
+                    'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ScInit', array('credit_card'=>'0','getToken'=>1), true),
                 ));
             }
-            if (Configuration::get('PAYPAL_METHOD') == 'PPP') {
-                $url = $this->context->link->getModuleLink($this->name, 'pppScInit', array(), true);
-            } else {
-                $url = $this->context->link->getModuleLink($this->name, 'ecScInit', array(), true);
-            }
             Media::addJsDef(array(
-                'sc_init_url'   => $url,
+                'sc_init_url'   => $this->context->link->getModuleLink($this->name, 'ScInit', array(), true),
             ));
         }
     }

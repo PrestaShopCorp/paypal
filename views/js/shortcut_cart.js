@@ -48,14 +48,14 @@ function setInput()
 {
     $('#paypal_url_page').val(document.location.href);
     if (typeof ec_sc_in_context != "undefined" && ec_sc_in_context) {
-        ECSInContext(combination);
+        ECSInContext();
     } else {
         $('#paypal_payment_form_cart').submit();
     }
 
 }
 
-function ECSInContext(combination) {
+function ECSInContext() {
     paypal.checkout.initXO();
     $.support.cors = true;
     $.ajax({

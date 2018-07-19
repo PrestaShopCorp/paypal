@@ -904,7 +904,7 @@ class MethodEC extends AbstractMethodPaypal
             'PayPal_payment_type' => $type,
             'PayPal_tracking_code' => 'PRESTASHOP_ECM',
             'PayPal_img_esc' => $shop_url.$img_esc,
-            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true),
+            'action_url' => $context->link->getModuleLink('paypal', 'ScInit', array(), true),
             'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
             'environment' => $environment,
@@ -917,6 +917,18 @@ class MethodEC extends AbstractMethodPaypal
             return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
         } elseif ($page_source == 'cart') {
             return $context->smarty->fetch('module:paypal/views/templates/hook/cart_shortcut.tpl');
+        }
+    }
+
+    public function processCheckoutSc($response)
+    {
+        if (!isset($response['L_ERRORCODE0'])) {
+            if (Tools::getvalue('getToken')) {
+                die($this->token);
+            }
+            Tools::redirect($response);
+        } else {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $response['L_ERRORCODE0'])));
         }
     }
 

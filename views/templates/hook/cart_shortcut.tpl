@@ -25,7 +25,7 @@
 
 <div id="container_express_checkout" style="float:right; margin: 10px 40px 0 0">
     <form id="paypal_payment_form_cart" class="paypal_payment_form" action="{$action_url|escape:'htmlall':'UTF-8'}" title="{l s='Pay with PayPal' mod='paypal'}" method="post" data-ajax="false">
-        <input type="hidden" name="express_checkout" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
+        <input type="hidden" name="method" value="{$PayPal_payment_type|escape:'htmlall':'UTF-8'}"/>
         <input type="hidden" name="current_shop_url" id="paypal_url_page" value="" />
         <input type="hidden" name="bn" value="{$PayPal_tracking_code|escape:'htmlall':'UTF-8'}" />
         <input type="hidden" id="in_context_checkout_enabled" value="0">
