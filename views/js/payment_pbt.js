@@ -91,7 +91,7 @@ function initPaypalBraintree(flow) {
             }, '#paypal-button').then(function (e) {
 
             });
-            $('#payment-confirmation button').click(function(){
+            $('#payment-confirmation button').click(function(event){
                 payment_selected = $('input[name=payment-option]:checked').attr('id');
                 if (!$('#pay-with-'+payment_selected+'-form .payment_module').hasClass('paypal-braintree')) {
                     return true;
