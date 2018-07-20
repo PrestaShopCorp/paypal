@@ -289,7 +289,7 @@ class MethodBT extends AbstractMethodPaypal
     {
         try {
             $this->initConfig();
-            $clientToken = $this->gateway->clientToken()->generate(2);
+            $clientToken = $this->gateway->clientToken()->generate();
             return $clientToken;
         } catch (Exception $e) {
             return array('error_code' => $e->getCode(), 'error_msg' => $e->getMessage());
