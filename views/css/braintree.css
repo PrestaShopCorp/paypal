@@ -106,7 +106,9 @@
 .braintree-error {
     display:none;
 }
-
+.braintree-card .error, .paypal-braintree .error {
+    color: red;
+}
 .braintree-card #card-image {
     position: absolute;
     top: 0em;

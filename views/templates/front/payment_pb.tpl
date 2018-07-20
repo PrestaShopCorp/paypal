@@ -28,28 +28,32 @@
             <div class="payment_module paypal-braintree">
                 <form action="{$braintreeSubmitUrl}" id="paypal-braintree-form" method="post">
                 {include file="module:paypal/views/templates/front/payment_infos.tpl"}
-                <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
-                <input type="hidden" name="payment_method_bt" value="{$bt_method|escape:'htmlall':'UTF-8'}"/>
-                <div id="paypal-button"></div>
-                <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
-                {if isset($active_vaulting) && $active_vaulting}
-                    <div class="save-in-vault">
-                        <input type="checkbox" name="save_account_in_vault" id="save_account_in_vault"/> <label for="save_account_in_vault"> {l s='Memorize my PayPal account' mod='paypal'}</label>
-                    </div>
-                {/if}
-                {if isset($active_vaulting) && isset($payment_methods) && !empty($payment_methods)}
-                    <div id="bt-vault-form">
-                        <p><b>{l s='Choose your PayPal account' mod='paypal'}:</b></p>
-                        <select name="pbt_vaulting_token" class="form-control">
-                            <option value="">{l s='Choose your paypal account' mod='paypal'}</option>
-                            {foreach from=$payment_methods key=method_key  item=method}
-                                <option value="{$method.token|escape:'htmlall':'UTF-8'}">
-                                    {if $method.name}{$method.name|escape:'htmlall':'UTF-8'} - {/if}
-                                    {$method.info|escape:'htmlall':'UTF-8'}
-                                </option>
-                            {/foreach}
-                        </select>
-                    </div>
+                {if isset($init_error)}
+                    <div class="error">{$init_error}</div>
+                {else}
+                    <input type="hidden" name="payment_method_nonce" id="paypal_payment_method_nonce"/>
+                    <input type="hidden" name="payment_method_bt" value="{$bt_method|escape:'htmlall':'UTF-8'}"/>
+                    <div id="paypal-button"></div>
+                    <div id="paypal-vault-info"><p>{l s='You have to finish your payment done with your account PayPal:' mod='paypal'}</p></div>
+                    {if isset($active_vaulting) && $active_vaulting}
+                        <div class="save-in-vault">
+                            <input type="checkbox" name="save_account_in_vault" id="save_account_in_vault"/> <label for="save_account_in_vault"> {l s='Memorize my PayPal account' mod='paypal'}</label>
+                        </div>
+                    {/if}
+                    {if isset($active_vaulting) && isset($payment_methods) && !empty($payment_methods)}
+                        <div id="bt-vault-form">
+                            <p><b>{l s='Choose your PayPal account' mod='paypal'}:</b></p>
+                            <select name="pbt_vaulting_token" class="form-control">
+                                <option value="">{l s='Choose your paypal account' mod='paypal'}</option>
+                                {foreach from=$payment_methods key=method_key  item=method}
+                                    <option value="{$method.token|escape:'htmlall':'UTF-8'}">
+                                        {if $method.name}{$method.name|escape:'htmlall':'UTF-8'} - {/if}
+                                        {$method.info|escape:'htmlall':'UTF-8'}
+                                    </option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    {/if}
                 {/if}
                 </form>
                 <div id="bt-paypal-error-msg"></div>

@@ -884,6 +884,12 @@ class PayPal extends PaymentModule
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
 
+        if (isset($clientToken['error_code'])) {
+            $this->context->smarty->assign(array(
+                'init_error'=> $this->l('Error Braintree initialization ').$clientToken['error_code'].' : '.$clientToken['error_msg'],
+            ));
+        }
+
         $this->context->smarty->assign(array(
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'btValidation', array(), true),
@@ -909,12 +915,16 @@ class PayPal extends PaymentModule
 
     protected function generateFormBt()
     {
-
         $amount = $this->context->cart->getOrderTotal();
-
-
         $braintree = AbstractMethodPaypal::load('BT');
+
         $clientToken = $braintree->init(true);
+
+        if (isset($clientToken['error_code'])) {
+            $this->context->smarty->assign(array(
+                'init_error'=> $this->l('Error Braintree initialization ').$clientToken['error_code'].' : '.$clientToken['error_msg'],
+            ));
+        }
         $check3DS = 0;
         $required_3ds_amount = Tools::convertPrice(Configuration::get('PAYPAL_3D_SECURE_AMOUNT'), Currency::getCurrencyInstance((int)$this->context->currency->id));
         if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
@@ -944,7 +954,6 @@ class PayPal extends PaymentModule
             'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
             'method_bt' => BT_CARD_PAYMENT,
         ));
-
        // echo '<pre>';print_r($payment_methods);die;
         return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
     }
