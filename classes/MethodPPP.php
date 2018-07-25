@@ -213,6 +213,11 @@ class MethodPPP extends AbstractMethodPaypal
 
         $fields_form[0]['form']['input'] = array(
             array(
+                'type' => 'html',
+                'name' => 'paypal_desc_shortcut',
+                'html_content' => $module->l('The PayPal shortcut is displayed directly in the cart or on your product pages, allowing a faster checkout experience for your buyers. It requires fewer pages, clicks and seconds in order to finalize the payment. PayPal provides you with the client’s billing and shipping information so that you don’t have to collect it yourself.'),
+            ),
+            array(
                 'type' => 'switch',
                 'label' => $module->l('Display the shortcut on product pages'),
                 'name' => 'paypal_show_shortcut',
@@ -273,10 +278,6 @@ class MethodPPP extends AbstractMethodPaypal
             'id_language' => Context::getContext()->language->id,
             'back_url' => $module->module_link.'#paypal_params'
         );
-
-        Context::getContext()->smarty->assign(array(
-            'shortcut_description' => $module->l('The PayPal shortcut is displayed directly in the cart or on your product pages, allowing a faster checkout experience for your buyers. It requires fewer pages, clicks and seconds in order to finalize the payment. PayPal provides you with the client’s billing and shipping information so that you don’t have to collect it yourself.'),
-        ));
 
         return $helper->generateForm($fields_form);
     }
