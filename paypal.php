@@ -364,13 +364,11 @@ class PayPal extends PaymentModule
 
         //Uninstall DataBase
         if (!$this->uninstallSQL()) {
-            die('erzer');
             return false;
         }
 
         // Uninstall default
         if (!parent::uninstall()) {
-            die('fsdfsaz');
             return false;
         }
         return true;
