@@ -78,7 +78,7 @@ class PayPal extends PaymentModule
         $this->express_checkout = $this->l('PayPal Express Checkout ');
         $this->module_link = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
 
-        $this->errors = array();
+        $this->errors = '';
     }
 
     public function install()
@@ -535,7 +535,7 @@ class PayPal extends PaymentModule
         $form = $helper->generateForm($fields_form);
 
 
-        if (count($this->errors)) {
+        if ($this->errors) {
             $this->message .= $this->errors;
         } elseif (Configuration::get('PAYPAL_METHOD') && Configuration::get('PAYPAL_SANDBOX') == 1) {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
