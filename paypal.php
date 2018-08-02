@@ -50,7 +50,7 @@ class PayPal extends PaymentModule
     public $amount_paid_paypal;
     public $module_link;
     public $errors;
-    public $bt_countries = array("FR", "UK", "IT", "ES", "US");
+    public $bt_countries = array("FR", "GB", "IT", "ES", "US");
 
 
     public function __construct()
