@@ -190,29 +190,25 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             !empty($paymentId) &&
             !empty($submit)
         ) {
+            $paypal = new PayPal();
 
-            $CallApiPaypalPlus = new CallApiPaypalPlus();
-            $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
+            if ($submit == 'confirmPayment') {
 
+                $CallApiPaypalPlus = new CallApiPaypalPlus();
+                $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
-            if (isset($payment->state)) {
-
-                $paypal = new PayPal();
-
-                $transaction = array(
-                    'id_transaction' => $payment->transactions[0]->related_resources[0]->sale->id,
-                    'payment_status' => $payment->state,
-                    'total_paid' => $payment->transactions[0]->amount->total,
-                    'id_invoice' => 0,
-                    'shipping' => 0,
-                    'currency' => $payment->transactions[0]->amount->currency,
-                    'payment_date' => date("Y-m-d H:i:s"),
-                );
-
-                if ($submit == 'confirmPayment') {
+                if (isset($payment->state)) {
+                    $transaction = array(
+                        'id_transaction' => $payment->transactions[0]->related_resources[0]->sale->id,
+                        'payment_status' => $payment->state,
+                        'total_paid' => $payment->transactions[0]->amount->total,
+                        'id_invoice' => 0,
+                        'shipping' => 0,
+                        'currency' => $payment->transactions[0]->amount->currency,
+                        'payment_date' => date("Y-m-d H:i:s"),
+                    );
 
                     if ($payment->state == 'approved') {
-
                         $paypal->validateOrder(
                             $this->id_cart,
                             $this->getOrderStatus('payment'),
@@ -223,7 +219,6 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                         );
                         $return['success'][] = $this->module->l('Your payment has been taken into account');
                     } else {
-
                         $paypal->validateOrder(
                             $this->id_cart,
                             $this->getOrderStatus('payment_error'),
@@ -243,26 +238,21 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
 
                         $paypal_plus_pui->save();
                     }
-
-                } elseif ($submit == 'confirmCancel') {
-
-                    $paypal->validateOrder(
-                        $this->id_cart,
-                        $this->getOrderStatus('order_canceled'),
-                        $payment->transactions[0]->amount->total,
-                        $payment->payer->payment_method,
-                        null,
-                        $transaction
-                    );
-                    $return['success'][] = $this->module->l('Your order has been canceled');
                 } else {
                     $return['error'][] = $this->module->l('An error occured during the payment');
                 }
-
+            } elseif ($submit == 'confirmCancel') {
+                $paypal->validateOrder(
+                    $this->id_cart,
+                    $this->getOrderStatus('order_canceled'),
+                    Context::getContext()->cart->getOrderTotal(),
+                    'PayPal',
+                    null
+                );
+                $return['success'][] = $this->module->l('Your order has been canceled');
             } else {
                 $return['error'][] = $this->module->l('An error occured during the payment');
             }
-
         } else {
             $return['error'][] = $this->module->l('An error occured during the payment');
         }
