@@ -1336,7 +1336,7 @@ class PayPal extends PaymentModule
                     'module_name' => $this->name,
                     'order_state' => $order_state,
                     'order_payment' => $order_payment,
-                    'params' => $params,
+                    'params' => array('id_order' => $params['id_order']),
                     'id_currency' => $currency->getSign(),
                     'rest_to_capture' => Tools::ps_round($cpt->getRestToPaid($order), '6'),
                     'list_captures' => $cpt->getListCaptured(),
@@ -2646,3 +2646,4 @@ class PayPal extends PaymentModule
 
     }
 }
+

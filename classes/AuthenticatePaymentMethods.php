@@ -113,6 +113,7 @@ class AuthenticatePaymentMethods
             //AFRIQUE
             'SL'=>array(WPS, ECS),
             'SN'=>array(WPS, ECS),
+            'SA'=>array(WPS, ECS),
         );
         $return = isset($payment_method[$iso_code]) ? $payment_method[$iso_code] : false;
         if (Configuration::get('VZERO_ENABLED')) {
