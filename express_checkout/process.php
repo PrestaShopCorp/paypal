@@ -109,8 +109,24 @@ class PaypalExpressCheckout extends Paypal
             return false;
         }
 
-        $currency_decimals = is_array($this->currency) ? (int) $this->currency['decimals'] : (int) $this->currency->decimals;
-        $this->decimals = $currency_decimals * _PS_PRICE_DISPLAY_PRECISION_;
+        $currency_mode = Currency::getPaymentCurrenciesSpecial($this->id);
+        $mode_id = $currency_mode['id_currency'];
+        if ($mode_id == -1) {
+            $iso = Context::getContext()->currency->iso_code;
+        } else if ($mode_id == -2) {
+            $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
+            $iso = $currency->iso_code;
+        } else {
+            $pp_currency = new Currency((int)$mode_id);
+            $iso = $pp_currency->iso_code;
+        }
+
+        $currency_wt_decimal = array('HUF', 'JPY', 'TWD');
+        if (in_array($iso, $currency_wt_decimal)) {
+            $this->decimals = (int)0;
+        } else {
+            $this->decimals = (int)2;
+        }
     }
 
     // Will build the product_list depending of the type

@@ -268,8 +268,7 @@ class PayPal extends PaymentModule
      */
     protected function loadDefaults()
     {
-        $this->loadLangDefault();
-        $this->paypal_logos = new PayPalLogos($this->iso_code);
+        $this->paypal_logos = new PayPalLogos(Tools::strtoupper($this->context->language->iso_code));
         $payment_method = Configuration::get('PAYPAL_PAYMENT_METHOD');
         $order_process_type = (int) Configuration::get('PS_ORDER_PROCESS_TYPE');
 
@@ -1647,12 +1646,8 @@ class PayPal extends PaymentModule
 
     public function getPaymentMethods()
     {
-        if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')) {
-            return AuthenticatePaymentMethods::authenticatePaymentMethodByLang(Tools::strtoupper($this->context->language->iso_code));
-        } else {
-            $country = new Country((int) Configuration::get('PS_COUNTRY_DEFAULT'));
-            return AuthenticatePaymentMethods::authenticatePaymentMethodByCountry($country->iso_code);
-        }
+        $country = new Country((int) Configuration::get('PS_COUNTRY_DEFAULT'));
+        return AuthenticatePaymentMethods::authenticatePaymentMethodByCountry($country->iso_code);
     }
 
     public function getCountryCode()
