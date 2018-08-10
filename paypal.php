@@ -740,8 +740,7 @@ class PayPal extends PaymentModule
             'ps_ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
 
-        $hss_mail = Configuration::get('PAYPAL_BUSINESS_ACCOUNT');
-        $hss_errors = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'paypal_hss_email_error` WHERE email = "'.$hss_mail.'"');
+        $hss_errors = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'paypal_hss_email_error`');
         $this->context->smarty->assign(array(
             'hss_errors' => $hss_errors
         ));
@@ -1813,9 +1812,8 @@ class PayPal extends PaymentModule
                     $refresh_webprofile = false;
                 }
 
-                $old_hss_email = Configuration::get('PAYPAL_BUSINESS_ACCOUNT');
                 $new_hss_email = Tools::getValue('api_business_account');
-                Db::getInstance()->delete('paypal_hss_email_error', 'email = "'.$old_hss_email.'"');
+                Db::getInstance()->delete('paypal_hss_email_error', 'email = "'.$new_hss_email.'"');
 
                 Configuration::updateValue('PAYPAL_BUSINESS', (int) Tools::getValue('business'));
                 Configuration::updateValue('PAYPAL_PAYMENT_METHOD', (int) Tools::getValue('paypal_payment_method'));
