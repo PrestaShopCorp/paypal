@@ -1640,12 +1640,8 @@ class PayPal extends PaymentModule
 
     public function getPaymentMethods()
     {
-        if (Configuration::get('PAYPAL_UPDATED_COUNTRIES_OK')) {
-            return AuthenticatePaymentMethods::authenticatePaymentMethodByLang(Tools::strtoupper($this->context->language->iso_code));
-        } else {
-            $country = new Country((int) Configuration::get('PS_COUNTRY_DEFAULT'));
-            return AuthenticatePaymentMethods::authenticatePaymentMethodByCountry($country->iso_code);
-        }
+        $country = new Country((int) Configuration::get('PS_COUNTRY_DEFAULT'));
+        return AuthenticatePaymentMethods::authenticatePaymentMethodByCountry($country->iso_code);
     }
 
     public function getCountryCode()
