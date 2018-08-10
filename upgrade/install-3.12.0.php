@@ -37,7 +37,7 @@ function upgrade_module_3_12_0($object, $install = false)
         return false;
     }
 
-    if (!$this->registerHook('ActionBeforeCartUpdateQty')) {
+    if (!$object->registerHook('ActionBeforeCartUpdateQty')) {
         return false;
     }
 
