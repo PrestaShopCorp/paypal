@@ -10,8 +10,8 @@
 		<PayPalMarkMedium>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_50x34.gif</PayPalMarkMedium>
 		<PayPalMarkLarge>https://www.paypal.com/en_GB/GB/i/logo/PayPal_mark_60x38.gif</PayPalMarkLarge>
 
-		<LocalPayPalHorizontalSolutionPP>/views/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
-		<LocalPayPalVerticalSolutionPP>/views/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
+		<LocalPayPalHorizontalSolutionPP>/modules/paypal/views/img/default_logos/default_horizontal.png</LocalPayPalHorizontalSolutionPP>
+		<LocalPayPalVerticalSolutionPP>/modules/paypal/views/img/default_logos/default_logo.gif</LocalPayPalVerticalSolutionPP>
 	</country>
 
 	<country iso_code="AU">

@@ -57,7 +57,6 @@ class PayPalLogos
                 $tmp_iso_code = (string) $item->attributes()->iso_code;
                 $logos[$tmp_iso_code] = (array) $item;
             }
-
             if (!isset($logos[$this->iso_code])) {
                 $result = $this->getLocalLogos($logos['default'], 'default');
             } else {
