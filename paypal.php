@@ -100,7 +100,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '3.12.1';
+        $this->version = '3.12.0';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -156,6 +156,7 @@ class PayPal extends PaymentModule
             || !$this->registerHook('adminOrder')
             || !$this->registerHook('backOfficeHeader')
             || !$this->registerHook('displayPDFInvoice')
+            || !$this->registerHook('actionBeforeCartUpdateQty')
             || !$this->registerHook('PDFInvoice')) {
 
             return false;
@@ -2648,6 +2649,14 @@ class PayPal extends PaymentModule
             return $tab;
         }
 
+    }
+
+    public function hookActionBeforeCartUpdateQty($params)
+    {
+        if (isset($this->context->cookie->express_checkout)) {
+            //unset cookie of payment init if it's no more same cart
+            Context::getContext()->cookie->__unset('express_checkout');
+        }
     }
 }
 
