@@ -100,7 +100,7 @@ class PayPal extends PaymentModule
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '3.12.0';
+        $this->version = '3.12.1';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
 
@@ -739,6 +739,12 @@ class PayPal extends PaymentModule
             'Braintree_Refresh_Token' => Configuration::get('PAYPAL_BRAINTREE_REFRESH_TOKEN'),
             'Braintree_Expires_At' => strtotime(Configuration::get('PAYPAL_BRAINTREE_EXPIRES_AT')),
             'ps_ssl_active' => Configuration::get('PS_SSL_ENABLED'),
+        ));
+
+        $hss_mail = Configuration::get('PAYPAL_BUSINESS_ACCOUNT');
+        $hss_errors = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'paypal_hss_email_error` WHERE email = "'.$hss_mail.'"');
+        $this->context->smarty->assign(array(
+            'hss_errors' => $hss_errors
         ));
 
         $this->getTranslations();
@@ -1811,6 +1817,11 @@ class PayPal extends PaymentModule
                 } else {
                     $refresh_webprofile = false;
                 }
+
+                $old_hss_email = Configuration::get('PAYPAL_BUSINESS_ACCOUNT');
+                $new_hss_email = Tools::getValue('api_business_account');
+                Db::getInstance()->delete('paypal_hss_email_error', 'email = "'.$old_hss_email.'"');
+
                 Configuration::updateValue('PAYPAL_BUSINESS', (int) Tools::getValue('business'));
                 Configuration::updateValue('PAYPAL_PAYMENT_METHOD', (int) Tools::getValue('paypal_payment_method'));
                 Configuration::updateValue('PAYPAL_API_USER', trim(Tools::getValue('api_username')));

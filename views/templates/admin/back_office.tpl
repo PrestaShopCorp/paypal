@@ -24,7 +24,15 @@
 *}
 
 <div id="paypal-wrapper">
-
+	{if !empty($hss_errors)}
+        <div style="background-color: red; color: white; font-weight: bolder; padding: 5px; margin-top: 10px;">
+            {l s='Orders for following carts (id) could not be created because of email error'}
+            {foreach from=$hss_errors item=hss}
+                <p><span style="background-color: black; padding: 5px;">{$hss.id_cart} - {$hss.email}</span></p>
+            {/foreach}
+            {l s='You must change the e-mail in the module configuration with the one displayed above'}
+        </div>
+	{/if}
 	{* PayPal configuration page header *}
 	<div class="box half left">
 		{if isset($PayPal_logo.LocalPayPalLogoLarge)}

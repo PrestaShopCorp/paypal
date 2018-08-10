@@ -229,6 +229,9 @@ class PayPalIPN extends PayPal
     }
 }
 
+$handle = fopen(dirname(__FILE__).'/log_order.txt', 'a+');
+fwrite($handle, Tools::getValue('receiver_email')."\r");
+fclose($handle);
 
 if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACCOUNT')) {
 
@@ -237,4 +240,11 @@ if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACC
         $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
         $ipn->confirmOrder($custom);
     }
+
+} else {
+    $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
+    Db::getInstance()->insert('paypal_hss_email_error', array('id_cart' => $custom['id_cart'], 'email' => Tools::getValue('receiver_email')));
 }
+
+
+
