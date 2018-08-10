@@ -24,16 +24,20 @@
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
-function upgrade_module_3_12_1($object, $install = false)
+function upgrade_module_3_12_0($object, $install = false)
 {
     if (Db::getInstance()->Execute('
             CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_hss_email_error` (
                 `id_paypal_hss_email_error` int(11) NOT NULL AUTO_INCREMENT,
                 `id_cart` int(11) NOT NULL,
-                `email` varchar 255 NOT NULL,
+                `email` varchar(255) NOT NULL,
                 PRIMARY KEY (`id_paypal_plus_pui`)
                 ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
         ')) {
+        return false;
+    }
+
+    if (!$this->registerHook('ActionBeforeCartUpdateQty')) {
         return false;
     }
 
