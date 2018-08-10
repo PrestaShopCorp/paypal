@@ -399,31 +399,6 @@ $(document).ready(function () {
             $('#paypal-get-identification').click( getIdentification );
         }
 
-        // Display country change form
-        function countryChange() {
-            var div = $('<div id="paypal-country-form">');
-            var inner = $('#paypal-country-form-content').clone().html();
-            $.fancybox({'content': div.append(inner)});
-            return false;
-        }
-
-        if(jquery_version[0]>=1 && jquery_version[1] >= 7) {
-            $('a#paypal_country_change').on('click', countryChange);
-        } else {
-            $('a#paypal_country_change').click( countryChange );
-        }
-
-        function defaultCountryChange() {
-            var form = $('#paypal_configuration');
-            form.append('<input type="hidden" name="paypal_country_only" value="' + $(this).val() + '" />');
-            form.submit();
-        }
-
-        if(jquery_version[0]>=1 && jquery_version[1] >= 7) {
-            $('#paypal_country_default').on('change', defaultCountryChange);
-        } else {
-            $('#paypal_country_default').change( defaultCountryChange);
-        }
 
         function loginActivate() {
             var val = parseInt($(this).val());

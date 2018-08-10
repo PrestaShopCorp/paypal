@@ -91,21 +91,8 @@
 				<div style="line-height: 20px; margin-top: 8px">
 					<div>
 						<label>{l s='Your country' mod='paypal'} :
-							{$PayPal_country|escape:'htmlall':'UTF-8'}&nbsp;&nbsp;&nbsp;<a href="#" id="paypal_country_change" class="small">{l s='change' mod='paypal'}</a>
+							{$PayPal_country|escape:'htmlall':'UTF-8'}
 						</label>
-
-						<div class="paypal-hide" id="paypal-country-form-content">
-							<h3>{l s='Select your country' mod='paypal'} :</h3>
-
-							<select name="paypal_country_default" id="paypal_country_default">
-							{foreach from=$Countries item=country}
-								<option value="{$country.id_country|escape:'htmlall':'UTF-8'}" {if $country.id_country == $PayPal_country_id}selected="selected"{/if}>{$country.name|escape:'htmlall':'UTF-8'}</option>
-							{/foreach}
-							</select>
-
-							<br />
-							<br />
-						</div>
 					</div>
 
 					<label>{l s='You already have a PayPal business account' mod='paypal'} ?</label>
