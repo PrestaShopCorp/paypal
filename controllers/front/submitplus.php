@@ -104,7 +104,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                         /* LookUp cancel */
                         $paypal->validateOrder(
                             $this->id_cart,
-                            $this->getOrderStatus('order_canceled'),
+                            Configuration::get('PS_OS_CANCELED'),
                             $payment->transactions[0]->amount->total,
                             $payment->payer->payment_method,
                             null,
@@ -116,7 +116,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                         /* Erreur de payment */
                         $paypal->validateOrder(
                             $this->id_cart,
-                            $this->getOrderStatus('payment_error'),
+                            Configuration::get('PS_OS_ERROR'),
                             $payment->transactions[0]->amount->total,
                             $payment->payer->payment_method,
                             null,
@@ -211,7 +211,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                     if ($payment->state == 'approved') {
                         $paypal->validateOrder(
                             $this->id_cart,
-                            $this->getOrderStatus('payment'),
+                            Configuration::get('PS_OS_PAYMENT'),
                             $payment->transactions[0]->amount->total,
                             $payment->payer->payment_method,
                             null,
@@ -221,7 +221,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
                     } else {
                         $paypal->validateOrder(
                             $this->id_cart,
-                            $this->getOrderStatus('payment_error'),
+                            Configuration::get('PS_OS_ERROR'),
                             $payment->transactions[0]->amount->total,
                             $payment->payer->payment_method,
                             null,
@@ -244,7 +244,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             } elseif ($submit == 'confirmCancel') {
                 $paypal->validateOrder(
                     $this->id_cart,
-                    $this->getOrderStatus('order_canceled'),
+                    Configuration::get('PS_OS_CANCELED'),
                     Context::getContext()->cart->getOrderTotal(),
                     'PayPal',
                     null
