@@ -34,7 +34,11 @@ class PaypalBtValidationModuleFrontController extends ModuleFrontController
     {
         $method_bt = AbstractMethodPaypal::load('BT');
 
-        $method_bt->validation();
+        try {
+            $method_bt->validation();
+        } catch (Exception $e) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $e->getCode())));
+        }
 
         $cart = Context::getContext()->cart;
         $customer = new Customer($cart->id_customer);

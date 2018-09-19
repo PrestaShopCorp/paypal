@@ -22,6 +22,9 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<p id="paypal-es-checked">
-    {l s='You have already payed with PayPal express checkout.' mod='paypal'}
-</p>
+
+<li>
+    <a href="{$link->getModuleLink('paypal', 'account')|escape:'html':'UTF-8'}" title="{l s='My payment methods' mod='paypal'}">
+        {l s='My payment methods' mod='paypal'}
+    </a>
+</li>

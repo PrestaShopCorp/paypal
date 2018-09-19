@@ -14,12 +14,6 @@
  */
 // init incontext
 document.addEventListener("DOMContentLoaded", function(){
-    var ec_sc_qty_wanted = $('#quantity_wanted').val();
-    var ec_sc_productId = $('#paypal_payment_form_cart input[name="id_product"]').val();
-    EcCheckProductAvailability(ec_sc_qty_wanted, ec_sc_productId, $('#es_cs_product_attribute').val());
-    prestashop.on('updatedProduct', function(e, xhr, settings) {
-        EcCheckProductAvailability(ec_sc_qty_wanted, ec_sc_productId, e.id_product_attribute);
-    });
     if (typeof ec_sc_in_context != "undefined" && ec_sc_in_context) {
         window.paypalCheckoutReady = function () {
             paypal.checkout.setup(merchant_id, {
@@ -27,13 +21,17 @@ document.addEventListener("DOMContentLoaded", function(){
             });
         };
     }
+    prestashop.on('updateCart', function (event) {
+        EcCheckProductAvailability();
+    });
+
 });
 
-function EcCheckProductAvailability(qty, productId, id_product_attribute) {
+function EcCheckProductAvailability() {
     $.ajax({
-        url: ec_sc_init_url,
+        url: sc_init_url,
         type: "POST",
-        data: 'checkAvailability=1&id_product='+productId+'&quantity='+qty+'&product_attribute='+id_product_attribute,
+        data: 'checkAvailability=1&source_page=cart',
         success: function (json) {
             if (json == 1) {
                 $('#container_express_checkout').show();
@@ -48,32 +46,22 @@ function EcCheckProductAvailability(qty, productId, id_product_attribute) {
 
 function setInput()
 {
-    $('#paypal_quantity').val($('[name="qty"]').val());
-    var combination = [];
-    var re = /group\[([0-9]+)\]/;
-    $.each($('#add-to-cart-or-refresh').serializeArray(),function(key, item){
-        if(res = item.name.match(re))
-        {
-            combination.push(res[1]+':'+item.value);
-        }
-    });
     $('#paypal_url_page').val(document.location.href);
-    $('#paypal_combination').val(combination.join('|'));
     if (typeof ec_sc_in_context != "undefined" && ec_sc_in_context) {
-        ECSInContext(combination);
+        ECSInContext();
     } else {
         $('#paypal_payment_form_cart').submit();
     }
 
 }
 
-function ECSInContext(combination) {
+function ECSInContext() {
     paypal.checkout.initXO();
     $.support.cors = true;
     $.ajax({
         url: ec_sc_action_url,
         type: "GET",
-        data: 'getToken=1&id_product='+$('#paypal_payment_form_cart input[name="id_product"]').val()+'&quantity='+$('[name="qty"]').val()+'&combination='+combination.join('|'),
+        data: 'getToken=1',
         success: function (token) {
             var url = paypal.checkout.urlPrefix +token;
             paypal.checkout.startFlow(url);

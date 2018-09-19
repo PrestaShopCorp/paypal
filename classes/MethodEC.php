@@ -89,7 +89,6 @@ class MethodEC extends AbstractMethodPaypal
                 'type' => 'switch',
                 'label' => $module->l('Show PayPal benefits to your customers'),
                 'name' => 'paypal_show_advantage',
-                'desc' => $module->l(''),
                 'is_bool' => true,
                 'hint' => $module->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
                 'values' => array(
@@ -107,31 +106,10 @@ class MethodEC extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
-                'label' => $module->l('Enabled Shortcut'),
-                'name' => 'paypal_show_shortcut',
-                'desc' => $module->l(''),
-                'is_bool' => true,
-                'hint' => $module->l('Express Checkout Shortcut involves placing the Check Out with PayPal button on your product and shopping cart pages. This commences the PayPal payment earlier in the checkout flow, allowing buyers to complete a purchase without manually entering information that can be obtained from PayPal.'),
-                'values' => array(
-                    array(
-                        'id' => 'paypal_show_shortcut_on',
-                        'value' => 1,
-                        'label' => $module->l('Enabled'),
-                    ),
-                    array(
-                        'id' => 'paypal_show_shortcut_off',
-                        'value' => 0,
-                        'label' => $module->l('Disabled'),
-                    )
-                ),
-            ),
-            array(
-                'type' => 'switch',
-                'label' => $module->l('Enabled In context'),
+                'label' => $module->l('PayPal In-Context'),
                 'name' => 'paypal_ec_in_context',
-                'desc' => $module->l(''),
                 'is_bool' => true,
-                'hint' => $module->l(''),
+                'hint' => $module->l('PayPal opens in a pop-up window, allowing your buyers to finalize their payment without leaving your website. Optimized, modern and reassuring experience which benefits from the same security standards than during a redirection to the PayPal website.'),
                 'values' => array(
                     array(
                         'id' => 'paypal_ec_in_context_on',
@@ -145,19 +123,35 @@ class MethodEC extends AbstractMethodPaypal
                     )
                 ),
             ),
+            array(
+                'type' => 'text',
+                'label' => $module->l('Brand name'),
+                'name' => 'config_brand',
+                'placeholder' => $module->l('Leave it empty to use your Shop name'),
+                'hint' => $module->l('A label that overrides the business name in the PayPal account on the PayPal pages.'),
+            ),
+            array(
+                'type' => 'file',
+                'label' => $module->l('Shop logo field'),
+                'name' => 'config_logo',
+                'display_image' => true,
+                'image' => file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))?'<img src="'.Context::getContext()->link->getBaseLink().'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png" class="img img-thumbnail" />':'',
+                'delete_url' => $module->module_link.'&deleteLogoPp=1',
+                'hint' => $module->l('An image must be stored on a secure (https) server. Use a valid graphics format, such as .gif, .jpg, or .png. Limit the image to 190 pixels wide by 60 pixels high. PayPal crops images that are larger. This logo will replace brand name  at the top of the cart review area.'),
+            ),
         ));
-
         $params['fields_value'] = array(
             'paypal_intent' => Configuration::get('PAYPAL_API_INTENT'),
             'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
-            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
             'paypal_ec_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'paypal_ec_merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.$mode),
+            'config_brand' => Configuration::get('PAYPAL_CONFIG_BRAND'),
+            'config_logo' => Configuration::get('PAYPAL_CONFIG_LOGO'),
         );
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        if ($country_default != "FR" && $country_default != "UK" && $country_default != "IT" && $country_default != "ES") {
+        if (!in_array($country_default, $module->bt_countries)) {
             $params['inputs'][] = array(
                 'type' => 'switch',
                 'label' => $module->l('Accept credit and debit card payment'),
@@ -198,6 +192,8 @@ class MethodEC extends AbstractMethodPaypal
 
         $params['form'] = $this->getApiUserName($module);
 
+        $params['shortcut'] = $this->createShortcutForm($module);
+
         return $params;
     }
 
@@ -223,7 +219,7 @@ class MethodEC extends AbstractMethodPaypal
 
         $helper = new HelperForm();
         $helper->module = $module;
-        $helper->name_controller = $module->name;
+        $helper->name_controller = 'form_api_username';
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
         $helper->title = $module->displayName;
@@ -239,6 +235,91 @@ class MethodEC extends AbstractMethodPaypal
         return $helper->generateForm($fields_form);
     }
 
+    public function createShortcutForm($module)
+    {
+        $fields_form = array();
+        $fields_form[0]['form'] = array(
+            'legend' => array(
+                'title' => $module->l('PayPal Express Shortcut'),
+                'icon' => 'icon-cogs',
+            ),
+            'submit' => array(
+                'title' => $module->l('Save'),
+                'class' => 'btn btn-default pull-right button',
+            ),
+        );
+
+        $fields_form[0]['form']['input'] = array(
+            array(
+                'type' => 'html',
+                'name' => 'paypal_desc_shortcut',
+                'html_content' => $module->l('The PayPal shortcut is displayed directly in the cart or on your product pages, allowing a faster checkout experience for your buyers. It requires fewer pages, clicks and seconds in order to finalize the payment. PayPal provides you with the client’s billing and shipping information so that you don’t have to collect it yourself.'),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Display the shortcut on product pages'),
+                'name' => 'paypal_show_shortcut',
+                'is_bool' => true,
+                'hint' => $module->l('Recommended for mono-product websites.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Display shortcut in the cart'),
+                'name' => 'paypal_show_shortcut_cart',
+                'is_bool' => true,
+                'hint' => $module->l('Recommended for multi-products websites.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+        );
+
+        $fields_value = array(
+            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
+            'paypal_show_shortcut_cart' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'),
+        );
+
+        $helper = new HelperForm();
+        $helper->module = $module;
+        $helper->name_controller = 'form_shortcut';
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
+        $helper->title = $module->displayName;
+        $helper->show_toolbar = false;
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = $default_lang;
+        $helper->submit_action = 'submit_shortcut';
+        $helper->allow_employee_form_lang = $default_lang;
+        $helper->tpl_vars = array(
+            'fields_value' => $fields_value,
+            'id_language' => Context::getContext()->language->id,
+            'back_url' => $module->module_link.'#paypal_params'
+        );
+
+        return $helper->generateForm($fields_form);
+    }
+
     public function setConfig($params)
     {
         $mode = Configuration::get('PAYPAL_SANDBOX') ? 'SANDBOX' : 'LIVE';
@@ -251,18 +332,48 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_SIGNATURE_'.$mode, $params['api_signature']);
             Configuration::updateValue('PAYPAL_'.$mode.'_ACCESS', 1);
             Configuration::updateValue('PAYPAL_MERCHANT_ID_'.$mode, $params['merchant_id']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 1);
             Tools::redirect($paypal->module_link);
+
+        }
+        if (Tools::isSubmit('submit_shortcut')) {
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
         }
         if (Tools::isSubmit('paypal_config')) {
             Configuration::updateValue('PAYPAL_API_INTENT', $params['paypal_intent']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
-            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
             Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', $params['paypal_ec_in_context']);
+            Configuration::updateValue('PAYPAL_CONFIG_BRAND', $params['config_brand']);
+            if (isset($_FILES['config_logo']['tmp_name']) && $_FILES['config_logo']['tmp_name'] != '') {
+                if (!in_array($_FILES['config_logo']['type'], array('image/gif', 'image/png', 'image/jpeg'))) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Use a valid graphics format, such as .gif, .jpg, or .png.'));
+                    return;
+                }
+                $size = getimagesize($_FILES['config_logo']['tmp_name']);
+                if ($size[0] > 190 || $size[1] > 60) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Limit the image to 190 pixels wide by 60 pixels high.'));
+                    return;
+                }
+                if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
+                    !move_uploaded_file($_FILES['config_logo']['tmp_name'], $tmpName)) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
+                }
+                if (!ImageManager::resize($tmpName, _PS_MODULE_DIR_.'paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png')) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
+                }
+                Configuration::updateValue('PAYPAL_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png');
+            }
+        }
+
+        if (Tools::getValue('deleteLogoPp')) {
+            unlink(Configuration::get('PAYPAL_CONFIG_LOGO'));
+            Configuration::updateValue('PAYPAL_CONFIG_LOGO', '');
         }
 
         $country_default = Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'));
 
-        if ($country_default != "FR" && $country_default != "UK" && $country_default != "IT" && $country_default != "ES") {
+        if (!in_array($country_default, $paypal->bt_countries)) {
             if (Tools::isSubmit('paypal_config')) {
                 Configuration::updateValue('PAYPAL_API_CARD', $params['paypal_card']);
             }
@@ -278,14 +389,7 @@ class MethodEC extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_CARD', $params['with_card']);
             if ((isset($params['modify']) && $params['modify']) || (Configuration::get('PAYPAL_METHOD') != $params['method'])) {
                 $response = $paypal->getPartnerInfo($params['method']);
-                $result = Tools::jsonDecode($response);
-
-                if (!$result->error && isset($result->data->url)) {
-                    $PartnerboardingURL = $result->data->url;
-                    Tools::redirectLink($PartnerboardingURL);
-                } else {
-                    $paypal->errors .= $paypal->displayError($paypal->l('Error onboarding Paypal : ').$result->error);
-                }
+                Tools::redirectLink($response);
             }
         }
 
@@ -327,6 +431,13 @@ class MethodEC extends AbstractMethodPaypal
             $setECReqDetails->NoShipping = 2;
         }
 
+        if (Configuration::get('PAYPAL_CONFIG_BRAND')) {
+            $setECReqDetails->BrandName = Configuration::get('PAYPAL_CONFIG_BRAND');
+        }
+        if (file_exists(Configuration::get('PAYPAL_CONFIG_LOGO'))) {
+            $setECReqDetails->cppheaderimage = Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/p_logo_'.Context::getContext()->shop->id.'.png';
+        }
+
         // Advanced options
         $setECReqDetails->AllowNote = 0;
         $setECReqType = new SetExpressCheckoutRequestType();
@@ -342,9 +453,8 @@ class MethodEC extends AbstractMethodPaypal
         $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
         /* wrap API method calls on the service object with a try catch */
 
-
         $payment = $paypalService->SetExpressCheckout($setECReq);
-       // echo '<pre>';print_r($setECReq);die;
+
         //You are not signed up to accept payment for digitally delivered goods.
         if (isset($payment->Errors)) {
             throw new Exception('ERROR in SetExpressCheckout', $payment->Errors[0]->ErrorCode);
@@ -442,7 +552,7 @@ class MethodEC extends AbstractMethodPaypal
         $subtotal = $this->formatPrice($summary['total_products']);
         $total_tax = number_format($this->_taxTotalValue, Paypal::getDecimal(), ".", '');
         // total shipping amount
-        $shippingTotal = new BasicAmountType($currency, $this->formatPrice($shipping));
+        $shippingTotal = new BasicAmountType($currency, $shipping);
         //total handling amount if any
         $handlingTotal = new BasicAmountType($currency, number_format(0, Paypal::getDecimal(), ".", ''));
         //total insurance amount if any
@@ -704,6 +814,55 @@ class MethodEC extends AbstractMethodPaypal
         return $result;
     }
 
+    public function partialRefund($params)
+    {
+        $paypal_order = PaypalOrder::loadByOrderId($params['order']->id);
+        $id_paypal_order = $paypal_order->id;
+        $capture = PaypalCapture::loadByOrderPayPalId($id_paypal_order);
+        $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
+        $currency = $paypal_order->currency;
+        $amount = 0;
+        foreach ($params['productList'] as $product) {
+            $amount += $product['amount'];
+        }
+        if (Tools::getValue('partialRefundShippingCost')) {
+            $amount += Tools::getValue('partialRefundShippingCost');
+        }
+        $refundTransactionReqType = new RefundTransactionRequestType();
+        $refundTransactionReqType->TransactionID = $id_transaction;
+        $refundTransactionReqType->RefundType = 'Partial';
+        $refundTransactionReqType->Amount =  new BasicAmountType($currency, number_format($amount, Paypal::getDecimal(), ".", ''));
+        $refundTransactionReq = new RefundTransactionReq();
+        $refundTransactionReq->RefundTransactionRequest = $refundTransactionReqType;
+
+        $paypalService = new PayPalAPIInterfaceServiceService($this->_getCredentialsInfo());
+        $response = $paypalService->RefundTransaction($refundTransactionReq);
+
+        if ($response instanceof PayPal\PayPalAPI\RefundTransactionResponseType) {
+            if (isset($response->Errors)) {
+                $result = array(
+                    'status' => $response->Ack,
+                    'error_code' => $response->Errors[0]->ErrorCode,
+                    'error_message' => $response->Errors[0]->LongMessage,
+                );
+                if (Validate::isLoadedObject($capture) && $response->Errors[0]->ErrorCode == "10009") {
+                    $result['already_refunded'] = true;
+                }
+            } else {
+                $result =  array(
+                    'success' => true,
+                    'refund_id' => $response->RefundTransactionID,
+                    'status' => $response->Ack,
+                    'total_amount' => $response->TotalRefundedAmount->value,
+                    'net_amount' => $response->NetRefundAmount->value,
+                    'currency' => $response->TotalRefundedAmount->currencyID,
+                );
+            }
+        }
+
+        return $result;
+    }
+
     public function void($authorization)
     {
         $doVoidReqType = new DoVoidRequestType();
@@ -731,31 +890,47 @@ class MethodEC extends AbstractMethodPaypal
         return $response;
     }
 
-    public function renderExpressCheckoutShortCut(&$context, $type)
+    public function renderExpressCheckoutShortCut(&$context, $type, $page_source)
     {
-        if (!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
-            return false;
-        }
-
         $lang = $context->country->iso_code;
         $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
-        $img_esc = "/modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
+        $img_esc = "modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
 
         if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
-            $img_esc = "/modules/paypal/views/img/ECShortcut/us/buy/buy.png";
+            $img_esc = "modules/paypal/views/img/ECShortcut/us/buy/buy.png";
         }
+        $shop_url = Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true);
         $context->smarty->assign(array(
+            'shop_url' => $shop_url,
             'PayPal_payment_type' => $type,
             'PayPal_tracking_code' => 'PRESTASHOP_ECM',
-            'PayPal_img_esc' => $img_esc,
-            'action_url' => $context->link->getModuleLink('paypal', 'ecScInit', array(), true),
+            'PayPal_img_esc' => $shop_url.$img_esc,
+            'action_url' => $context->link->getModuleLink('paypal', 'ScInit', array(), true),
             'ec_sc_in_context' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'),
             'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
             'environment' => $environment,
-            'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
         ));
 
-        return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
+        if ($page_source == 'product') {
+            $context->smarty->assign(array(
+                'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
+            ));
+            return $context->smarty->fetch('module:paypal/views/templates/hook/EC_shortcut.tpl');
+        } elseif ($page_source == 'cart') {
+            return $context->smarty->fetch('module:paypal/views/templates/hook/cart_shortcut.tpl');
+        }
+    }
+
+    public function processCheckoutSc($response)
+    {
+        if (!isset($response['L_ERRORCODE0'])) {
+            if (Tools::getvalue('getToken')) {
+                die($this->token);
+            }
+            Tools::redirect($response);
+        } else {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $response['L_ERRORCODE0'])));
+        }
     }
 
     public function getInfo($params)

@@ -15,15 +15,23 @@
 
 $(document).ready(function(){
     if ($('section#checkout-payment-step').hasClass('js-current-step')) {
-        initPaypalBraintree();
+        initPaypalBraintree('checkout');
     }
+    $(document).on('change', 'input[name=save_account_in_vault]', function(){
+        $('#paypal-button').html('');
+        if ($(this).is(':checked')) {
+            initPaypalBraintree('vault');
+        } else {
+            initPaypalBraintree('checkout');
+        }
+    });
 });
 
-function initPaypalBraintree() {
+function initPaypalBraintree(flow) {
     var paypal_bt_form = document.querySelector('#paypal-braintree-form');
 
     braintree.client.create({
-        authorization: authorization
+        authorization: paypal_braintree.authorization
     }, function (clientErr, clientInstance) {
 
         // Stop if there was a problem creating the client.
@@ -48,14 +56,16 @@ function initPaypalBraintree() {
             }
 
             paypal.Button.render({
-                env: mode, // 'production' or 'sandbox'
+                env: paypal_braintree.mode, // 'production' or 'sandbox'
 
                 payment: function () {
                     return paypalCheckoutInstance.createPayment({
-                        flow: 'vault',
-                        billingAgreementDescription: 'Your agreement description',
+                        flow: flow,
+                        amount : paypal_braintree.amount,
+                        currency : paypal_braintree.currency,
+                        billingAgreementDescription: '',
                         enableShippingAddress: false,
-                        shippingAddressEditable: false,
+                        shippingAddressEditable: false
                     });
                 },
 
@@ -81,15 +91,15 @@ function initPaypalBraintree() {
             }, '#paypal-button').then(function (e) {
 
             });
-            $('#payment-confirmation button').click(function(){
+            $('#payment-confirmation button').click(function(event){
                 payment_selected = $('input[name=payment-option]:checked').attr('id');
                 if (!$('#pay-with-'+payment_selected+'-form .payment_module').hasClass('paypal-braintree')) {
                     return true;
                 }
-                if (!document.querySelector('input#paypal_payment_method_nonce').value) {
+                if (!document.querySelector('input#paypal_payment_method_nonce').value && !$('select[name=pbt_vaulting_token]').val()) {
                     event.preventDefault();
                     event.stopPropagation();
-                    $('#bt-paypal-error-msg').show().text(pbt_translations.empty_nonce);
+                    $('#bt-paypal-error-msg').show().text(paypal_braintree.translations.empty_nonce);
                 }
             });
 

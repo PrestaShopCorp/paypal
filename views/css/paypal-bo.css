@@ -216,6 +216,9 @@ p.contentPara {
 .blue a:hover, .dark a:hover {
     color: #fff;
 }
+div#config_logo-images-thumbnails img {
+    max-height: 90px;
+}
 @media only screen and (max-width: 1240px) {
     #paypal_conf .box ul {
         width: 55%;

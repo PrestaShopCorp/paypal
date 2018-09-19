@@ -14,21 +14,23 @@
  */
 var ppp;
 $(document).ready(function() {
-    if (ppp_mode == 'sandbox')
-        showPui = true
-    else
-        showPui = false
+    if ($('section#checkout-payment-step').hasClass('js-current-step')) {
+        if (ppp_mode == 'sandbox')
+            showPui = true
+        else
+            showPui = false
 
-    ppp = PAYPAL.apps.PPP({
-        "approvalUrl": ppp_approval_url,
-        "placeholder": "ppplus",
-        "mode": ppp_mode,
-        "language": ppp_language_iso_code,
-        "country": ppp_country_iso_code,
-        "buttonLocation": "outside",
-        "useraction": "continue",
-        "showPuiOnSandbox": showPui,
-    });
+        ppp = PAYPAL.apps.PPP({
+            "approvalUrl": ppp_approval_url,
+            "placeholder": "ppplus",
+            "mode": ppp_mode,
+            "language": ppp_language_iso_code,
+            "country": ppp_country_iso_code,
+            "buttonLocation": "outside",
+            "useraction": "continue",
+            "showPuiOnSandbox": showPui,
+        });
+    }
 });
 exec_ppp_payment = true;
 function doPatchPPP() {

@@ -35,7 +35,8 @@ include_once 'classes/AbstractMethodPaypal.php';
 include_once 'classes/PaypalCapture.php';
 include_once 'classes/PaypalOrder.php';
 
-
+const BT_CARD_PAYMENT = 'card-braintree';
+const BT_PAYPAL_PAYMENT = 'paypal-braintree';
 // EC = express checkout
 // ECS = express checkout sortcut
 // BT = Braintree
@@ -49,12 +50,15 @@ class PayPal extends PaymentModule
     public $amount_paid_paypal;
     public $module_link;
     public $errors;
+    public $bt_countries = array("FR", "GB", "IT", "ES", "US");
+
 
     public function __construct()
     {
         $this->name = 'paypal';
         $this->tab = 'payments_gateways';
-        $this->version = '4.3.3';
+        $this->version = '4.4.2';
+        $this->author_address = '0x416357AF746680E3B2787841AB0e51d9BB684734';
         $this->author = 'PrestaShop';
         $this->display = 'view';
         $this->module_key = '336225a5988ad434b782f2d868d7bfcd';
@@ -73,6 +77,8 @@ class PayPal extends PaymentModule
         $this->confirmUninstall = $this->l('Are you sure you want to delete your details?');
         $this->express_checkout = $this->l('PayPal Express Checkout ');
         $this->module_link = $this->context->link->getAdminLink('AdminModules', true).'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+
+        $this->errors = '';
     }
 
     public function install()
@@ -110,9 +116,11 @@ class PayPal extends PaymentModule
             || !Configuration::updateValue('PAYPAL_API_CARD', 0)
             || !Configuration::updateValue('PAYPAL_METHOD', '')
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', 0)
+            || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', 1)
             || !Configuration::updateValue('PAYPAL_CRON_TIME', date('Y-m-d H:m:s'))
             || !Configuration::updateValue('PAYPAL_BY_BRAINTREE', 0)
             || !Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT', 0)
+            || !Configuration::updateValue('PAYPAL_VAULTING', 0)
         ) {
             return false;
         }
@@ -152,6 +160,26 @@ class PayPal extends PaymentModule
               `id_paypal_order` INT(11),
               `capture_amount` FLOAT(11),
               `result` VARCHAR(255),
+              `date_add` DATETIME,
+              `date_upd` DATETIME
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
+
+        $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_customer` (
+              `id_paypal_customer` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `id_customer` INT(11),
+              `reference` VARCHAR(55),
+              `method` VARCHAR(55),
+              `date_add` DATETIME,
+              `date_upd` DATETIME
+        ) ENGINE = " . _MYSQL_ENGINE_ ;
+
+        $sql[] = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "paypal_vaulting` (
+              `id_paypal_vaulting` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              `id_paypal_customer` INT(11),
+              `token` VARCHAR(255),
+              `name` VARCHAR(255),
+              `info` VARCHAR(255),
+              `payment_tool` VARCHAR(255),
               `date_add` DATETIME,
               `date_upd` DATETIME
         ) ENGINE = " . _MYSQL_ENGINE_ ;
@@ -229,7 +257,11 @@ class PayPal extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
-            $order_state->add();
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'paypal/views/img/os_braintree.png';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING', (int) $order_state->id);
         }
         if (!Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION')
@@ -249,7 +281,11 @@ class PayPal extends PaymentModule
             $order_state->delivery = false;
             $order_state->logable = false;
             $order_state->invoice = false;
-            $order_state->add();
+            if ($order_state->add()) {
+                $source = _PS_MODULE_DIR_.'paypal/views/img/os_braintree.png';
+                $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING_VALIDATION', (int) $order_state->id);
         }
         return true;
@@ -274,10 +310,13 @@ class PayPal extends PaymentModule
             || !$this->registerHook('actionBeforeCartUpdateQty')
             || !$this->registerHook('displayReassurance')
             || !$this->registerHook('displayInvoiceLegalFreeText')
+            || !$this->registerHook('actionAdminControllerSetMedia')
+            || !$this->registerHook('displayMyAccountBlock')
+            || !$this->registerHook('displayCustomerAccount')
+            || !$this->registerHook('displayShoppingCartFooter')
         ) {
             return false;
         }
-
 
         return true;
     }
@@ -313,7 +352,10 @@ class PayPal extends PaymentModule
             'PAYPAL_BY_BRAINTREE',
             'PAYPAL_CRON_TIME',
             'PAYPAL_EXPRESS_CHECKOUT',
-            'PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT'
+            'PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT',
+            'PAYPAL_VAULTING',
+            'PAYPAL_CONFIG_BRAND',
+            'PAYPAL_CONFIG_LOGO'
         );
 
         foreach ($config as $var) {
@@ -339,10 +381,10 @@ class PayPal extends PaymentModule
     private function uninstallSQL()
     {
         $sql = array();
-
         $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_capture`";
-
         $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_order`";
+        $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_customer`";
+        $sql[] = "DROP TABLE IF EXISTS `"._DB_PREFIX_."paypal_vaulting`";
 
         foreach ($sql as $q) {
             if (!DB::getInstance()->execute($q)) {
@@ -371,6 +413,17 @@ class PayPal extends PaymentModule
         }
     }
 
+    public function hookDisplayShoppingCartFooter()
+    {
+        if ('cart' !== $this->context->controller->php_self
+            || (Configuration::get('PAYPAL_METHOD') != 'EC' && Configuration::get('PAYPAL_METHOD') != 'PPP')
+            || !Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) {
+            return false;
+        }
+        $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
+        return $method->renderExpressCheckoutShortCut($this->context, Configuration::get('PAYPAL_METHOD'), 'cart');
+    }
+
     public function getContent()
     {
         $this->_postProcess();
@@ -397,9 +450,10 @@ class PayPal extends PaymentModule
             'PAYPAL_SANDBOX_SECRET' => Configuration::get('PAYPAL_SANDBOX_SECRET'),
             'PAYPAL_LIVE_CLIENTID' => Configuration::get('PAYPAL_LIVE_CLIENTID'),
             'PAYPAL_LIVE_SECRET' => Configuration::get('PAYPAL_LIVE_SECRET'),
+            'ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
 
-        if (getenv('PLATEFORM') != 'PSREADY' && ($country_default == "FR" || $country_default == "GB" || $country_default == "IT" || $country_default == "ES")) {
+        if (getenv('PLATEFORM') != 'PSREADY' && in_array($country_default, $this->bt_countries)) {
             $this->context->smarty->assign(array(
                 'braintree_available' => true,
             ));
@@ -409,6 +463,11 @@ class PayPal extends PaymentModule
             ));
         }
 
+        if (Configuration::get('PAYPAL_METHOD') == 'BT') {
+            $hint = $this->l('Set up a test environment in your Braintree account (only if you are a developer)');
+        } else {
+            $hint = $this->l('Set up a test environment in your PayPal account (only if you are a developer)');
+        }
 
         $fields_form = array();
         $inputs = array(
@@ -417,7 +476,7 @@ class PayPal extends PaymentModule
                 'label' => $this->l('Activate sandbox'),
                 'name' => 'paypal_sandbox',
                 'is_bool' => true,
-                'hint' => $this->l('Set up a test environment in your PayPal account (only if you are a developer)'),
+                'hint' => $hint,
                 'values' => array(
                     array(
                         'id' => 'paypal_sandbox_on',
@@ -459,7 +518,7 @@ class PayPal extends PaymentModule
         );
         $helper = new HelperForm();
         $helper->module = $this;
-        $helper->name_controller = $this->name;
+        $helper->name_controller = 'main_form';
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
         $helper->title = $this->displayName;
@@ -476,7 +535,7 @@ class PayPal extends PaymentModule
         $form = $helper->generateForm($fields_form);
 
 
-        if (count($this->errors)) {
+        if ($this->errors) {
             $this->message .= $this->errors;
         } elseif (Configuration::get('PAYPAL_METHOD') && Configuration::get('PAYPAL_SANDBOX') == 1) {
             if (Configuration::get('PAYPAL_METHOD') == 'BT') {
@@ -499,6 +558,9 @@ class PayPal extends PaymentModule
             $result .= $config['block_info'];
         }
         $result .= $this->display(__FILE__, 'views/templates/admin/configuration.tpl').$form;
+        if (isset($config['shortcut'])) {
+            $result .= $config['shortcut'];
+        }
         if (isset($config['form'])) {
             $result .= $config['form'];
         }
@@ -519,7 +581,6 @@ class PayPal extends PaymentModule
         } else {
             $method_name = Configuration::get('PAYPAL_METHOD');
         }
-
 
         if ($method_name) {
             $method = AbstractMethodPaypal::load($method_name);
@@ -590,13 +651,16 @@ class PayPal extends PaymentModule
                         $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_infos_card.tpl'));
                         $payments_options[] = $payment_options;
                     }
-                    if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
+                    if ((Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) && isset($this->context->cookie->paypal_ecs)) {
                         $payment_options = new PaymentOption();
                         $action_text = $this->l('Pay with paypal express checkout');
                         $payment_options->setCallToActionText($action_text);
                         $payment_options->setModuleName('express_checkout_schortcut');
                         $payment_options->setAction($this->context->link->getModuleLink($this->name, 'ecValidation', array('shortcut'=>'1'), true));
-                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_ec.tpl'));
+                        $this->context->smarty->assign(array(
+                            'paypal_account_email' => $this->context->cookie->paypal_ecs_email,
+                        ));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_sc.tpl'));
                         $payments_options[] = $payment_options;
                     }
                 }
@@ -646,6 +710,18 @@ class PayPal extends PaymentModule
                         die($e);
                     }
                     $payments_options[] = $payment_options;
+                    if ((Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) && isset($this->context->cookie->paypal_pSc)) {
+                        $payment_options = new PaymentOption();
+                        $action_text = $this->l('Pay with paypal plus shortcut');
+                        $payment_options->setCallToActionText($action_text);
+                        $payment_options->setModuleName('paypal_plus_schortcut');
+                        $payment_options->setAction($this->context->link->getModuleLink($this->name, 'pppValidation', array('shortcut'=>'1'), true));
+                        $this->context->smarty->assign(array(
+                            'paypal_account_email' => $this->context->cookie->paypal_pSc_email,
+                        ));
+                        $payment_options->setAdditionalInformation($this->context->smarty->fetch('module:paypal/views/templates/front/payment_sc.tpl'));
+                        $payments_options[] = $payment_options;
+                    }
                 }
 
                 break;
@@ -673,8 +749,8 @@ class PayPal extends PaymentModule
                     $this->context->controller->registerJavascript($this->name . '-pp-braintreejs', 'modules/' . $this->name . '/views/js/payment_pbt.js');
                 }
             }
-            if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && isset($this->context->cookie->paypal_ecs)) {
-                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/ec_shortcut_payment.js');
+            if ((Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART')) && (isset($this->context->cookie->paypal_ecs) || isset($this->context->cookie->paypal_pSc))) {
+                $this->context->controller->registerJavascript($this->name . '-paypal-ec-sc', 'modules/' . $this->name . '/views/js/shortcut_payment.js');
             }
             if (Configuration::get('PAYPAL_METHOD') == 'EC' && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
@@ -684,7 +760,7 @@ class PayPal extends PaymentModule
                     'url_token'   => $this->context->link->getModuleLink($this->name, 'ecInit', array('credit_card'=>'0','getToken'=>1), true),
                 ));
                 $this->context->controller->registerJavascript($this->name . '-paypal-checkout', 'https://www.paypalobjects.com/api/checkout.js', array('server' => 'remote'));
-                $this->context->controller->registerJavascript($this->name . '-paypal-checkout-in-context', 'modules/' . $this->name . '/views/js/ec_in_context.js', array('server' => 'remote'));
+                $this->context->controller->registerJavascript($this->name . '-paypal-checkout-in-context', 'modules/' . $this->name . '/views/js/ec_in_context.js');
             }
             if (Configuration::get('PAYPAL_METHOD') == 'PPP' && Configuration::get('PAYPAL_PLUS_ENABLED')) {
                 $this->context->controller->registerJavascript($this->name . '-plus-minjs', 'https://www.paypalobjects.com/webstatic/ppplus/ppplus.min.js', array('server' => 'remote'));
@@ -692,18 +768,19 @@ class PayPal extends PaymentModule
                 $this->context->controller->addJqueryPlugin('fancybox');
             }
         }
-        if (Tools::getValue('controller') == "product" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT')) {
-            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT')) {
+        if ((Tools::getValue('controller') == "product" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'))
+        || (Tools::getValue('controller') == "cart" && Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'))) {
+            if (Configuration::get('PAYPAL_EXPRESS_CHECKOUT_IN_CONTEXT') && Configuration::get('PAYPAL_METHOD') == 'EC') {
                 $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
                 Media::addJsDef(array(
                     'ec_sc_in_context' => 1,
                     'ec_sc_environment' => $environment,
                     'merchant_id' => Configuration::get('PAYPAL_MERCHANT_ID_'.Tools::strtoupper($environment)),
-                    'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array('credit_card'=>'0','getToken'=>1), true),
+                    'ec_sc_action_url'   => $this->context->link->getModuleLink($this->name, 'ScInit', array('credit_card'=>'0','getToken'=>1), true),
                 ));
             }
             Media::addJsDef(array(
-                'ec_sc_init_url'   => $this->context->link->getModuleLink($this->name, 'ecScInit', array(), true),
+                'sc_init_url'   => $this->context->link->getModuleLink($this->name, 'ScInit', array(), true),
             ));
         }
     }
@@ -735,6 +812,7 @@ class PayPal extends PaymentModule
                                     $paypal_order->payment_status = $transaction->status;
                                     $paypal_order->update();
                                     $ps_order->setCurrentState(Configuration::get('PS_OS_PAYMENT'));
+                                    $this->setTransactionId($ps_order, $transaction->id);
                                 }
                                 break;
                             case 'settling': // waiting
@@ -751,6 +829,13 @@ class PayPal extends PaymentModule
                 }
             }
         }
+    }
+
+    public function setTransactionId($ps_order, $transaction_id)
+    {
+        Db::getInstance()->update('order_payment', array(
+            'transaction_id' => pSQL($transaction_id),
+        ), 'order_reference = "'.pSQL($ps_order->reference).'"');
     }
 
     public function hookActionObjectCurrencyAddAfter($params)
@@ -800,6 +885,13 @@ class PayPal extends PaymentModule
 
         $braintree = AbstractMethodPaypal::load('BT');
         $clientToken = $braintree->init(true);
+
+        if (isset($clientToken['error_code'])) {
+            $this->context->smarty->assign(array(
+                'init_error'=> $this->l('Error Braintree initialization ').$clientToken['error_code'].' : '.$clientToken['error_msg'],
+            ));
+        }
+
         $this->context->smarty->assign(array(
             'braintreeToken'=> $clientToken,
             'braintreeSubmitUrl'=> $this->context->link->getModuleLink('paypal', 'btValidation', array(), true),
@@ -807,7 +899,17 @@ class PayPal extends PaymentModule
             'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
             'path' => $this->_path,
             'mode' => $braintree->mode == 'SANDBOX' ? Tools::strtolower($braintree->mode) : 'production',
+            'bt_method' => BT_PAYPAL_PAYMENT,
+            'active_vaulting'=> Configuration::get('PAYPAL_VAULTING'),
+            'currency' => $this->context->currency->iso_code,
         ));
+
+        if (Configuration::get('PAYPAL_VAULTING')) {
+            $payment_methods = PaypalVaulting::getCustomerMethods($this->context->customer->id, BT_PAYPAL_PAYMENT);
+            $this->context->smarty->assign(array(
+                'payment_methods' => $payment_methods,
+            ));
+        }
 
         return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_pb.tpl');
     }
@@ -815,15 +917,35 @@ class PayPal extends PaymentModule
 
     protected function generateFormBt()
     {
-
         $amount = $this->context->cart->getOrderTotal();
-
         $braintree = AbstractMethodPaypal::load('BT');
+
         $clientToken = $braintree->init(true);
+
+        if (isset($clientToken['error_code'])) {
+            $this->context->smarty->assign(array(
+                'init_error'=> $this->l('Error Braintree initialization ').$clientToken['error_code'].' : '.$clientToken['error_msg'],
+            ));
+        }
         $check3DS = 0;
         $required_3ds_amount = Tools::convertPrice(Configuration::get('PAYPAL_3D_SECURE_AMOUNT'), Currency::getCurrencyInstance((int)$this->context->currency->id));
         if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
             $check3DS = 1;
+        }
+
+        if (Configuration::get('PAYPAL_VAULTING')) {
+            $payment_methods = PaypalVaulting::getCustomerMethods($this->context->customer->id, BT_CARD_PAYMENT);
+            if (Configuration::get('PAYPAL_USE_3D_SECURE') && $amount > $required_3ds_amount) {
+                foreach ($payment_methods as $key => $method) {
+                    $nonce = $braintree->createMethodNonce($method['token']);
+                    $payment_methods[$key]['nonce'] = $nonce;
+                }
+            }
+
+            $this->context->smarty->assign(array(
+                'active_vaulting'=> true,
+                'payment_methods' => $payment_methods,
+            ));
         }
         $this->context->smarty->assign(array(
             'error_msg'=> Tools::getValue('bt_error_msg'),
@@ -832,9 +954,9 @@ class PayPal extends PaymentModule
             'braintreeAmount'=> $amount,
             'check3Dsecure'=> $check3DS,
             'baseDir' => $this->context->link->getBaseLink($this->context->shop->id, true),
+            'method_bt' => BT_CARD_PAYMENT,
         ));
-
-
+       // echo '<pre>';print_r($payment_methods);die;
         return $this->context->smarty->fetch('module:paypal/views/templates/front/payment_bt.tpl');
     }
 
@@ -871,11 +993,11 @@ class PayPal extends PaymentModule
 
     public function hookDisplayReassurance()
     {
-        if ('product' !== $this->context->controller->php_self || Configuration::get('PAYPAL_METHOD') != 'EC') {
+        if ('product' !== $this->context->controller->php_self || !Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') || (Configuration::get('PAYPAL_METHOD') != 'EC' && Configuration::get('PAYPAL_METHOD') != 'PPP')) {
             return false;
         }
-        $method = AbstractMethodPaypal::load('EC');
-        return $method->renderExpressCheckoutShortCut($this->context, 'EC');
+        $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
+        return $method->renderExpressCheckoutShortCut($this->context, Configuration::get('PAYPAL_METHOD'), 'product');
     }
 
     public function needConvert()
@@ -967,6 +1089,18 @@ class PayPal extends PaymentModule
         }
     }
 
+    public function hookActionAdminControllerSetMedia()
+    {
+        if (Tools::getValue('controller') == "AdminOrders" && Tools::getValue('id_order')) {
+            $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
+            if (Validate::isLoadedObject($paypal_order)) {
+                $method = $paypal_order->method == 'BT' ? $this->l('Refund Braintree') : $this->l('Refund PayPal');
+                Media::addJsDefL('chb_paypal_refund', $method);
+                $this->context->controller->addJS($this->_path . '/views/js/bo_order.js');
+            }
+        }
+    }
+
 
     public function hookDisplayAdminOrder($params)
     {
@@ -996,13 +1130,23 @@ class PayPal extends PaymentModule
             );
         }
         if ($order->current_state == Configuration::get('PS_OS_REFUND') &&  $paypal_order->payment_status == 'Refunded') {
+            if ($paypal_order->method == 'BT') {
+                $msg = $this->l('Your order is fully refunded by Braintree.');
+            } else {
+                $msg = $this->l('Your order is fully refunded by PayPal.');
+            }
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">'.$this->l('Your order is fully refunded by PayPal.').'</p>'
+                '<p class="paypal-warning">'.$msg.'</p>'
             );
         }
         if ($order->current_state == Configuration::get('PS_OS_PAYMENT') && Validate::isLoadedObject($paypal_capture) && $paypal_capture->id_capture) {
+            if ($paypal_order->method == 'BT') {
+                $msg = $this->l('Your order is fully captured by Braintree.');
+            } else {
+                $msg = $this->l('Your order is fully captured by PayPal.');
+            }
             $paypal_msg .= $this->displayWarning(
-                '<p class="paypal-warning">'.$this->l('Your order is fully captured by PayPal.').'</p>'
+                '<p class="paypal-warning">'.$msg.'</p>'
             );
         }
         if (Tools::getValue('error_capture')) {
@@ -1028,6 +1172,13 @@ class PayPal extends PaymentModule
             //unset cookie of payment init if it's no more same cart
             Context::getContext()->cookie->__unset('paypal_ecs');
             Context::getContext()->cookie->__unset('paypal_ecs_payerid');
+            Context::getContext()->cookie->__unset('paypal_ecs_email');
+        }
+        if (isset($this->context->cookie->paypal_pSc) || isset($this->context->cookie->paypal_pSc_payerid)) {
+            //unset cookie of payment init if it's no more same cart
+            Context::getContext()->cookie->__unset('paypal_pSc');
+            Context::getContext()->cookie->__unset('paypal_pSc_payerid');
+            Context::getContext()->cookie->__unset('paypal_pSc_email');
         }
     }
 
@@ -1044,6 +1195,90 @@ class PayPal extends PaymentModule
         $orderThread->token = Tools::passwdGen(12);
         $orderThread->add();
         return (int)$orderThread->id;
+    }
+
+    public function hookActionOrderSlipAdd($params)
+    {
+        if (Tools::isSubmit('doPartialRefundPaypal')) {
+            $paypal_order = PaypalOrder::loadByOrderId($params['order']->id);
+
+            if (!Validate::isLoadedObject($paypal_order)) {
+                return false;
+            }
+            $method = AbstractMethodPaypal::load($paypal_order->method);
+            $orderMessage = new CustomerMessage();
+            $orderMessage->id_customer_thread = $this->createOrderThread($params['order']->id);
+            $orderMessage->private = 1;
+            $orderMessage->id_order = $params['order']->id;
+            $orderMessage->id_customer = $this->context->customer->id;
+            $orderMessage->message = '';
+            $ex_detailed_message = '';
+            $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
+            if (Validate::isLoadedObject($capture) && !$capture->id_capture) {
+                $orderMessage->message = $this->l('You couldn\'t refund order, it\'s not payed yet.');
+                $orderMessage->save();
+                return true;
+            }
+            $status = '';
+            if ($paypal_order->method == "BT") {
+                $status = $method->getTransactionStatus($paypal_order->id_transaction);
+            }
+
+            if ($paypal_order->method == "BT" && $status == "submitted_for_settlement") {
+                $orderMessage->message = $this->l('You couldn\'t refund order, it\'s not payed yet.');
+                $orderMessage->save();
+                return true;
+            } else {
+                try {
+                    $refund_response = $method->partialRefund($params);
+                } catch (PayPal\Exception\PPConnectionException $e) {
+                    $ex_detailed_message = $this->l('Error connecting to ') . $e->getUrl();
+                } catch (PayPal\Exception\PPMissingCredentialException $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                } catch (PayPal\Exception\PPConfigurationException $e) {
+                    $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+                } catch (PayPal\Exception\PayPalConnectionException $e) {
+                    $decoded_message = Tools::jsonDecode($e->getData());
+                    $ex_detailed_message = $decoded_message->message;
+                } catch (PayPal\Exception\PayPalInvalidCredentialException $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                } catch (PayPal\Exception\PayPalMissingCredentialException $e) {
+                    $ex_detailed_message = $this->l('Invalid configuration. Please check your configuration file');
+                } catch (Exception $e) {
+                    $ex_detailed_message = $e->errorMessage();
+                }
+            }
+
+            if ($refund_response['success']) {
+                if (Validate::isLoadedObject($capture) && $capture->id_capture) {
+                    $capture->result = 'refunded';
+                    $capture->save();
+                }
+                $paypal_order->payment_status = 'refunded';
+                $paypal_order->save();
+            }
+            if ($ex_detailed_message) {
+                $orderMessage->message = $ex_detailed_message;
+            } else {
+                foreach ($refund_response as $key => $msg) {
+                    $orderMessage->message .= $key." : ".$msg.";\r";
+                }
+            }
+            if ($orderMessage->message) {
+                $orderMessage->save();
+            }
+        }
+    }
+
+    public function hookActionOrderStatusPostUpdate(&$params)
+    {
+        if ($params['newOrderStatus']->id == Configuration::get('PS_OS_PAYMENT')) {
+            $capture = PaypalCapture::getByOrderId($params['id_order']);
+            $ps_order = new Order($params['id_order']);
+            if ($capture['id_capture']) {
+                $this->setTransactionId($ps_order, $capture['id_capture']);
+            }
+        }
     }
 
 
@@ -1266,11 +1501,13 @@ class PayPal extends PaymentModule
             'last_name'     => $this->context->employee->lastname,
             'shop_name'     => Configuration::get('PS_SHOP_NAME', null, null, null, ''),
             'ref_merchant'  => 'PrestaShop_'.(getenv('PLATEFORM') == 'PSREADY' ? 'Ready':''),
+            'ps_version'    => _PS_VERSION_,
+            'pp_version'    => $this->version,
+            'sandbox'       => Configuration::get('PAYPAL_SANDBOX') ? "true" : '',
         );
 
-        $sdk = new PaypalSDK(Configuration::get('PAYPAL_SANDBOX'));
+        $response = "https://partners-subscribe.prestashop.com/paypal/request.php?".http_build_query($partner_info, '', '&');
 
-        $response = $sdk->getUrlOnboarding($partner_info);
         return $response;
     }
 
@@ -1302,6 +1539,20 @@ class PayPal extends PaymentModule
             return (int)0;
         } else {
             return (int)2;
+        }
+    }
+
+    public function hookDisplayCustomerAccount()
+    {
+        if (Configuration::get('PAYPAL_METHOD') == 'BT' && Configuration::get('PAYPAL_VAULTING')) {
+            return $this->display(__FILE__, 'my-account.tpl');
+        }
+    }
+
+    public function hookDisplayMyAccountBlock()
+    {
+        if (Configuration::get('PAYPAL_METHOD') == 'BT' && Configuration::get('PAYPAL_VAULTING')) {
+            return $this->display(__FILE__, 'my-account-footer.tpl');
         }
     }
 }

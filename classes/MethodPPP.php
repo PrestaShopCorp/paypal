@@ -64,16 +64,24 @@ class MethodPPP extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_TITLE', $params['ppp_config_title']);
             Configuration::updateValue('PAYPAL_PPP_CONFIG_BRAND', $params['ppp_config_brand']);
-
             if (isset($_FILES['ppp_config_logo']['tmp_name']) && $_FILES['ppp_config_logo']['tmp_name'] != '') {
+                if (!in_array($_FILES['ppp_config_logo']['type'], array('image/gif', 'image/png', 'image/jpeg'))) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Use a valid graphics format, such as .gif, .jpg, or .png.'));
+                    return;
+                }
+                $size = getimagesize($_FILES['ppp_config_logo']['tmp_name']);
+                if ($size[0] > 190 || $size[1] > 60) {
+                    $paypal->errors .= $paypal->displayError($paypal->l('Limit the image to 190 pixels wide by 60 pixels high.'));
+                    return;
+                }
                 if (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) ||
                 !move_uploaded_file($_FILES['ppp_config_logo']['tmp_name'], $tmpName)) {
                     $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
                 }
-                if (!ImageManager::resize($tmpName, _PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')) {
+                if (!ImageManager::resize($tmpName, _PS_MODULE_DIR_.'paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png')) {
                     $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while copying the image.'));
                 }
-                Configuration::updateValue('PAYPAL_PPP_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png');
+                Configuration::updateValue('PAYPAL_PPP_CONFIG_LOGO', _PS_MODULE_DIR_.'paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png');
             }
             if ((Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_SANDBOX_CLIENTID') && Configuration::get('PAYPAL_SANDBOX_SECRET'))
                 || (!Configuration::get('PAYPAL_SANDBOX') && Configuration::get('PAYPAL_LIVE_CLIENTID') && Configuration::get('PAYPAL_LIVE_SECRET'))) {
@@ -84,6 +92,15 @@ class MethodPPP extends AbstractMethodPaypal
                     $paypal->errors .= $paypal->displayError($paypal->l('An error occurred while creating your web experience. Check your credentials.'));
                 }
             }
+        }
+        if (Tools::isSubmit('submit_shortcut')) {
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT', $params['paypal_show_shortcut']);
+            Configuration::updateValue('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART', $params['paypal_show_shortcut_cart']);
+        }
+
+        if (Tools::getValue('deleteLogoPp')) {
+            unlink(Configuration::get('PAYPAL_PPP_CONFIG_LOGO'));
+            Configuration::updateValue('PAYPAL_PPP_CONFIG_LOGO', '');
         }
 
         if (Tools::isSubmit('save_credentials')) {
@@ -111,11 +128,197 @@ class MethodPPP extends AbstractMethodPaypal
         }
     }
 
+    public function getConfig(Paypal $module)
+    {
+        $params = array('inputs' => array(
+            array(
+                'type' => 'text',
+                'label' => $module->l('Title'),
+                'name' => 'ppp_config_title',
+                'placeholder' => $module->l('Leave it empty to use default PayPal payment method title'),
+            ),
+            array(
+                'type' => 'text',
+                'label' => $module->l('Brand name'),
+                'name' => 'ppp_config_brand',
+                'placeholder' => $module->l('Leave it empty to use your Shop name'),
+                'hint' => $module->l('A label that overrides the business name in the PayPal account on the PayPal pages.'),
+            ),
+            array(
+                'type' => 'file',
+                'label' => $module->l('Shop logo field'),
+                'name' => 'ppp_config_logo',
+                'display_image' => true,
+                'delete_url' => $module->module_link.'&deleteLogoPp=1',
+                'hint' => $module->l('An image must be stored on a secure (https) server. Use a valid graphics format, such as .gif, .jpg, or .png. Limit the image to 190 pixels wide by 60 pixels high. PayPal crops images that are larger. This logo will replace brand name  at the top of the cart review area.'),
+                'image' => file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png')?'<img src="'.Context::getContext()->link->getBaseLink().'modules/paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png" class="img img-thumbnail" />':''
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Show PayPal benefits to your customers'),
+                'name' => 'paypal_show_advantage',
+                'desc' => $module->l(''),
+                'is_bool' => true,
+                'hint' => $module->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_advantage_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_advantage_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+        ));
+
+        $params['fields_value'] = array(
+            'ppp_config_title' => Configuration::get('PAYPAL_PPP_CONFIG_TITLE'),
+            'ppp_config_brand' => Configuration::get('PAYPAL_PPP_CONFIG_BRAND'),
+            'ppp_config_logo' => Configuration::get('PAYPAL_PPP_CONFIG_LOGO'),
+            'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
+        );
+
+        $params['shortcut'] = $this->createShortcutForm($module);
+
+
+        $context = Context::getContext();
+        $context->smarty->assign(array(
+            'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
+            'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
+        ));
+        if ((Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN))  {
+            $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
+        }
+
+        return $params;
+    }
+
+    public function createShortcutForm($module)
+    {
+        $fields_form = array();
+        $fields_form[0]['form'] = array(
+            'legend' => array(
+                'title' => $module->l('PayPal Express Shortcut'),
+                'icon' => 'icon-cogs',
+            ),
+            'submit' => array(
+                'title' => $module->l('Save'),
+                'class' => 'btn btn-default pull-right button',
+            ),
+        );
+
+        $fields_form[0]['form']['input'] = array(
+            array(
+                'type' => 'html',
+                'name' => 'paypal_desc_shortcut',
+                'html_content' => $module->l('The PayPal shortcut is displayed directly in the cart or on your product pages, allowing a faster checkout experience for your buyers. It requires fewer pages, clicks and seconds in order to finalize the payment. PayPal provides you with the client’s billing and shipping information so that you don’t have to collect it yourself.'),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Display the shortcut on product pages'),
+                'name' => 'paypal_show_shortcut',
+                'is_bool' => true,
+                'hint' => $module->l('Recommended for mono-product websites.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Display shortcut in the cart'),
+                'name' => 'paypal_show_shortcut_cart',
+                'is_bool' => true,
+                'hint' => $module->l('Recommended for multi-products websites.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_show_shortcut_cart_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+        );
+
+        $fields_value = array(
+            'paypal_show_shortcut' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'),
+            'paypal_show_shortcut_cart' => Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT_CART'),
+        );
+
+        $helper = new HelperForm();
+        $helper->module = $module;
+        $helper->name_controller = 'form_shortcut';
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
+        $helper->title = $module->displayName;
+        $helper->show_toolbar = false;
+        $default_lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $helper->default_form_language = $default_lang;
+        $helper->submit_action = 'submit_shortcut';
+        $helper->allow_employee_form_lang = $default_lang;
+        $helper->tpl_vars = array(
+            'fields_value' => $fields_value,
+            'id_language' => Context::getContext()->language->id,
+            'back_url' => $module->module_link.'#paypal_params'
+        );
+
+        return $helper->generateForm($fields_form);
+    }
+
+    public function _getCredentialsInfo()
+    {
+        switch (Configuration::get('PAYPAL_SANDBOX')) {
+            case 0:
+                $apiContext = new ApiContext(
+                    new OAuthTokenCredential(
+                        Configuration::get('PAYPAL_LIVE_CLIENTID'),
+                        Configuration::get('PAYPAL_LIVE_SECRET')
+                    )
+                );
+                break;
+            case 1:
+                $apiContext = new ApiContext(
+                    new OAuthTokenCredential(
+                        Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
+                        Configuration::get('PAYPAL_SANDBOX_SECRET')
+                    )
+                );
+                break;
+        }
+
+        $apiContext->setConfig(
+            array(
+                'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
+                'log.LogEnabled' => false,
+                'cache.enabled' => true,
+            )
+        );
+        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP_17');
+        return $apiContext;
+    }
+
     public function createWebExperience()
     {
 
         $brand_name = Configuration::get('PAYPAL_PPP_CONFIG_BRAND')?Configuration::get('PAYPAL_PPP_CONFIG_BRAND'):Configuration::get('PS_SHOP_NAME');
-        $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/ppp_logo.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
+        $brand_logo = file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png')?Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true).'modules/paypal/views/img/ppp_logo'.Context::getContext()->shop->id.'.png':Context::getContext()->link->getBaseLink().'img/'.Configuration::get('PS_LOGO');
 
         $flowConfig = new \PayPal\Api\FlowConfig();
         // When set to "commit", the buyer is shown an amount, and the button text will read "Pay Now" on the checkout page.
@@ -126,11 +329,11 @@ class MethodPPP extends AbstractMethodPaypal
         $presentation = new \PayPal\Api\Presentation();
         // A URL to logo image. Allowed vaues: .gif, .jpg, or .png.
         $presentation->setLogoImage($brand_logo)
-        //	A label that overrides the business name in the PayPal account on the PayPal pages.
+            //	A label that overrides the business name in the PayPal account on the PayPal pages.
             ->setBrandName($brand_name)
-        //  Locale of pages displayed by PayPal payment experience.
+            //  Locale of pages displayed by PayPal payment experience.
             ->setLocaleCode(Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT')))
-        // A label to use as hypertext for the return to merchant link.
+            // A label to use as hypertext for the return to merchant link.
             ->setReturnUrlLabel("Return");
         // Parameters for input fields customization.
         $inputFields = new \PayPal\Api\InputFields();
@@ -163,102 +366,6 @@ class MethodPPP extends AbstractMethodPaypal
         return $createProfileResponse;
     }
 
-    public function _getCredentialsInfo()
-    {
-        switch (Configuration::get('PAYPAL_SANDBOX')) {
-            case 0:
-                $apiContext = new ApiContext(
-                    new OAuthTokenCredential(
-                        Configuration::get('PAYPAL_LIVE_CLIENTID'),
-                        Configuration::get('PAYPAL_LIVE_SECRET')
-                    )
-                );
-                break;
-            case 1:
-                $apiContext = new ApiContext(
-                    new OAuthTokenCredential(
-                        Configuration::get('PAYPAL_SANDBOX_CLIENTID'),
-                        Configuration::get('PAYPAL_SANDBOX_SECRET')
-                    )
-                );
-                break;
-        }
-
-        $apiContext->setConfig(
-            array(
-                'mode' => Configuration::get('PAYPAL_SANDBOX') ? 'sandbox' : 'live',
-                'log.LogEnabled' => false,
-                'cache.enabled' => true,
-            )
-        );
-        $apiContext->addRequestHeader('PayPal-Partner-Attribution-Id', (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_PPP':'PrestaShop_Cart_PPP');
-        return $apiContext;
-    }
-
-    public function getConfig(Paypal $module)
-    {
-        $params = array('inputs' => array(
-            array(
-                'type' => 'text',
-                'label' => $module->l('Title'),
-                'name' => 'ppp_config_title',
-                'placeholder' => $module->l('Leave it empty to use default PayPal payment method title'),
-            ),
-            array(
-                'type' => 'text',
-                'label' => $module->l('Brand name'),
-                'name' => 'ppp_config_brand',
-                'placeholder' => $module->l('Leave it empty to use your Shop name'),
-            ),
-            array(
-                'type' => 'file',
-                'label' => $module->l('Shop logo field'),
-                'name' => 'ppp_config_logo',
-                'hint' => $module->l('Leave it empty to use your default shop logo'),
-                'thumb' => file_exists(_PS_MODULE_DIR_.'paypal/views/img/ppp_logo.png')?Context::getContext()->link->getBaseLink().'modules/paypal/views/img/ppp_logo.png':''
-            ),
-            array(
-                'type' => 'switch',
-                'label' => $module->l('Show PayPal benefits to your customers'),
-                'name' => 'paypal_show_advantage',
-                'desc' => $module->l(''),
-                'is_bool' => true,
-                'hint' => $module->l('You can increase your conversion rate by presenting PayPal benefits to your customers on payment methods selection page.'),
-                'values' => array(
-                    array(
-                        'id' => 'paypal_show_advantage_on',
-                        'value' => 1,
-                        'label' => $module->l('Enabled'),
-                    ),
-                    array(
-                        'id' => 'paypal_show_advantage_off',
-                        'value' => 0,
-                        'label' => $module->l('Disabled'),
-                    )
-                ),
-            )
-        ));
-
-        $params['fields_value'] = array(
-            'ppp_config_title' => Configuration::get('PAYPAL_PPP_CONFIG_TITLE'),
-            'ppp_config_brand' => Configuration::get('PAYPAL_PPP_CONFIG_BRAND'),
-            'ppp_config_logo' => Configuration::get('PAYPAL_PPP_CONFIG_LOGO'),
-            'paypal_show_advantage' => Configuration::get('PAYPAL_API_ADVANTAGES'),
-        );
-
-
-        $context = Context::getContext();
-        $context->smarty->assign(array(
-            'need_rounding' => ((Configuration::get('PS_ROUND_TYPE') == Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN) ? 0 : 1),
-            'ppp_active' => Configuration::get('PAYPAL_PLUS_ENABLED'),
-        ));
-        if ((Configuration::get('PS_ROUND_TYPE') != Order::ROUND_ITEM) || (Configuration::get('PS_PRICE_ROUND_MODE') != PS_ROUND_HALF_DOWN))  {
-            $params['block_info'] = $module->display(_PS_MODULE_DIR_.$module->name, 'views/templates/admin/block_info.tpl');
-        }
-
-        return $params;
-    }
-
     public function init($params)
     {
         $payer = new Payer();
@@ -288,7 +395,12 @@ class MethodPPP extends AbstractMethodPaypal
         // payment approval/ cancellation.
 
         $redirectUrls = new RedirectUrls();
-        $redirectUrls->setReturnUrl(Context::getContext()->link->getModuleLink($this->name, 'pppValidation', array(), true))
+        if ($params['short_cut']) {
+            $return_url = Context::getContext()->link->getModuleLink($this->name, 'pppScOrder', array(), true);
+        } else {
+            $return_url = Context::getContext()->link->getModuleLink($this->name, 'pppValidation', array(), true);
+        }
+        $redirectUrls->setReturnUrl($return_url)
             ->setCancelUrl(Context::getContext()->link->getPageLink('order', true));
 
         // ### Payment
@@ -346,7 +458,7 @@ class MethodPPP extends AbstractMethodPaypal
             $item = new Item();
             $item->setName(Tools::substr($product['name'], 0, 126))
                 ->setCurrency($currency)
-                ->setDescription($product['attributes'])
+                ->setDescription(isset($product['attributes']) ? $product['attributes'] : '')
                 ->setQuantity($product['quantity'])
                 ->setSku($product['id_product']) // Similar to `item_number` in Classic API
                 ->setPrice($this->formatPrice($product['price']));
@@ -427,7 +539,7 @@ class MethodPPP extends AbstractMethodPaypal
         // Retrieve the payment object by calling the tatic `get` method
         // on the Payment class by passing a valid Payment ID
         $payment = Payment::get(Context::getContext()->cookie->paypal_plus_payment, $this->_getCredentialsInfo());
-        // echo'<pre>';print_r($payment);die;
+
         $cart = new Cart(Context::getContext()->cart->id);
         $address_delivery = new Address($cart->id_address_delivery);
 
@@ -469,26 +581,55 @@ class MethodPPP extends AbstractMethodPaypal
     public function validation()
     {
         $context = Context::getContext();
+        $cart = $context->cart;
         // Get the payment Object by passing paymentId
         // payment id was previously stored in session in
         // CreatePaymentUsingPayPal.php
-        $paymentId = Tools::getValue('paymentId');
+        $paymentId = Tools::getValue('shortcut') ? $context->cookie->paypal_pSc : Tools::getValue('paymentId');
         $payment = Payment::get($paymentId, $this->_getCredentialsInfo());
+        if (Tools::getValue('shortcut')) {
+            $discounts = Context::getContext()->cart->getCartRules();
+            if (count($discounts) > 0) {
+                Context::getContext()->cookie->__unset('paypal_pSc');
+                Context::getContext()->cookie->__unset('paypal_pSc_payerid');
+                throw new Exception('The total of the order do not match amount paid.');
+            }
+            $address_delivery = new Address($cart->id_address_delivery);
+            $state = '';
+            if ($address_delivery->id_state) {
+                $state = new State((int) $address_delivery->id_state);
+            }
+            $state_name = $state ? $state->iso_code : '';
+            $patchAdd = new Patch();
+            $patchAdd->setOp('replace')
+                ->setPath('/transactions/0/item_list/shipping_address')
+                ->setValue(json_decode('{
+                    "recipient_name": "'.$address_delivery->firstname.' '.$address_delivery->lastname.'",
+                    "line1": "'.$address_delivery->address1.'",
+                    "city": "'.$address_delivery->city.'",
+                    "state": "'.$state_name.'",
+                    "postal_code": "'.$address_delivery->postcode.'",
+                    "country_code": "'.Country::getIsoById($address_delivery->id_country).'"
+                }'));
+
+            $patchRequest = new PatchRequest();
+            $patchRequest->setPatches(array($patchAdd));
+            $payment->update($patchRequest, $this->_getCredentialsInfo());
+        }
+
         // ### Payment Execute
         // PaymentExecution object includes information necessary
         // to execute a PayPal account payment.
         // The payer_id is added to the request query parameters
         // when the user is redirected from paypal back to your site
         $execution = new PaymentExecution();
-        $execution->setPayerId(Tools::getValue('PayerID'));
+        $execution->setPayerId(Tools::getValue('shortcut') ? $context->cookie->paypal_pSc_payerid : Tools::getValue('PayerID'));
         // ### Optional Changes to Amount
         // If you wish to update the amount that you wish to charge the customer,
         // based on the shipping address or any other reason, you could
         // do that by passing the transaction object with just `amount` field in it.
-
         $exec_payment = $payment->execute($execution, $this->_getCredentialsInfo());
 
-        $cart = $context->cart;
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
             Tools::redirect('index.php?controller=order&step=1');
@@ -555,6 +696,40 @@ class MethodPPP extends AbstractMethodPaypal
         return $result;
     }
 
+    public function partialRefund($params)
+    {
+        $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
+
+        $sale = Sale::get($paypal_order->id_transaction, $this->_getCredentialsInfo());
+
+        $amount = 0;
+        foreach ($params['productList'] as $product) {
+            $amount += $product['amount'];
+        }
+        if (Tools::getValue('partialRefundShippingCost')) {
+            $amount += Tools::getValue('partialRefundShippingCost');
+        }
+
+        $amt = new Amount();
+        $amt->setCurrency($sale->getAmount()->getCurrency())
+            ->setTotal(number_format($amount, Paypal::getDecimal(), ".", ''));
+        $refundRequest = new RefundRequest();
+        $refundRequest->setAmount($amt);
+
+        $response = $sale->refundSale($refundRequest, $this->_getCredentialsInfo());
+
+        $result =  array(
+            'success' => true,
+            'refund_id' => $response->id,
+            'status' => $response->state,
+            'total_amount' => $response->total_refunded_amount->value,
+            'currency' => $response->total_refunded_amount->currency,
+            'saleId' => $response->sale_id,
+        );
+
+        return $result;
+    }
+
     public function void($params)
     {
     }
@@ -563,5 +738,42 @@ class MethodPPP extends AbstractMethodPaypal
     {
         $sale = Payment::get($id_payment, $this->_getCredentialsInfo());
         return $sale->payment_instruction;
+    }
+
+    public function renderExpressCheckoutShortCut(&$context, $type, $page_source)
+    {
+        $lang = $context->country->iso_code;
+        $environment = (Configuration::get('PAYPAL_SANDBOX')?'sandbox':'live');
+        $img_esc = "modules/paypal/views/img/ECShortcut/".Tools::strtolower($lang)."/buy/buy.png";
+
+        if (!file_exists(_PS_ROOT_DIR_.$img_esc)) {
+            $img_esc = "modules/paypal/views/img/ECShortcut/us/buy/buy.png";
+        }
+        $shop_url = Context::getContext()->link->getBaseLink(Context::getContext()->shop->id, true);
+        $context->smarty->assign(array(
+            'shop_url' => $shop_url,
+            'PayPal_payment_type' => $type,
+            'PayPal_img_esc' => $shop_url.$img_esc,
+            'action_url' => $context->link->getModuleLink('paypal', 'ScInit', array(), true),
+            'environment' => $environment,
+        ));
+
+        if ($page_source == 'product') {
+            $context->smarty->assign(array(
+                'es_cs_product_attribute' => Tools::getValue('id_product_attribute'),
+            ));
+            return $context->smarty->fetch('module:paypal/views/templates/hook/PPP_shortcut.tpl');
+        } elseif ($page_source == 'cart') {
+            return $context->smarty->fetch('module:paypal/views/templates/hook/cart_shortcut.tpl');
+        }
+    }
+
+    public function processCheckoutSc($response)
+    {
+        if (isset($response['approval_url'])) {
+            Tools::redirect($response['approval_url']);
+        } else {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => '00000')));
+        }
     }
 }

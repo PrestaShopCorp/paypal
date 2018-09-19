@@ -92,28 +92,9 @@
                     }
                     event.preventDefault();
                     event.stopPropagation();
-                    hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
-                        if (tokenizeErr) {
-                            var popup_message = '';
-                            switch (tokenizeErr.code) {
-                                case 'HOSTED_FIELDS_FIELDS_EMPTY':
-                                    popup_message = bt_translations.empty;
-                                    break;
-                                case 'HOSTED_FIELDS_FIELDS_INVALID':
-                                    popup_message = bt_translations.invalid+tokenizeErr.details.invalidFieldKeys;
-                                    break;
-                                case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
-                                    popup_message = bt_translations.token;
-                                    break;
-                                case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
-                                    popup_message = bt_translations.network;
-                                    break;
-                                default:
-                                    popup_message = bt_translations.tkn_failed;
-                            }
-                            $('#bt-card-error-msg').show().text(popup_message);
-                            return false;
-                        }
+
+                    // use vaulted card
+                    if ($('select[name=bt_vaulting_token]').val()) {
                         if (check3DS) {
                             braintree.threeDSecure.create({
                                 client: clientInstance
@@ -131,49 +112,128 @@
                                     $('#bt-card-error-msg').show().text(popup_message);
                                     return false;
                                 }
-                                threeDSecure.verifyCard({
-                                    nonce: payload.nonce,
-                                    amount: bt_amount,
-                                    addFrame: function (err, iframe) {
-                                        $.fancybox.open([
-                                            {
-                                                type: 'inline',
-                                                autoScale: true,
-                                                minHeight: 30,
-                                                content: '<p class="braintree-iframe">'+iframe.outerHTML+'</p>'
-                                            }
-                                        ]);
-                                    },
-                                    removeFrame: function () {
-
+                            threeDSecure.verifyCard({
+                                amount: bt_amount,
+                                nonce: $('select[name=bt_vaulting_token] option:checked').data('nonce'),
+                                addFrame: function (err, iframe) {
+                                    $.fancybox.open([
+                                        {
+                                            type: 'inline',
+                                            autoScale: true,
+                                            minHeight: 30,
+                                            content: '<p class="braintree-iframe">'+iframe.outerHTML+'</p>'
+                                        }
+                                    ]);
+                                },
+                                removeFrame: function () {
+                                }
+                            }, function (err, three_d_secure_response) {
+                                if (err) {
+                                    var popup_message = '';
+                                    switch (err.code) {
+                                        case 'CLIENT_REQUEST_ERROR':
+                                            popup_message = bt_translations.request_problem;
+                                            break;
+                                        default:
+                                            popup_message = bt_translations.failed_3d;
                                     }
-                                }, function (err, three_d_secure_response) {
-                                    if (err) {
-                                        var popup_message = '';
-                                        switch (err.code) {
-                                            case 'CLIENT_REQUEST_ERROR':
-                                                popup_message = bt_translations.request_problem;
+                                    $('#bt-card-error-msg').show().text(popup_message);
+                                    return false;
+                                }
+                                bt_form.submit()
+                                return;
+
+                            });
+                            });
+                        } else {
+                            bt_form.submit();
+                            return;
+                        }
+                    } else {
+                        hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+                            if (tokenizeErr) {
+                                var popup_message = '';
+                                switch (tokenizeErr.code) {
+                                    case 'HOSTED_FIELDS_FIELDS_EMPTY':
+                                        popup_message = bt_translations.empty;
+                                        break;
+                                    case 'HOSTED_FIELDS_FIELDS_INVALID':
+                                        popup_message = bt_translations.invalid+tokenizeErr.details.invalidFieldKeys;
+                                        break;
+                                    case 'HOSTED_FIELDS_FAILED_TOKENIZATION':
+                                        popup_message = bt_translations.token;
+                                        break;
+                                    case 'HOSTED_FIELDS_TOKENIZATION_NETWORK_ERROR':
+                                        popup_message = bt_translations.network;
+                                        break;
+                                    default:
+                                        popup_message = bt_translations.tkn_failed;
+                                }
+                                $('#bt-card-error-msg').show().text(popup_message);
+                                return false;
+                            }
+                            if (check3DS) {
+                                braintree.threeDSecure.create({
+                                    client: clientInstance
+                                }, function (ThreeDSecureerror,threeDSecure) {
+
+                                    if(ThreeDSecureerror)
+                                    {
+                                        switch (ThreeDSecureerror.code) {
+                                            case 'THREEDS_HTTPS_REQUIRED':
+                                                popup_message = bt_translations.https;
                                                 break;
                                             default:
-                                                popup_message = bt_translations.failed_3d;
+                                                popup_message = bt_translations.load_3d;
                                         }
                                         $('#bt-card-error-msg').show().text(popup_message);
                                         return false;
                                     }
+                                    threeDSecure.verifyCard({
+                                        nonce: payload.nonce,
+                                        amount: bt_amount,
+                                        addFrame: function (err, iframe) {
+                                            $.fancybox.open([
+                                                {
+                                                    type: 'inline',
+                                                    autoScale: true,
+                                                    minHeight: 30,
+                                                    content: '<p class="braintree-iframe">'+iframe.outerHTML+'</p>'
+                                                }
+                                            ]);
+                                        },
+                                        removeFrame: function () {
+                                        }
+                                    }, function (err, three_d_secure_response) {
+                                        if (err) {
+                                            var popup_message = '';
+                                            switch (err.code) {
+                                                case 'CLIENT_REQUEST_ERROR':
+                                                    popup_message = bt_translations.request_problem;
+                                                    break;
+                                                default:
+                                                    popup_message = bt_translations.failed_3d;
+                                            }
+                                            $('#bt-card-error-msg').show().text(popup_message);
+                                            return false;
+                                        }
 
-                                    document.querySelector('#braintree-form #payment_method_nonce').value = three_d_secure_response.nonce;
-                                    document.querySelector('#braintree-form #braintree_card_type').value = payload.details.cardType;
-                                    bt_form.submit()
+                                        document.querySelector('#braintree-form #payment_method_nonce').value = three_d_secure_response.nonce;
+                                        document.querySelector('#braintree-form #braintree_card_type').value = payload.details.cardType;
+                                        bt_form.submit()
 
+                                    });
                                 });
-                            });
-                        } else {
-                            document.querySelector('#braintree-form #payment_method_nonce').value = payload.nonce;
+                            } else {
+                                document.querySelector('#braintree-form #payment_method_nonce').value = payload.nonce;
 
-                            bt_form.submit();
-                        }
+                                bt_form.submit();
+                            }
 
-                    });
+                        });
+                    }
+
+
                 },true);
             });
         });

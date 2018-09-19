@@ -18,14 +18,6 @@
 }
 
 
-.braintree-row-payment label{
-    float: left;
-    margin: 9px 20px 0 0;
-    display:block;
-    width: 200px;
-    text-align: left !important;
-}
-
 .braintree-row-payment .half_block_field .hosted_field {
     width:100%;
 }
@@ -114,7 +106,9 @@
 .braintree-error {
     display:none;
 }
-
+.braintree-card .error, .paypal-braintree .error {
+    color: red;
+}
 .braintree-card #card-image {
     position: absolute;
     top: 0em;
@@ -163,6 +157,31 @@
 #bt-paypal-error-msg {
     margin-bottom: 10px;
 }
+#logo_braintree_by_paypal{
+    margin-top:15px;
+}
+/*------------------VAULT-------------*/
+#bt-vault-form {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+#bt-vault-form .form-control {
+    background: #ffffff;
+    border-radius: 5px;
+    color: #7a7a7a;
+    border: 1px solid rgba(0,0,0,.25);
+    padding: 0.4rem 1rem;
+}
+.save-in-vault {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+label[for="save_card_in_vault"], label[for="save_account_in_vault"] {
+    display: inline-block !important;
+    padding-left: 5px;
+    vertical-align: text-top;
+}
 @media only screen and (max-width: 500px) {
     .braintree-row-payment .block_field {
         width: 81%;
@@ -171,7 +190,4 @@
         width: 40%;
         margin-right: 1%;
     }
-}
-#logo_braintree_by_paypal{
-    margin-top:15px;
 }

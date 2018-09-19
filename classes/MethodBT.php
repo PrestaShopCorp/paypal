@@ -25,6 +25,8 @@
  */
 
 include_once(_PS_MODULE_DIR_.'paypal/sdk/braintree/lib/Braintree.php');
+include_once 'PaypalCustomer.php';
+include_once 'PaypalVaulting.php';
 
 class MethodBT extends AbstractMethodPaypal
 {
@@ -99,6 +101,44 @@ class MethodBT extends AbstractMethodPaypal
             ),
             array(
                 'type' => 'switch',
+                'label' => $module->l('Enable Vault'),
+                'name' => 'paypal_vaulting',
+                'is_bool' => true,
+                'hint' => $module->l('The Vault is used to process payments so your customers don\'t need to re-enter their information each time they make a purchase from you.'),
+                'values' => array(
+                    array(
+                        'id' => 'paypal_vaulting_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'paypal_vaulting_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
+                'label' => $module->l('Enable Card verification'),
+                'name' => 'card_verification',
+                'is_bool' => true,
+                'hint' => $module->l('Card verification is a strong first-line defense against potentially fraudulent cards. It ensures that the credit card number provided is associated with a valid, open account and can be stored in the Vault and charged successfully.'),
+                'values' => array(
+                    array(
+                        'id' => 'card_verification_on',
+                        'value' => 1,
+                        'label' => $module->l('Enabled'),
+                    ),
+                    array(
+                        'id' => 'card_verification_off',
+                        'value' => 0,
+                        'label' => $module->l('Disabled'),
+                    )
+                ),
+            ),
+            array(
+                'type' => 'switch',
                 'label' => $module->l('Activate 3D Secure for Braintree'),
                 'name' => 'paypal_3DSecure',
                 'desc' => $module->l(''),
@@ -130,6 +170,8 @@ class MethodBT extends AbstractMethodPaypal
             'activate_paypal' => Configuration::get('PAYPAL_BY_BRAINTREE'),
             'paypal_3DSecure' => Configuration::get('PAYPAL_USE_3D_SECURE'),
             'paypal_3DSecure_amount' => Configuration::get('PAYPAL_3D_SECURE_AMOUNT'),
+            'paypal_vaulting' => Configuration::get('PAYPAL_VAULTING'),
+            'card_verification' => Configuration::get('PAYPAL_BT_CARD_VERIFICATION'),
         );
         $context = Context::getContext();
         $context->smarty->assign(array(
@@ -174,7 +216,7 @@ class MethodBT extends AbstractMethodPaypal
 
         $helper = new HelperForm();
         $helper->module = $module;
-        $helper->name_controller = $module->name;
+        $helper->name_controller = 'bt_currency_form';
         $helper->token = Tools::getAdminTokenLite('AdminModules');
         $helper->currentIndex = AdminController::$currentIndex.'&configure='.$module->name;
         $helper->title = $module->displayName;
@@ -230,6 +272,8 @@ class MethodBT extends AbstractMethodPaypal
             Configuration::updateValue('PAYPAL_USE_3D_SECURE', $params['paypal_3DSecure']);
             Configuration::updateValue('PAYPAL_3D_SECURE_AMOUNT', (int)$params['paypal_3DSecure_amount']);
             Configuration::updateValue('PAYPAL_API_ADVANTAGES', $params['paypal_show_advantage']);
+            Configuration::updateValue('PAYPAL_VAULTING', $params['paypal_vaulting']);
+            Configuration::updateValue('PAYPAL_BT_CARD_VERIFICATION', $params['card_verification']);
         }
 
         if (isset($params['method'])) {
@@ -269,7 +313,7 @@ class MethodBT extends AbstractMethodPaypal
             $clientToken = $this->gateway->clientToken()->generate();
             return $clientToken;
         } catch (Exception $e) {
-            return false;
+            return array('error_code' => $e->getCode(), 'error_msg' => $e->getMessage());
         }
     }
 
@@ -338,7 +382,7 @@ class MethodBT extends AbstractMethodPaypal
         $transaction = $this->sale(context::getContext()->cart, Tools::getValue('payment_method_nonce'), Tools::getValue('deviceData'));
 
         if (!$transaction) {
-            Tools::redirect('index.php?controller=order&step=3&bt_error_msg='.urlencode($this->error));
+            throw new Exception('', '00000');
         }
         $transactionDetail = $this->getDetailsTransaction($transaction);
         if (Configuration::get('PAYPAL_API_INTENT') == "sale" && $transaction->paymentInstrumentType == "paypal_account" && $transaction->status == "settling") { // or submitted for settlement?
@@ -384,10 +428,10 @@ class MethodBT extends AbstractMethodPaypal
 
     public function sale($cart, $token_payment, $device_data)
     {
-
         $this->initConfig();
         $bt_method = Tools::getValue('payment_method_bt');
-        if ($bt_method == "paypal-braintree") {
+        $vault_token = '';
+        if ($bt_method == BT_PAYPAL_PAYMENT) {
             $options = array(
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
                 'threeDSecure' => array(
@@ -399,6 +443,7 @@ class MethodBT extends AbstractMethodPaypal
                 'submitForSettlement' => Configuration::get('PAYPAL_API_INTENT') == "sale" ? true : false,
             );
         }
+
         $merchant_accounts = (array)Tools::jsonDecode(Configuration::get('PAYPAL_'.$this->mode.'_BRAINTREE_ACCOUNT_ID'));
         $address_billing = new Address($cart->id_address_invoice);
         $country_billing = new Country($address_billing->id_country);
@@ -407,11 +452,15 @@ class MethodBT extends AbstractMethodPaypal
         $amount = $this->formatPrice($cart->getOrderTotal());
         $paypal = Module::getInstanceByName('paypal');
         $currency = $paypal->getPaymentCurrencyIso();
+        $iso_state = '';
+        if ($address_shipping->id_state) {
+            $state = new State((int) $address_shipping->id_state);
+            $iso_state = $state->iso_code;
+        }
 
         try {
             $data = [
                 'amount'                => $amount,
-                'paymentMethodNonce'    => $token_payment,
                 'merchantAccountId'     => $merchant_accounts[$currency],
                 'orderId'               => $this->getOrderId($cart),
                 'channel'               => (getenv('PLATEFORM') == 'PSREAD')?'PrestaShop_Cart_Ready_Braintree':'PrestaShop_Cart_Braintree',
@@ -424,6 +473,7 @@ class MethodBT extends AbstractMethodPaypal
                     'locality'          => $address_billing->city,
                     'postalCode'        => $address_billing->postcode,
                     'countryCodeAlpha2' => $country_billing->iso_code,
+                    'region'            => $iso_state,
                 ],
                 'shipping' => [
                     'firstName'         => $address_shipping->firstname,
@@ -434,14 +484,75 @@ class MethodBT extends AbstractMethodPaypal
                     'locality'          => $address_shipping->city,
                     'postalCode'        => $address_shipping->postcode,
                     'countryCodeAlpha2' => $country_shipping->iso_code,
+                    'region'            => $iso_state,
                 ],
                 "deviceData"            => $device_data,
-                'options' => $options,
             ];
 
+            $paypal_customer = PaypalCustomer::loadCustomerByMethod(Context::getContext()->customer->id, 'BT');
+
+            if (!$paypal_customer->id) {
+                $paypal_customer = $this->createCustomer();
+            } else {
+                $this->updateCustomer($paypal_customer->reference);
+            }
+           // echo'<pre>';print_r($this->gateway->customer()->find($paypal_customer->reference));die;
+            $paypal = Module::getInstanceByName($this->name);
+            if (Configuration::get('PAYPAL_VAULTING')) {
+                if ($bt_method == BT_CARD_PAYMENT) {
+                    $vault_token = Tools::getValue('bt_vaulting_token');
+                } elseif ($bt_method == BT_PAYPAL_PAYMENT) {
+                    $vault_token = Tools::getValue('pbt_vaulting_token');
+                }
+
+                if ($vault_token && $paypal_customer->id) {
+                    if (PaypalVaulting::vaultingExist($vault_token, $paypal_customer->id)) {
+                        $data['paymentMethodToken'] = $vault_token;
+                    }
+                } else {
+                    if (Tools::getValue('save_card_in_vault') || Tools::getValue('save_account_in_vault')) {
+                        if (Configuration::get('PAYPAL_BT_CARD_VERIFICATION') && Tools::getValue('save_card_in_vault')) {
+                            $payment_method = $this->gateway->paymentMethod()->create([
+                                'customerId' => $paypal_customer->reference,
+                                'paymentMethodNonce' => $token_payment,
+                                'options' => array('verifyCard' => true),
+                            ]);
+                            //echo'<pre>';print_r($payment_method);die;
+                            if (isset($payment_method->verification) && $payment_method->verification->status != 'verified') {
+                                $error_msg = $paypal->l('Card verification repond with status').' '.$payment_method->verification->status.'. ';
+                                $error_msg .= $paypal->l('The reason : ').' '.$payment_method->verification->processorResponseText.'. ';
+                                if ($payment_method->verification->gatewayRejectionReason) {
+                                    $error_msg .= $paypal->l('Rejection reason : ').' '.$payment_method->verification->gatewayRejectionReason;
+                                }
+                                Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $error_msg)));
+                            }
+                            $paymentMethodToken = $payment_method->paymentMethod->token;
+                        }
+                        $options['storeInVaultOnSuccess'] = true;
+                        $data['customerId'] = $paypal_customer->reference;
+
+                    }
+                    if ($paymentMethodToken) {
+                        $data['paymentMethodToken'] = $paymentMethodToken;
+                    } else {
+                        $data['paymentMethodNonce'] = $token_payment;
+                    }
+                }
+            } else {
+                $data['paymentMethodNonce'] = $token_payment;
+            }
+
+            $data['options'] = $options;
+
             $result = $this->gateway->transaction()->sale($data);
-           // echo '<pre>';print_r($result);die;
+
             if (($result instanceof Braintree_Result_Successful) && $result->success && $this->isValidStatus($result->transaction->status)) {
+                if (Configuration::get('PAYPAL_VAULTING')
+                    && ((Tools::getValue('save_card_in_vault') && $bt_method == BT_CARD_PAYMENT)
+                        || (Tools::getValue('save_account_in_vault') && $bt_method == BT_PAYPAL_PAYMENT))
+                    && !PaypalVaulting::vaultingExist($result->transaction->creditCard['token'], $paypal_customer->id)) {
+                    $this->createVaulting($result, $paypal_customer);
+                }
                 return $result->transaction;
             } else {
                 $errors = $result->errors->deepAll();
@@ -458,6 +569,61 @@ class MethodBT extends AbstractMethodPaypal
         }
 
         return false;
+    }
+
+    public function createVaulting($result, $paypal_customer)
+    {
+        $vaulting = new PaypalVaulting();
+        $vaulting->id_paypal_customer = $paypal_customer->id;
+        $vaulting->payment_tool = Tools::getValue('payment_method_bt');
+        if (Tools::getValue('payment_method_bt') == BT_CARD_PAYMENT) {
+            $vaulting->token = $result->transaction->creditCard['token'];
+            $vaulting->info = $result->transaction->creditCard['cardType'].': *';
+            $vaulting->info .= $result->transaction->creditCard['last4'].' ';
+            $vaulting->info .= $result->transaction->creditCard['expirationMonth'].'/';
+            $vaulting->info .= $result->transaction->creditCard['expirationYear'];
+        } elseif (Tools::getValue('payment_method_bt') == BT_PAYPAL_PAYMENT) {
+            $vaulting->token = $result->transaction->paypal['token'];
+            $vaulting->info = $result->transaction->paypal['payerFirstName'].' ';
+            $vaulting->info .= $result->transaction->paypal['payerLastName'].' ';
+            $vaulting->info .= $result->transaction->paypal['payerEmail'];
+        }
+        $vaulting->save();
+    }
+
+    public function updateCustomer($id_customer)
+    {
+        $context = Context::getContext();
+        $data = [
+            'firstName' => $context->customer->firstname,
+            'lastName' => $context->customer->lastname,
+            'email' => $context->customer->email
+        ];
+        $this->gateway->customer()->update($id_customer, $data);
+    }
+
+    public function createCustomer()
+    {
+        $context = Context::getContext();
+        $data = [
+            'firstName' => $context->customer->firstname,
+            'lastName' => $context->customer->lastname,
+            'email' => $context->customer->email
+        ];
+
+        $result = $this->gateway->customer()->create($data);
+        $customer = new PaypalCustomer();
+        $customer->id_customer = $context->customer->id;
+        $customer->reference = $result->customer->id;
+        $customer->method = 'BT';
+        $customer->save();
+        return $customer;
+    }
+
+    public function deleteVaultedMethod($payment_method)
+    {
+        $this->initConfig();
+        $this->gateway->paymentMethod()->delete($payment_method->token);
     }
 
     public function isValidStatus($status)
@@ -521,7 +687,7 @@ class MethodBT extends AbstractMethodPaypal
             $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
             $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
             $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
-         //  echo '<pre>';print_r($this->gateway->transaction()->find($id_transaction));die;
+
             $result = $this->gateway->transaction()->refund($id_transaction, number_format($paypal_order->total_paid, 2, ".", ''));
 
             if ($result->success) {
@@ -541,6 +707,56 @@ class MethodBT extends AbstractMethodPaypal
                 $response =  array(
                     'transaction_id' => $result->params['id'],
                     'error_message' => $result->message,
+                );
+            } else {
+                $errors = $result->errors->deepAll();
+                foreach ($errors as $error) {
+                    $response = array(
+                        'transaction_id' => $result->transaction->refundedTransactionId,
+                        'status' => 'Failure',
+                        'error_code' => $error->code,
+                        'error_message' => $error->message,
+                    );
+                    if ($error->code == Braintree_Error_Codes::TRANSACTION_HAS_ALREADY_BEEN_REFUNDED) {
+                        $response['already_refunded'] = true;
+                    }
+                }
+            }
+            return $response;
+        } catch (Exception $e) {
+            $response =  array(
+                'error_message' => $e->getCode().'=>'.$e->getMessage(),
+            );
+            return $response;
+        }
+    }
+
+    public function partialRefund($params)
+    {
+        $this->initConfig();
+        try {
+            $paypal_order = PaypalOrder::loadByOrderId(Tools::getValue('id_order'));
+            $capture = PaypalCapture::loadByOrderPayPalId($paypal_order->id);
+            $id_transaction = Validate::isLoadedObject($capture) ? $capture->id_capture : $paypal_order->id_transaction;
+            $amount = 0;
+            foreach ($params['productList'] as $product) {
+                $amount += $product['amount'];
+            }
+            if (Tools::getValue('partialRefundShippingCost')) {
+                $amount += Tools::getValue('partialRefundShippingCost');
+            }
+            $result = $this->gateway->transaction()->refund($id_transaction, number_format($amount, 2, ".", ''));
+
+            if ($result->success) {
+                $response =  array(
+                    'success' => true,
+                    'refund_id' => $result->transaction->refundedTransactionId,
+                    'transaction_id' => $result->transaction->id,
+                    'status' => $result->transaction->status,
+                    'amount' => $result->transaction->amount,
+                    'currency' => $result->transaction->currencyIsoCode,
+                    'payment_type' => $result->transaction->payment_type,
+                    'merchantAccountId' => $result->transaction->merchantAccountId,
                 );
             } else {
                 $errors = $result->errors->deepAll();
@@ -607,5 +823,11 @@ class MethodBT extends AbstractMethodPaypal
             $ids_transaction
         ]);
         return $collection;
+    }
+
+    public function createMethodNonce($token) {
+        $this->initConfig();
+        $nonce = $this->gateway->paymentMethodNonce()->create($token);
+        return $nonce->paymentMethodNonce->nonce;
     }
 }

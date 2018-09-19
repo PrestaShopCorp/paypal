@@ -35,6 +35,7 @@ abstract class AbstractMethodPaypal
     abstract public function setConfig($params);
     abstract public function getConfig(Paypal $module);
     abstract public function void($params);
+    abstract public function partialRefund($params);
 
     public static function load($method)
     {

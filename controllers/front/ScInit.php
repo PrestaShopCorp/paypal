@@ -26,11 +26,45 @@
 
 include_once _PS_MODULE_DIR_.'paypal/classes/AbstractMethodPaypal.php';
 
-class PaypalEcScInitModuleFrontController extends ModuleFrontController
+class PaypalScInitModuleFrontController extends ModuleFrontController
 {
     public $name = 'paypal';
 
     public function postProcess()
+    {
+        switch (Tools::getValue('source_page')) {
+            case 'cart':
+                $this->prepareCart();
+                break;
+            case 'product':
+                $this->prepareProduct();
+                break;
+            default:
+        }
+
+        $method = AbstractMethodPaypal::load(Configuration::get('PAYPAL_METHOD'));
+
+        try {
+            $response = $method->init(array('use_card'=>0, 'short_cut' => 1));
+        } catch (Exception $e) {
+            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_msg' => $e->getMessage())));
+        }
+
+        $method->processCheckoutSc($response);
+    }
+
+    public function prepareCart()
+    {
+        if (Tools::getValue('checkAvailability')) {
+            if ($this->context->cart->checkQuantities()) {
+                die(Tools::jsonEncode(1));
+            } else {
+                die(Tools::jsonEncode(0));
+            }
+        }
+    }
+
+    public function prepareProduct()
     {
         if (Tools::getValue('checkAvailability')) {
             $product = new Product(Tools::getValue('id_product'));
@@ -41,7 +75,6 @@ class PaypalEcScInitModuleFrontController extends ModuleFrontController
                 die(Tools::jsonEncode(0));
             }
         }
-        $method_ec = AbstractMethodPaypal::load('EC');
 
         if (empty($this->context->cart->id)) {
             $this->context->cart->add();
@@ -55,7 +88,6 @@ class PaypalEcScInitModuleFrontController extends ModuleFrontController
             }
         }
 
-
         if (Tools::getValue('combination')) {
             // build group for search product attribute
             $temp_group = explode('|', Tools::getValue('combination'));
@@ -67,19 +99,6 @@ class PaypalEcScInitModuleFrontController extends ModuleFrontController
             $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'), Product::getIdProductAttributesByIdAttributes(Tools::getValue('id_product'), $group));
         } else {
             $this->context->cart->updateQty(Tools::getValue('quantity'), Tools::getValue('id_product'));
-        }
-
-        $response = $method_ec->init(array(
-            'use_card'=>0,
-            'short_cut' => 1
-        ));
-        if (!isset($response['L_ERRORCODE0'])) {
-            if (Tools::getvalue('getToken')) {
-                die($method_ec->token);
-            }
-            Tools::redirect($response);
-        } else {
-            Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'error', array('error_code' => $response['L_ERRORCODE0'])));
         }
     }
 }
