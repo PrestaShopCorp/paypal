@@ -311,7 +311,7 @@ class PayPal extends PaymentModule
                 }
             }
 
-            if (($order_process_type == 1) && ((int) $payment_method == HSS) && !$this->useMobile()) {
+            if (($order_process_type == 1) && ((int) $payment_method == HSS)) {
                 $this->context->smarty->assign('paypal_order_opc', true);
             } elseif (($order_process_type == 1) && ((bool) Tools::getValue('isPaymentStep') == true || $isECS)) {
                 $shop_url = PayPal::getShopDomainSsl(true, true);
@@ -653,7 +653,7 @@ class PayPal extends PaymentModule
         if (!Tools::isSubmit('submitButton') && Tools::getIsset('accessToken') && Tools::getIsset('expiresAt') && Tools::getIsset('refreshToken')) {
             $output = $this->displayConfirmation((Configuration::get('PAYPAL_SANDBOX')?$this->l('Your Braintree account is now configured in sandbox mode. You can sell on Euro only. If you have problems, you can join Braintree support on 08 05 54 27 14'):$this->l('Your Braintree account is now configured in live mode. If you have problems, you can join Braintree support on 08 05 54 27 14') ));
         }
-        
+
         if (!Tools::isSubmit('submitButton') && Tools::getValue('error')) {
             $output = $this->displayError($this->l('Braintree is not configured. If you have problems, you can join Braintree support on 08 05 54 27 14'));
 
@@ -762,16 +762,16 @@ class PayPal extends PaymentModule
      */
     public function hookHeader($params)
     {
-        if ($this->useMobile()) {
-            $id_hook = (int) Configuration::get('PS_MOBILE_HOOK_HEADER_ID');
-            if ($id_hook > 0) {
-                $module = Hook::getModulesFromHook($id_hook, $this->id);
-                if (!$module) {
-                    $this->registerHook('displayMobileHeader');
-                }
 
+        $id_hook = (int) Configuration::get('PS_MOBILE_HOOK_HEADER_ID');
+        if ($id_hook > 0) {
+            $module = Hook::getModulesFromHook($id_hook, $this->id);
+            if (!$module) {
+                $this->registerHook('displayMobileHeader');
             }
+
         }
+
 
         if (isset($this->context->cart) && $this->context->cart->id) {
             $this->context->smarty->assign('id_cart', (int) $this->context->cart->id);
@@ -996,7 +996,7 @@ class PayPal extends PaymentModule
             }
         }
     }
-    
+
     public function hookPayment($params)
     {
         if (!$this->canBeUsed()) {
@@ -1005,11 +1005,7 @@ class PayPal extends PaymentModule
 
         $use_mobile = $this->useMobile();
 
-        if ($use_mobile) {
-            $method = ECS;
-        } else {
-            $method = (int) Configuration::get('PAYPAL_PAYMENT_METHOD');
-        }
+        $method = (int) Configuration::get('PAYPAL_PAYMENT_METHOD');
 
         if (isset($this->context->cookie->express_checkout)) {
             $this->redirectToConfirmation();
@@ -1035,11 +1031,11 @@ class PayPal extends PaymentModule
             include_once _PS_MODULE_DIR_.'paypal/classes/Braintree.php';
 
             $braintree = new PrestaBraintree();
-            
+
             $clientToken = $braintree->createToken($id_account_braintree);
-            
+
             $this->reset_context();
-            
+
             if (!$clientToken) {
                 $return_braintree = '';
             } else {
@@ -1428,13 +1424,13 @@ class PayPal extends PaymentModule
 
     public function renderExpressCheckoutButton($type)
     {
-        if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && !$this->useMobile())) {
+        if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'))) {
             return null;
         }
 
         if (!in_array(ECS, $this->getPaymentMethods()) || (((int) Configuration::get('PAYPAL_BUSINESS')
             == 1) &&
-            (int) Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS) && !$this->useMobile()) {
+            (int) Configuration::get('PAYPAL_PAYMENT_METHOD') == HSS)) {
             return null;
         }
 
@@ -1461,10 +1457,10 @@ class PayPal extends PaymentModule
 
     public function renderExpressCheckoutForm($type)
     {
-        if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT') && !$this->useMobile())
+        if ((!Configuration::get('PAYPAL_EXPRESS_CHECKOUT_SHORTCUT'))
             || !in_array(ECS, $this->getPaymentMethods()) ||
             (((int) Configuration::get('PAYPAL_BUSINESS') == 1) && ((int) Configuration::get('PAYPAL_PAYMENT_METHOD')
-                == HSS) && !$this->useMobile())) {
+                == HSS))) {
             return;
         }
 
@@ -1573,7 +1569,7 @@ class PayPal extends PaymentModule
             return;
         }
         $order = new Order($id_order);
-       
+
         $price = Tools::displayPrice($order->total_paid_tax_incl, $this->context->currency);
 
         $this->context->smarty->assign(array(
@@ -1853,10 +1849,10 @@ class PayPal extends PaymentModule
                 //*TO DELETE* Configuration::updateValue('PAYPAL_BRAINTREE_PRIVATE_KEY', Tools::getValue('braintree_private_key'));
                 // TO DELETE* Configuration::updateValue('PAYPAL_BRAINTREE_MERCHANT_ID', Tools::getValue('braintree_merchant_id'));
                 // TO DELETE* Configuration::updateValue('PAYPAL_USE_3D_SECURE',Tools::getValue('check3Dsecure'));
-                
+
                 /* USE PAYPAL PLUS */
                 if ((int) Tools::getValue('paypal_payment_method') == 5) {
-                    
+
                     Configuration::updateValue('PAYPAL_PLUS_CLIENT_ID', Tools::getValue('client_id'));
                     Configuration::updateValue('PAYPAL_PLUS_SECRET', Tools::getValue('secret'));
                     if ((int) Tools::getValue('paypalplus_webprofile') == 1 || $refresh_webprofile) {
@@ -1908,7 +1904,7 @@ class PayPal extends PaymentModule
             }
         } else if (Tools::getValue('accessToken')) {
             Configuration::updateValue('PAYPAL_BRAINTREE_ENABLED', 1);
-            
+
             Configuration::updateValue('PAYPAL_BRAINTREE_ACCESS_TOKEN', Tools::getValue('accessToken'));
             Configuration::updateValue('PAYPAL_BRAINTREE_EXPIRES_AT', Tools::getValue('expiresAt'));
             Configuration::updateValue('PAYPAL_BRAINTREE_REFRESH_TOKEN', Tools::getValue('refreshToken'));
@@ -1931,9 +1927,9 @@ class PayPal extends PaymentModule
 
         $id_paypal_braintree = Db::getInstance()->getValue('
                     SELECT `id_paypal_braintree`
-                    FROM `'._DB_PREFIX_.'paypal_braintree` 
+                    FROM `'._DB_PREFIX_.'paypal_braintree`
                     WHERE `id_order` = '.(int) $id_order);
-        
+
         if (Configuration::get('PAYPAL_BRAINTREE_ENABLED') && $id_paypal_braintree) {
             if (!$amt) {
                 $amt = Db::getInstance()->getValue('
@@ -1943,7 +1939,7 @@ class PayPal extends PaymentModule
             }
             include_once(_PS_MODULE_DIR_.'paypal/classes/Braintree.php');
             $braintree = new PrestaBraintree();
-            
+
             $transaction_status = $braintree->getTransactionStatus($id_transaction);
 
             if ($transaction_status == 'submitted_for_settlement') {

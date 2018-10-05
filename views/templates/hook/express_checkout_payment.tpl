@@ -33,9 +33,9 @@
 			{else}
 				<a href="javascript:$('#paypal_payment_form_payment').submit();" title="{l s='Pay with PayPal' mod='paypal'}">
 			{/if}
-				{if isset($use_mobile) && $use_mobile}
+				{* {if isset($use_mobile) && $use_mobile}
 					<img src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code|escape:'htmlall':'UTF-8'}_orange_295x43.png" />
-				{else}
+				{else} *}
 					{if isset($logos.LocalPayPalHorizontalSolutionPP) && $PayPal_payment_method == $PayPal_integral}
 						<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}}" height="48px" />
 					{else}
@@ -46,15 +46,15 @@
                     {else}
 					{l s='Pay with your card or your PayPal account' mod='paypal'}
                     {/if}
-				{/if}
-				
+				{* {/if} *}
+
 			</a>
 		</p>
     </div>
 </div>
 
 <style>
-	p.payment_module.paypal a 
+	p.payment_module.paypal a
 	{ldelim}
 		padding-left:17px;
 	{rdelim}
@@ -62,16 +62,16 @@
 {else}
 <p class="payment_module">
 		<a href="javascript:void(0)" id="paypal_process_payment" title="{l s='Pay with PayPal' mod='paypal'}">
-		{if isset($use_mobile) && $use_mobile}
+		{* {if isset($use_mobile) && $use_mobile}
 			<img src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/views/img/logos/express_checkout_mobile/CO_{$PayPal_lang_code|escape:'htmlall':'UTF-8'}_orange_295x43.png" />
-		{else}
+		{else} *}
 			{if isset($logos.LocalPayPalHorizontalSolutionPP) && $PayPal_payment_method == $PayPal_integral}
 				<img src="{$logos.LocalPayPalHorizontalSolutionPP|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" height="48px" />
 			{else}
 				<img src="{$logos.LocalPayPalLogoMedium|escape:'htmlall':'UTF-8'}" alt="{l s='Pay with your card or your PayPal account' mod='paypal'}" />
 			{/if}
-			{l s='Pay with your card or your PayPal account' mod='paypal'}	
-        {/if}
+			{l s='Pay with your card or your PayPal account' mod='paypal'}
+        {* {/if} *}
 	</a>
 </p>
 
