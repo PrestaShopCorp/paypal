@@ -231,7 +231,7 @@ $(document).ready(function () {
 
         if(paypal_payment_method == PayPal_PVZ)
         {
-// c'est quoi cette fonction !!!
+            // c'est quoi cette fonction !!!
         }
         else if (paypal_payment_method != PayPal_HSS &&
                 ($('input[name="api_username"]').val().length > 0 ||
@@ -418,5 +418,9 @@ $(document).ready(function () {
             $("#paypal_login_yes_or_no input[name='paypal_login']").change(loginActivate);
         }
     }
+
+    $('#test_ssl_submit').click(function() {
+        $('#test_ssl_result').load(tlscurltest_url);
+    });
 
 });

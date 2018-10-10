@@ -481,7 +481,16 @@
 
 				<hr />
 			</div>
+
 		</form>
+		{* TEST FOR CURL*}
+		<div>
+			<span class="paypal-section">4</span>
+			<h3 class="inline">{l s='Test TLS & curl' mod='paypal'}</h3>
+			<br /><br />
+			<button id="test_ssl_submit">{l s='Test' mod='paypal'}</button>
+			<div id="test_ssl_result"></div>
+		</div>
     {else}
 		<div class="paypal-clear"></div><hr />
 			<div class="box">
@@ -489,7 +498,7 @@
 			</div>
 			<hr />
 		</div>
-		
+
 	{/if}
 
 </div>

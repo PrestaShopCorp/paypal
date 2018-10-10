@@ -741,6 +741,10 @@ class PayPal extends PaymentModule
             'ps_ssl_active' => Configuration::get('PS_SSL_ENABLED'),
         ));
 
+        Media::addJsDef(array(
+            'tlscurltest_url' => $this->context->link->getModuleLink($this->name, 'tlscurltest', array('ajax'=>1))
+        ));
+
         $hss_errors = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'paypal_hss_email_error`');
         $this->context->smarty->assign(array(
             'hss_errors' => $hss_errors
