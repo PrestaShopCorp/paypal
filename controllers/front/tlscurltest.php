@@ -29,18 +29,24 @@ class PayPalTlscurltestModuleFrontController extends ModuleFrontController
 {
     public function displayAjax()
     {
-        $tls_server = $this->context->link->getModuleLink('paypal', 'tlscurltestserver');
-        $curl = curl_init($tls_server);
-        curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,true);
-        curl_setopt($curl,CURLOPT_SSL_VERIFYHOST,2);
-        curl_setopt($curl,CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-        $response = curl_exec($curl);
-        if($response != 'ok') {
-            var_dump(curl_error($curl));
+        if (defined('CURL_SSLVERSION_TLSv1_2')) {
+            $tls_server = $this->context->link->getModuleLink('paypal', 'tlscurltestserver');
+            $curl = curl_init($tls_server);
+            curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+            curl_setopt($curl,CURLOPT_SSL_VERIFYPEER,true);
+            curl_setopt($curl,CURLOPT_SSL_VERIFYHOST,2);
+            curl_setopt($curl,CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+            $response = curl_exec($curl);
+            if($response != 'ok') {
+                echo '<p style="color:red">'.curl_error($curl).'</p>';
+            }
+            else {
+                echo '<p style="color:green">TLS version is compatible</p>';
+            }
+        } else {
+            echo '<p style="color:red">TLS version is not compatible</p>';
         }
-        else {
-            echo 'SUCCESS !!';
-        }
+
+        die;
     }
 }
