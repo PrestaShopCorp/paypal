@@ -38,7 +38,12 @@ class PayPalTlscurltestModuleFrontController extends ModuleFrontController
             curl_setopt($curl,CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
             $response = curl_exec($curl);
             if($response != 'ok') {
-                echo '<p style="color:red">'.curl_error($curl).'</p>';
+                $curl_info = curl_getinfo($curl);
+                if ($curl_info['http_code'] == 401) {
+                    echo '<p style="color:red">401 Unauthorized</p>';
+                } else {
+                    echo '<p style="color:red">'.curl_error($curl).'</p>';
+                }
             }
             else {
                 echo '<p style="color:green">TLS version is compatible</p>';
