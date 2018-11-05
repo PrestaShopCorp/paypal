@@ -97,7 +97,7 @@ $(document).ready( function() {
 		var id_product_attribute = $('input[name="id_product_attribute"]').val();
 		$.ajax({
 			type: "GET",
-			url: baseDir+'/modules/paypal/express_checkout/ajax.php',
+			url: baseDirPP+'/modules/paypal/express_checkout/ajax.php',
 			data: { get_qty: "1", id_product: id_product, id_product_attribute: id_product_attribute },
 			cache: false,
 			success: function(result) {
