@@ -294,5 +294,34 @@ class PayPalInstall
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING', (int) $order_state_wait->id);
         }
 
+        /** Paypal HSS  */
+        if (!Configuration::get('PAYPAL_OS_AWAITING_HSS')) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+
+            foreach (Language::getLanguages() as $language) {
+                if (Tools::strtolower($language['iso_code']) == 'fr') {
+                    $order_state->name[$language['id_lang']] = 'En attend confirmation par PayPal';
+                } else {
+                    $order_state->name[$language['id_lang']] = 'Awaiting confirmation from PayPal';
+                }
+
+            }
+            $order_state->send_email = false;
+            $order_state->paid = false;
+            $order_state->color = '#DDEEFF';
+            $order_state->hidden = false;
+            $order_state->delivery = false;
+            $order_state->logable = true;
+            $order_state->invoice = false;
+
+            if ($order_state->add()) {
+                $source = dirname(__FILE__).'/../../img/os/'.Configuration::get('PS_OS_PAYPAL').'.gif';
+                $destination = dirname(__FILE__).'/../../img/os/'.(int) $order_state->id.'.gif';
+                copy($source, $destination);
+            }
+            Configuration::updateValue('PAYPAL_OS_AWAITING_HSS', (int) $order_state->id);
+        }
+
     }
 }
