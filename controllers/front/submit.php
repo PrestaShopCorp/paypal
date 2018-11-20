@@ -42,7 +42,7 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         $this->context = Context::getContext();
         $this->id_module = (int) Tools::getValue('id_module');
         $id_cart = Tools::getValue('id_cart');
-        $res = @fopen(dirname(__FILE__).'/../../'.$id_cart.'.txt','x');
+        $res = @fopen(dirname(__FILE__).'/../../'.$id_cart.'.txt', 'x');
         if (!$res) {
             while (file_exists(dirname(__FILE__).'/../../'.$id_cart.'.txt')) {
                 sleep(1);
@@ -65,15 +65,13 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         } else {
             $this->displayConfirmation($order);
         }
-
     }
 
     public function createTmpOrder()
     {
         $id_cart = Tools::getValue('id_cart');
         $cart = Context::getContext()->cart;
-        if($cart->id != $id_cart)
-        {
+        if ($cart->id != $id_cart) {
             Tools::redirect($this->context->link->getPageLink('history'));
         }
 
@@ -81,12 +79,10 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         $customer = new Customer((int) $cart->id_customer);
         $paypal = Module::getInstanceByName('paypal');
         $paypal->validateOrder((int)$id_cart, Configuration::get('PAYPAL_OS_AWAITING_HSS'), $order_total, $paypal->displayName, null, array(), $cart->id_currency, false, $customer->secure_key, Context::getContext()->shop);
-
     }
 
     public function displayConfirmation($order)
     {
-
         // fix security issue
         if ($order->id_cart != Tools::getValue('id_cart') || $order->secure_key != Tools::getValue('key')) {
             Tools::redirect($this->context->link->getPageLink('history'));

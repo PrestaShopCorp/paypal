@@ -238,7 +238,7 @@ if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACC
     if (Tools::getIsset('custom')) {
         $ipn = new PayPalIPN();
         $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
-        $res = @fopen($custom['id_cart'].'.txt','x');
+        $res = @fopen($custom['id_cart'].'.txt', 'x');
         if (!$res) {
             while (file_exists($custom['id_cart'].'.txt')) {
                 sleep(1);
