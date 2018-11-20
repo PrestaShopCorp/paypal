@@ -236,10 +236,17 @@
 				<hr />
 
 			</div>
-
+			{* TEST FOR CURL*}
+			<div>
+				<span class="paypal-section">3</span>
+				<h3 class="inline">{l s='Test TLS & curl' mod='paypal'}</h3>
+				<br /><br />
+				<span style="background-color: cyan;cursor: pointer;padding: 5px 10px;border: solid 1px blue;border-radius: 3px;" id="test_ssl_submit">{l s='Test' mod='paypal'}</span>
+				<div style="margin-top: 10px;" id="test_ssl_result"></div>
+			</div>
 			{* ENABLE YOUR ONLINE SHOP TO PROCESS PAYMENT *}
 			<div class="box paypal-disabled" id="credentials">
-				<span class="paypal-section">3</span> <h3 class="inline">{l s='Process payments on your online shop' mod='paypal'}</h3>
+				<span class="paypal-section">4</span> <h3 class="inline">{l s='Process payments on your online shop' mod='paypal'}</h3>
 				<br /><br />
 
 				<div class="paypal-hide" id="configuration">
@@ -483,14 +490,7 @@
 			</div>
 
 		</form>
-		{* TEST FOR CURL*}
-		<div>
-			<span class="paypal-section">4</span>
-			<h3 class="inline">{l s='Test TLS & curl' mod='paypal'}</h3>
-			<br /><br />
-			<button id="test_ssl_submit">{l s='Test' mod='paypal'}</button>
-			<div style="margin-top: 10px;" id="test_ssl_result"></div>
-		</div>
+
     {else}
 		<div class="paypal-clear"></div><hr />
 			<div class="box">

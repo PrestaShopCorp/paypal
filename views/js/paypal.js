@@ -77,7 +77,13 @@ function updateFormDatas()
 }
 	
 $(document).ready( function() {
-
+    {/literal}
+	{if $ssl_enabled}
+	var baseDirPP = baseDir.replace('http:', 'https:');
+	{else}
+	var baseDirPP = baseDir;
+	{/if}
+	{literal}
 	if($('#in_context_checkout_enabled').val() != 1)
 	{
 		$('#payment_paypal_express_checkout').click(function() {
@@ -105,7 +111,7 @@ $(document).ready( function() {
 		var id_product_attribute = $('input[name="id_product_attribute"]').val();
 		$.ajax({
 			type: "GET",
-			url: baseDir+'/modules/paypal/express_checkout/ajax.php',
+			url: baseDirPP+'/modules/paypal/express_checkout/ajax.php',
 			data: { get_qty: "1", id_product: id_product, id_product_attribute: id_product_attribute },
 			cache: false,
 			success: function(result) {
@@ -127,8 +133,9 @@ $(document).ready( function() {
 		setTimeout(function(){displayExpressCheckoutShortcut()}, 500);
 	});
 
-	if($('body#product').length > 0)
-		setTimeout(function(){displayExpressCheckoutShortcut()}, 500);
+    if($('body#product').length > 0) {
+        setTimeout(function(){displayExpressCheckoutShortcut()}, 500);
+    }
 	
 	{/literal}
 	{if isset($paypal_authorization)}
@@ -211,13 +218,7 @@ $(document).ready( function() {
 
 	var modulePath = 'modules/paypal';
 	var subFolder = '/integral_evolution';
-	{/literal}
-	{if $ssl_enabled}
-		var baseDirPP = baseDir.replace('http:', 'https:');
-	{else}
-		var baseDirPP = baseDir;
-	{/if}
-	{literal}
+
 	var fullPath = baseDirPP + modulePath + subFolder;
 	var confirmTimer = false;
 		

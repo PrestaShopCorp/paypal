@@ -74,9 +74,8 @@ class PayPalIPN extends PayPal
         $mc_gross = Tools::getValue('mc_gross');
         $txn_id = Tools::getValue('txn_id');
 
-        $id_order = (int) PayPalOrder::getIdOrderByTransactionId($txn_id);
-
-        if ($id_order != 0) {
+        $id_order = (int) Order::getOrderByCartId((int) $custom['id_cart']);
+        if ($id_order) {
             Context::getContext()->cart = new Cart((int) $id_order);
         } elseif (isset($custom['id_cart'])) {
             Context::getContext()->cart = new Cart((int) $custom['id_cart']);
@@ -95,7 +94,7 @@ class PayPalIPN extends PayPal
         if (strcmp(trim($result), "VERIFIED") === false) {
             $details = $this->getIPNTransactionDetails($result);
 
-            if ($id_order != 0) {
+            if ($id_order) {
                 $history = new OrderHistory();
                 $history->id_order = (int) $id_order;
 
@@ -115,22 +114,26 @@ class PayPalIPN extends PayPal
                 $shop = new Shop($shop_id);
             }
 
-            if ($id_order != 0) {
+            if ($id_order) {
                 $order = new Order((int) $id_order);
                 $values = $this->checkPayment($payment_status, $mc_gross, false);
-
                 if ((int) $order->current_state == (int) $values['payment_type']) {
                     return;
                 }
-
                 $history = new OrderHistory();
                 $history->id_order = (int) $id_order;
-
-                PayPalOrder::updateOrder($id_order, $details);
+                if (PayPalOrder::getOrderById($id_order)) {
+                    PayPalOrder::updateOrder($id_order, $details);
+                } else {
+                    PayPalOrder::saveOrder($id_order, $details);
+                }
                 $history->changeIdOrderState($values['payment_type'], $history->id_order);
 
                 $history->addWithemail();
                 $history->save();
+                Db::getInstance()->update('order_payment', array(
+                    'transaction_id' => pSQL($details['transaction_id']),
+                ), 'order_reference = "'.pSQL($order->reference).'"');
             } else {
                 $values = $this->checkPayment($payment_status, $mc_gross, true);
                 $customer = new Customer((int) Context::getContext()->cart->id_customer);
@@ -139,7 +142,7 @@ class PayPalIPN extends PayPal
         }
     }
 
-    public function checkPayment($payment_status, $mc_gross_not_rounded, $new_order)
+    public function checkPayment($payment_status, $mc_gross_not_rounded, $new_order = false)
     {
         $currency_decimals = is_array(Context::getContext()->currency) ? (int) Context::getContext()->currency['decimals'] : (int) Context::getContext()->currency->decimals;
         $this->decimals = $currency_decimals * _PS_PRICE_DISPLAY_PRECISION_;
@@ -156,10 +159,10 @@ class PayPalIPN extends PayPal
 
         $total_price = Tools::ps_round($shipping + $subtotal + $tax, $this->decimals);
 
-        if (($new_order == true) && ($this->comp($mc_gross, $total_price, 2) !== 0)) {
+        if (($new_order) && ($this->comp($mc_gross, $total_price, 2) !== 0)) {
             $payment_type = (int) Configuration::get('PS_OS_ERROR');
             $message = $this->l('Price paid on paypal is not the same that on PrestaShop.').'<br />';
-        } elseif (($new_order == true) && ($custom['hash'] != $cart_hash)) {
+        } elseif (($new_order) && ($custom['hash'] != $cart_hash)) {
             $payment_type = (int) Configuration::get('PS_OS_ERROR');
             $message = $this->l('Cart changed, please retry.').'<br />';
         } else {
@@ -168,7 +171,6 @@ class PayPalIPN extends PayPal
                 'total_price' => $total_price,
             );
         }
-
         return array(
             'message' => $message,
             'payment_type' => $payment_type,
@@ -189,6 +191,9 @@ class PayPalIPN extends PayPal
             } elseif (strcmp($payment_status, 'Pending') === 0) {
                 $payment_type = (int) Configuration::get('PS_OS_PAYPAL');
                 $message = $this->l('Pending payment confirmation.').'<br />';
+            } elseif (strcmp($payment_status, 'Refunded') === 0) {
+                $payment_type = (int) Configuration::get('PS_OS_REFUND');
+                $message = $this->l('Payment refunded.').'<br />';
             } else {
                 $payment_type = (int) Configuration::get('PS_OS_ERROR');
                 $message = $this->l('Cart changed, please retry.').'<br />';
@@ -229,15 +234,21 @@ class PayPalIPN extends PayPal
     }
 }
 
-$handle = fopen(dirname(__FILE__).'/log_order.txt', 'a+');
-fwrite($handle, Tools::getValue('receiver_email')."\r");
-fclose($handle);
-
 if (Tools::getValue('receiver_email') == Configuration::get('PAYPAL_BUSINESS_ACCOUNT')) {
     if (Tools::getIsset('custom')) {
         $ipn = new PayPalIPN();
         $custom = Tools::jsonDecode(Tools::getValue('custom'), true);
+        $res = @fopen($custom['id_cart'].'.txt','x');
+        if (!$res) {
+            while (file_exists($custom['id_cart'].'.txt')) {
+                sleep(1);
+            }
+        }
         $ipn->confirmOrder($custom);
+        if ($res) {
+            fclose($res);
+            unlink($custom['id_cart'].'.txt');
+        }
     }
 } else {
     $custom = Tools::jsonDecode(Tools::getValue('custom'), true);

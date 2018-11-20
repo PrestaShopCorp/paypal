@@ -40,10 +40,53 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
 
         $this->paypal = new PayPal();
         $this->context = Context::getContext();
-
         $this->id_module = (int) Tools::getValue('id_module');
-        $this->id_order = (int) Tools::getValue('id_order');
-        $order = new Order($this->id_order);
+        $id_cart = Tools::getValue('id_cart');
+        $res = @fopen(dirname(__FILE__).'/../../'.$id_cart.'.txt','x');
+        if (!$res) {
+            while (file_exists(dirname(__FILE__).'/../../'.$id_cart.'.txt')) {
+                sleep(1);
+            }
+        } else {
+            $id_order = Order::getOrderByCartId((int) $id_cart);
+            if (!$id_order) {
+                $this->createTmpOrder();
+            }
+        }
+        if ($res) {
+            fclose($res);
+            unlink(dirname(__FILE__).'/../../'.$id_cart.'.txt');
+        }
+        $id_order = Order::getOrderByCartId((int) $id_cart);
+        $this->id_order = (int) $id_order;
+        $order = new Order($id_order);
+        if ($order->current_state == Configuration::get('PAYPAL_OS_AWAITING_HSS')) {
+            $this->displayAwaitingConfirmation($order);
+        } else {
+            $this->displayConfirmation($order);
+        }
+
+    }
+
+    public function createTmpOrder()
+    {
+        $id_cart = Tools::getValue('id_cart');
+        $cart = Context::getContext()->cart;
+        if($cart->id != $id_cart)
+        {
+            Tools::redirect($this->context->link->getPageLink('history'));
+        }
+
+        $order_total = (float) $cart->getOrderTotal(true, Cart::BOTH);
+        $customer = new Customer((int) $cart->id_customer);
+        $paypal = Module::getInstanceByName('paypal');
+        $paypal->validateOrder((int)$id_cart, Configuration::get('PAYPAL_OS_AWAITING_HSS'), $order_total, $paypal->displayName, null, array(), $cart->id_currency, false, $customer->secure_key, Context::getContext()->shop);
+
+    }
+
+    public function displayConfirmation($order)
+    {
+
         // fix security issue
         if ($order->id_cart != Tools::getValue('id_cart') || $order->secure_key != Tools::getValue('key')) {
             Tools::redirect($this->context->link->getPageLink('history'));
@@ -101,12 +144,25 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         }
 
         $this->module->assignCartSummary();
-
         if ($this->context->getMobileDevice() == true) {
-            $this->setTemplate('order-confirmation-mobile.tpl');
+            return $this->setTemplate('order-confirmation-mobile.tpl');
         } else {
-            $this->setTemplate('order-confirmation.tpl');
+            return $this->setTemplate('order-confirmation.tpl');
         }
+    }
+
+    public function displayAwaitingConfirmation($order)
+    {
+        $this->context->smarty->assign(
+            array(
+                'order' => $order,
+                'is_guest' => (($this->context->customer->is_guest) || $this->context->customer->id == false),
+                'price' => Tools::displayPrice($order->total_paid, $this->context->currency->id),
+                'HOOK_ORDER_CONFIRMATION' => $this->displayOrderConfirmation(),
+                'HOOK_PAYMENT_RETURN' => $this->displayPaymentReturn(),
+            )
+        );
+        return $this->setTemplate('order-awaiting.tpl');
     }
 
     private function displayHook()
