@@ -20,8 +20,8 @@
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
  *  @copyright 2007-2018 PrestaShop SA
- *  @version  Release: $Revision: 13573 $
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @version  Release: $Revision: 13573 $
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -68,12 +68,10 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         $this->token = Tools::getValue('token');
 
         if (!empty($this->id_cart) && !empty($this->paymentId) && !empty($this->token)) {
-
             $CallApiPaypalPlus = new CallApiPaypalPlus();
             $payment = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($this->paymentId));
 
             if (isset($payment->state)) {
-
                 $this->context->smarty->assign('state', $payment->state);
 
                 $transaction = array(
@@ -128,13 +126,11 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             } else {
                 $this->context->smarty->assign('state', 'failed');
             }
-
         } else {
             $this->context->smarty->assign('state', 'failed');
         }
 
         if (($this->context->customer->is_guest) || $this->context->customer->id == false) {
-
             /* If guest we clear the cookie for security reason */
             $this->context->customer->mylogout();
         }
@@ -146,7 +142,6 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         } else {
             $this->setTemplate('order-confirmation-plus.tpl');
         }
-
     }
 
     private function displayHook()
@@ -184,8 +179,7 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
         $paymentId = Tools::getValue('paymentId');
         $submit = Tools::getValue('submit');
 
-        if (
-            (!empty($id_cart) && $this->context->cart->id == $id_cart) &&
+        if ((!empty($id_cart) && $this->context->cart->id == $id_cart) &&
             !empty($payerID) &&
             !empty($paymentId) &&
             !empty($submit)
@@ -193,7 +187,6 @@ class PayPalSubmitplusModuleFrontController extends ModuleFrontController
             $paypal = new PayPal();
 
             if ($submit == 'confirmPayment') {
-
                 $CallApiPaypalPlus = new CallApiPaypalPlus();
                 $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 

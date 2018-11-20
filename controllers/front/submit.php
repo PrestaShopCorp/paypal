@@ -20,8 +20,8 @@
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
  *  @copyright 2007-2018 PrestaShop SA
- *  @version  Release: $Revision: 13573 $
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @version  Release: $Revision: 13573 $
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -45,8 +45,7 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         $this->id_order = (int) Tools::getValue('id_order');
         $order = new Order($this->id_order);
         // fix security issue
-        if($order->id_cart != Tools::getValue('id_cart') || $order->secure_key != Tools::getValue('key'))
-        {
+        if ($order->id_cart != Tools::getValue('id_cart') || $order->secure_key != Tools::getValue('key')) {
             Tools::redirect($this->context->link->getPageLink('history'));
         }
 
@@ -108,7 +107,6 @@ class PayPalSubmitModuleFrontController extends ModuleFrontController
         } else {
             $this->setTemplate('order-confirmation.tpl');
         }
-
     }
 
     private function displayHook()

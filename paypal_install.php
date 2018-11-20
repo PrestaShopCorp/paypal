@@ -218,7 +218,6 @@ class PayPalInstall
                 } else {
                     $order_state->name[$language['id_lang']] = 'Authorization accepted from PayPal';
                 }
-
             }
 
             $order_state->send_email = false;
@@ -249,7 +248,6 @@ class PayPalInstall
                 } else {
                     $order_state_auth->name[$language['id_lang']] = 'Authorization accepted from Braintree';
                 }
-
             }
             $order_state_auth->send_email = false;
             $order_state_auth->color = '#4169E1';
@@ -277,7 +275,6 @@ class PayPalInstall
                 } else {
                     $order_state_wait->name[$language['id_lang']] = 'Awaiting for Braintree payment';
                 }
-
             }
             $order_state_wait->send_email = false;
             $order_state_wait->color = '#4169E1';
@@ -289,10 +286,8 @@ class PayPalInstall
                 $source = _PS_MODULE_DIR_.'paypal/views/img/logos/os_braintree.png';
                 $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state_wait->id.'.gif';
                 copy($source, $destination);
-
             }
             Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING', (int) $order_state_wait->id);
         }
-
     }
 }

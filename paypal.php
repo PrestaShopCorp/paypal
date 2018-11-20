@@ -112,10 +112,8 @@ class PayPal extends PaymentModule
 
         if ($country->iso_code == 'FR') {
             $this->description = $this->l('Benefit from PayPal\'s complete payments platform and grow your business online, on mobile and internationally and discover a new payment experience with Braintree.Accept credit cards, debit cards and PayPal payments.');
-
         } else {
             $this->description = $this->l('Accepts payments by credit cards (CB, Visa, MasterCard, Amex, Aurore, Cofinoga, 4 stars) with PayPal.');
-
         }
         $this->displayName = $this->l('PayPal');
         $this->confirmUninstall = $this->l('Are you sure you want to delete your details?');
@@ -136,7 +134,6 @@ class PayPal extends PaymentModule
             } elseif ($mobile_enabled && !$this->active) {
                 $this->checkMobileNeeds();
             }
-
         } else {
             $this->checkMobileNeeds();
         }
@@ -158,7 +155,6 @@ class PayPal extends PaymentModule
             || !$this->registerHook('displayPDFInvoice')
             || !$this->registerHook('actionBeforeCartUpdateQty')
             || !$this->registerHook('PDFInvoice')) {
-
             return false;
         }
 
@@ -210,7 +206,6 @@ class PayPal extends PaymentModule
                 }
             }
         }
-
     }
 
     private function compatibilityCheck()
@@ -234,10 +229,8 @@ class PayPal extends PaymentModule
                 } else {
                     Configuration::updateValue($key, $value);
                 }
-
             }
         }
-
     }
 
     public function isPayPalAPIAvailable()
@@ -285,7 +278,6 @@ class PayPal extends PaymentModule
                     SET m.version = \''.bqSQL($this->version).'\'
                     WHERE m.name = \''.bqSQL($this->name).'\'');
             }
-
         }
 
         if (defined('_PS_ADMIN_DIR_')) {
@@ -340,7 +332,6 @@ class PayPal extends PaymentModule
             (!(bool) Configuration::get('PAYPAL_API_SIGNATURE')))) {
             $this->warning .= $this->l('You must set your PayPal Integral credentials in order to have the mobile theme work correctly.').'<br />';
         }
-
     }
 
     protected function checkMobileNeeds()
@@ -352,11 +343,9 @@ class PayPal extends PaymentModule
             if (($this->context->shop->getTheme() == 'default') && in_array($iso_code, $paypal_countries)) {
                 $this->warning .= $this->l('The mobile theme only works with the PayPal\'s payment module at this time. Please activate the module to enable payments.').'<br />';
             }
-
         } else {
             $this->warning .= $this->l('In order to use the module you need to install the backward compatibility.').'<br />';
         }
-
     }
 
     /* Check status of backward compatibility module */
@@ -370,11 +359,9 @@ class PayPal extends PaymentModule
             } elseif ($backward_module->version < PayPal::BACKWARD_REQUIREMENT) {
                 $this->warning .= $this->l('To work properly the module requires at least the backward compatibility module v').PayPal::BACKWARD_REQUIREMENT.'.<br />';
             }
-
         } else {
             $this->warning .= $this->l('In order to use the module you need to install the backward compatibility.').'<br />';
         }
-
     }
 
     public static function countryIso2to3($iso2)
@@ -641,8 +628,7 @@ class PayPal extends PaymentModule
 
         $braintree_message = '';
         $braintree_style = '';
-        if(version_compare(phpversion(),'5.4','<'))
-        {
+        if (version_compare(phpversion(), '5.4', '<')) {
             if (version_compare(_PS_VERSION_, '1.6.1', '>=')) {
                 $output = $this->displayWarning($this->l('Your server is not compatible with PayPal module upcoming release. Please contact your hosting company in order to upgrade PHP version to at least version 5.4 or latest.'));
             } else {
@@ -773,7 +759,6 @@ class PayPal extends PaymentModule
             if (!$module) {
                 $this->registerHook('displayMobileHeader');
             }
-
         }
 
 
@@ -824,7 +809,6 @@ class PayPal extends PaymentModule
 
 
         if (Configuration::get('PAYPAL_PAYMENT_METHOD') == PPP) {
-
             $this->context->smarty->assign(array(
                 'paypal_locale' => $this->getLocalePayPalPlus(),
                 'PAYPAL_LOGIN_CLIENT_ID' => Configuration::get('PAYPAL_LOGIN_CLIENT_ID'),
@@ -1196,8 +1180,6 @@ class PayPal extends PaymentModule
                 'form' => $this->fetchTemplate('paypal_plus_payment_eu.tpl'),
             );
         }
-
-
     }
 
     public function hookShoppingCartExtra()
@@ -1237,7 +1219,6 @@ class PayPal extends PaymentModule
             return $this->fetchTemplate('braintree_return.tpl');
         } else {
             return $this->fetchTemplate('confirmation.tpl');
-
         }
     }
 
@@ -1523,7 +1504,6 @@ class PayPal extends PaymentModule
             } elseif (_PS_MOBILE_PHONE_) {
                 return $isApacCountry ? APAC_SMARTPHONE_TRACKING_CODE : SMARTPHONE_TRACKING_CODE;
             }
-
         }
         //Get Seamless checkout
 
@@ -1543,7 +1523,6 @@ class PayPal extends PaymentModule
             } else {
                 return $isApacCountry ? APAC_TRACKING_INTEGRAL : TRACKING_INTEGRAL;
             }
-
         }
         if ($method == HSS) {
             return $isApacCountry ? APAC_TRACKING_INTEGRAL_EVOLUTION : TRACKING_INTEGRAL_EVOLUTION;
@@ -1555,7 +1534,6 @@ class PayPal extends PaymentModule
             } else {
                 return $isApacCountry ? APAC_TRACKING_OPTION_PLUS : TRACKING_OPTION_PLUS;
             }
-
         }
         if ($method == PPP) {
             return $isApacCountry ? APAC_TRACKING_PAYPAL_PLUS : TRACKING_PAYPAL_PLUS;
@@ -1603,7 +1581,6 @@ class PayPal extends PaymentModule
                     } elseif ($country_iso == 'default') {
                         $default = (array) $country;
                     }
-
                 }
 
                 $content += $default;
@@ -1767,12 +1744,10 @@ class PayPal extends PaymentModule
             : false;
             if ($this->default_country === false || $sandbox_mode === false || $payment_capture
                 === false || $business === false || $payment_method === false) {
-
                 $this->_errors[] = $this->l('Some fields are empty.');
             } elseif ($business == 0) {
                 $this->_errors[] = $this->l('Credentials fields cannot be empty');
             } elseif ($business == 1) {
-
                 if (($payment_method == WPS || $payment_method == ECS) && (!Tools::getValue('api_username')
                     || !Tools::getValue('api_password') || !Tools::getValue('api_signature'))) {
                     $this->_errors[] = $this->l('Credentials fields cannot be empty');
@@ -1792,7 +1767,6 @@ class PayPal extends PaymentModule
                 if ($payment_method == PVZ && empty($account_braintree[$currency->iso_code])) {
                     $this->_errors[] = sprintf($this->l('Braintree Account %s field cannot be empty'), $currency->iso_code);
                 }
-
             }
         }
 
@@ -1856,7 +1830,6 @@ class PayPal extends PaymentModule
 
                 /* USE PAYPAL PLUS */
                 if ((int) Tools::getValue('paypal_payment_method') == 5) {
-
                     Configuration::updateValue('PAYPAL_PLUS_CLIENT_ID', Tools::getValue('client_id'));
                     Configuration::updateValue('PAYPAL_PLUS_SECRET', Tools::getValue('secret'));
                     if ((int) Tools::getValue('paypalplus_webprofile') == 1 || $refresh_webprofile) {
@@ -1869,7 +1842,6 @@ class PayPal extends PaymentModule
                         } else {
                             Configuration::updateValue('PAYPAL_WEB_PROFILE_ID', '0');
                         }
-
                     }
                 }
                 /* IS IN_CONTEXT_CHECKOUT ENABLED */
@@ -1901,7 +1873,6 @@ class PayPal extends PaymentModule
                         return $this->displayWarning($this->l('You have switched from sandbox to live mode. Please reconfigure your products.'));
                     }
                 }
-
             } else {
                 $this->_html = $this->displayError(implode('<br />', $this->_errors)); // Not displayed at this time
                 $this->context->smarty->assign('PayPal_save_failure', true);
@@ -1913,7 +1884,6 @@ class PayPal extends PaymentModule
             Configuration::updateValue('PAYPAL_BRAINTREE_EXPIRES_AT', Tools::getValue('expiresAt'));
             Configuration::updateValue('PAYPAL_BRAINTREE_REFRESH_TOKEN', Tools::getValue('refreshToken'));
             Configuration::updateValue('PAYPAL_BRAINTREE_MERCHANT_ID', Tools::getValue('merchantId'));
-
         }
 
         return $this->loadLangDefault();
@@ -1954,7 +1924,6 @@ class PayPal extends PaymentModule
 
             return $result;
         } elseif ($payment_method != PPP) {
-
             if (!$amt) {
                 $params = array('TRANSACTIONID' => $id_transaction, 'REFUNDTYPE' => 'Full');
             } else {
@@ -1977,12 +1946,9 @@ class PayPal extends PaymentModule
                 '&'.http_build_query($params, '', '&')
             );
         } else {
-
             if (!$amt) {
-
                 $params = new stdClass();
             } else {
-
                 $result = Db::getInstance()->ExecuteS('SELECT * FROM '._DB_PREFIX_.'paypal_order WHERE id_transaction = "'.pSQL($id_transaction).'"');
                 $result = current($result);
 
@@ -2069,7 +2035,6 @@ class PayPal extends PaymentModule
             }
         }
         if ((array_key_exists('ACK', $response) && $response['ACK'] == 'Success' && $response['REFUNDTRANSACTIONID'] != '') || (isset($response->state) && $response->state == 'completed') || ((Configuration::get('PAYPAL_PAYMENT_METHOD') || Configuration::get('PAYPAL_BRAINTREE_ENABLED')) && $response)) {
-
             if (Configuration::get('PAYPAL_BRAINTREE_ENABLED') && !is_array($response)) {
                 $message .= $this->l('Braintree refund successful!');
             } else {
@@ -2117,7 +2082,7 @@ class PayPal extends PaymentModule
         if ($transaction_braintree) {
             include_once(_PS_MODULE_DIR_.'paypal/classes/Braintree.php');
             $braintree = new PrestaBraintree();
-            $result_transaction = $braintree->submitForSettlement($transaction_braintree, $amount);
+            $result_transaction = $braintree->submitForSettlement($transaction_braintree, $capture_amount);
             if (!$result_transaction) {
                 if ($braintree->error == 'Authorization_expired') {
                     die(Tools::displayError($this->l('The authorization of the banking transaction has expired. For more information, please refer to the expiration cases.')));
@@ -2154,7 +2119,6 @@ class PayPal extends PaymentModule
                 $order_history->addWithemail();
                 $message = $this->l('Order finished with PayPal!');
             }
-
         } else {
             $complete = 'Complete';
             if (!$is_complete) {
@@ -2261,7 +2225,6 @@ class PayPal extends PaymentModule
                 ) {
                     die(Tools::displayError('Error when updating PayPal database'));
                 }
-
             }
 
             $message = $this->l('Verification status :').'<br>';
@@ -2289,9 +2252,7 @@ class PayPal extends PaymentModule
             } elseif (@filemtime(dirname(__FILE__).'/'.$views.'admin/'.$name)) {
                 return $this->display(__FILE__, $views.'admin/'.$name);
             }
-
         }
-
         return $this->display(__FILE__, $name);
     }
 
@@ -2341,7 +2302,6 @@ class PayPal extends PaymentModule
         if (!function_exists('curl_init')) {
             $this->warning .= $this->l('In order to use your module, please activate cURL (PHP extension)');
         }
-
     }
 
     private function loadLangDefault()
@@ -2369,7 +2329,6 @@ class PayPal extends PaymentModule
         foreach ($response as $key => $value) {
             $message .= $key.': '.$value.'<br>';
         }
-
     }
 
     private function checkCurrency($cart)
@@ -2381,7 +2340,6 @@ class PayPal extends PaymentModule
         } else {
             return false;
         }
-
     }
 
     public static function getShopDomainSsl($http = false, $entities = false)
@@ -2480,7 +2438,6 @@ class PayPal extends PaymentModule
             } else {
                 Tools::redirect(Context::getContext()->link->getModuleLink('paypal', 'confirm', $values));
             }
-
         }
     }
 
@@ -2574,7 +2531,6 @@ class PayPal extends PaymentModule
                     } elseif ((int) $num1{$i} < (int) $num2{$i}) {
                         return -1;
                     }
-
                 }
                 // if the two numbers have no difference (they're the same).. return 0
                 return 0;
@@ -2594,7 +2550,7 @@ class PayPal extends PaymentModule
             'address_billing' => new Address($this->context->cart->id_address_invoice),
             'cart' => $this->context->cart,
             'patternRules' => array('avoid' => array()),
-            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : version_compare(_PS_VERSION_, '1.6', '<') ? 'small_default' : 'cart_default',
+            'cart_image_size' => version_compare(_PS_VERSION_, '1.5', '<') ? 'small' : version_compare(_PS_VERSION_, '1.6', '<') ? ImageType::getFormatedName('small') : ImageType::getFormatedName('cart'),
             'useStyle14' => version_compare(_PS_VERSION_, '1.5', '<'),
             'useStyle15' => version_compare(_PS_VERSION_, '1.5', '>') && version_compare(_PS_VERSION_, '1.6', '<'),
         ));
@@ -2648,7 +2604,6 @@ class PayPal extends PaymentModule
 </table>';
             return $tab;
         }
-
     }
 
     public function hookActionBeforeCartUpdateQty($params)
@@ -2659,4 +2614,3 @@ class PayPal extends PaymentModule
         }
     }
 }
-

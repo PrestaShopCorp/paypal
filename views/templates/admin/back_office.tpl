@@ -26,11 +26,11 @@
 <div id="paypal-wrapper">
 	{if !empty($hss_errors)}
         <div style="background-color: red; color: white; font-weight: bolder; padding: 5px; margin-top: 10px;">
-            {l s='Orders for following carts (id) could not be created because of email error'}
+            {l s='Orders for following carts (id) could not be created because of email error' mod='paypal'}
             {foreach from=$hss_errors item=hss}
-                <p><span style="background-color: black; padding: 5px;">{$hss.id_cart} - {$hss.email}</span></p>
+                <p><span style="background-color: black; padding: 5px;">{$hss.id_cart|escape:'htmlall':'UTF-8'} - {$hss.email|escape:'htmlall':'UTF-8'}</span></p>
             {/foreach}
-            {l s='You must change the e-mail in the module configuration with the one displayed above'}
+            {l s='You must change the e-mail in the module configuration with the one displayed above' mod='paypal'}
         </div>
 	{/if}
 	{* PayPal configuration page header *}
@@ -175,15 +175,15 @@
 
                 {if (in_array($PayPal_PVZ, $PayPal_allowed_methods))}
                     {if version_compare($smarty.const.PHP_VERSION, '5.4.0', '<')}
-						<strong class="braintree_title_bo">{l s='Want to use Braintree as card processor ?' mod='paypal'}</strong> &nbsp;<a href="{l s='https://www.braintreepayments.com/' mod='paypal'}" target="_blank" class="braintree_link"><img src="{$PayPal_module_dir}/views/img/logos/BRAINTREE.png" class="braintree_logo"> &nbsp;&nbsp;&nbsp;<div class="bo_paypal_help">?</div></a><br/>
+						<strong class="braintree_title_bo">{l s='Want to use Braintree as card processor ?' mod='paypal'}</strong> &nbsp;<a href="{l s='https://www.braintreepayments.com/' mod='paypal'}" target="_blank" class="braintree_link"><img src="{$PayPal_module_dir|escape:'htmlall':'UTF-8'}/views/img/logos/BRAINTREE.png" class="braintree_logo"> &nbsp;&nbsp;&nbsp;<div class="bo_paypal_help">?</div></a><br/>
 						<p id="error_version_php">{l s='You can\'t use braintree because your PHP version is too old (PHP 5.4 min)' mod='paypal'}</p>
                     {elseif !$ps_ssl_active}
-						<strong class="braintree_title_bo">{l s='Want to use Braintree as card processor ?' mod='paypal'}</strong> &nbsp;<a href="{l s='https://www.braintreepayments.com/' mod='paypal'}" target="_blank" class="braintree_link"><img src="{$PayPal_module_dir}/views/img/logos/BRAINTREE.png" class="braintree_logo"> &nbsp;&nbsp;&nbsp;<div class="bo_paypal_help">?</div></a><br/>
+						<strong class="braintree_title_bo">{l s='Want to use Braintree as card processor ?' mod='paypal'}</strong> &nbsp;<a href="{l s='https://www.braintreepayments.com/' mod='paypal'}" target="_blank" class="braintree_link"><img src="{$PayPal_module_dir|escape:'htmlall':'UTF-8'}/views/img/logos/BRAINTREE.png" class="braintree_logo"> &nbsp;&nbsp;&nbsp;<div class="bo_paypal_help">?</div></a><br/>
 						<p id="error_version_php">{l s='You can\'t use braintree because you haven\'t enabled https' mod='paypal'}</p>
 					{else}
                     {* WEBSITE PAYMENT PLUS *}
                         <br />
-                        <strong class="braintree_title_bo">{l s='Want to use Braintree as card processor ?' mod='paypal'} {l s='(Euro only)' mod='paypal'}</strong> &nbsp;<a href="{l s='https://www.braintreepayments.com/' mod='paypal'}" target="_blank" class="braintree_link"><img src="{$PayPal_module_dir}/views/img/logos/BRAINTREE.png" class="braintree_logo"> &nbsp;&nbsp;&nbsp;<div class="bo_paypal_help">?</div></a><br/>
+                        <strong class="braintree_title_bo">{l s='Want to use Braintree as card processor ?' mod='paypal'} {l s='(Euro only)' mod='paypal'}</strong> &nbsp;<a href="{l s='https://www.braintreepayments.com/' mod='paypal'}" target="_blank" class="braintree_link"><img src="{$PayPal_module_dir|escape:'htmlall':'UTF-8'}/views/img/logos/BRAINTREE.png" class="braintree_logo"> &nbsp;&nbsp;&nbsp;<div class="bo_paypal_help">?</div></a><br/>
 
 						<label for="braintree_enabled">
                             <input type="checkbox" name="braintree_enabled" id="braintree_enabled" value='{$PayPal_PVZ|escape:'htmlall':'UTF-8'}' {if $PayPal_braintree_enabled}checked="checked"{/if} />
@@ -191,7 +191,7 @@
                             <span class="description"></span>
                             <!-- <p class="toolbox"></p> -->
                         </label>
-                        <span id="braintree_message" style="{$Braintree_Style}">{$Braintree_Message|escape:'htmlall':'UTF-8'}</span>
+                        <span id="braintree_message" style="{$Braintree_Style|escape:'htmlall':'UTF-8'}">{$Braintree_Message|escape:'htmlall':'UTF-8'}</span>
                         <div id="paypal_braintree">
 							{include './button_braintree.tpl'}
 						</div>

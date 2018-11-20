@@ -37,7 +37,6 @@ if ($id_cart = Tools::getValue('id_cart')) {
     if ($id_order !== false) {
         echo (int) $id_order;
     }
-
 }
 
 die();

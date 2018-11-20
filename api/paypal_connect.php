@@ -104,7 +104,6 @@ class PayPalConnect
                 if (curl_errno($ch)) {
                     $this->_logPaypal(curl_error($ch));
                 }
-
             } else {
                 $this->_logs[] = $this->paypal->l('Send with CURL method successful');
             }
@@ -138,7 +137,6 @@ class PayPalConnect
             } else {
                 $this->_logs[] = $this->paypal->l('Send with fsockopen method successful');
             }
-
         }
         return isset($tmp) ? $tmp : false;
     }
@@ -175,7 +173,6 @@ class PayPalConnect
                 }
                 Configuration::updateValue('PAYPAL_PURGE_LOG_DATE', $date);
             }
-
         } catch (Exception $e) {
             return false;
         }

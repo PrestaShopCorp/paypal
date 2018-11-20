@@ -111,12 +111,10 @@ class PayPalLogos
                     } else if (file_exists(dirname(__FILE__).'/views/img/bo-cards/default.png')) {
                         $values['BackOfficeCards'] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.'/views/img/bo-cards/default.png';
                     }
-
                 } else if (isset($values['Local'.$key])) {
                     // Use the local version
                     $values['Local'.$key] = _MODULE_DIR_._PAYPAL_MODULE_DIRNAME_.$values['Local'.$key];
                 }
-
             }
         }
 
@@ -137,14 +135,12 @@ class PayPalLogos
                     if ($size > 0 || (file_exists(_MODULE_DIR_.$destination) && (@filesize(_MODULE_DIR_.$destination) > 0))) {
                         return _MODULE_DIR_.$destination;
                     }
-
                 }
             } elseif (strstr($source, 'https')) {
                 return $this->updatePictures(str_replace('https', 'http', $source), $destination);
             } else {
                 return false;
             }
-
         }
 
         return _MODULE_DIR_.$destination;
