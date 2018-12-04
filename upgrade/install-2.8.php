@@ -54,7 +54,6 @@ function upgrade_module_2_8($object, $install = false)
                 foreach ($confs as $key => $value) {
                     Configuration::updateValue($key, $value);
                 }
-
             }
         }
 
@@ -90,7 +89,6 @@ function upgrade_module_2_8($object, $install = false)
                 } else {
                     $order_state->name[$language['id_lang']] = 'Authorization accepted from PayPal';
                 }
-
             }
 
             $order_state->send_email = false;

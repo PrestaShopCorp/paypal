@@ -52,7 +52,6 @@ function upgrade_module_3_12_0($object, $install = false)
             } else {
                 $order_state->name[$language['id_lang']] = 'Awaiting confirmation from PayPal';
             }
-
         }
         $order_state->send_email = false;
         $order_state->paid = false;
@@ -70,7 +69,6 @@ function upgrade_module_3_12_0($object, $install = false)
         } else {
             return false;
         }
-
     }
 
     return true;

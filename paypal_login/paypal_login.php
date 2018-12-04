@@ -44,7 +44,6 @@ class PayPalLogin
         } else {
             return 'api.paypal.com';
         }
-
     }
 
     public function getTokenServiceEndpoint()
@@ -55,7 +54,6 @@ class PayPalLogin
         } else {
             return '/v1/identity/openidconnect/tokenservice';
         }
-
     }
 
     public function getUserInfoEndpoint()
@@ -71,7 +69,6 @@ class PayPalLogin
         } else {
             return 'http://'.Configuration::get('PS_SHOP_DOMAIN').'/modules/paypal/paypal_login/paypal_login_token.php';
         }
-
     }
 
     public function getAuthorizationCode()
@@ -106,7 +103,6 @@ class PayPalLogin
         $result = Tools::jsonDecode($result);
 
         if ($result) {
-
             $login = new PayPalLoginUser();
 
             $customer = $this->getUserInformations($result->access_token, $login);
@@ -224,9 +220,9 @@ class PayPalLogin
     private function setCustomer($result)
     {
         $customer = new Customer();
-        $full_name_arr = strpos($result->name," ");
-        $customer->firstname = substr($result->name,0,$full_name_arr);
-        $customer->lastname = substr($result->name,$full_name_arr);
+        $full_name_arr = strpos($result->name, " ");
+        $customer->firstname = Tools::substr($result->name, 0, $full_name_arr);
+        $customer->lastname = Tools::substr($result->name, $full_name_arr);
         if (version_compare(_PS_VERSION_, '1.5.3.1', '>')) {
             $customer->id_lang = Language::getIdByIso(strstr($result->language, '_', true));
         }

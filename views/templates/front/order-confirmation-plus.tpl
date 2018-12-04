@@ -38,10 +38,10 @@
 {include file="$tpl_dir./errors.tpl"}
 
 {if $smarty.const._PS_VERSION_ < 1.5}
-	<link rel="stylesheet" href="{$base_dir|escape:'UTF-8'}modules/paypal/views/css/paypal_1_4.css">
+	<link rel="stylesheet" href="{$base_dir|escape:'htmlall':'UTF-8'}modules/paypal/views/css/paypal_1_4.css">
 {/if}
 
-{$paypal_cart_summary|escape:'UTF-8'}
+{$paypal_cart_summary|escape:'htmlall':'UTF-8'}
 <div class="inforeturn"></div>
 <div class="confirm_PPP">
     
@@ -76,7 +76,7 @@
                     $('#confirm').attr('disabled','disabled');
 
                     $.ajax({
-                        url: '{$linkSubmitPlus|escape:'UTF-8'}',
+                        url: '{$linkSubmitPlus|escape:'htmlall':'UTF-8'}',
                         type: 'POST',
                         data: form.serialize() + '&ajax=true&submit=' + nameSubmit,
                         success: function (data) {

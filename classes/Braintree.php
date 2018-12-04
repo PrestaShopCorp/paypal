@@ -20,8 +20,8 @@
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
  *  @copyright 2007-2018 PrestaShop SA
- *  @version  Release: $Revision: 13573 $
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @version  Release: $Revision: 13573 $
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -132,7 +132,6 @@ class PrestaBraintree
 
                 $this->error = $result->transaction->status;
             }
-
         } catch (Exception $e) {
             $this->error = $e->getCode().' : '.$e->getMessage();
             return false;
@@ -187,7 +186,6 @@ class PrestaBraintree
         } else {
             return false;
         }
-
     }
 
     public function getTransactionId($id_order)
@@ -251,7 +249,6 @@ class PrestaBraintree
                     }
                 }
                 if ($result->transaction->status == 'Authorization_expired') {
-
                     $this->error = $result->transaction->status;
                 }
             }
@@ -260,7 +257,6 @@ class PrestaBraintree
             return false;
         }
         return false;
-
     }
 
     public function void($transaction_id)
@@ -287,9 +283,7 @@ class PrestaBraintree
      */
     private function _checkToken()
     {
-
         if (Configuration::get('PAYPAL_BRAINTREE_EXPIRES_AT') && Configuration::get('PAYPAL_BRAINTREE_REFRESH_TOKEN')) {
-        
             $datetime_bt = DateTime::createFromFormat(DateTime::ISO8601, Configuration::get('PAYPAL_BRAINTREE_EXPIRES_AT'));
             $datetime_now = new DateTime();
 
@@ -315,9 +309,7 @@ class PrestaBraintree
 
                 return true;
             }
-
             return true;
-        
         } else {
             return false;
         }

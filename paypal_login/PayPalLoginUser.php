@@ -120,7 +120,6 @@ class PaypalLoginUser extends ObjectModel
             foreach ($results as $result) {
                 $logins[$result['id_paypal_login_user']] = new PaypalLoginUser((int) $result['id_paypal_login_user']);
             }
-
         }
 
         return $logins;

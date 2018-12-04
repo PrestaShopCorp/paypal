@@ -96,7 +96,6 @@ class PaypalExpressCheckout extends Paypal
             foreach ($this->cookie_key as $key) {
                 $this->{$key} = $paypal[$key];
             }
-
         }
 
         $this->currency = new Currency((int) $this->context->cart->id_currency);
@@ -202,7 +201,6 @@ class PaypalExpressCheckout extends Paypal
         if (!empty($cancel_url)) {
             $fields['CANCELURL'] = $cancel_url;
         }
-
     }
 
     public function getExpressCheckout()
@@ -288,7 +286,6 @@ class PaypalExpressCheckout extends Paypal
                 $field = str_replace(',', '.', $field);
             }
         }
-
     }
 
     private function setShippingAddress(&$fields, $id_address)
@@ -360,7 +357,6 @@ class PaypalExpressCheckout extends Paypal
                 $total = Tools::ps_round($total + $fields['L_PAYMENTREQUEST_0_AMT'.$index], $this->decimals);
             }
         }
-
     }
 
     private function setGiftWrapping(&$fields, &$index, &$total)
@@ -473,7 +469,6 @@ class PaypalExpressCheckout extends Paypal
         if (is_array($this->result) && isset($this->result['TOKEN'])) {
             $this->token = (string) $this->result['TOKEN'];
         }
-
     }
 
     // Store data for the next reloading page

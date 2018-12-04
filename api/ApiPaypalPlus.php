@@ -47,7 +47,6 @@ class ApiPaypalPlus
         $ch = curl_init();
 
         if ($ch) {
-
             if ((int) Configuration::get('PAYPAL_SANDBOX') == 1) {
                 curl_setopt($ch, CURLOPT_URL, 'https://api.sandbox.paypal.com'.$url);
             } else {
@@ -73,7 +72,6 @@ class ApiPaypalPlus
                 } else {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
                 }
-
             }
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HEADER, false);
@@ -104,7 +102,6 @@ class ApiPaypalPlus
         if (isset($oPayPalToken->error)) {
             return false;
         } else {
-
             if ($this->context->cookie->paypal_access_token_time_max > time()) {
                 return $this->context->cookie->paypal_access_token_access_token;
             }
@@ -151,9 +148,7 @@ class ApiPaypalPlus
         $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN, array('grant_type' => 'client_credentials'));
 
         if ($accessToken) {
-
             $data = $this->_createWebProfile();
-
             $header = array(
                 'Content-Type:application/json',
                 'Authorization:Bearer '.$accessToken,
@@ -163,7 +158,6 @@ class ApiPaypalPlus
             if (isset($result->id)) {
                 return $result->id;
             } else {
-
                 $results = $this->getListProfile();
 
                 foreach ($results as $result) {
@@ -183,7 +177,6 @@ class ApiPaypalPlus
         $accessToken = $this->getToken(URL_PPP_CREATE_TOKEN, array('grant_type' => 'client_credentials'));
 
         if ($accessToken) {
-
             $header = array(
                 'Content-Type:application/json',
                 'Authorization:Bearer '.$accessToken,
@@ -229,7 +222,6 @@ class ApiPaypalPlus
             } else {
                 $giftWithoutTax = (float) (Configuration::get('PS_GIFT_WRAPPING_PRICE'));
             }
-
         } else {
             $giftWithoutTax = 0;
         }
@@ -268,7 +260,6 @@ class ApiPaypalPlus
         $aItems = array();
         /* Item */
         foreach ($cartItems as $cartItem) {
-
             $item = new stdClass();
             $item->name = $cartItem['name'];
             $item->currency = $oCurrency->iso_code;
@@ -281,7 +272,6 @@ class ApiPaypalPlus
         }
 
         foreach ($discounts as $discount) {
-
             $item = new stdClass();
             $item->name = $discount['name'];
             $item->currency = $oCurrency->iso_code;

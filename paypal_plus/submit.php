@@ -33,7 +33,6 @@ include_once _PS_ROOT_DIR_.'/init.php';
  */
 
 if (version_compare(_PS_VERSION_, '1.5', '<')) {
-
     include_once _PS_MODULE_DIR_.'paypal/backward_compatibility/backward.php';
     $context = Context::getContext();
     $ajax = Tools::getValue('ajax');
@@ -45,7 +44,6 @@ if (version_compare(_PS_VERSION_, '1.5', '<')) {
     } else {
         displayConfirm($context);
     }
-
 } else {
     $values = array(
         'id_cart' => (int) Tools::getValue('id_cart'),
@@ -72,12 +70,10 @@ function displayConfirm($context)
     $token = Tools::getValue('token');
 
     if (!empty($id_cart) && !empty($paymentId) && !empty($token)) {
-
         $CallApiPaypalPlus = new CallApiPaypalPlus();
         $payment = Tools::jsonDecode($CallApiPaypalPlus->lookUpPayment($paymentId));
 
         if (isset($payment->state)) {
-
             $context->smarty->assign('state', $payment->state);
 
             $paypal->assignCartSummary();
@@ -134,7 +130,6 @@ function displayConfirm($context)
         } else {
             $context->smarty->assign('state', 'failed');
         }
-
     } else {
         $context->smarty->assign('state', 'failed');
     }
@@ -155,20 +150,17 @@ function displayAjax($context)
     $paypal = new PayPal();
     $return = array();
 
-    if (
-        (!empty($id_cart) && $context->cart->id == $id_cart) &&
+    if ((!empty($id_cart) && $context->cart->id == $id_cart) &&
         !empty($payerID) &&
         !empty($paymentId) &&
         !empty($submit)
     ) {
-
         include_once _PS_MODULE_DIR_.'paypal/paypal.php';
 
         $CallApiPaypalPlus = new CallApiPaypalPlus();
         $payment = Tools::jsonDecode($CallApiPaypalPlus->executePayment($payerID, $paymentId));
 
         if (isset($payment->state)) {
-
             $transaction = array(
                 'id_transaction' => $payment->transactions[0]->related_resources[0]->sale->id,
                 'payment_status' => $payment->state,
@@ -180,9 +172,7 @@ function displayAjax($context)
             );
 
             if ($submit == 'confirmPayment') {
-
                 if ($payment->state == 'approved') {
-
                     $paypal->validateOrder(
                         $id_cart,
                         getOrderStatus('payment'),
@@ -193,7 +183,6 @@ function displayAjax($context)
                     );
                     $return['success'][] = $paypal->l('Your payment has been taken into account');
                 } else {
-
                     $paypal->validateOrder(
                         $id_cart,
                         getOrderStatus('payment_error'),
@@ -212,7 +201,6 @@ function displayAjax($context)
                     $paypal_plus_pui->pui_informations = Tools::jsonEncode($payment->payment_instruction);
                 }
             } elseif ($submit == 'confirmCancel') {
-
                 $paypal->validateOrder(
                     $id_cart,
                     getOrderStatus('order_canceled'),
@@ -225,11 +213,9 @@ function displayAjax($context)
             } else {
                 $return['error'][] = $paypal->l('An error occured during the payment');
             }
-
         } else {
             $return['error'][] = $paypal->l('An error occured during the payment');
         }
-
     } else {
         $return['error'][] = $paypal->l('An error occured during the payment');
     }

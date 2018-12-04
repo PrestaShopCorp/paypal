@@ -32,7 +32,7 @@
 			{if $error_msg != ''}<p class="braintree_error">{$error_msg|escape:'htmlall':'UTF-8'}<p>{/if}
                 <label class="paypal_title_pay_card">{l s='Pay with your card' mod='paypal'}</label><div class="paypal_clear"></div>
                 <img src="{$base_dir_ssl|escape:'htmlall':'UTF-8'}modules/paypal/views/img/logos/braintree_cards.png" alt="">
-				<form action="{$braintreeSubmitUrl}" id="braintree-form" method="post">
+				<form action="{$braintreeSubmitUrl|escape:'htmlall':'UTF-8'}" id="braintree-form" method="post">
 					<div id="block-card-number" class="block_field">
 						<div id="card-number" class="hosted_field"></div>
 					</div>
@@ -185,7 +185,7 @@
 							}
 							threeDSecure.verifyCard({
 								nonce: payload.nonce,
-								amount: {/literal}{$braintreeAmount}{literal},
+								amount: {/literal}{$braintreeAmount|escape:'htmlall':'UTF-8'}{literal},
 								addFrame: function (err, iframe) {
 									$.fancybox.open([
 										{

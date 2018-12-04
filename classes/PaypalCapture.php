@@ -109,7 +109,6 @@ class PaypalCapture extends ObjectModel
             $query->where('result = "Completed"');
             return Tools::ps_round(DB::getInstance()->getValue($query), 2);
         }
-
     }
 
     public function getRestToPaid(Order $order)
@@ -129,7 +128,6 @@ class PaypalCapture extends ObjectModel
         } else {
             return false;
         }
-
     }
 
     public function getListCaptured()
@@ -149,7 +147,6 @@ class PaypalCapture extends ObjectModel
             foreach ($result as &$foo) {
                 $foo['date'] = Tools::displayDate($foo['date_add'], Configuration::get('PS_LANG_DEFAULT'), true);
             }
-
         }
         return $result;
     }
@@ -167,6 +164,5 @@ class PaypalCapture extends ObjectModel
         } else {
             return false;
         }
-
     }
 }

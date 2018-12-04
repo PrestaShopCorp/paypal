@@ -50,7 +50,6 @@ function upgrade_module_3_11_2($object, $install = false)
                 $order_state_auth->name[$language['id_lang']] = 'Authorization accepted from Braintree';
                 $order_state_wait->name[$language['id_lang']] = 'Awaiting for Braintree payment';
             }
-
         }
 
         $order_state_auth->send_email = false;
@@ -75,13 +74,11 @@ function upgrade_module_3_11_2($object, $install = false)
         Configuration::updateValue('PAYPAL_BT_OS_AUTHORIZATION', (int) $order_state_auth->id);
 
         if ($order_state_wait->add()) {
-
             $source = _PS_MODULE_DIR_.'paypal/views/img/logos/os_braintree.png';
             $destination = _PS_ROOT_DIR_.'/img/os/'.(int) $order_state_wait->id.'.gif';
             copy($source, $destination);
         }
         Configuration::updateValue('PAYPAL_BRAINTREE_OS_AWAITING', (int) $order_state_wait->id);
-
     }
     return true;
 }

@@ -67,7 +67,6 @@ function upgrade_module_3_0($object, $install = false)
                 Db::getInstance()->Execute('ALTER TABLE `'._DB_PREFIX_.'paypal_order` ADD `'.pSQL($column['name']).'` '.pSQL($column['type']));
             }
         }
-
     }
 
     if (count(Db::getInstance()->ExecuteS('SHOW TABLES FROM `'._DB_NAME_.'` LIKE \''._DB_PREFIX_.'paypal_customer\'')) <= 0) {

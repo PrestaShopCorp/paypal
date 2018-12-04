@@ -62,7 +62,6 @@ function upgrade_module_3_11($object, $install = false)
         }
 
         Configuration::updateValue('PAYPAL_VERSION', '3.11.0');
-
     }
     return true;
 }

@@ -54,6 +54,6 @@ if ($obj) {
 ?>
 
 <script type="text/javascript">
-	window.opener.location.reload(false);
-	window.close();
+        window.opener.location.reload(false);
+        window.close();
 </script>

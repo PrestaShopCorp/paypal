@@ -20,8 +20,8 @@
  *
  *  @author    PrestaShop SA <contact@prestashop.com>
  *  @copyright 2007-2018 PrestaShop SA
- *  @version  Release: $Revision: 13573 $
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ *  @version  Release: $Revision: 13573 $
  *  International Registered Trademark & Property of PrestaShop SA
  */
 
@@ -66,7 +66,7 @@ class PayPalBraintreeSubmitModuleFrontController extends ModuleFrontController
         
 
         $cart_status = $braintree->cartStatus($this->context->cart->id);
-        switch($cart_status) {
+        switch ($cart_status) {
             case 'alreadyUse':
                 $order_id = Order::getOrderByCartId($this->context->cart->id);
                 $this->redirectConfirmation($paypal->id, $this->context->cart->id, $order_id);
@@ -78,8 +78,8 @@ class PayPalBraintreeSubmitModuleFrontController extends ModuleFrontController
                     $paypal->validateOrder($this->context->cart->id, (Configuration::get('PAYPAL_CAPTURE')?Configuration::get('PAYPAL_BRAINTREE_OS_AWAITING'):Configuration::get('PS_OS_PAYMENT')), $braintree_transaction->amount, 'Braintree', $paypal->l('Payment accepted.'), $transactionDetail, $this->context->cart->id_currency, false, $this->context->customer->secure_key);
                     $order_id = Order::getOrderByCartId($this->context->cart->id);
                     $this->redirectConfirmation($paypal->id, $this->context->cart->id, $order_id);
-                    break;
                 }
+                break;
             default:
                 $id_braintree_presta = $braintree->saveTransaction(array('id_cart' => $this->context->cart->id, 'nonce_payment_token' => Tools::getValue('payment_method_nonce'), 'client_token' => Tools::getValue('client_token'), 'datas' => Tools::getValue('deviceData')));
                 
@@ -106,7 +106,6 @@ class PayPalBraintreeSubmitModuleFrontController extends ModuleFrontController
         } else {
             Tools::redirect('index.php?controller=order&step=3&bt_error_msg='.urlencode($error));
         }
-
     }
 
     public function redirectConfirmation($id_paypal, $id_cart, $id_order)

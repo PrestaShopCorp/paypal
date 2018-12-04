@@ -31,7 +31,7 @@
 <script type="application/javascript">
 
     var ppp = PAYPAL.apps.PPP({
-        "approvalUrl": "{/literal}{$approval_url|escape:'UTF-8'}{literal}",
+        "approvalUrl": "{/literal}{$approval_url|escape:'htmlall':'UTF-8'}{literal}",
         "placeholder": "ppplus",
         "mode": "{/literal}{$mode|escape:'htmlall':'UTF-8'}{literal}",
         {/literal}{if $mode == 'sandbox'}"showPuiOnSandbox": true,{/if}{literal}
