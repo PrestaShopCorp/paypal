@@ -103,6 +103,7 @@ class PayPal extends PaymentModule
         $this->version = '3.12.0';
         $this->author = 'PrestaShop';
         $this->is_eu_compatible = 1;
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
 
         $this->currencies = true;
         $this->currencies_mode = 'radio';
