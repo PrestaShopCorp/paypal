@@ -307,7 +307,7 @@ class PayPalInstall
             $order_state->color = '#DDEEFF';
             $order_state->hidden = false;
             $order_state->delivery = false;
-            $order_state->logable = true;
+            $order_state->logable = false;
             $order_state->invoice = false;
 
             if ($order_state->add()) {
