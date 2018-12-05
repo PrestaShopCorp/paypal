@@ -297,9 +297,9 @@ class PayPalInstall
 
             foreach (Language::getLanguages() as $language) {
                 if (Tools::strtolower($language['iso_code']) == 'fr') {
-                    $order_state->name[$language['id_lang']] = 'En attente confirmation par PayPal';
+                    $order_state->name[$language['id_lang']] = 'En attente de confirmation par PayPal';
                 } else {
-                    $order_state->name[$language['id_lang']] = 'Awaiting confirmation from PayPal';
+                    $order_state->name[$language['id_lang']] = 'Waiting for validation by PayPal';
                 }
             }
             $order_state->send_email = false;
