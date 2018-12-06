@@ -330,7 +330,15 @@ class PaypalExpressCheckout extends Paypal
 
             $fields['L_PAYMENTREQUEST_0_DESC'.$index] = Tools::substr(strip_tags($product['description_short']), 0, 50).'...';
 
-            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = Tools::ps_round($product['price_wt'], $this->decimals);
+            $price = $product['price_wt'];
+            if (version_compare(_PS_VERSION_, '1.6.1', '<')) {
+                if (isset($product['ecotax']) && $product['ecotax'] > 0) {
+                    $price += $product['ecotax'];
+                }
+            }
+
+            $fields['L_PAYMENTREQUEST_0_AMT'.$index] = Tools::ps_round($price, $this->decimals);
+
             $fields['L_PAYMENTREQUEST_0_QTY'.$index] = $product['quantity'];
 
             $total = $total + ($fields['L_PAYMENTREQUEST_0_AMT'.$index] * $product['quantity']);
