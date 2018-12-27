@@ -26,7 +26,7 @@
 
 function upgrade_module_3_12_0($object, $install = false)
 {
-    if (Db::getInstance()->Execute('
+    if (!Db::getInstance()->Execute('
             CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'paypal_hss_email_error` (
                 `id_paypal_hss_email_error` int(11) NOT NULL AUTO_INCREMENT,
                 `id_cart` int(11) NOT NULL,
