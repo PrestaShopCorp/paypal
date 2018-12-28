@@ -53,29 +53,7 @@
 
 	<div class="paypal-clear"></div>
 
-	{*
-	<!-- div class="bootstrap">
-		<form method="post" action="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}" id="paypal_configuration">
-			{if $PayPal_tls_verificator == '1'}
-				<div style="margin-bottom: 20px;">
-					{l s='Your configuration use version 1.2 of protocol TLS' mod='paypal'}<br/>
-					<a href="{l s='https://www.paypal-knowledge.com/infocenter/index?page=content&widgetview=true&id=FAQ1914&viewlocale=en_US' mod='paypal'}">{l s='Click here to know more' mod='paypal'}</a>
-				</div>
-			{elseif $PayPal_tls_verificator == '0'}
-				<div style="margin-bottom: 20px;">
-					{l s='Your configuration use version 1.0 to communicate with PayPal.From July, all payments will be blocked.Thank you to approach your hosting company to enable the TLS version 1.2' mod='paypal'}<br/>
-					<a href="{l s='https://www.paypal-knowledge.com/infocenter/index?page=content&widgetview=true&id=FAQ1914&viewlocale=en_US' mod='paypal'}">{l s='Click here to know more' mod='paypal'}</a>
-				</div>
-			{else}
-			{/if}
-			<button name="submitTlsVerificator" id="submitTlsVerificator">{l s='check your tls version' mod='paypal'}</button>
 
-		</form>
-
-
-
-	</div -->
-	*}
 	{if $PayPal_allowed_methods}
 		{if $default_lang_iso == 'fr'}
 			<div class="paypal-clear"></div><hr />
@@ -241,7 +219,8 @@
 				<span class="paypal-section">3</span>
 				<h3 class="inline">{l s='Test TLS & curl' mod='paypal'}</h3>
 				<br /><br />
-				<span style="background-color: cyan;cursor: pointer;padding: 5px 10px;border: solid 1px blue;border-radius: 3px;" id="test_ssl_submit">{l s='Test' mod='paypal'}</span>
+				<input type="hidden" id="security_token" value="{$smarty.get.token}" >
+				<span style="cursor: pointer;display: inline-block;" id="test_ssl_submit"><b>{l s='Test' mod='paypal'}</b></span>
 				<div style="margin-top: 10px;" id="test_ssl_result"></div>
 			</div>
 			{* ENABLE YOUR ONLINE SHOP TO PROCESS PAYMENT *}
@@ -502,3 +481,6 @@
 	{/if}
 
 </div>
+<script>
+	var tlscurltest_url = '{$tls_link_ajax|addslashes}';
+</script>

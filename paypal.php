@@ -621,6 +621,9 @@ class PayPal extends PaymentModule
 
     public function getContent()
     {
+        if (Configuration::get('PS_SSL_ENABLED') && Configuration::get('PS_SSL_ENABLED_EVERYWHERE') && !isset($_SERVER['HTTPS'])) {
+            Tools::redirect('https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+        }
         if (Tools::getIsset('BRAINTREE_ENABLED')) {
             Configuration::updateValue('VZERO_ENABLED', 1);
         }
@@ -726,10 +729,7 @@ class PayPal extends PaymentModule
             'Braintree_Refresh_Token' => Configuration::get('PAYPAL_BRAINTREE_REFRESH_TOKEN'),
             'Braintree_Expires_At' => strtotime(Configuration::get('PAYPAL_BRAINTREE_EXPIRES_AT')),
             'ps_ssl_active' => Configuration::get('PS_SSL_ENABLED'),
-        ));
-
-        Media::addJsDef(array(
-            'tlscurltest_url' => $this->context->link->getModuleLink($this->name, 'tlscurltest', array('ajax'=>1))
+            'tls_link_ajax' => $this->context->link->getModuleLink($this->name, 'tlscurltest', array('ajax'=>1)),
         ));
 
         $hss_errors = Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'paypal_hss_email_error`');
