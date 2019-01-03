@@ -753,7 +753,6 @@ class PayPal extends PaymentModule
      */
     public function hookHeader($params)
     {
-
         $id_hook = (int) Configuration::get('PS_MOBILE_HOOK_HEADER_ID');
         if ($id_hook > 0) {
             $module = Hook::getModulesFromHook($id_hook, $this->id);
@@ -783,10 +782,12 @@ class PayPal extends PaymentModule
             'PayPal_in_context_checkout' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT'),
             'use_paypal_in_context' => (int) $this->useInContextCheckout(),
             'PayPal_in_context_checkout_merchant_id' => Configuration::get('PAYPAL_IN_CONTEXT_CHECKOUT_M_ID'),
+            'paypal_mode' => Configuration::get('PAYPAL_SANDBOX') ? "sandbox" : "production",
         ));
-
-        $process = '<script type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
+        $process = '<script defer type="text/javascript">'.$this->fetchTemplate('views/js/paypal.js').'</script>';
         if ($this->useInContextCheckout()) {
+            $process .= $this->fetchTemplate('header.tpl');
+            $this->context->controller->addJS(_MODULE_DIR_.$this->name.'/views/js/incontext.js');
             $process .= '<script defer src="//www.paypalobjects.com/api/checkout.js"></script>';
         }
 
