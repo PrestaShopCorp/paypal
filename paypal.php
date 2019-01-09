@@ -1217,6 +1217,9 @@ class PayPal extends PaymentModule
         if (!$this->active) {
             return null;
         }
+        $this->context->smarty->assign(array(
+            'PayPal_payment_mode' => Configuration::get('PAYPAL_CAPTURE'),
+        ));
         if (Tools::getValue('braintree')) {
             return $this->fetchTemplate('braintree_return.tpl');
         } else {

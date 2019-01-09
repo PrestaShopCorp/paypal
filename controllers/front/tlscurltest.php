@@ -29,6 +29,7 @@ class PayPalTlscurltestModuleFrontController extends ModuleFrontController
 {
     public function displayAjax()
     {
+        $paypal = Module::getInstanceByName('paypal');
         if (defined('CURL_SSLVERSION_TLSv1_2')) {
             $tls_server = $this->context->link->getModuleLink('paypal', 'tlscurltestserver');
             $curl = curl_init($tls_server);
@@ -40,15 +41,15 @@ class PayPalTlscurltestModuleFrontController extends ModuleFrontController
             if ($response != 'ok') {
                 $curl_info = curl_getinfo($curl);
                 if ($curl_info['http_code'] == 401) {
-                    echo '<p style="color:red">401 Unauthorized</p>';
+                    echo '<p style="color:red">'.$paypal->l('401 Unauthorized').'</p>';
                 } else {
                     echo '<p style="color:red">'.curl_error($curl).'</p>';
                 }
             } else {
-                echo '<p style="color:green">TLS version is compatible</p>';
+                echo '<p style="color:green">'.$paypal->l('TLS version is compatible').'</p>';
             }
         } else {
-            echo '<p style="color:red">TLS version is not compatible</p>';
+            echo '<p style="color:red">'.$paypal->l('TLS version is not compatible').'</p>';
         }
 
         die;
