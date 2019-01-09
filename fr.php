@@ -323,6 +323,7 @@ $_MODULE['<{paypal}prestashop>column_dac2693baa5c5c9a5318609ed81c4f2a'] = 'Payer
 $_MODULE['<{paypal}prestashop>confirmation_2e2117b7c81aa9ea6931641ea2c6499f'] = 'Votre commande sur';
 $_MODULE['<{paypal}prestashop>confirmation_75fbf512d744977d62599cc3f0ae2bb4'] = 'est bien enregistrée.';
 $_MODULE['<{paypal}prestashop>confirmation_15b0f8e55c6bdfc3d5fd0b6b3b6cb3ee'] = 'Vous avez choisi de payer avec PayPal.';
+$_MODULE['<{paypal}prestashop>confirmation_62598c2bf85ccc7617d9f6164206bfde'] = 'Votre commande vous sera envoyée dès que le paiement sera capturé.';
 $_MODULE['<{paypal}prestashop>confirmation_e6dc7945b557a1cd949bea92dd58963e'] = 'Votre commande vous sera envoyée très prochainement.';
 $_MODULE['<{paypal}prestashop>confirmation_0db71da7150c27142eef9d22b843b4a9'] = 'Pour toute question ou information complémentaire merci de contacter notre';
 $_MODULE['<{paypal}prestashop>confirmation_64430ad2835be8ad60c59e7d44e4b0b1'] = 'support client';
